@@ -109,19 +109,17 @@ const Dashboard: React.FC = () => {
         {/* KPI strip */}
         <div className="dash-kpi-strip">
           {[
-            { icon: <DollarSign size={11} strokeWidth={1.5} />, label: 'Spend', value: formatCurrency(totalSpend) },
-            { icon: <TrendingUp size={11} strokeWidth={1.5} />, label: 'Revenue', value: formatCurrency(totalRevenue) },
-            { icon: <Users size={11} strokeWidth={1.5} />, label: 'Purchases', value: formatNumber(totalPurchases) },
-            { icon: <BarChart3 size={11} strokeWidth={1.5} />, label: 'ROAS', value: `${overallRoas.toFixed(2)}x`, highlight: true },
+            { icon: <DollarSign size={11} strokeWidth={1.5} />, label: 'Spend',     value: formatCurrency(totalSpend),                    highlight: false },
+            { icon: <TrendingUp size={11} strokeWidth={1.5} />, label: 'Revenue',   value: formatCurrency(totalRevenue),                   highlight: false },
+            { icon: <Users size={11} strokeWidth={1.5} />,      label: 'Purchases', value: formatNumber(totalPurchases),                   highlight: false },
+            { icon: <BarChart3 size={11} strokeWidth={1.5} />,  label: 'ROAS',      value: `${overallRoas.toFixed(2)}x`,                  highlight: true  },
           ].map(({ icon, label, value, highlight }) => (
             <div key={label} className={`dash-kpi-chip ${highlight ? 'highlight' : ''}`}>
               <div className="dash-kpi-label">{icon}{label}</div>
-              <div className="dash-kpi-value"
-                style={highlight ? {
-                  color: overallRoas >= (bracket?.benchmark_roas || 2.8)
-                    ? 'var(--success)' : overallRoas >= 1.5
-                    ? 'var(--warning)' : 'var(--danger)'
-                } : {}}>
+              <div
+                className="dash-kpi-value"
+                style={highlight ? { color: '#C4836A', fontWeight: 500 } : {}}
+              >
                 {value}
               </div>
             </div>

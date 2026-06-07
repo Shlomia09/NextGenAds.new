@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { Mail, Eye, EyeOff, AlertCircle, Globe } from 'lucide-react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { Mail, Eye, EyeOff, AlertCircle, Globe, LayoutDashboard } from 'lucide-react';
 import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 
 const Login: React.FC = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -57,7 +58,6 @@ const Login: React.FC = () => {
             9 years of Beauty & Cosmetics benchmark data, layered on top of your ad account.
           </p>
 
-          {/* Proof points */}
           <div className="login-proof-list">
             {[
               { stat: '847', label: 'Beauty brands analysed' },
@@ -69,6 +69,16 @@ const Login: React.FC = () => {
                 <div className="login-proof-label">{label}</div>
               </div>
             ))}
+          </div>
+
+          {/* Demo access CTA — prominent on the dark panel */}
+          <div className="login-demo-cta">
+            <p className="login-demo-label">No Supabase account yet?</p>
+            <button className="login-demo-btn" onClick={() => navigate('/demo')}>
+              <LayoutDashboard size={14} strokeWidth={1.5} />
+              Enter Full Demo Dashboard
+            </button>
+            <p className="login-demo-sub">All features · Mock data · No setup required</p>
           </div>
 
           <div className="login-quote">
@@ -150,7 +160,17 @@ const Login: React.FC = () => {
             {error && (
               <div className="login-error">
                 <AlertCircle size={13} strokeWidth={1.5} />
-                {error}
+                <div>
+                  <div>{error}</div>
+                  {error.toLowerCase().includes('fetch') && (
+                    <div className="login-error-hint">
+                      Supabase is not configured yet.{' '}
+                      <button type="button" className="login-error-demo" onClick={() => navigate('/demo')}>
+                        Try the Demo Dashboard instead →
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -166,6 +186,21 @@ const Login: React.FC = () => {
                 : 'Create Account'}
             </button>
           </form>
+
+          {/* Demo bypass button — always visible */}
+          <div className="login-demo-bypass">
+            <div className="login-bypass-divider">
+              <span>or explore without account</span>
+            </div>
+            <button
+              className="btn btn-secondary btn-lg full-width"
+              onClick={() => navigate('/demo')}
+              style={{ justifyContent: 'center', gap: 8 }}
+            >
+              <LayoutDashboard size={14} strokeWidth={1.5} />
+              View Demo Dashboard
+            </button>
+          </div>
 
           <p className="login-footer">
             By continuing you agree to our Terms of Service and Privacy Policy.
@@ -205,6 +240,9 @@ const Login: React.FC = () => {
           position: relative;
           z-index: 1;
           max-width: 440px;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
         }
 
         .login-eyebrow {
@@ -249,14 +287,14 @@ const Login: React.FC = () => {
           font-weight: 300;
           color: #C4A090;
           line-height: 1.6;
-          margin-bottom: 36px;
+          margin-bottom: 32px;
           max-width: 360px;
         }
 
         .login-proof-list {
           display: flex;
           gap: 32px;
-          margin-bottom: 40px;
+          margin-bottom: 32px;
         }
 
         .login-proof-item {
@@ -280,6 +318,54 @@ const Login: React.FC = () => {
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: #7A5A48;
+        }
+
+        /* ——— Demo CTA box on dark panel ——— */
+        .login-demo-cta {
+          background: rgba(196,131,106,0.08);
+          border: 0.5px solid rgba(196,131,106,0.25);
+          border-radius: 6px;
+          padding: 16px 18px;
+          margin-bottom: 28px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .login-demo-label {
+          font-family: 'Outfit', sans-serif;
+          font-size: 11px;
+          font-weight: 300;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #8B6050;
+        }
+
+        .login-demo-btn {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          background: #C4836A;
+          border: none;
+          border-radius: 4px;
+          padding: 11px 16px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 13px;
+          font-weight: 500;
+          letter-spacing: 0.06em;
+          color: #FDF6F0;
+          cursor: pointer;
+          transition: background 0.2s;
+          width: fit-content;
+        }
+
+        .login-demo-btn:hover { background: #B06E55; }
+
+        .login-demo-sub {
+          font-family: 'DM Mono', monospace;
+          font-size: 9px;
+          color: #6B4A38;
+          letter-spacing: 0.06em;
         }
 
         .login-quote {
@@ -307,7 +393,7 @@ const Login: React.FC = () => {
           max-width: 360px;
           display: flex;
           flex-direction: column;
-          gap: 18px;
+          gap: 16px;
         }
 
         .login-logo {
@@ -429,16 +515,64 @@ const Login: React.FC = () => {
 
         .login-error {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           gap: 7px;
           background: #FEE2E2;
           border: 0.5px solid rgba(239,68,68,0.2);
           border-radius: var(--radius);
-          padding: 9px 12px;
+          padding: 10px 12px;
           font-family: 'Outfit', sans-serif;
           font-size: 12px;
           font-weight: 300;
           color: #991B1B;
+          line-height: 1.5;
+        }
+
+        .login-error svg { flex-shrink: 0; margin-top: 1px; }
+
+        .login-error-hint {
+          margin-top: 4px;
+          font-size: 11px;
+          color: #7f1d1d;
+        }
+
+        .login-error-demo {
+          background: none;
+          border: none;
+          font-family: inherit;
+          font-size: inherit;
+          color: #B45309;
+          cursor: pointer;
+          text-decoration: underline;
+          padding: 0;
+          font-weight: 500;
+        }
+
+        /* ——— Demo bypass section ——— */
+        .login-demo-bypass {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .login-bypass-divider {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--text-hint);
+        }
+
+        .login-bypass-divider::before,
+        .login-bypass-divider::after {
+          content: '';
+          flex: 1;
+          height: 0.5px;
+          background: var(--border-light);
         }
 
         .login-footer {
@@ -454,6 +588,7 @@ const Login: React.FC = () => {
         @media (max-width: 768px) {
           .login-page { flex-direction: column; }
           .login-left { width: 100%; padding: 40px 24px; }
+          .login-left .login-demo-btn { width: 100%; justify-content: center; }
           .login-right { padding: 32px 24px; }
         }
       `}</style>

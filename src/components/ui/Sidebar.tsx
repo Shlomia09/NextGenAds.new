@@ -22,7 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
 
   return (
     <>
-      {/* Hamburger — mobile only */}
+      {/* Mobile hamburger */}
       <button className="sb-hamburger" onClick={() => setOpen(true)} aria-label="Open menu">
         <Menu size={18} strokeWidth={1.5} />
       </button>
@@ -31,27 +31,32 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
       {open && <div className="sb-overlay" onClick={() => setOpen(false)} />}
 
       <aside className={`sidebar ${open ? 'sidebar-open' : ''}`}>
-        {/* Logo */}
+
+        {/* ── Logo ── */}
         <div className="sidebar-logo-wrap">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="sidebar-logo-text">Next<span>Gen</span>Ads</div>
+            <div className="sidebar-logo-text">
+              {/* "NextGen" Playfair regular, "Ads" Playfair italic */}
+              <span>NextGen</span><em>Ads</em>
+            </div>
             <button className="sb-close-btn" onClick={() => setOpen(false)} aria-label="Close">
               <X size={15} strokeWidth={1.5} />
             </button>
           </div>
+          {/* Subtitle: Outfit 300, letter-spacing 0.2em, #7A5A48 */}
           <div className="sidebar-logo-sub">Campaign Intelligence</div>
         </div>
 
-        {/* Active brand */}
+        {/* ── Active brand ── */}
         {brand && (
           <div className="sidebar-brand-pill">
             <div className="sidebar-brand-dot" />
             <span className="truncate">{brand.name}</span>
-            <ChevronRight size={11} style={{ color: 'var(--text-dark-muted)', flexShrink: 0 }} />
+            <ChevronRight size={11} style={{ color: '#7A5A48', flexShrink: 0 }} />
           </div>
         )}
 
-        {/* Nav */}
+        {/* ── Nav ── */}
         <nav className="sidebar-nav">
           {navItems.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
@@ -69,17 +74,17 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           })}
         </nav>
 
-        {/* Footer badge */}
+        {/* ── Footer ── */}
         <div className="sidebar-footer">
           <div className="sidebar-benchmark-badge">
-            <div className="live-dot" style={{ background: 'var(--rose-gold)' }} />
+            <div className="live-dot" style={{ background: '#C4836A' }} />
             <span>9-Year Benchmark Active</span>
           </div>
         </div>
       </aside>
 
       <style>{`
-        /* ─── Sidebar shell ─── */
+        /* ─── Shell ─── */
         .sidebar {
           width: 220px;
           background: #2C1810;
@@ -93,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           transition: transform 0.26s ease;
         }
 
-        /* ─── Mobile: hamburger & overlay ─── */
+        /* ─── Mobile controls ─── */
         .sb-hamburger {
           display: none;
           position: fixed;
@@ -120,8 +125,7 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
         .sb-close-btn {
           display: none;
           background: none; border: none;
-          color: #7A5A48; cursor: pointer; padding: 2px;
-          line-height: 1;
+          color: #7A5A48; cursor: pointer; padding: 2px; line-height: 1;
         }
 
         @media (max-width: 900px) {
@@ -136,20 +140,32 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
         .sidebar-logo-wrap {
           padding: 22px 20px 16px;
           border-bottom: 0.5px solid #3d2a1e;
+          flex-shrink: 0;
         }
 
         .sidebar-logo-text {
           font-family: 'Playfair Display', serif;
-          font-size: 17px; font-weight: 400;
-          color: #F5E6D8; letter-spacing: 0.04em; line-height: 1;
+          font-size: 18px;
+          font-weight: 400;        /* regular weight for "NextGen" */
+          color: #F5E6D8;          /* ✅ #F5E6D8 as specified */
+          letter-spacing: 0.02em;
+          line-height: 1;
         }
-        .sidebar-logo-text span { font-style: italic; color: #C4836A; }
+
+        /* "Ads" = italic */
+        .sidebar-logo-text em {
+          font-style: italic;
+          color: #C4836A;
+        }
 
         .sidebar-logo-sub {
           font-family: 'Outfit', sans-serif;
-          font-size: 9px; font-weight: 300;
-          letter-spacing: 0.2em; text-transform: uppercase;
-          color: #7A5A48; margin-top: 5px;
+          font-size: 9px;
+          font-weight: 300;            /* ✅ Outfit 300 */
+          letter-spacing: 0.2em;       /* ✅ 0.2em as specified */
+          text-transform: uppercase;
+          color: #7A5A48;              /* ✅ #7A5A48 as specified */
+          margin-top: 6px;
         }
 
         /* ─── Brand pill ─── */
@@ -162,7 +178,8 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           font-family: 'Outfit', sans-serif;
           font-size: 11px; font-weight: 300; color: #C4A090;
           overflow: hidden; cursor: pointer;
-          transition: border-color var(--transition);
+          transition: border-color 0.2s;
+          flex-shrink: 0;
         }
         .sidebar-brand-pill:hover { border-color: #6d4a3e; }
 
@@ -184,28 +201,35 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           font-family: 'Outfit', sans-serif;
           font-size: 11px; font-weight: 300;
           letter-spacing: 0.1em; text-transform: uppercase;
-          color: #7A5A48; text-decoration: none;
-          transition: all var(--transition);
+          color: #C4A090;                      /* ✅ #C4A090 inactive */
+          text-decoration: none;
+          transition: all 0.18s ease;
           border-left: 2px solid transparent;
         }
+
         .sidebar-nav-item:hover {
-          color: #C4A090; background: rgba(196,131,106,0.06);
+          color: #F5E6D8;                      /* ✅ #F5E6D8 on hover */
+          background: rgba(196,131,106,0.07);
         }
+
         .sidebar-nav-item.active {
-          color: #C4A090; border-left-color: #C4836A;
-          background: rgba(196,131,106,0.08);
+          color: #F5E6D8;                      /* ✅ #F5E6D8 active */
+          border-left-color: #C4836A;
+          background: rgba(196,131,106,0.10);
         }
 
         /* ─── Footer ─── */
         .sidebar-footer {
           padding: 14px 12px;
           border-top: 0.5px solid #3d2a1e;
+          flex-shrink: 0;
         }
+
         .sidebar-benchmark-badge {
           display: flex; align-items: center; gap: 7px;
           font-family: 'Outfit', sans-serif;
           font-size: 10px; font-weight: 300;
-          letter-spacing: 0.08em; color: #8B6050;
+          letter-spacing: 0.08em; color: #7A5A48;
         }
       `}</style>
     </>

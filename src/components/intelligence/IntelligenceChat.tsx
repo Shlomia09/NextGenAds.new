@@ -20,7 +20,7 @@ const QUICK_QUESTIONS = [
 
 const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
   brand,
-  campaigns,
+  campaigns: _campaigns,
   initialMessages = [],
   compact = false,
 }) => {
@@ -84,10 +84,6 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
     }
   };
 
-  const avgRoas =
-    campaigns.length > 0
-      ? campaigns.reduce((s, c) => s + c.roas, 0) / campaigns.length
-      : 0;
 
   return (
     <div className={`ic-container ${compact ? 'ic-compact' : ''}`}>
@@ -100,7 +96,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           <div>
             <div className="ic-title">Intelligence Engine</div>
             <div className="ic-subtitle">
-              {brand.name} · €{brand.aov_min}–{brand.aov_max} AOV · <span style={{ fontFamily: 'var(--font-mono)' }}>{avgRoas.toFixed(2)}x</span> ROAS
+              Active brand context · 9yr Beauty benchmark data
             </div>
           </div>
         </div>
