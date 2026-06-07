@@ -254,6 +254,43 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) throw new Error('Unauthorized');
 
+    // ── Chat limit enforcement ────────────────────────────────
+    const supabaseService = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+    const currentMonth = new Date().toISOString().slice(0, 7);
+
+    const { data: subData } = await supabaseService
+      .from('subscriptions')
+      .select('plans(chat_queries_monthly)')
+      .eq('user_id', user.id)
+      .single();
+
+    const chatLimit = (subData?.plans as { chat_queries_monthly?: number } | null)?.chat_queries_monthly ?? 0;
+
+    if (chatLimit !== -1) {
+      // Not unlimited — check current usage
+      const { data: usageData } = await supabaseService
+        .from('usage')
+        .select('chat_queries_used')
+        .eq('user_id', user.id)
+        .eq('month', currentMonth)
+        .single();
+
+      const used = usageData?.chat_queries_used ?? 0;
+      if (used >= chatLimit) {
+        return new Response(
+          JSON.stringify({
+            error: 'CHAT_LIMIT_REACHED',
+            message: `You have used ${used}/${chatLimit} Intelligence Chat queries this month. Upgrade to Growth for unlimited queries.`,
+            upgrade_to: 'growth',
+          }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     // Fetch brand context
     const { data: brand } = await supabase
       .from('brands')
@@ -301,6 +338,12 @@ Analyze the above data in context of the benchmark knowledge when answering.`;
     });
 
     const content = response.content[0].type === 'text' ? response.content[0].text : '';
+
+    // ── Increment chat usage atomically ──────────────────────
+    await supabaseService.rpc('increment_chat_usage', {
+      p_user_id: user.id,
+      p_month: currentMonth,
+    });
 
     return new Response(
       JSON.stringify({ content }),

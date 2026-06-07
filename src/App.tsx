@@ -13,6 +13,8 @@ import Brands from './pages/Brands';
 import Connect from './pages/Connect';
 import Settings from './pages/Settings';
 import DemoDashboard from './pages/DemoDashboard';
+import Pricing from './pages/Pricing';
+import Audit from './pages/Audit';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,9 +49,11 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 const AppRoutes: React.FC = () => (
   <Routes>
     {/* ── Public ── */}
-    <Route path="/"      element={<Landing />} />
-    <Route path="/login" element={<Login />} />
-    <Route path="/demo"  element={<DemoDashboard />} />
+    <Route path="/"        element={<Landing />} />
+    <Route path="/login"   element={<Login />} />
+    <Route path="/demo"    element={<DemoDashboard />} />
+    <Route path="/pricing" element={<Pricing />} />
+    <Route path="/audit"   element={<Audit />} />
 
     {/* ── Onboarding (auth, no sidebar) ── */}
     <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
