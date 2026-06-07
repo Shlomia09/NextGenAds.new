@@ -65,10 +65,10 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err) {
+    } catch {
       const errorMsg: ChatMessage = {
         role: 'assistant',
-        content: '⚠️ Unable to connect to the Intelligence Engine. Please check your API configuration.',
+        content: 'Unable to connect to the Intelligence Engine. Please check your API configuration.',
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -90,42 +90,42 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
       : 0;
 
   return (
-    <div className={`chat-container ${compact ? 'chat-compact' : ''}`}>
+    <div className={`ic-container ${compact ? 'ic-compact' : ''}`}>
       {/* Header */}
-      <div className="chat-header">
-        <div className="flex items-center gap-2">
-          <div className="chat-ai-avatar">
-            <Sparkles size={14} />
+      <div className="ic-header">
+        <div className="ic-header-left">
+          <div className="ic-avatar">
+            <Sparkles size={13} strokeWidth={1.5} />
           </div>
           <div>
-            <div className="chat-title">Intelligence Engine</div>
-            <div className="chat-subtitle">
-              Context: {brand.name} · AOV €{brand.aov_min}–{brand.aov_max} · ROAS {avgRoas.toFixed(2)}x
+            <div className="ic-title">Intelligence Engine</div>
+            <div className="ic-subtitle">
+              {brand.name} · €{brand.aov_min}–{brand.aov_max} AOV · <span style={{ fontFamily: 'var(--font-mono)' }}>{avgRoas.toFixed(2)}x</span> ROAS
             </div>
           </div>
         </div>
         <button className="btn btn-ghost btn-sm">
-          <Plus size={14} />
-          New Chat
+          <Plus size={12} />
+          New
         </button>
       </div>
 
       {/* Messages */}
-      <div className="chat-messages">
+      <div className="ic-messages">
         {messages.length === 0 && (
-          <div className="chat-empty animate-fade-in">
-            <div className="chat-empty-icon">
-              <MessageSquare size={24} />
+          <div className="ic-empty animate-fade-in">
+            <div className="ic-empty-icon">
+              <MessageSquare size={20} strokeWidth={1.5} />
             </div>
-            <p className="chat-empty-title">Ask the Intelligence Engine</p>
-            <p className="chat-empty-sub">
-              I have full context of your brand, campaigns, and 9-year benchmark data
+            <p className="ic-empty-title">Ask the Intelligence Engine</p>
+            <p className="ic-empty-sub">
+              Full context of your brand, campaigns, and 9 years of benchmark data
             </p>
-            <div className="quick-questions">
+            <div className="ic-quick-questions">
               {QUICK_QUESTIONS.map((q) => (
                 <button
                   key={q}
-                  className="quick-q-btn"
+                  className="ic-quick-btn"
                   onClick={() => sendMessage(q)}
                 >
                   {q}
@@ -138,31 +138,32 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`chat-message ${msg.role === 'user' ? 'user' : 'assistant'} animate-fade-in`}
+            className={`ic-message ${msg.role}`}
           >
-            <div className="msg-avatar">
-              {msg.role === 'user' ? <User size={12} /> : <Sparkles size={12} />}
+            <div className={`ic-msg-avatar ${msg.role}`}>
+              {msg.role === 'user' ? <User size={11} strokeWidth={1.5} /> : <Sparkles size={11} strokeWidth={1.5} />}
             </div>
-            <div className="msg-bubble">
-              <p className="msg-content">{msg.content}</p>
-              <span className="msg-time">
-                {new Date(msg.timestamp).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+            <div className="ic-msg-body">
+              <div className={`ic-msg-bubble ${msg.role}`}>
+                {msg.content}
+              </div>
+              <span className="ic-msg-time">
+                {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
           </div>
         ))}
 
         {loading && (
-          <div className="chat-message assistant animate-fade-in">
-            <div className="msg-avatar">
-              <Sparkles size={12} />
+          <div className="ic-message assistant animate-fade-in">
+            <div className="ic-msg-avatar assistant">
+              <Sparkles size={11} strokeWidth={1.5} />
             </div>
-            <div className="msg-bubble msg-loading">
-              <Loader size={14} className="animate-spin" />
-              <span>Analyzing your account data...</span>
+            <div className="ic-msg-body">
+              <div className="ic-msg-bubble assistant ic-loading">
+                <Loader size={12} className="animate-spin" />
+                <span>Analysing your account data…</span>
+              </div>
             </div>
           </div>
         )}
@@ -171,78 +172,84 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
       </div>
 
       {/* Input */}
-      <div className="chat-input-area">
+      <div className="ic-input-area">
         <textarea
           ref={inputRef}
-          className="chat-input"
-          placeholder="Ask about your campaigns, ROAS, audiences..."
+          className="ic-input"
+          placeholder="Ask about campaigns, ROAS, audiences…"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={2}
         />
         <button
-          className="chat-send-btn"
+          className="ic-send-btn"
           onClick={() => sendMessage(input)}
           disabled={!input.trim() || loading}
         >
-          <Send size={14} />
+          <Send size={13} strokeWidth={1.5} />
         </button>
       </div>
 
       <style>{`
-        .chat-container {
+        .ic-container {
           display: flex;
           flex-direction: column;
-          background: var(--surface);
-          border: 1px solid var(--border);
+          background: var(--bg-primary);
+          border: 0.5px solid var(--border-light);
           border-radius: var(--radius-lg);
           overflow: hidden;
           height: 100%;
           min-height: 500px;
         }
 
-        .chat-compact {
-          min-height: 400px;
-        }
+        .ic-compact { min-height: 400px; }
 
-        .chat-header {
+        .ic-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 14px 16px;
-          border-bottom: 1px solid var(--border);
-          background: var(--surface-2);
+          padding: 12px 16px;
+          border-bottom: 0.5px solid var(--border-light);
+          background: var(--bg-card);
           flex-shrink: 0;
         }
 
-        .chat-ai-avatar {
+        .ic-header-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .ic-avatar {
           width: 28px;
           height: 28px;
-          background: linear-gradient(135deg, var(--accent), #818CF8);
-          border-radius: 8px;
+          background: var(--bg-dark);
+          border-radius: 4px;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
+          color: var(--rose-gold-pale);
           flex-shrink: 0;
         }
 
-        .chat-title {
-          font-family: var(--font-display);
+        .ic-title {
+          font-family: 'Playfair Display', serif;
           font-size: 13px;
-          font-weight: 600;
+          font-weight: 400;
           color: var(--text-primary);
         }
 
-        .chat-subtitle {
-          font-size: 11px;
+        .ic-subtitle {
+          font-family: 'Outfit', sans-serif;
+          font-size: 10px;
+          font-weight: 300;
           color: var(--text-muted);
-          font-family: var(--font-mono);
           margin-top: 1px;
+          letter-spacing: 0.02em;
         }
 
-        .chat-messages {
+        .ic-messages {
           flex: 1;
           overflow-y: auto;
           padding: 16px;
@@ -251,7 +258,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           gap: 12px;
         }
 
-        .chat-empty {
+        .ic-empty {
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -262,197 +269,189 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           flex: 1;
         }
 
-        .chat-empty-icon {
-          width: 48px;
-          height: 48px;
-          background: var(--accent-dim);
+        .ic-empty-icon {
+          width: 44px;
+          height: 44px;
+          background: var(--rose-gold-light);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: var(--accent);
-          margin-bottom: 8px;
+          color: var(--rose-gold);
+          margin-bottom: 6px;
         }
 
-        .chat-empty-title {
-          font-family: var(--font-display);
-          font-size: 14px;
-          font-weight: 600;
+        .ic-empty-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 15px;
+          font-weight: 400;
           color: var(--text-primary);
         }
 
-        .chat-empty-sub {
+        .ic-empty-sub {
+          font-family: 'Outfit', sans-serif;
           font-size: 12px;
+          font-weight: 300;
           color: var(--text-secondary);
           max-width: 240px;
           line-height: 1.5;
         }
 
-        .quick-questions {
+        .ic-quick-questions {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 5px;
           width: 100%;
           max-width: 280px;
           margin-top: 8px;
         }
 
-        .quick-q-btn {
-          background: var(--surface-3);
-          border: 1px solid var(--border);
+        .ic-quick-btn {
+          background: var(--bg-card);
+          border: 0.5px solid var(--border-light);
           border-radius: var(--radius);
           padding: 8px 12px;
-          font-size: 12px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 11px;
+          font-weight: 300;
           color: var(--text-secondary);
           text-align: left;
           cursor: pointer;
           transition: all var(--transition);
-          font-family: var(--font-body);
         }
 
-        .quick-q-btn:hover {
-          border-color: var(--accent);
+        .ic-quick-btn:hover {
+          border-color: var(--rose-gold);
           color: var(--text-primary);
-          background: var(--accent-dim);
+          background: var(--rose-gold-light);
         }
 
-        .chat-message {
+        .ic-message {
           display: flex;
           gap: 8px;
           align-items: flex-start;
         }
 
-        .chat-message.user {
-          flex-direction: row-reverse;
-        }
+        .ic-message.user { flex-direction: row-reverse; }
 
-        .msg-avatar {
-          width: 24px;
-          height: 24px;
-          border-radius: 6px;
+        .ic-msg-avatar {
+          width: 22px;
+          height: 22px;
+          border-radius: 3px;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          font-size: 12px;
         }
 
-        .chat-message.user .msg-avatar {
-          background: var(--accent-dim);
-          color: var(--accent);
+        .ic-msg-avatar.user {
+          background: var(--bg-dark);
+          color: var(--rose-gold-pale);
         }
 
-        .chat-message.assistant .msg-avatar {
-          background: linear-gradient(135deg, var(--accent), #818CF8);
-          color: white;
+        .ic-msg-avatar.assistant {
+          background: var(--rose-gold-light);
+          color: var(--rose-gold-dark);
         }
 
-        .msg-bubble {
+        .ic-msg-body {
           max-width: 85%;
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 3px;
         }
 
-        .chat-message.user .msg-bubble {
-          align-items: flex-end;
-        }
+        .ic-message.user .ic-msg-body { align-items: flex-end; }
 
-        .msg-content {
-          background: var(--surface-3);
-          border: 1px solid var(--border);
+        .ic-msg-bubble {
           border-radius: var(--radius);
-          padding: 10px 12px;
+          padding: 9px 12px;
+          font-family: 'Outfit', sans-serif;
           font-size: 13px;
-          color: var(--text-primary);
-          line-height: 1.5;
+          font-weight: 300;
+          line-height: 1.55;
           white-space: pre-wrap;
           word-break: break-word;
         }
 
-        .chat-message.user .msg-content {
-          background: var(--accent-dim);
-          border-color: rgba(99,102,241,0.3);
+        .ic-msg-bubble.user {
+          background: #2C1810;
+          color: #E8C4A8;
+          border: 0.5px solid #3d2a1e;
+        }
+
+        .ic-msg-bubble.assistant {
+          background: var(--bg-card);
+          border: 0.5px solid var(--border-light);
           color: var(--text-primary);
         }
 
-        .msg-loading {
+        .ic-loading {
           display: flex !important;
           flex-direction: row !important;
           align-items: center;
           gap: 8px;
-          background: var(--surface-3);
-          border: 1px solid var(--border);
-          border-radius: var(--radius);
-          padding: 10px 12px;
-          font-size: 13px;
-          color: var(--text-secondary);
-        }
-
-        .msg-time {
-          font-family: var(--font-mono);
-          font-size: 10px;
           color: var(--text-muted);
+          font-size: 12px;
         }
 
-        .chat-input-area {
+        .ic-msg-time {
+          font-family: 'DM Mono', monospace;
+          font-size: 9px;
+          font-weight: 400;
+          color: var(--text-hint);
+        }
+
+        .ic-input-area {
           display: flex;
           align-items: flex-end;
           gap: 8px;
-          padding: 12px 16px;
-          border-top: 1px solid var(--border);
-          background: var(--surface-2);
+          padding: 10px 14px;
+          border-top: 0.5px solid var(--border-light);
+          background: var(--bg-card);
           flex-shrink: 0;
         }
 
-        .chat-input {
+        .ic-input {
           flex: 1;
-          background: var(--surface-3);
-          border: 1px solid var(--border);
+          background: var(--bg-secondary);
+          border: 0.5px solid var(--border-light);
           border-radius: var(--radius);
-          padding: 10px 12px;
+          padding: 9px 12px;
           color: var(--text-primary);
+          font-family: 'Outfit', sans-serif;
           font-size: 13px;
+          font-weight: 300;
           resize: none;
           outline: none;
           transition: border-color var(--transition);
           line-height: 1.4;
-          font-family: var(--font-body);
         }
 
-        .chat-input:focus {
-          border-color: var(--accent);
-        }
+        .ic-input:focus { border-color: var(--rose-gold); }
+        .ic-input::placeholder { color: var(--text-hint); }
 
-        .chat-input::placeholder {
-          color: var(--text-muted);
-        }
-
-        .chat-send-btn {
-          width: 36px;
-          height: 36px;
-          background: var(--accent);
+        .ic-send-btn {
+          width: 34px;
+          height: 34px;
+          background: var(--rose-gold);
           border-radius: var(--radius);
           border: none;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
+          color: var(--bg-primary);
           cursor: pointer;
           flex-shrink: 0;
           transition: all var(--transition);
         }
 
-        .chat-send-btn:hover:not(:disabled) {
-          background: #5254CC;
+        .ic-send-btn:hover:not(:disabled) {
+          background: var(--rose-gold-dark);
           transform: translateY(-1px);
-          box-shadow: var(--shadow-accent);
         }
 
-        .chat-send-btn:disabled {
-          opacity: 0.4;
-          cursor: not-allowed;
-        }
+        .ic-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
       `}</style>
     </div>
   );

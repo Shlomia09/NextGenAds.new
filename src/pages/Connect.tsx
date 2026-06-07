@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Globe, Search, Mail, CheckCircle, AlertCircle, ArrowRight, Zap } from 'lucide-react';
+import { Globe, Search, Mail, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { getAdAccounts } from '../lib/supabase';
 import { initiateMetaOAuth } from '../lib/meta-api';
 import { useAuth } from '../hooks/useAuth';
@@ -10,8 +10,8 @@ const Connect: React.FC = () => {
 
   const { data: adAccounts = [] } = useQuery({
     queryKey: ['adAccounts', user?.id],
-    queryFn: () => getAdAccounts(user!.id),
-    enabled: !!user,
+    queryFn:  () => getAdAccounts(user!.id),
+    enabled:  !!user,
   });
 
   const metaAccount = adAccounts.find((a) => a.platform === 'meta');
@@ -19,149 +19,139 @@ const Connect: React.FC = () => {
   return (
     <div className="page-container">
       <div className="page-header">
-        <div className="page-title">Connect Your Accounts</div>
-        <div className="page-subtitle">
+        <div className="section-eyebrow">Integrations</div>
+        <h1 className="page-title">Connect Your Accounts</h1>
+        <p className="page-subtitle">
           Integrate your ad platforms to unlock real-time benchmark comparisons and AI recommendations
-        </div>
+        </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
 
         {/* Meta Ads */}
-        <div className="connect-card" style={metaAccount ? { borderColor: 'rgba(16,185,129,0.4)' } : {}}>
-          <div className="connect-card-header">
-            <div className="connect-icon" style={{ background: '#1877F2' }}>
-              <Globe size={20} />
+        <div className="conn-card" style={metaAccount ? { borderColor: 'rgba(16,185,129,0.35)' } : {}}>
+          <div className="conn-header">
+            <div className="conn-icon" style={{ background: '#1877F2' }}>
+              <Globe size={18} strokeWidth={1.5} />
             </div>
             <div>
-              <div className="connect-name">Meta Ads</div>
-              <div className="connect-desc">Facebook & Instagram campaigns</div>
+              <div className="conn-name">Meta Ads</div>
+              <div className="conn-desc">Facebook & Instagram campaigns</div>
             </div>
-            {metaAccount ? (
-              <span className="badge badge-success" style={{ marginLeft: 'auto' }}>
-                <CheckCircle size={10} /> Connected
-              </span>
-            ) : (
-              <span className="badge badge-neutral" style={{ marginLeft: 'auto' }}>
-                <AlertCircle size={10} /> Not connected
-              </span>
-            )}
+            {metaAccount
+              ? <span className="badge badge-success" style={{ marginLeft: 'auto' }}><CheckCircle size={9} strokeWidth={1.5} />Connected</span>
+              : <span className="badge badge-neutral" style={{ marginLeft: 'auto' }}><AlertCircle size={9} strokeWidth={1.5} />Not connected</span>}
           </div>
 
           {metaAccount ? (
-            <div className="connect-account-info">
-              <div className="connect-account-name">{metaAccount.account_name}</div>
-              <div className="connect-account-id">ID: {metaAccount.account_id}</div>
-              <div className="connect-account-status">
+            <div className="conn-account-info">
+              <div className="conn-account-name">{metaAccount.account_name}</div>
+              <div className="conn-account-id">ID: {metaAccount.account_id}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
                 <div className="live-dot" />
-                Last synced: {new Date(metaAccount.connected_at).toLocaleDateString()}
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--success)' }}>
+                  Connected {new Date(metaAccount.connected_at).toLocaleDateString()}
+                </span>
               </div>
             </div>
           ) : (
             <>
-              <p className="connect-feature-list">
-                ✅ Campaign performance sync<br />
-                ✅ Real-time ROAS vs benchmarks<br />
-                ✅ AI recommendations from your data<br />
-                ✅ One-click campaign execution
-              </p>
+              <ul className="conn-features">
+                <li>Campaign performance sync</li>
+                <li>Real-time ROAS vs benchmarks</li>
+                <li>AI recommendations from your data</li>
+                <li>One-click campaign execution</li>
+              </ul>
               <button className="btn btn-primary" onClick={initiateMetaOAuth}>
-                <Globe size={14} />
+                <Globe size={13} strokeWidth={1.5} />
                 Connect Meta Ads
-                <ArrowRight size={14} />
+                <ArrowRight size={13} strokeWidth={1.5} />
               </button>
             </>
           )}
         </div>
 
         {/* Google Ads */}
-        <div className="connect-card connect-card-soon">
-          <div className="connect-card-header">
-            <div className="connect-icon" style={{ background: '#4285F4' }}>
-              <Search size={20} />
+        <div className="conn-card conn-soon">
+          <div className="conn-header">
+            <div className="conn-icon" style={{ background: '#4285F4' }}>
+              <Search size={18} strokeWidth={1.5} />
             </div>
             <div>
-              <div className="connect-name">Google Ads</div>
-              <div className="connect-desc">Search & Display campaigns</div>
+              <div className="conn-name">Google Ads</div>
+              <div className="conn-desc">Search & Display campaigns</div>
             </div>
             <span className="badge badge-neutral" style={{ marginLeft: 'auto' }}>Coming Soon</span>
           </div>
-          <p className="connect-feature-list" style={{ opacity: 0.5 }}>
-            ✅ Google Search + Brand campaigns<br />
-            ✅ Cross-platform ROAS view<br />
-            ✅ Intent capture analysis
-          </p>
+          <ul className="conn-features" style={{ opacity: 0.4 }}>
+            <li>Google Search + Brand campaigns</li>
+            <li>Cross-platform ROAS view</li>
+            <li>Intent capture analysis</li>
+          </ul>
           <button className="btn btn-secondary" disabled>
-            <Search size={14} />
+            <Search size={13} strokeWidth={1.5} />
             Connect Google Ads
           </button>
         </div>
 
         {/* Klaviyo */}
-        <div className="connect-card connect-card-soon">
-          <div className="connect-card-header">
-            <div className="connect-icon" style={{ background: '#231F20' }}>
-              <Mail size={20} />
+        <div className="conn-card conn-soon">
+          <div className="conn-header">
+            <div className="conn-icon" style={{ background: '#231F20' }}>
+              <Mail size={18} strokeWidth={1.5} />
             </div>
             <div>
-              <div className="connect-name">Klaviyo</div>
-              <div className="connect-desc">Email flows & revenue attribution</div>
+              <div className="conn-name">Klaviyo</div>
+              <div className="conn-desc">Email flows & revenue attribution</div>
             </div>
             <span className="badge badge-neutral" style={{ marginLeft: 'auto' }}>Coming Soon</span>
           </div>
-          <p className="connect-feature-list" style={{ opacity: 0.5 }}>
-            ✅ Email sequence analysis<br />
-            ✅ AOV-based flow recommendations<br />
-            ✅ High-AOV closing sequence optimizer
-          </p>
+          <ul className="conn-features" style={{ opacity: 0.4 }}>
+            <li>Email sequence analysis</li>
+            <li>AOV-based flow recommendations</li>
+            <li>High-AOV closing sequence optimizer</li>
+          </ul>
           <button className="btn btn-secondary" disabled>
-            <Mail size={14} />
+            <Mail size={13} strokeWidth={1.5} />
             Connect Klaviyo
           </button>
         </div>
-
       </div>
 
       {/* Benchmark note */}
-      <div className="connect-benchmark-note">
-        <Zap size={14} style={{ color: 'var(--accent)' }} />
-        <div>
-          <strong>Benchmark data is always active</strong> — even before you connect any accounts, NextGenAds
-          intelligence is powered by 9 years of Beauty & Cosmetics campaign data. Connect your accounts to layer
-          your real performance on top.
-        </div>
+      <div className="conn-benchmark-note">
+        <div className="conn-bench-eyebrow">Always active</div>
+        <p>
+          Benchmark intelligence is powered by 9 years of Beauty & Cosmetics campaign data — even before
+          you connect any accounts. Connect your platforms to layer your real performance on top.
+        </p>
       </div>
 
       <style>{`
-        .connect-card {
-          background: var(--surface);
-          border: 1px solid var(--border);
+        .conn-card {
+          background: var(--bg-card);
+          border: 0.5px solid var(--border-light);
           border-radius: var(--radius-lg);
-          padding: 24px;
+          padding: 22px;
           display: flex;
           flex-direction: column;
-          gap: 16px;
-          transition: border-color var(--transition);
+          gap: 14px;
+          transition: border-color var(--transition), box-shadow var(--transition);
         }
 
-        .connect-card:hover {
-          border-color: var(--border-hover);
-        }
+        .conn-card:hover { border-color: var(--rose-gold-pale); box-shadow: var(--shadow-sm); }
+        .conn-soon { opacity: 0.65; }
 
-        .connect-card-soon {
-          opacity: 0.7;
-        }
-
-        .connect-card-header {
+        .conn-header {
           display: flex;
           align-items: center;
           gap: 12px;
         }
 
-        .connect-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
+        .conn-icon {
+          width: 38px;
+          height: 38px;
+          border-radius: 6px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -169,72 +159,93 @@ const Connect: React.FC = () => {
           flex-shrink: 0;
         }
 
-        .connect-name {
-          font-family: var(--font-display);
-          font-size: 15px;
-          font-weight: 600;
+        .conn-name {
+          font-family: 'Playfair Display', serif;
+          font-size: 14px;
+          font-weight: 400;
           color: var(--text-primary);
         }
 
-        .connect-desc {
-          font-size: 12px;
-          color: var(--text-secondary);
+        .conn-desc {
+          font-family: 'Outfit', sans-serif;
+          font-size: 11px;
+          font-weight: 300;
+          color: var(--text-muted);
           margin-top: 2px;
         }
 
-        .connect-account-info {
-          background: var(--surface-3);
-          border: 1px solid var(--border);
+        .conn-account-info {
+          background: var(--bg-secondary);
+          border: 0.5px solid var(--border-light);
           border-radius: var(--radius);
-          padding: 12px;
+          padding: 10px 12px;
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 3px;
         }
 
-        .connect-account-name {
-          font-size: 13px;
-          font-weight: 600;
+        .conn-account-name {
+          font-family: 'Outfit', sans-serif;
+          font-size: 12px;
+          font-weight: 500;
           color: var(--text-primary);
         }
 
-        .connect-account-id {
-          font-family: var(--font-mono);
-          font-size: 11px;
-          color: var(--text-muted);
+        .conn-account-id {
+          font-family: 'DM Mono', monospace;
+          font-size: 10px;
+          color: var(--text-hint);
         }
 
-        .connect-account-status {
+        .conn-features {
+          list-style: none;
           display: flex;
-          align-items: center;
+          flex-direction: column;
           gap: 6px;
-          font-size: 11px;
-          color: var(--success);
-          margin-top: 4px;
+          padding: 0;
         }
 
-        .connect-feature-list {
-          font-size: 13px;
+        .conn-features li {
+          font-family: 'Outfit', sans-serif;
+          font-size: 12px;
+          font-weight: 300;
           color: var(--text-secondary);
-          line-height: 1.8;
+          padding-left: 14px;
+          position: relative;
         }
 
-        .connect-benchmark-note {
+        .conn-features li::before {
+          content: '—';
+          position: absolute;
+          left: 0;
+          color: var(--rose-gold);
+          font-size: 10px;
+        }
+
+        .conn-benchmark-note {
           margin-top: 24px;
-          display: flex;
-          gap: 12px;
-          align-items: flex-start;
-          background: var(--accent-dim);
-          border: 1px solid rgba(99,102,241,0.25);
+          background: var(--rose-gold-light);
+          border: 0.5px solid var(--border-rose);
           border-radius: var(--radius-lg);
-          padding: 16px;
+          padding: 16px 20px;
+        }
+
+        .conn-bench-eyebrow {
+          font-family: 'Outfit', sans-serif;
+          font-size: 9px;
+          font-weight: 400;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--rose-gold-dark);
+          margin-bottom: 6px;
+        }
+
+        .conn-benchmark-note p {
+          font-family: 'Outfit', sans-serif;
           font-size: 13px;
+          font-weight: 300;
           color: var(--text-secondary);
           line-height: 1.6;
-        }
-
-        .connect-benchmark-note strong {
-          color: var(--text-primary);
         }
       `}</style>
     </div>

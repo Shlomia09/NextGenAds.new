@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Zap, Mail, Globe, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Mail, Eye, EyeOff, AlertCircle, Globe } from 'lucide-react';
 import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 
@@ -46,70 +46,64 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-page">
-      {/* Background decorations */}
-      <div className="login-bg-grid" />
-      <div className="login-bg-glow" />
-
-      <div className="login-container animate-fade-in">
-        {/* Logo */}
-        <div className="login-logo">
-          <div className="login-logo-icon">
-            <Zap size={20} />
-          </div>
-          <span className="login-logo-text">NextGenAds</span>
-        </div>
-
-        {/* Headline */}
-        <div className="login-hero">
+      {/* Left — dark editorial panel */}
+      <div className="login-left">
+        <div className="login-left-content">
+          <div className="login-eyebrow">Campaign Intelligence</div>
           <h1 className="login-headline">
-            Campaign Intelligence<br />
-            <span className="login-headline-accent">Powered by 9-Year Benchmarks</span>
+            Know if your ROAS<br />is good <em>before</em> you<br />run out of budget
           </h1>
-          <p className="login-subheadline">
-            Not just your data — know if your ROAS is good before you run out of budget.
+          <p className="login-tagline">
+            9 years of Beauty & Cosmetics benchmark data, layered on top of your ad account.
           </p>
-        </div>
 
-        {/* Benchmark pills */}
-        <div className="login-pills">
-          <div className="login-pill">
-            <div className="login-pill-dot" />
-            847 Beauty brands analyzed
+          {/* Proof points */}
+          <div className="login-proof-list">
+            {[
+              { stat: '847', label: 'Beauty brands analysed' },
+              { stat: '9yr',  label: 'Benchmark dataset' },
+              { stat: '€100+', label: 'Avg AOV served' },
+            ].map(({ stat, label }) => (
+              <div key={label} className="login-proof-item">
+                <div className="login-proof-stat">{stat}</div>
+                <div className="login-proof-label">{label}</div>
+              </div>
+            ))}
           </div>
-          <div className="login-pill">
-            <div className="login-pill-dot" />
-            2015–2024 dataset
-          </div>
-          <div className="login-pill">
-            <div className="login-pill-dot" />
-            Meta + Google + Klaviyo
+
+          <div className="login-quote">
+            <em>"Feminine intelligence meets hard data."</em>
           </div>
         </div>
+      </div>
 
-        {/* Auth card */}
-        <div className="login-card">
+      {/* Right — cream auth panel */}
+      <div className="login-right">
+        <div className="login-form-wrap animate-fade-in">
+          {/* Logo */}
+          <div className="login-logo">
+            Next<em>Gen</em>Ads
+          </div>
+
+          {/* Tabs */}
           <div className="login-tabs">
             <button
               className={`login-tab ${mode === 'signin' ? 'active' : ''}`}
               onClick={() => setMode('signin')}
-            >
-              Sign In
-            </button>
+            >Sign In</button>
             <button
               className={`login-tab ${mode === 'signup' ? 'active' : ''}`}
               onClick={() => setMode('signup')}
-            >
-              Get Started
-            </button>
+            >Get Started</button>
           </div>
 
-          {/* Google OAuth */}
-          <button className="btn-google" onClick={handleGoogleAuth}>
-            <Globe size={16} />
+          {/* Google */}
+          <button className="login-google-btn" onClick={handleGoogleAuth}>
+            <Globe size={15} strokeWidth={1.5} />
             Continue with Google
           </button>
 
-          <div className="login-divider">
+          <div className="login-or">
             <span>or</span>
           </div>
 
@@ -117,8 +111,8 @@ const Login: React.FC = () => {
           <form onSubmit={handleEmailAuth} className="login-form">
             <div className="form-group">
               <label className="form-label">Email</label>
-              <div className="input-with-icon">
-                <Mail size={14} className="input-icon" />
+              <div className="login-input-wrap">
+                <Mail size={13} className="login-input-icon" strokeWidth={1.5} />
                 <input
                   type="email"
                   className="form-input"
@@ -133,14 +127,14 @@ const Login: React.FC = () => {
 
             <div className="form-group">
               <label className="form-label">Password</label>
-              <div className="input-with-icon">
+              <div className="login-input-wrap">
                 <button
                   type="button"
-                  className="input-icon-right"
+                  className="login-input-toggle"
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                  {showPassword ? <EyeOff size={13} strokeWidth={1.5} /> : <Eye size={13} strokeWidth={1.5} />}
                 </button>
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -155,7 +149,7 @@ const Login: React.FC = () => {
 
             {error && (
               <div className="login-error">
-                <AlertCircle size={14} />
+                <AlertCircle size={13} strokeWidth={1.5} />
                 {error}
               </div>
             )}
@@ -165,157 +159,175 @@ const Login: React.FC = () => {
               className="btn btn-primary btn-lg full-width"
               disabled={submitting}
             >
-              {submitting ? (
-                <span className="animate-spin" style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%' }} />
-              ) : null}
-              {mode === 'signin' ? 'Sign In' : 'Create Account'}
+              {submitting
+                ? 'Please wait…'
+                : mode === 'signin'
+                ? 'Sign In'
+                : 'Create Account'}
             </button>
           </form>
-        </div>
 
-        <p className="login-footer">
-          By continuing, you agree to our Terms of Service and Privacy Policy.
-        </p>
+          <p className="login-footer">
+            By continuing you agree to our Terms of Service and Privacy Policy.
+          </p>
+        </div>
       </div>
 
       <style>{`
         .login-page {
           min-height: 100vh;
           display: flex;
+        }
+
+        /* ——— Left dark panel ——— */
+        .login-left {
+          width: 52%;
+          background: #2C1810;
+          display: flex;
           align-items: center;
-          justify-content: center;
-          padding: 24px;
+          padding: 60px 64px;
           position: relative;
           overflow: hidden;
         }
 
-        .login-bg-grid {
-          position: fixed;
-          inset: 0;
-          background-image:
-            linear-gradient(to right, rgba(99,102,241,0.04) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(99,102,241,0.04) 1px, transparent 1px);
-          background-size: 40px 40px;
+        .login-left::before {
+          content: '';
+          position: absolute;
+          top: -120px;
+          right: -120px;
+          width: 400px;
+          height: 400px;
+          background: radial-gradient(circle, rgba(196,131,106,0.08) 0%, transparent 70%);
           pointer-events: none;
         }
 
-        .login-bg-glow {
-          position: fixed;
-          top: -200px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 600px;
-          height: 600px;
-          background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
-          pointer-events: none;
-        }
-
-        .login-container {
+        .login-left-content {
           position: relative;
           z-index: 1;
-          width: 100%;
           max-width: 440px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 24px;
         }
 
-        .login-logo {
+        .login-eyebrow {
+          font-family: 'Outfit', sans-serif;
+          font-size: 10px;
+          font-weight: 400;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: var(--rose-gold);
           display: flex;
           align-items: center;
           gap: 10px;
+          margin-bottom: 20px;
         }
 
-        .login-logo-icon {
-          width: 36px;
-          height: 36px;
-          background: var(--accent);
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          box-shadow: 0 0 20px var(--accent-glow);
-        }
-
-        .login-logo-text {
-          font-family: var(--font-display);
-          font-size: 18px;
-          font-weight: 700;
-          color: var(--text-primary);
-          letter-spacing: -0.02em;
-        }
-
-        .login-hero {
-          text-align: center;
+        .login-eyebrow::before {
+          content: '';
+          display: block;
+          width: 24px;
+          height: 0.5px;
+          background: var(--rose-gold);
         }
 
         .login-headline {
-          font-family: var(--font-display);
-          font-size: 28px;
-          font-weight: 700;
-          line-height: 1.2;
-          letter-spacing: -0.03em;
-          color: var(--text-primary);
-          margin-bottom: 10px;
+          font-family: 'Playfair Display', serif;
+          font-size: 42px;
+          font-weight: 400;
+          line-height: 1.15;
+          color: #F5E6D8;
+          letter-spacing: -0.01em;
+          margin-bottom: 20px;
         }
 
-        .login-headline-accent {
-          background: linear-gradient(135deg, var(--accent), #818CF8);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+        .login-headline em {
+          font-style: italic;
+          color: var(--rose-gold);
         }
 
-        .login-subheadline {
+        .login-tagline {
+          font-family: 'Outfit', sans-serif;
           font-size: 14px;
-          color: var(--text-secondary);
-          line-height: 1.5;
+          font-weight: 300;
+          color: #C4A090;
+          line-height: 1.6;
+          margin-bottom: 36px;
+          max-width: 360px;
         }
 
-        .login-pills {
+        .login-proof-list {
           display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 8px;
+          gap: 32px;
+          margin-bottom: 40px;
         }
 
-        .login-pill {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: 20px;
-          padding: 5px 12px;
-          font-size: 11px;
-          color: var(--text-secondary);
-          font-weight: 500;
-        }
-
-        .login-pill-dot {
-          width: 6px;
-          height: 6px;
-          background: var(--accent);
-          border-radius: 50%;
-        }
-
-        .login-card {
-          width: 100%;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-xl);
-          padding: 28px;
+        .login-proof-item {
           display: flex;
           flex-direction: column;
-          gap: 16px;
-          box-shadow: var(--shadow-lg);
+          gap: 4px;
+        }
+
+        .login-proof-stat {
+          font-family: 'DM Mono', monospace;
+          font-size: 22px;
+          font-weight: 500;
+          color: #F5E6D8;
+          line-height: 1;
+        }
+
+        .login-proof-label {
+          font-family: 'Outfit', sans-serif;
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #7A5A48;
+        }
+
+        .login-quote {
+          font-family: 'Playfair Display', serif;
+          font-style: italic;
+          font-size: 14px;
+          color: #8B6050;
+          border-left: 1px solid #3d2a1e;
+          padding-left: 16px;
+          line-height: 1.6;
+        }
+
+        /* ——— Right cream panel ——— */
+        .login-right {
+          flex: 1;
+          background: var(--bg-primary);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 48px 40px;
+        }
+
+        .login-form-wrap {
+          width: 100%;
+          max-width: 360px;
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        .login-logo {
+          font-family: 'Playfair Display', serif;
+          font-size: 20px;
+          font-weight: 400;
+          color: var(--text-primary);
+          letter-spacing: 0.02em;
+          margin-bottom: 4px;
+        }
+
+        .login-logo em {
+          font-style: italic;
+          color: var(--rose-gold);
         }
 
         .login-tabs {
           display: flex;
-          background: var(--surface-3);
+          background: var(--bg-secondary);
+          border: 0.5px solid var(--border-light);
           border-radius: var(--radius);
           padding: 3px;
           gap: 2px;
@@ -324,10 +336,12 @@ const Login: React.FC = () => {
         .login-tab {
           flex: 1;
           padding: 8px;
-          border-radius: calc(var(--radius) - 2px);
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--text-secondary);
+          border-radius: calc(var(--radius) - 1px);
+          font-family: 'Outfit', sans-serif;
+          font-size: 12px;
+          font-weight: 400;
+          letter-spacing: 0.04em;
+          color: var(--text-muted);
           background: transparent;
           border: none;
           cursor: pointer;
@@ -335,48 +349,50 @@ const Login: React.FC = () => {
         }
 
         .login-tab.active {
-          background: var(--surface);
+          background: var(--bg-card);
           color: var(--text-primary);
           box-shadow: var(--shadow-sm);
         }
 
-        .btn-google {
+        .login-google-btn {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 9px;
           width: 100%;
           padding: 11px;
-          background: var(--surface-3);
-          border: 1px solid var(--border);
+          background: var(--bg-card);
+          border: 0.5px solid var(--border-light);
           border-radius: var(--radius);
           color: var(--text-primary);
-          font-size: 13px;
-          font-weight: 500;
+          font-family: 'Outfit', sans-serif;
+          font-size: 12px;
+          font-weight: 400;
+          letter-spacing: 0.06em;
           cursor: pointer;
           transition: all var(--transition);
-          font-family: var(--font-body);
         }
 
-        .btn-google:hover {
-          border-color: var(--border-hover);
-          background: var(--surface-2);
+        .login-google-btn:hover {
+          border-color: var(--rose-gold-pale);
+          background: var(--bg-secondary);
         }
 
-        .login-divider {
+        .login-or {
           display: flex;
           align-items: center;
           gap: 12px;
-          color: var(--text-muted);
-          font-size: 12px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 11px;
+          color: var(--text-hint);
         }
 
-        .login-divider::before,
-        .login-divider::after {
+        .login-or::before,
+        .login-or::after {
           content: '';
           flex: 1;
-          height: 1px;
-          background: var(--border);
+          height: 0.5px;
+          background: var(--border-light);
         }
 
         .login-form {
@@ -385,27 +401,27 @@ const Login: React.FC = () => {
           gap: 14px;
         }
 
-        .input-with-icon {
+        .login-input-wrap {
           position: relative;
         }
 
-        .input-icon {
+        .login-input-icon {
           position: absolute;
           left: 12px;
           top: 50%;
           transform: translateY(-50%);
-          color: var(--text-muted);
+          color: var(--text-hint);
           pointer-events: none;
         }
 
-        .input-icon-right {
+        .login-input-toggle {
           position: absolute;
           right: 10px;
           top: 50%;
           transform: translateY(-50%);
           background: none;
           border: none;
-          color: var(--text-muted);
+          color: var(--text-hint);
           cursor: pointer;
           padding: 2px;
           display: flex;
@@ -414,20 +430,31 @@ const Login: React.FC = () => {
         .login-error {
           display: flex;
           align-items: center;
-          gap: 6px;
-          background: var(--danger-dim);
-          border: 1px solid rgba(239,68,68,0.25);
+          gap: 7px;
+          background: #FEE2E2;
+          border: 0.5px solid rgba(239,68,68,0.2);
           border-radius: var(--radius);
-          padding: 10px 12px;
+          padding: 9px 12px;
+          font-family: 'Outfit', sans-serif;
           font-size: 12px;
-          color: var(--danger);
+          font-weight: 300;
+          color: #991B1B;
         }
 
         .login-footer {
-          font-size: 11px;
-          color: var(--text-muted);
+          font-family: 'Outfit', sans-serif;
+          font-size: 10px;
+          font-weight: 300;
+          color: var(--text-hint);
           text-align: center;
           line-height: 1.5;
+          letter-spacing: 0.02em;
+        }
+
+        @media (max-width: 768px) {
+          .login-page { flex-direction: column; }
+          .login-left { width: 100%; padding: 40px 24px; }
+          .login-right { padding: 32px 24px; }
         }
       `}</style>
     </div>

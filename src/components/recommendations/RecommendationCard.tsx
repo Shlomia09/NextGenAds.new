@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle, XCircle, Info, AlertTriangle, Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle, XCircle, ChevronDown, ChevronUp, AlertTriangle, Zap, Info } from 'lucide-react';
 import type { Recommendation } from '../../types';
 
 interface RecommendationCardProps {
@@ -11,34 +11,31 @@ interface RecommendationCardProps {
 
 const priorityConfig = {
   critical: {
-    badge: 'badge-critical',
-    icon: <AlertTriangle size={14} />,
+    badgeClass: 'badge-critical',
+    icon: <AlertTriangle size={11} />,
     label: 'Critical',
-    borderColor: 'rgba(239,68,68,0.3)',
-    glow: 'rgba(239,68,68,0.08)',
+    borderColor: 'var(--danger)',
   },
   high: {
-    badge: 'badge-high',
-    icon: <Zap size={14} />,
-    label: 'High Priority',
-    borderColor: 'rgba(245,158,11,0.3)',
-    glow: 'rgba(245,158,11,0.06)',
+    badgeClass: 'badge-high',
+    icon: <Zap size={11} />,
+    label: 'High',
+    borderColor: 'var(--warning)',
   },
   medium: {
-    badge: 'badge-medium',
-    icon: <Info size={14} />,
+    badgeClass: 'badge-medium',
+    icon: <Info size={11} />,
     label: 'Medium',
-    borderColor: 'rgba(99,102,241,0.2)',
-    glow: 'rgba(99,102,241,0.05)',
+    borderColor: 'var(--rose-gold)',
   },
 };
 
-const typeIcon: Record<string, string> = {
-  funnel_structure: '🔀',
-  audience: '👥',
-  budget: '💰',
-  creative: '🎨',
-  scaling: '📈',
+const typeLabel: Record<string, string> = {
+  funnel_structure: 'Funnel',
+  audience:         'Audience',
+  budget:           'Budget',
+  creative:         'Creative',
+  scaling:          'Scaling',
 };
 
 const RecommendationCard: React.FC<RecommendationCardProps> = ({
@@ -52,162 +49,156 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
   return (
     <div
-      className="rec-card"
-      style={{
-        borderColor: config.borderColor,
-        background: `linear-gradient(135deg, var(--surface) 0%, ${config.glow} 100%)`,
-      }}
+      className={`rec-card-wrap ${rec.priority}`}
+      style={{ borderLeftColor: config.borderColor }}
     >
-      {/* Header */}
-      <div className="rec-header">
-        <div className="rec-badges">
-          <span className={`badge ${config.badge}`}>
+      {/* Header row */}
+      <div className="rcw-header">
+        <div className="rcw-badges">
+          <span className={`badge ${config.badgeClass}`}>
             {config.icon}
             {config.label}
           </span>
-          <span className="rec-type-emoji">{typeIcon[rec.type] || '⚡'}</span>
+          <span className="badge badge-neutral">{typeLabel[rec.type] || rec.type}</span>
         </div>
         <button
           className="btn btn-ghost btn-sm"
           onClick={() => setExpanded(!expanded)}
-          aria-label="Toggle details"
+          style={{ padding: '4px 6px', textTransform: 'none', letterSpacing: 0 }}
         >
-          {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         </button>
       </div>
 
-      {/* Title */}
-      <h3 className="rec-title">{rec.title}</h3>
+      {/* Title — Outfit 500 */}
+      <div className="rcw-title">{rec.title}</div>
 
-      {/* Description */}
-      <p className="rec-description">{rec.description}</p>
+      {/* Description — Outfit 300 */}
+      <p className="rcw-description">{rec.description}</p>
 
-      {/* Expanded content */}
+      {/* Expanded details */}
       {expanded && (
-        <div className="rec-expanded animate-fade-in">
-          <div className="rec-section">
-            <div className="rec-section-label">📊 Benchmark Reference</div>
-            <p className="rec-section-text">{rec.benchmark_reference}</p>
+        <div className="rcw-expanded animate-fade-in">
+          <div className="rcw-detail-block">
+            <div className="rcw-detail-label">Benchmark Reference</div>
+            <span className="rec-benchmark-ref">{rec.benchmark_reference}</span>
           </div>
-          <div className="rec-section">
-            <div className="rec-section-label">⚡ Recommended Action</div>
-            <p className="rec-section-text">{rec.action}</p>
+          <div className="rcw-detail-block">
+            <div className="rcw-detail-label">Recommended Action</div>
+            <p className="rcw-detail-text">{rec.action}</p>
           </div>
-          <div className="rec-section">
-            <div className="rec-section-label">🧠 AI Reasoning</div>
-            <p className="rec-section-text">{rec.reasoning}</p>
+          <div className="rcw-detail-block">
+            <div className="rcw-detail-label">AI Reasoning</div>
+            <p className="rcw-detail-text">{rec.reasoning}</p>
           </div>
         </div>
       )}
 
       {/* Actions */}
-      <div className="rec-actions">
-        <button
-          className="btn btn-success btn-sm"
-          onClick={() => onApprove(rec.id)}
-        >
-          <CheckCircle size={13} />
-          Execute with Approval
+      <div className="rcw-actions">
+        <button className="btn btn-success btn-sm" onClick={() => onApprove(rec.id)}>
+          <CheckCircle size={12} />
+          Execute
         </button>
-        <button
-          className="btn btn-ghost btn-sm"
-          onClick={() => onLearnMore(rec)}
-        >
-          <Info size={13} />
-          Learn More
+        <button className="btn btn-ghost btn-sm" onClick={() => onLearnMore(rec)}>
+          <Info size={12} />
+          Details
         </button>
         <button
           className="btn btn-ghost btn-sm"
           onClick={() => onDismiss(rec.id)}
-          style={{ color: 'var(--text-muted)', marginLeft: 'auto' }}
+          style={{ marginLeft: 'auto', color: 'var(--text-hint)' }}
         >
-          <XCircle size={13} />
+          <XCircle size={12} />
           Dismiss
         </button>
       </div>
 
       <style>{`
-        .rec-card {
-          border: 1px solid;
+        .rec-card-wrap {
+          background: var(--bg-card);
+          border: 0.5px solid var(--border-light);
+          border-left: 2.5px solid;
           border-radius: var(--radius-lg);
-          padding: 16px;
+          padding: 1rem 1.1rem;
           display: flex;
           flex-direction: column;
-          gap: 10px;
-          transition: transform var(--transition), border-color var(--transition);
+          gap: 8px;
+          transition: box-shadow var(--transition);
         }
 
-        .rec-card:hover {
-          transform: translateY(-1px);
+        .rec-card-wrap:hover {
+          box-shadow: var(--shadow-sm);
         }
 
-        .rec-header {
+        .rcw-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
         }
 
-        .rec-badges {
+        .rcw-badges {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
         }
 
-        .rec-type-emoji {
-          font-size: 16px;
-        }
-
-        .rec-title {
-          font-family: var(--font-display);
-          font-size: 14px;
-          font-weight: 600;
-          color: var(--text-primary);
-          line-height: 1.3;
-        }
-
-        .rec-description {
+        .rcw-title {
+          font-family: 'Outfit', sans-serif;
           font-size: 13px;
-          color: var(--text-secondary);
-          line-height: 1.5;
+          font-weight: 500;
+          color: var(--text-primary);
+          line-height: 1.35;
         }
 
-        .rec-expanded {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          padding: 12px;
-          background: var(--surface-3);
-          border-radius: var(--radius);
-          border: 1px solid var(--border);
-        }
-
-        .rec-section {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-
-        .rec-section-label {
-          font-size: 11px;
-          font-weight: 600;
-          color: var(--text-muted);
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-        }
-
-        .rec-section-text {
+        .rcw-description {
+          font-family: 'Outfit', sans-serif;
           font-size: 12px;
+          font-weight: 300;
+          color: var(--text-secondary);
+          line-height: 1.6;
+        }
+
+        .rcw-expanded {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          padding: 10px 12px;
+          background: var(--bg-secondary);
+          border-radius: var(--radius);
+          border: 0.5px solid var(--border-light);
+        }
+
+        .rcw-detail-block {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .rcw-detail-label {
+          font-family: 'Outfit', sans-serif;
+          font-size: 9px;
+          font-weight: 400;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--text-muted);
+        }
+
+        .rcw-detail-text {
+          font-family: 'Outfit', sans-serif;
+          font-size: 12px;
+          font-weight: 300;
           color: var(--text-secondary);
           line-height: 1.5;
         }
 
-        .rec-actions {
+        .rcw-actions {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           flex-wrap: wrap;
-          padding-top: 4px;
-          border-top: 1px solid var(--border);
+          padding-top: 6px;
+          border-top: 0.5px solid var(--border-light);
         }
       `}</style>
     </div>

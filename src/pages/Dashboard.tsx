@@ -1,19 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { RefreshCw, TrendingUp, AlertTriangle, Sparkles, BarChart3, Users, DollarSign } from 'lucide-react';
 import {
-  RefreshCw,
-  TrendingUp,
-  AlertTriangle,
-  Sparkles,
-  BarChart3,
-  Users,
-  DollarSign,
-} from 'lucide-react';
-import {
-  getBrands,
-  getCampaigns,
-  getRecommendations,
-  updateRecommendationStatus,
+  getBrands, getCampaigns, getRecommendations, updateRecommendationStatus,
 } from '../lib/supabase';
 import { getBenchmarkMetrics, getAovBracket, formatCurrency, formatNumber } from '../lib/benchmarks';
 import { useAuth } from '../hooks/useAuth';
@@ -23,7 +12,6 @@ import IntelligenceChat from '../components/intelligence/IntelligenceChat';
 import type { Recommendation } from '../types';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
-// Mock ROAS trend data (replaced with real data when synced)
 const mockRoasTrend = Array.from({ length: 14 }, (_, i) => ({
   day: `D-${14 - i}`,
   roas: parseFloat((Math.random() * 2 + 1.5).toFixed(2)),
@@ -80,10 +68,8 @@ const Dashboard: React.FC = () => {
 
   if (brandsLoading) {
     return (
-      <div className="page-container">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 400 }}>
-          <RefreshCw size={20} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
-        </div>
+      <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
+        <RefreshCw size={18} className="animate-spin" style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} />
       </div>
     );
   }
@@ -91,13 +77,11 @@ const Dashboard: React.FC = () => {
   if (!activeBrand) {
     return (
       <div className="page-container">
-        <div className="dash-empty-state">
-          <Sparkles size={40} />
-          <h2>No Brand Connected Yet</h2>
-          <p>Complete the onboarding to activate your Intelligence Dashboard</p>
-          <a href="/onboarding" className="btn btn-primary btn-lg">
-            Set Up Your Brand
-          </a>
+        <div className="dash-empty">
+          <Sparkles size={32} strokeWidth={1.5} style={{ color: 'var(--rose-gold)' }} />
+          <h2 className="dash-empty-title">No Brand Connected Yet</h2>
+          <p className="dash-empty-sub">Complete the onboarding to activate your Intelligence Dashboard</p>
+          <a href="/onboarding" className="btn btn-primary btn-lg">Set Up Your Brand</a>
         </div>
       </div>
     );
@@ -106,163 +90,156 @@ const Dashboard: React.FC = () => {
   return (
     <div className="page-container">
       {/* Page Header */}
-      <div className="dash-header">
+      <div className="dash-top-bar">
         <div>
-          <div className="page-title" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="section-eyebrow">
             <div className="live-dot" />
-            Intelligence Dashboard
+            Live Intelligence
           </div>
-          <div className="page-subtitle">
-            {activeBrand.name} · AOV {activeBrand.currency}{activeBrand.aov_min}–{activeBrand.aov_max} ·{' '}
-            <span style={{ color: 'var(--accent)' }}>{bracket?.label} bracket</span>
-          </div>
+          <h1 className="section-title">
+            {activeBrand.name} <em>Dashboard</em>
+          </h1>
+          <p className="page-subtitle">
+            AOV {activeBrand.currency}{activeBrand.aov_min}–{activeBrand.aov_max} ·{' '}
+            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--rose-gold)' }}>{bracket?.label}</span> bracket ·{' '}
+            {bracket?.recommended_funnel}
+          </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
-          <div className="dash-kpi">
-            <span className="dash-kpi-label"><DollarSign size={11} />Spend</span>
-            <span className="dash-kpi-value">{formatCurrency(totalSpend)}</span>
-          </div>
-          <div className="dash-kpi">
-            <span className="dash-kpi-label"><TrendingUp size={11} />Revenue</span>
-            <span className="dash-kpi-value">{formatCurrency(totalRevenue)}</span>
-          </div>
-          <div className="dash-kpi">
-            <span className="dash-kpi-label"><Users size={11} />Purchases</span>
-            <span className="dash-kpi-value">{formatNumber(totalPurchases)}</span>
-          </div>
-          <div className="dash-kpi dash-kpi-roas">
-            <span className="dash-kpi-label"><BarChart3 size={11} />Overall ROAS</span>
-            <span className="dash-kpi-value"
-              style={{ color: overallRoas >= bracket!.benchmark_roas ? 'var(--success)' : overallRoas >= 1.5 ? 'var(--warning)' : 'var(--danger)' }}>
-              {overallRoas.toFixed(2)}x
-            </span>
-          </div>
+        {/* KPI strip */}
+        <div className="dash-kpi-strip">
+          {[
+            { icon: <DollarSign size={11} strokeWidth={1.5} />, label: 'Spend', value: formatCurrency(totalSpend) },
+            { icon: <TrendingUp size={11} strokeWidth={1.5} />, label: 'Revenue', value: formatCurrency(totalRevenue) },
+            { icon: <Users size={11} strokeWidth={1.5} />, label: 'Purchases', value: formatNumber(totalPurchases) },
+            { icon: <BarChart3 size={11} strokeWidth={1.5} />, label: 'ROAS', value: `${overallRoas.toFixed(2)}x`, highlight: true },
+          ].map(({ icon, label, value, highlight }) => (
+            <div key={label} className={`dash-kpi-chip ${highlight ? 'highlight' : ''}`}>
+              <div className="dash-kpi-label">{icon}{label}</div>
+              <div className="dash-kpi-value"
+                style={highlight ? {
+                  color: overallRoas >= (bracket?.benchmark_roas || 2.8)
+                    ? 'var(--success)' : overallRoas >= 1.5
+                    ? 'var(--warning)' : 'var(--danger)'
+                } : {}}>
+                {value}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* 3-Column Grid */}
+      {/* 3-Column Intelligence Grid */}
       <div className="dash-grid">
 
-        {/* ===== Column 1: Benchmark Intelligence ===== */}
+        {/* ── Column 1: Benchmark Intelligence ── */}
         <div className="dash-col">
-          <div className="dash-col-header">
-            <div className="dash-col-title">
-              <BarChart3 size={14} />
+          <div className="dash-col-heading">
+            <div className="section-eyebrow" style={{ marginBottom: 0 }}>
+              <BarChart3 size={11} strokeWidth={1.5} />
               Benchmark Intelligence
             </div>
-            <span className="dash-col-subtitle">vs {bracket?.label} bracket</span>
           </div>
 
           <div className="bench-source-tag">
-            Based on 847 Beauty brands · AOV {bracket?.label} · 2015–2024
+            847 Beauty brands · {bracket?.label} · 2015–2024
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {benchmarkMetrics.length === 0 || campaignsLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <BenchmarkMetricCard
-                  key={i}
-                  label="" yourValue={0} benchmarkValue={0}
-                  unit="" higherIsBetter loading
-                />
-              ))
-            ) : (
-              benchmarkMetrics.map((m) => (
-                <BenchmarkMetricCard
-                  key={m.label}
-                  label={m.label}
-                  yourValue={m.your_value}
-                  benchmarkValue={m.benchmark_value}
-                  unit={m.unit}
-                  higherIsBetter={m.higher_is_better}
-                />
-              ))
-            )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {benchmarkMetrics.length === 0 || campaignsLoading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <BenchmarkMetricCard key={i} label="" yourValue={0} benchmarkValue={0} unit="" higherIsBetter loading />
+                ))
+              : benchmarkMetrics.map((m) => (
+                  <BenchmarkMetricCard
+                    key={m.label}
+                    label={m.label}
+                    yourValue={m.your_value}
+                    benchmarkValue={m.benchmark_value}
+                    unit={m.unit}
+                    higherIsBetter={m.higher_is_better}
+                  />
+                ))}
           </div>
 
-          {/* ROAS Trend Chart */}
-          <div className="card" style={{ marginTop: 4 }}>
-            <div className="dash-col-title" style={{ marginBottom: 12 }}>
-              <TrendingUp size={14} />
-              ROAS Trend (14d)
+          {/* ROAS Trend */}
+          <div className="card" style={{ padding: '16px' }}>
+            <div className="section-eyebrow" style={{ marginBottom: 12, fontSize: 9 }}>
+              <TrendingUp size={10} strokeWidth={1.5} />
+              ROAS Trend — 14 Days
             </div>
-            <ResponsiveContainer width="100%" height={120}>
+            <ResponsiveContainer width="100%" height={110}>
               <AreaChart data={mockRoasTrend}>
                 <defs>
-                  <linearGradient id="roasGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
+                  <linearGradient id="rg" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="#C4836A" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#C4836A" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={30} />
+                <XAxis dataKey="day" tick={{ fontSize: 9, fill: 'var(--text-hint)', fontFamily: 'DM Mono' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 9, fill: 'var(--text-hint)', fontFamily: 'DM Mono' }} axisLine={false} tickLine={false} width={28} />
                 <Tooltip
-                  contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }}
-                  labelStyle={{ color: 'var(--text-muted)' }}
+                  contentStyle={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-light)', borderRadius: 4, fontSize: 11, fontFamily: 'DM Mono' }}
                 />
-                <Area type="monotone" dataKey="roas" stroke="var(--accent)" fill="url(#roasGrad)" strokeWidth={2} name="Your ROAS" />
-                <Area type="monotone" dataKey="benchmark" stroke="var(--text-muted)" fill="none" strokeDasharray="4 4" strokeWidth={1} name="Benchmark" />
+                <Area type="monotone" dataKey="roas" stroke="#C4836A" fill="url(#rg)" strokeWidth={1.5} name="Your ROAS" />
+                <Area type="monotone" dataKey="benchmark" stroke="var(--text-hint)" fill="none" strokeDasharray="3 3" strokeWidth={1} name="Benchmark" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* ===== Column 2: AI Recommendations ===== */}
+        {/* ── Column 2: AI Recommendations ── */}
         <div className="dash-col">
-          <div className="dash-col-header">
-            <div className="dash-col-title">
-              <AlertTriangle size={14} />
+          <div className="dash-col-heading">
+            <div className="section-eyebrow" style={{ marginBottom: 0 }}>
+              <AlertTriangle size={11} strokeWidth={1.5} />
               AI Recommendations
             </div>
-            <div style={{ display: 'flex', gap: 6 }}>
+            <div style={{ display: 'flex', gap: 5 }}>
               {criticalRecs.length > 0 && <span className="badge badge-critical">{criticalRecs.length}</span>}
               {highRecs.length > 0 && <span className="badge badge-high">{highRecs.length}</span>}
               {mediumRecs.length > 0 && <span className="badge badge-medium">{mediumRecs.length}</span>}
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-            {recsLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="skeleton" style={{ height: 140, borderRadius: 10 }} />
-              ))
-            ) : recommendations.length === 0 ? (
-              <div className="dash-no-recs">
-                <Sparkles size={28} />
-                <p>No pending recommendations</p>
-                <span>Connect your Meta account and sync campaigns to generate AI insights</span>
-              </div>
-            ) : (
-              [...criticalRecs, ...highRecs, ...mediumRecs].map((rec) => (
-                <RecommendationCard
-                  key={rec.id}
-                  rec={rec}
-                  onApprove={(id) => updateRecMutation.mutate({ id, status: 'approved' })}
-                  onDismiss={(id) => updateRecMutation.mutate({ id, status: 'dismissed' })}
-                  onLearnMore={setLearnMoreRec}
-                />
-              ))
-            )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {recsLoading
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="skeleton" style={{ height: 130, borderRadius: 6 }} />
+                ))
+              : recommendations.length === 0
+              ? (
+                <div className="dash-no-recs">
+                  <Sparkles size={24} strokeWidth={1.5} style={{ color: 'var(--rose-gold)' }} />
+                  <p>No pending recommendations</p>
+                  <span>Connect your Meta account and sync campaigns to generate AI insights</span>
+                </div>
+              )
+              : [...criticalRecs, ...highRecs, ...mediumRecs].map((rec) => (
+                  <RecommendationCard
+                    key={rec.id}
+                    rec={rec}
+                    onApprove={(id) => updateRecMutation.mutate({ id, status: 'approved' })}
+                    onDismiss={(id) => updateRecMutation.mutate({ id, status: 'dismissed' })}
+                    onLearnMore={setLearnMoreRec}
+                  />
+                ))}
           </div>
         </div>
 
-        {/* ===== Column 3: Intelligence Chat ===== */}
+        {/* ── Column 3: Intelligence Chat ── */}
         <div className="dash-col">
-          <div className="dash-col-header">
-            <div className="dash-col-title">
-              <Sparkles size={14} />
+          <div className="dash-col-heading">
+            <div className="section-eyebrow" style={{ marginBottom: 0 }}>
+              <Sparkles size={11} strokeWidth={1.5} />
               Intelligence Chat
             </div>
-            <span className="dash-col-subtitle">Context-aware</span>
+            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              Context-aware
+            </span>
           </div>
-
           <div style={{ flex: 1, minHeight: 0 }}>
-            <IntelligenceChat
-              brand={activeBrand}
-              campaigns={campaigns}
-              compact
-            />
+            <IntelligenceChat brand={activeBrand} campaigns={campaigns} compact />
           </div>
         </div>
       </div>
@@ -271,19 +248,24 @@ const Dashboard: React.FC = () => {
       {learnMoreRec && (
         <div className="modal-overlay" onClick={() => setLearnMoreRec(null)}>
           <div className="modal-card animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="section-eyebrow" style={{ marginBottom: 6 }}>AI Recommendation</div>
             <h3 className="modal-title">{learnMoreRec.title}</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{learnMoreRec.description}</p>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 300, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              {learnMoreRec.description}
+            </p>
             <div className="divider" />
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              <strong style={{ color: 'var(--text-primary)' }}>Benchmark Reference:</strong><br />
-              {learnMoreRec.benchmark_reference}
+            <div>
+              <div className="form-label" style={{ marginBottom: 6 }}>Benchmark Reference</div>
+              <span className="rec-benchmark-ref">{learnMoreRec.benchmark_reference}</span>
             </div>
             <div className="divider" />
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              <strong style={{ color: 'var(--text-primary)' }}>Recommended Action:</strong><br />
-              {learnMoreRec.action}
+            <div>
+              <div className="form-label" style={{ marginBottom: 6 }}>Recommended Action</div>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {learnMoreRec.action}
+              </p>
             </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
               <button className="btn btn-secondary" onClick={() => setLearnMoreRec(null)}>Close</button>
             </div>
           </div>
@@ -291,36 +273,46 @@ const Dashboard: React.FC = () => {
       )}
 
       <style>{`
-        .dash-header {
+        .dash-top-bar {
           display: flex;
           align-items: flex-start;
           justify-content: space-between;
-          margin-bottom: 20px;
+          margin-bottom: 24px;
           flex-wrap: wrap;
           gap: 16px;
         }
 
-        .dash-kpi {
-          background: var(--surface);
-          border: 1px solid var(--border);
+        .dash-kpi-strip {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .dash-kpi-chip {
+          background: var(--bg-card);
+          border: 0.5px solid var(--border-light);
           border-radius: var(--radius);
           padding: 10px 14px;
           display: flex;
           flex-direction: column;
           gap: 4px;
-          min-width: 90px;
+          min-width: 88px;
+          transition: border-color var(--transition);
         }
 
-        .dash-kpi-roas {
-          border-color: rgba(99,102,241,0.3);
-          background: var(--accent-dim);
+        .dash-kpi-chip:hover { border-color: var(--rose-gold-pale); }
+
+        .dash-kpi-chip.highlight {
+          border-color: var(--border-rose);
+          background: var(--rose-gold-light);
         }
 
         .dash-kpi-label {
-          font-size: 10px;
-          font-weight: 600;
+          font-family: 'Outfit', sans-serif;
+          font-size: 9px;
+          font-weight: 400;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
-          letter-spacing: 0.06em;
           color: var(--text-muted);
           display: flex;
           align-items: center;
@@ -328,9 +320,9 @@ const Dashboard: React.FC = () => {
         }
 
         .dash-kpi-value {
-          font-family: var(--font-display);
-          font-size: 15px;
-          font-weight: 700;
+          font-family: 'DM Mono', monospace;
+          font-size: 14px;
+          font-weight: 500;
           color: var(--text-primary);
         }
 
@@ -344,60 +336,49 @@ const Dashboard: React.FC = () => {
         .dash-col {
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 10px;
           min-width: 0;
         }
 
-        .dash-col-header {
+        .dash-col-heading {
           display: flex;
           align-items: center;
           justify-content: space-between;
         }
 
-        .dash-col-title {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--text-primary);
-        }
-
-        .dash-col-subtitle {
-          font-size: 11px;
-          color: var(--text-muted);
-          font-family: var(--font-mono);
-        }
-
         .bench-source-tag {
-          font-size: 10px;
-          color: var(--text-muted);
-          background: var(--surface-3);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
+          font-family: 'DM Mono', monospace;
+          font-size: 9px;
+          font-weight: 400;
+          color: var(--text-hint);
+          background: var(--bg-secondary);
+          border: 0.5px solid var(--border-light);
+          border-radius: 2px;
           padding: 4px 8px;
-          font-family: var(--font-mono);
+          letter-spacing: 0.04em;
         }
 
-        .dash-empty-state {
+        .dash-empty {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           text-align: center;
           padding: 80px 40px;
-          gap: 12px;
-          color: var(--text-muted);
+          gap: 14px;
         }
 
-        .dash-empty-state h2 {
-          font-family: var(--font-display);
-          font-size: 20px;
+        .dash-empty-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 22px;
+          font-weight: 400;
           color: var(--text-primary);
         }
 
-        .dash-empty-state p {
+        .dash-empty-sub {
+          font-family: 'Outfit', sans-serif;
           font-size: 13px;
+          font-weight: 300;
           color: var(--text-secondary);
         }
 
@@ -409,76 +390,35 @@ const Dashboard: React.FC = () => {
           text-align: center;
           padding: 40px 20px;
           gap: 8px;
-          color: var(--text-muted);
-          background: var(--surface);
-          border: 1px dashed var(--border);
+          background: var(--bg-card);
+          border: 0.5px dashed var(--border-light);
           border-radius: var(--radius-lg);
-          flex: 1;
         }
 
         .dash-no-recs p {
+          font-family: 'Outfit', sans-serif;
           font-size: 13px;
-          font-weight: 500;
+          font-weight: 400;
           color: var(--text-secondary);
         }
 
         .dash-no-recs span {
-          font-size: 12px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 11px;
+          font-weight: 300;
           color: var(--text-muted);
           max-width: 240px;
           line-height: 1.5;
         }
 
-        .modal-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,0.7);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          padding: 24px;
-          backdrop-filter: blur(4px);
-        }
-
-        .modal-card {
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-xl);
-          padding: 28px;
-          max-width: 520px;
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          box-shadow: var(--shadow-lg);
-        }
-
-        .modal-title {
-          font-family: var(--font-display);
-          font-size: 16px;
-          font-weight: 600;
-          color: var(--text-primary);
-        }
-
         @media (max-width: 1100px) {
-          .dash-grid {
-            grid-template-columns: 1fr 1fr;
-          }
-
-          .dash-col:last-child {
-            grid-column: 1 / -1;
-          }
+          .dash-grid { grid-template-columns: 1fr 1fr; }
+          .dash-col:last-child { grid-column: 1 / -1; }
         }
 
         @media (max-width: 768px) {
-          .dash-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .dash-header {
-            flex-direction: column;
-          }
+          .dash-grid { grid-template-columns: 1fr; }
+          .dash-top-bar { flex-direction: column; }
         }
       `}</style>
     </div>

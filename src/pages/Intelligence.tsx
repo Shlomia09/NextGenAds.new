@@ -10,48 +10,51 @@ const Intelligence: React.FC = () => {
 
   const { data: brands } = useQuery({
     queryKey: ['brands', user?.id],
-    queryFn: () => getBrands(user!.id),
-    enabled: !!user,
+    queryFn:  () => getBrands(user!.id),
+    enabled:  !!user,
   });
 
   const activeBrand = brands?.[0];
 
   const { data: campaigns = [] } = useQuery({
     queryKey: ['campaigns', activeBrand?.id],
-    queryFn: () => getCampaigns(activeBrand!.id),
-    enabled: !!activeBrand,
+    queryFn:  () => getCampaigns(activeBrand!.id),
+    enabled:  !!activeBrand,
   });
 
   return (
     <div className="page-container" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 48px)' }}>
       <div className="page-header flex items-center justify-between">
         <div>
-          <div className="page-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Sparkles size={18} style={{ color: 'var(--accent)' }} />
-            Intelligence Engine
+          <div className="section-eyebrow">
+            <Sparkles size={10} strokeWidth={1.5} />
+            AI Strategist
           </div>
-          <div className="page-subtitle">
-            9-year Beauty & Cosmetics benchmark knowledge · Context-aware AI strategist
-          </div>
+          <h1 className="page-title">
+            Intelligence <em style={{ fontStyle: 'italic', color: 'var(--rose-gold)' }}>Engine</em>
+          </h1>
+          <p className="page-subtitle">
+            9-year Beauty & Cosmetics benchmark knowledge · Context-aware campaign strategist
+          </p>
         </div>
         <button className="btn btn-secondary">
-          <Plus size={14} />
+          <Plus size={13} strokeWidth={1.5} />
           New Session
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: 16, flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 14, flex: 1, minHeight: 0 }}>
         {/* Sessions sidebar */}
         <div className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div style={{ padding: '10px 14px', borderBottom: '0.5px solid var(--border-light)', fontFamily: 'var(--font-sans)', fontSize: 9, fontWeight: 400, color: 'var(--text-hint)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
             Sessions
           </div>
-          <div style={{ flex: 1, overflow: 'auto', padding: '8px' }}>
-            <div className="intelligence-session-item active">
-              <MessageSquare size={12} />
+          <div style={{ flex: 1, overflow: 'auto', padding: '6px' }}>
+            <div className="int-session-item active">
+              <MessageSquare size={11} strokeWidth={1.5} />
               <div>
-                <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)' }}>Current Session</div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Just now</div>
+                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 400, color: 'var(--text-primary)' }}>Current Session</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-hint)', marginTop: 2 }}>Just now</div>
               </div>
             </div>
           </div>
@@ -62,9 +65,9 @@ const Intelligence: React.FC = () => {
           {activeBrand ? (
             <IntelligenceChat brand={activeBrand} campaigns={campaigns} />
           ) : (
-            <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', gap: 12, color: 'var(--text-muted)' }}>
-              <Sparkles size={32} />
-              <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Set up a brand to start chatting</p>
+            <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', gap: 14 }}>
+              <Sparkles size={28} strokeWidth={1.5} style={{ color: 'var(--rose-gold)' }} />
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 400, color: 'var(--text-primary)' }}>Set up a brand to start</p>
               <a href="/onboarding" className="btn btn-primary">Get Started</a>
             </div>
           )}
@@ -72,7 +75,7 @@ const Intelligence: React.FC = () => {
       </div>
 
       <style>{`
-        .intelligence-session-item {
+        .int-session-item {
           display: flex;
           align-items: center;
           gap: 8px;
@@ -80,18 +83,15 @@ const Intelligence: React.FC = () => {
           border-radius: var(--radius);
           cursor: pointer;
           transition: all var(--transition);
-          color: var(--text-secondary);
+          color: var(--text-muted);
         }
 
-        .intelligence-session-item:hover {
-          background: var(--surface-3);
-          color: var(--text-primary);
-        }
+        .int-session-item:hover { background: var(--bg-secondary); color: var(--text-primary); }
 
-        .intelligence-session-item.active {
-          background: var(--accent-dim);
-          color: var(--accent);
-          border: 1px solid rgba(99,102,241,0.2);
+        .int-session-item.active {
+          background: var(--rose-gold-light);
+          color: var(--rose-gold-dark);
+          border: 0.5px solid var(--border-rose);
         }
       `}</style>
     </div>
