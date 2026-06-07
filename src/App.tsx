@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './hooks/useAuth';
 import Sidebar from './components/ui/Sidebar';
+import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
@@ -11,136 +12,65 @@ import Campaigns from './pages/Campaigns';
 import Brands from './pages/Brands';
 import Connect from './pages/Connect';
 import Settings from './pages/Settings';
+import DemoDashboard from './pages/DemoDashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      staleTime: 60_000,
-      retry: 1,
-    },
+    queries: { staleTime: 60_000, retry: 1 },
   },
 });
 
-// Protected Route wrapper
+const LoadingScreen: React.FC = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-primary)', gap: 12 }}>
+    <div className="animate-spin" style={{ width: 18, height: 18, border: '1.5px solid var(--border-light)', borderTopColor: 'var(--rose-gold)', borderRadius: '50%' }} />
+    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, color: 'var(--text-muted)' }}>Loading…</span>
+  </div>
+);
+
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', gap: 10 }}>
-        <div className="animate-spin" style={{ width: 20, height: 20, border: '2px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%' }} />
-        <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>Loading...</span>
-      </div>
-    );
-  }
+  if (loading) return <LoadingScreen />;
   if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
-// App layout with sidebar
-const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <div className="app-layout">
-      <Sidebar />
-      <div className="main-content">
-        {children}
-      </div>
+const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="app-layout">
+    <Sidebar />
+    <div className="main-content">
+      {children}
     </div>
-  );
-};
+  </div>
+);
 
-const AppRoutes: React.FC = () => {
-  return (
-    <Routes>
-      {/* Public */}
-      <Route path="/login" element={<Login />} />
+const AppRoutes: React.FC = () => (
+  <Routes>
+    {/* ── Public ── */}
+    <Route path="/"      element={<Landing />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/demo"  element={<DemoDashboard />} />
 
-      {/* Onboarding — authenticated but no sidebar */}
-      <Route
-        path="/onboarding"
-        element={
-          <ProtectedRoute>
-            <Onboarding />
-          </ProtectedRoute>
-        }
-      />
+    {/* ── Onboarding (auth, no sidebar) ── */}
+    <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
 
-      {/* Protected app routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Dashboard />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/intelligence"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Intelligence />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/campaigns"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Campaigns />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/brands"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Brands />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/connect"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Connect />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Settings />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
+    {/* ── Protected app ── */}
+    <Route path="/dashboard"   element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
+    <Route path="/intelligence" element={<ProtectedRoute><AppLayout><Intelligence /></AppLayout></ProtectedRoute>} />
+    <Route path="/campaigns"   element={<ProtectedRoute><AppLayout><Campaigns /></AppLayout></ProtectedRoute>} />
+    <Route path="/brands"      element={<ProtectedRoute><AppLayout><Brands /></AppLayout></ProtectedRoute>} />
+    <Route path="/connect"     element={<ProtectedRoute><AppLayout><Connect /></AppLayout></ProtectedRoute>} />
+    <Route path="/settings"    element={<ProtectedRoute><AppLayout><Settings /></AppLayout></ProtectedRoute>} />
 
-      {/* Default redirect */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
-  );
-};
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes>
+);
 
-const App: React.FC = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-};
+const App: React.FC = () => (
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  </QueryClientProvider>
+);
 
 export default App;
