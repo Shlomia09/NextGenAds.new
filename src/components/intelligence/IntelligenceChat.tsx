@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, User, Loader, MessageSquare, Plus } from 'lucide-react';
+import { Send, Sparkles, User, MessageSquare, Plus } from 'lucide-react';
+
 import type { ChatMessage, Brand, Campaign } from '../../types';
 import { sendChatMessage } from '../../lib/claude-api';
 
@@ -18,6 +19,22 @@ const QUICK_QUESTIONS = [
   'Am I ready to increase budget?',
 ];
 
+// ─── After-Dark token palette (inline-only, no CSS vars) ──────────────────────
+const T = {
+  bgDeep:      '#0F0A07',
+  bgContainer: '#1C1208',
+  border:      '0.5px solid #2a1a0e',
+  borderColor: '#2a1a0e',
+  accent:      '#C4836A',
+  accentHover: '#A86B52',
+  textPrimary: '#F5E6D8',
+  textBody:    '#C4A090',
+  textMuted:   '#8B6050',
+  textHint:    '#4a2e1e',
+  radius:      '5px',
+  transition:  'all 0.18s ease',
+} as const;
+
 const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
   brand,
   campaigns: _campaigns,
@@ -27,6 +44,9 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [hoveredQuick, setHoveredQuick] = useState<string | null>(null);
+  const [sendHovered, setSendHovered] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -84,45 +104,224 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
     }
   };
 
+  // Render AI message content — bolds **…** patterns using DM Mono accent
+  const renderAIContent = (content: string) => {
+    const parts = content.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, idx) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return (
+          <strong
+            key={idx}
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontWeight: 500,
+              color: T.accent,
+            }}
+          >
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return <span key={idx}>{part}</span>;
+    });
+  };
 
   return (
-    <div className={`ic-container ${compact ? 'ic-compact' : ''}`}>
-      {/* Header */}
-      <div className="ic-header">
-        <div className="ic-header-left">
-          <div className="ic-avatar">
-            <Sparkles size={13} strokeWidth={1.5} />
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        background: T.bgContainer,
+        border: T.border,
+        borderRadius: '8px',
+        overflow: 'hidden',
+        height: '100%',
+        minHeight: compact ? 400 : 500,
+      }}
+    >
+      {/* ── Header ── */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '11px 16px',
+          background: T.bgContainer,
+          borderBottom: T.border,
+          flexShrink: 0,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Avatar */}
+          <div
+            style={{
+              width: 26,
+              height: 26,
+              background: T.bgDeep,
+              border: T.border,
+              borderRadius: 4,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: T.accent,
+              flexShrink: 0,
+            }}
+          >
+            <Sparkles size={12} strokeWidth={1.5} />
           </div>
+
           <div>
-            <div className="ic-title">Intelligence Engine</div>
-            <div className="ic-subtitle">
+            <div
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 13,
+                fontWeight: 400,
+                color: T.textPrimary,
+                lineHeight: 1.2,
+              }}
+            >
+              Intelligence Engine
+            </div>
+            <div
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 8,
+                fontWeight: 300,
+                color: T.textHint,
+                letterSpacing: '0.08em',
+                marginTop: 2,
+                textTransform: 'uppercase',
+              }}
+            >
               Active brand context · 9yr Beauty benchmark data
             </div>
           </div>
         </div>
-        <button className="btn btn-ghost btn-sm">
-          <Plus size={12} />
+
+        {/* New button */}
+        <button
+          onClick={() => setMessages([])}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            background: T.bgDeep,
+            border: T.border,
+            borderRadius: T.radius,
+            padding: '4px 9px',
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: 9,
+            fontWeight: 300,
+            color: T.textMuted,
+            cursor: 'pointer',
+            letterSpacing: '0.04em',
+            transition: T.transition,
+          }}
+        >
+          <Plus size={10} />
           New
         </button>
       </div>
 
-      {/* Messages */}
-      <div className="ic-messages">
+      {/* ── Messages ── */}
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: 16,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+          background: 'transparent',
+        }}
+      >
+        {/* Empty state */}
         {messages.length === 0 && (
-          <div className="ic-empty animate-fade-in">
-            <div className="ic-empty-icon">
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              padding: '32px 16px',
+              gap: 8,
+              flex: 1,
+            }}
+          >
+            {/* Icon circle */}
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                background: 'rgba(196,131,106,0.1)',
+                border: '0.5px solid rgba(196,131,106,0.2)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: T.accent,
+                marginBottom: 6,
+              }}
+            >
               <MessageSquare size={20} strokeWidth={1.5} />
             </div>
-            <p className="ic-empty-title">Ask the Intelligence Engine</p>
-            <p className="ic-empty-sub">
+
+            <p
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: 13,
+                fontWeight: 400,
+                color: T.textPrimary,
+                margin: 0,
+              }}
+            >
+              Ask the Intelligence Engine
+            </p>
+            <p
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: 9,
+                fontWeight: 300,
+                color: T.textHint,
+                maxWidth: 240,
+                lineHeight: 1.55,
+                margin: 0,
+              }}
+            >
               Full context of your brand, campaigns, and 9 years of benchmark data
             </p>
-            <div className="ic-quick-questions">
+
+            {/* Suggested questions */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 5,
+                width: '100%',
+                maxWidth: 280,
+                marginTop: 10,
+              }}
+            >
               {QUICK_QUESTIONS.map((q) => (
                 <button
                   key={q}
-                  className="ic-quick-btn"
+                  onMouseEnter={() => setHoveredQuick(q)}
+                  onMouseLeave={() => setHoveredQuick(null)}
                   onClick={() => sendMessage(q)}
+                  style={{
+                    background: hoveredQuick === q ? 'rgba(196,131,106,0.05)' : T.bgDeep,
+                    border: hoveredQuick === q ? `0.5px solid ${T.accent}` : T.border,
+                    borderRadius: T.radius,
+                    padding: '7px 12px',
+                    fontFamily: "'Outfit', sans-serif",
+                    fontSize: 10,
+                    fontWeight: 300,
+                    color: T.textMuted,
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    transition: T.transition,
+                  }}
                 >
                   {q}
                 </button>
@@ -131,35 +330,165 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           </div>
         )}
 
+        {/* Message list */}
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`ic-message ${msg.role}`}
+            style={{
+              display: 'flex',
+              gap: 8,
+              alignItems: 'flex-start',
+              flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
+            }}
           >
-            <div className={`ic-msg-avatar ${msg.role}`}>
-              {msg.role === 'user' ? <User size={11} strokeWidth={1.5} /> : <Sparkles size={11} strokeWidth={1.5} />}
+            {/* Avatar */}
+            <div
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 3,
+                border: T.border,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                background: msg.role === 'user' ? T.accent : T.bgDeep,
+                color: msg.role === 'user' ? T.bgDeep : T.accent,
+              }}
+            >
+              {msg.role === 'user'
+                ? <User size={11} strokeWidth={1.5} />
+                : <Sparkles size={11} strokeWidth={1.5} />}
             </div>
-            <div className="ic-msg-body">
-              <div className={`ic-msg-bubble ${msg.role}`}>
-                {msg.content}
+
+            {/* Body */}
+            <div
+              style={{
+                maxWidth: msg.role === 'user' ? 'calc(80%)' : '90%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+                alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
+              }}
+            >
+              {/* Bubble */}
+              <div
+                style={
+                  msg.role === 'user'
+                    ? {
+                        background: T.accent,
+                        color: T.bgDeep,
+                        borderRadius: T.radius,
+                        padding: '8px 12px',
+                        fontFamily: "'Outfit', sans-serif",
+                        fontSize: 11,
+                        fontWeight: 400,
+                        lineHeight: 1.5,
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        marginLeft: '20%',
+                      }
+                    : {
+                        background: T.bgDeep,
+                        border: T.border,
+                        color: T.textBody,
+                        borderRadius: T.radius,
+                        padding: '9px 13px',
+                        fontFamily: "'Outfit', sans-serif",
+                        fontSize: 11,
+                        fontWeight: 300,
+                        lineHeight: 1.65,
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        marginRight: '10%',
+                      }
+                }
+              >
+                {msg.role === 'assistant'
+                  ? renderAIContent(msg.content)
+                  : msg.content}
               </div>
-              <span className="ic-msg-time">
-                {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+
+              {/* Timestamp */}
+              <span
+                style={{
+                  fontFamily: "'DM Mono', monospace",
+                  fontSize: 9,
+                  fontWeight: 400,
+                  color: T.textHint,
+                }}
+              >
+                {new Date(msg.timestamp).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </span>
             </div>
           </div>
         ))}
 
+        {/* Typing indicator */}
         {loading && (
-          <div className="ic-message assistant animate-fade-in">
-            <div className="ic-msg-avatar assistant">
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              alignItems: 'flex-start',
+            }}
+          >
+            <div
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 3,
+                border: T.border,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                background: T.bgDeep,
+                color: T.accent,
+              }}
+            >
               <Sparkles size={11} strokeWidth={1.5} />
             </div>
-            <div className="ic-msg-body">
-              <div className="ic-msg-bubble assistant ic-loading">
-                <Loader size={12} className="animate-spin" />
-                <span>Analysing your account data…</span>
-              </div>
+
+            <div
+              style={{
+                background: T.bgDeep,
+                border: T.border,
+                borderRadius: T.radius,
+                padding: '9px 13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 7,
+              }}
+            >
+              {/* Animated dots */}
+              {[0, 1, 2].map((idx) => (
+                <span
+                  key={idx}
+                  style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: '50%',
+                    background: T.accent,
+                    display: 'inline-block',
+                    animation: `ic-dot-bounce 1.2s ease-in-out ${idx * 0.2}s infinite`,
+                  }}
+                />
+              ))}
+              <span
+                style={{
+                  fontFamily: "'Outfit', sans-serif",
+                  fontSize: 10,
+                  fontWeight: 300,
+                  color: T.textHint,
+                  marginLeft: 2,
+                }}
+              >
+                Analysing your account data…
+              </span>
             </div>
           </div>
         )}
@@ -167,287 +496,76 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <div className="ic-input-area">
+      {/* ── Input area ── */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 8,
+          padding: '10px 14px',
+          borderTop: T.border,
+          background: T.bgContainer,
+          flexShrink: 0,
+        }}
+      >
         <textarea
           ref={inputRef}
-          className="ic-input"
           placeholder="Ask about campaigns, ROAS, audiences…"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => setInputFocused(false)}
           rows={2}
+          style={{
+            flex: 1,
+            background: T.bgDeep,
+            border: inputFocused ? `0.5px solid ${T.accent}` : T.border,
+            borderRadius: T.radius,
+            padding: '8px 12px',
+            color: T.textPrimary,
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: 11,
+            fontWeight: 300,
+            resize: 'none',
+            outline: 'none',
+            transition: T.transition,
+            lineHeight: 1.45,
+          }}
         />
         <button
-          className="ic-send-btn"
           onClick={() => sendMessage(input)}
           disabled={!input.trim() || loading}
+          onMouseEnter={() => setSendHovered(true)}
+          onMouseLeave={() => setSendHovered(false)}
+          style={{
+            width: 32,
+            height: 32,
+            background: sendHovered && input.trim() && !loading ? T.accentHover : T.accent,
+            border: 'none',
+            borderRadius: T.radius,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: T.bgDeep,
+            cursor: !input.trim() || loading ? 'not-allowed' : 'pointer',
+            opacity: !input.trim() || loading ? 0.35 : 1,
+            flexShrink: 0,
+            transition: T.transition,
+            transform: sendHovered && input.trim() && !loading ? 'translateY(-1px)' : 'none',
+          }}
         >
           <Send size={13} strokeWidth={1.5} />
         </button>
       </div>
 
+      {/* Dot-bounce keyframes */}
       <style>{`
-        .ic-container {
-          display: flex;
-          flex-direction: column;
-          background: var(--bg-primary);
-          border: 0.5px solid var(--border-light);
-          border-radius: var(--radius-lg);
-          overflow: hidden;
-          height: 100%;
-          min-height: 500px;
+        @keyframes ic-dot-bounce {
+          0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+          40%            { transform: translateY(-4px); opacity: 1; }
         }
-
-        .ic-compact { min-height: 400px; }
-
-        .ic-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 12px 16px;
-          border-bottom: 0.5px solid var(--border-light);
-          background: var(--bg-card);
-          flex-shrink: 0;
-        }
-
-        .ic-header-left {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        .ic-avatar {
-          width: 28px;
-          height: 28px;
-          background: var(--bg-dark);
-          border-radius: 4px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--rose-gold-pale);
-          flex-shrink: 0;
-        }
-
-        .ic-title {
-          font-family: 'Playfair Display', serif;
-          font-size: 13px;
-          font-weight: 400;
-          color: var(--text-primary);
-        }
-
-        .ic-subtitle {
-          font-family: 'Outfit', sans-serif;
-          font-size: 10px;
-          font-weight: 300;
-          color: var(--text-muted);
-          margin-top: 1px;
-          letter-spacing: 0.02em;
-        }
-
-        .ic-messages {
-          flex: 1;
-          overflow-y: auto;
-          padding: 16px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .ic-empty {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          padding: 32px 16px;
-          gap: 8px;
-          flex: 1;
-        }
-
-        .ic-empty-icon {
-          width: 44px;
-          height: 44px;
-          background: var(--rose-gold-light);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--rose-gold);
-          margin-bottom: 6px;
-        }
-
-        .ic-empty-title {
-          font-family: 'Playfair Display', serif;
-          font-size: 15px;
-          font-weight: 400;
-          color: var(--text-primary);
-        }
-
-        .ic-empty-sub {
-          font-family: 'Outfit', sans-serif;
-          font-size: 12px;
-          font-weight: 300;
-          color: var(--text-secondary);
-          max-width: 240px;
-          line-height: 1.5;
-        }
-
-        .ic-quick-questions {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-          width: 100%;
-          max-width: 280px;
-          margin-top: 8px;
-        }
-
-        .ic-quick-btn {
-          background: var(--bg-card);
-          border: 0.5px solid var(--border-light);
-          border-radius: var(--radius);
-          padding: 8px 12px;
-          font-family: 'Outfit', sans-serif;
-          font-size: 11px;
-          font-weight: 300;
-          color: var(--text-secondary);
-          text-align: left;
-          cursor: pointer;
-          transition: all var(--transition);
-        }
-
-        .ic-quick-btn:hover {
-          border-color: var(--rose-gold);
-          color: var(--text-primary);
-          background: var(--rose-gold-light);
-        }
-
-        .ic-message {
-          display: flex;
-          gap: 8px;
-          align-items: flex-start;
-        }
-
-        .ic-message.user { flex-direction: row-reverse; }
-
-        .ic-msg-avatar {
-          width: 22px;
-          height: 22px;
-          border-radius: 3px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-
-        .ic-msg-avatar.user {
-          background: var(--bg-dark);
-          color: var(--rose-gold-pale);
-        }
-
-        .ic-msg-avatar.assistant {
-          background: var(--rose-gold-light);
-          color: var(--rose-gold-dark);
-        }
-
-        .ic-msg-body {
-          max-width: 85%;
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-        }
-
-        .ic-message.user .ic-msg-body { align-items: flex-end; }
-
-        .ic-msg-bubble {
-          border-radius: var(--radius);
-          padding: 9px 12px;
-          font-family: 'Outfit', sans-serif;
-          font-size: 13px;
-          font-weight: 300;
-          line-height: 1.55;
-          white-space: pre-wrap;
-          word-break: break-word;
-        }
-
-        .ic-msg-bubble.user {
-          background: #2C1810;
-          color: #E8C4A8;
-          border: 0.5px solid #3d2a1e;
-        }
-
-        .ic-msg-bubble.assistant {
-          background: var(--bg-card);
-          border: 0.5px solid var(--border-light);
-          color: var(--text-primary);
-        }
-
-        .ic-loading {
-          display: flex !important;
-          flex-direction: row !important;
-          align-items: center;
-          gap: 8px;
-          color: var(--text-muted);
-          font-size: 12px;
-        }
-
-        .ic-msg-time {
-          font-family: 'DM Mono', monospace;
-          font-size: 9px;
-          font-weight: 400;
-          color: var(--text-hint);
-        }
-
-        .ic-input-area {
-          display: flex;
-          align-items: flex-end;
-          gap: 8px;
-          padding: 10px 14px;
-          border-top: 0.5px solid var(--border-light);
-          background: var(--bg-card);
-          flex-shrink: 0;
-        }
-
-        .ic-input {
-          flex: 1;
-          background: var(--bg-secondary);
-          border: 0.5px solid var(--border-light);
-          border-radius: var(--radius);
-          padding: 9px 12px;
-          color: var(--text-primary);
-          font-family: 'Outfit', sans-serif;
-          font-size: 13px;
-          font-weight: 300;
-          resize: none;
-          outline: none;
-          transition: border-color var(--transition);
-          line-height: 1.4;
-        }
-
-        .ic-input:focus { border-color: var(--rose-gold); }
-        .ic-input::placeholder { color: var(--text-hint); }
-
-        .ic-send-btn {
-          width: 34px;
-          height: 34px;
-          background: var(--rose-gold);
-          border-radius: var(--radius);
-          border: none;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--bg-primary);
-          cursor: pointer;
-          flex-shrink: 0;
-          transition: all var(--transition);
-        }
-
-        .ic-send-btn:hover:not(:disabled) {
-          background: var(--rose-gold-dark);
-          transform: translateY(-1px);
-        }
-
-        .ic-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .ic-container textarea::placeholder { color: #4a2e1e; }
       `}</style>
     </div>
   );

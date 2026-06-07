@@ -11,22 +11,28 @@ interface RecommendationCardProps {
 
 const priorityConfig = {
   critical: {
-    badgeClass: 'badge-critical',
-    icon: <AlertTriangle size={11} />,
+    icon: <AlertTriangle size={10} strokeWidth={1.5} />,
     label: 'Critical',
-    borderColor: 'var(--danger)',
+    borderColor: '#EF4444',
+    badgeBg: 'rgba(239,68,68,0.12)',
+    badgeColor: '#EF4444',
+    badgeBorder: 'rgba(239,68,68,0.25)',
   },
   high: {
-    badgeClass: 'badge-high',
-    icon: <Zap size={11} />,
+    icon: <Zap size={10} strokeWidth={1.5} />,
     label: 'High',
-    borderColor: 'var(--warning)',
+    borderColor: '#F59E0B',
+    badgeBg: 'rgba(245,158,11,0.12)',
+    badgeColor: '#F59E0B',
+    badgeBorder: 'rgba(245,158,11,0.25)',
   },
   medium: {
-    badgeClass: 'badge-medium',
-    icon: <Info size={11} />,
+    icon: <Info size={10} strokeWidth={1.5} />,
     label: 'Medium',
-    borderColor: 'var(--rose-gold)',
+    borderColor: '#C4836A',
+    badgeBg: 'rgba(196,131,106,0.12)',
+    badgeColor: '#C4836A',
+    badgeBorder: 'rgba(196,131,106,0.25)',
   },
 };
 
@@ -49,158 +55,210 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
   return (
     <div
-      className={`rec-card-wrap ${rec.priority}`}
-      style={{ borderLeftColor: config.borderColor }}
+      style={{
+        background: '#1C1208',
+        border: '0.5px solid #2a1a0e',
+        borderLeft: `2.5px solid ${config.borderColor}`,
+        borderRadius: 6,
+        padding: '12px 14px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+        transition: 'border-color 0.15s',
+      }}
     >
       {/* Header row */}
-      <div className="rcw-header">
-        <div className="rcw-badges">
-          <span className={`badge ${config.badgeClass}`}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {/* Priority badge */}
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            background: config.badgeBg,
+            color: config.badgeColor,
+            border: `0.5px solid ${config.badgeBorder}`,
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: 8,
+            fontWeight: 500,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase' as const,
+            padding: '2px 8px',
+            borderRadius: 2,
+          }}>
             {config.icon}
             {config.label}
           </span>
-          <span className="badge badge-neutral">{typeLabel[rec.type] || rec.type}</span>
+          {/* Type badge */}
+          <span style={{
+            background: 'rgba(107,64,48,0.15)',
+            color: '#6b4030',
+            border: '0.5px solid #2a1a0e',
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: 8,
+            fontWeight: 400,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase' as const,
+            padding: '2px 8px',
+            borderRadius: 2,
+          }}>
+            {typeLabel[rec.type] || rec.type}
+          </span>
         </div>
         <button
-          className="btn btn-ghost btn-sm"
           onClick={() => setExpanded(!expanded)}
-          style={{ padding: '4px 6px', textTransform: 'none', letterSpacing: 0 }}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: '#4a2e1e',
+            cursor: 'pointer',
+            padding: '3px',
+            display: 'flex',
+            alignItems: 'center',
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#8B6050')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#4a2e1e')}
         >
-          {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+          {expanded ? <ChevronUp size={13} strokeWidth={1.5} /> : <ChevronDown size={13} strokeWidth={1.5} />}
         </button>
       </div>
 
-      {/* Title — Outfit 500 */}
-      <div className="rcw-title">{rec.title}</div>
+      {/* Title — Playfair Display */}
+      <div style={{
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 13,
+        fontWeight: 400,
+        color: '#F5E6D8',
+        lineHeight: 1.35,
+      }}>
+        {rec.title}
+      </div>
 
       {/* Description — Outfit 300 */}
-      <p className="rcw-description">{rec.description}</p>
+      <p style={{
+        fontFamily: "'Outfit', sans-serif",
+        fontSize: 11,
+        fontWeight: 300,
+        color: '#8B6050',
+        lineHeight: 1.6,
+        margin: 0,
+      }}>
+        {rec.description}
+      </p>
+
+      {/* Benchmark reference pill */}
+      <span style={{
+        background: 'rgba(196,131,106,0.10)',
+        border: '0.5px solid rgba(196,131,106,0.2)',
+        color: '#C4836A',
+        fontFamily: "'DM Mono', monospace",
+        fontSize: 8,
+        padding: '3px 8px',
+        display: 'inline-block',
+        borderRadius: 2,
+        alignSelf: 'flex-start',
+      }}>
+        {rec.benchmark_reference}
+      </span>
 
       {/* Expanded details */}
       {expanded && (
-        <div className="rcw-expanded animate-fade-in">
-          <div className="rcw-detail-block">
-            <div className="rcw-detail-label">Benchmark Reference</div>
-            <span className="rec-benchmark-ref">{rec.benchmark_reference}</span>
+        <div
+          className="animate-fade-in"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
+            padding: '10px 12px',
+            background: '#0F0A07',
+            borderRadius: 4,
+            border: '0.5px solid #2a1a0e',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#4a2e1e' }}>
+              Recommended Action
+            </div>
+            <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: 0 }}>
+              {rec.action}
+            </p>
           </div>
-          <div className="rcw-detail-block">
-            <div className="rcw-detail-label">Recommended Action</div>
-            <p className="rcw-detail-text">{rec.action}</p>
-          </div>
-          <div className="rcw-detail-block">
-            <div className="rcw-detail-label">AI Reasoning</div>
-            <p className="rcw-detail-text">{rec.reasoning}</p>
-          </div>
+          {rec.reasoning && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#4a2e1e' }}>
+                AI Reasoning
+              </div>
+              <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: 0 }}>
+                {rec.reasoning}
+              </p>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Actions */}
-      <div className="rcw-actions">
-        <button className="btn btn-success btn-sm" onClick={() => onApprove(rec.id)}>
-          <CheckCircle size={12} />
+      {/* Action buttons */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        flexWrap: 'wrap',
+        paddingTop: 6,
+        borderTop: '0.5px solid #2a1a0e',
+      }}>
+        <button
+          onClick={() => onApprove(rec.id)}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            background: '#10B981', color: '#0F0A07',
+            border: 'none', borderRadius: 2,
+            padding: '6px 12px',
+            fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 500,
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            cursor: 'pointer', transition: 'background 0.15s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = '#0DA271')}
+          onMouseLeave={e => (e.currentTarget.style.background = '#10B981')}
+        >
+          <CheckCircle size={11} strokeWidth={1.5} />
           Execute
         </button>
-        <button className="btn btn-ghost btn-sm" onClick={() => onLearnMore(rec)}>
-          <Info size={12} />
+        <button
+          onClick={() => onLearnMore(rec)}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            background: 'transparent', color: '#6b4030',
+            border: '0.5px solid #2a1a0e', borderRadius: 2,
+            padding: '6px 12px',
+            fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 400,
+            letterSpacing: '0.1em', textTransform: 'uppercase',
+            cursor: 'pointer', transition: 'all 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = '#C4836A'; e.currentTarget.style.color = '#C4836A'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = '#2a1a0e'; e.currentTarget.style.color = '#6b4030'; }}
+        >
+          <Info size={11} strokeWidth={1.5} />
           Details
         </button>
         <button
-          className="btn btn-ghost btn-sm"
           onClick={() => onDismiss(rec.id)}
-          style={{ marginLeft: 'auto', color: 'var(--text-hint)' }}
+          style={{
+            marginLeft: 'auto',
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            background: 'transparent', color: '#4a2e1e',
+            border: 'none',
+            padding: '6px',
+            fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 400,
+            letterSpacing: '0.1em', textTransform: 'uppercase',
+            cursor: 'pointer', transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#8B6050')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#4a2e1e')}
         >
-          <XCircle size={12} />
+          <XCircle size={11} strokeWidth={1.5} />
           Dismiss
         </button>
       </div>
-
-      <style>{`
-        .rec-card-wrap {
-          background: var(--bg-card);
-          border: 0.5px solid var(--border-light);
-          border-left: 2.5px solid;
-          border-radius: var(--radius-lg);
-          padding: 1rem 1.1rem;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          transition: box-shadow var(--transition);
-        }
-
-        .rec-card-wrap:hover {
-          box-shadow: var(--shadow-sm);
-        }
-
-        .rcw-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .rcw-badges {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .rcw-title {
-          font-family: 'Outfit', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--text-primary);
-          line-height: 1.35;
-        }
-
-        .rcw-description {
-          font-family: 'Outfit', sans-serif;
-          font-size: 12px;
-          font-weight: 300;
-          color: var(--text-secondary);
-          line-height: 1.6;
-        }
-
-        .rcw-expanded {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          padding: 10px 12px;
-          background: var(--bg-secondary);
-          border-radius: var(--radius);
-          border: 0.5px solid var(--border-light);
-        }
-
-        .rcw-detail-block {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-        }
-
-        .rcw-detail-label {
-          font-family: 'Outfit', sans-serif;
-          font-size: 9px;
-          font-weight: 400;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--text-muted);
-        }
-
-        .rcw-detail-text {
-          font-family: 'Outfit', sans-serif;
-          font-size: 12px;
-          font-weight: 300;
-          color: var(--text-secondary);
-          line-height: 1.5;
-        }
-
-        .rcw-actions {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          flex-wrap: wrap;
-          padding-top: 6px;
-          border-top: 0.5px solid var(--border-light);
-        }
-      `}</style>
     </div>
   );
 };

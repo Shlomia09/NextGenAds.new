@@ -11,72 +11,49 @@ const BenchmarkAvailabilityBadge: React.FC<Props> = ({ availability, aovLabel, m
   const isFull = availability === 'full';
 
   return (
-    <div className={`bab-wrap ${isFull ? 'full' : 'partial'}`}>
-      <div className="bab-dot-wrap">
-        <div className={`bab-dot ${isFull ? 'full' : 'partial'}`} />
+    <div style={{
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: 8,
+      padding: '8px 11px',
+      borderRadius: 4,
+      border: `0.5px solid ${isFull ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}`,
+      background: isFull ? 'rgba(16,185,129,0.06)' : 'rgba(245,158,11,0.06)',
+    }}>
+      {/* Pulsing dot */}
+      <div style={{ display: 'flex', alignItems: 'center', paddingTop: 2 }}>
+        <div style={{
+          width: 7, height: 7,
+          borderRadius: '50%',
+          background: isFull ? '#10B981' : '#F59E0B',
+          flexShrink: 0,
+          animation: 'pulse-subtle 2.5s ease-in-out infinite',
+        }} />
       </div>
-      <div className="bab-text">
-        <div className="bab-title">
+
+      <div>
+        <div style={{
+          fontFamily: "'Outfit', sans-serif",
+          fontSize: 10,
+          fontWeight: 500,
+          letterSpacing: '0.04em',
+          color: isFull ? '#10B981' : '#F59E0B',
+        }}>
           {isFull ? '9yr Benchmark Active' : 'Partial Benchmark Active'}
         </div>
-        <div className="bab-sub">
+        <div style={{
+          fontFamily: "'DM Mono', monospace",
+          fontSize: 8,
+          fontWeight: 400,
+          marginTop: 2,
+          lineHeight: 1.4,
+          color: isFull ? 'rgba(16,185,129,0.7)' : 'rgba(245,158,11,0.6)',
+        }}>
           {isFull
             ? `847 Beauty brands · ${aovLabel ?? 'AOV calibrated'} · ${markets?.join('/') ?? 'EU'} · 2015–2024`
             : 'CPM/CTR data available · Purchase benchmarks: N/A'}
         </div>
       </div>
-
-      <style>{`
-        .bab-wrap {
-          display: flex;
-          align-items: flex-start;
-          gap: 8px;
-          padding: 9px 12px;
-          border-radius: 4px;
-          border: 0.5px solid;
-        }
-
-        .bab-wrap.full {
-          background: rgba(16,185,129,0.04);
-          border-color: rgba(16,185,129,0.2);
-        }
-
-        .bab-wrap.partial {
-          background: rgba(245,158,11,0.04);
-          border-color: rgba(245,158,11,0.2);
-        }
-
-        .bab-dot-wrap { display: flex; align-items: center; padding-top: 2px; }
-
-        .bab-dot {
-          width: 7px; height: 7px;
-          border-radius: 50%;
-          animation: pulse-subtle 2.5s ease-in-out infinite;
-          flex-shrink: 0;
-        }
-
-        .bab-dot.full    { background: #10B981; }
-        .bab-dot.partial { background: #F59E0B; }
-
-        .bab-title {
-          font-family: 'Outfit', sans-serif;
-          font-size: 11px; font-weight: 500;
-          letter-spacing: 0.04em;
-        }
-
-        .bab-wrap.full .bab-title    { color: #065F46; }
-        .bab-wrap.partial .bab-title { color: #92400E; }
-
-        .bab-sub {
-          font-family: 'DM Mono', monospace;
-          font-size: 9px; font-weight: 400;
-          margin-top: 2px;
-          line-height: 1.4;
-        }
-
-        .bab-wrap.full .bab-sub    { color: #6EE7B7; color: #047857; }
-        .bab-wrap.partial .bab-sub { color: #D97706; }
-      `}</style>
     </div>
   );
 };

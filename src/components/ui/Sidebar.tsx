@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Sparkles, BarChart3, Plug, Tag, Settings, ChevronRight, Menu, X,
+  LayoutDashboard, Sparkles, BarChart3, Plug, Tag, Settings, Menu, X,
 } from 'lucide-react';
 import type { Brand } from '../../types';
 
@@ -35,24 +35,22 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
         {/* ── Logo ── */}
         <div className="sidebar-logo-wrap">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div className="sidebar-logo-text">
-              {/* "NextGen" Playfair regular, "Ads" Playfair italic */}
-              <span>NextGen</span><em>Ads</em>
+            {/* "NextAds" regular + "Gen" italic rose gold — per spec */}
+            <div className="sidebar-logo">
+              NextAds<em>Gen</em>
             </div>
             <button className="sb-close-btn" onClick={() => setOpen(false)} aria-label="Close">
               <X size={15} strokeWidth={1.5} />
             </button>
           </div>
-          {/* Subtitle: Outfit 300, letter-spacing 0.2em, #7A5A48 */}
-          <div className="sidebar-logo-sub">Campaign Intelligence</div>
+          <div className="sidebar-tagline">Campaign Intelligence</div>
         </div>
 
-        {/* ── Active brand ── */}
+        {/* ── Active brand pill ── */}
         {brand && (
           <div className="sidebar-brand-pill">
             <div className="sidebar-brand-dot" />
             <span className="truncate">{brand.name}</span>
-            <ChevronRight size={11} style={{ color: '#7A5A48', flexShrink: 0 }} />
           </div>
         )}
 
@@ -67,28 +65,27 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
                 className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
                 onClick={() => setOpen(false)}
               >
-                <Icon size={14} strokeWidth={1.5} />
+                <Icon size={13} strokeWidth={1.5} />
                 <span>{label}</span>
               </NavLink>
             );
           })}
         </nav>
 
-        {/* ── Footer ── */}
-        <div className="sidebar-footer">
-          <div className="sidebar-benchmark-badge">
-            <div className="live-dot" style={{ background: '#C4836A' }} />
-            <span>9-Year Benchmark Active</span>
-          </div>
+        {/* ── Footer — 9yr benchmark indicator ── */}
+        <div className="sidebar-benchmark">
+          <span className="sidebar-benchmark-dot" />
+          <span className="sidebar-benchmark-text">9-Year Benchmark Active</span>
         </div>
+
       </aside>
 
       <style>{`
         /* ─── Shell ─── */
         .sidebar {
           width: 220px;
-          background: #2C1810;
-          border-right: 0.5px solid #3d2a1e;
+          background: #0F0A07;
+          border-right: 0.5px solid #2a1a0e;
           position: fixed;
           left: 0; top: 0; bottom: 0;
           display: flex;
@@ -104,33 +101,30 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           position: fixed;
           top: 12px; left: 14px;
           z-index: 110;
-          background: #2C1810;
-          border: 0.5px solid #3d2a1e;
+          background: #0F0A07;
+          border: 0.5px solid #2a1a0e;
           border-radius: 4px;
-          color: #C4A090;
+          color: #8B6050;
           width: 36px; height: 36px;
           align-items: center; justify-content: center;
           cursor: pointer;
-          box-shadow: 0 2px 8px rgba(44,24,16,0.25);
         }
-
         .sb-overlay {
           display: none;
           position: fixed; inset: 0;
-          background: rgba(44,24,16,0.55);
+          background: rgba(0,0,0,0.6);
           z-index: 99;
-          backdrop-filter: blur(3px);
+          backdrop-filter: blur(4px);
         }
-
         .sb-close-btn {
           display: none;
           background: none; border: none;
-          color: #7A5A48; cursor: pointer; padding: 2px; line-height: 1;
+          color: #4a2e1e; cursor: pointer;
+          padding: 2px; line-height: 1;
         }
-
         @media (max-width: 900px) {
           .sidebar { transform: translateX(-100%); }
-          .sidebar.sidebar-open { transform: translateX(0); box-shadow: 8px 0 32px rgba(44,24,16,0.4); }
+          .sidebar.sidebar-open { transform: translateX(0); box-shadow: 8px 0 40px rgba(0,0,0,0.5); }
           .sb-hamburger { display: flex; }
           .sb-overlay { display: block; }
           .sb-close-btn { display: flex; }
@@ -139,97 +133,121 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
         /* ─── Logo ─── */
         .sidebar-logo-wrap {
           padding: 22px 20px 16px;
-          border-bottom: 0.5px solid #3d2a1e;
+          border-bottom: 0.5px solid #2a1a0e;
           flex-shrink: 0;
         }
 
-        .sidebar-logo-text {
+        /* "NextAds" regular + "Gen" italic rose gold */
+        .sidebar-logo {
           font-family: 'Playfair Display', serif;
           font-size: 18px;
-          font-weight: 400;        /* regular weight for "NextGen" */
-          color: #F5E6D8;          /* ✅ #F5E6D8 as specified */
-          letter-spacing: 0.02em;
+          font-weight: 400;
+          color: #F5E6D8;
+          letter-spacing: 0.03em;
           line-height: 1;
         }
-
-        /* "Ads" = italic */
-        .sidebar-logo-text em {
+        .sidebar-logo em {
           font-style: italic;
           color: #C4836A;
         }
 
-        .sidebar-logo-sub {
+        .sidebar-tagline {
           font-family: 'Outfit', sans-serif;
-          font-size: 9px;
-          font-weight: 300;            /* ✅ Outfit 300 */
-          letter-spacing: 0.2em;       /* ✅ 0.2em as specified */
+          font-size: 7px;
+          letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: #7A5A48;              /* ✅ #7A5A48 as specified */
-          margin-top: 6px;
+          color: #4a2e1e;
+          margin-top: 5px;
         }
 
         /* ─── Brand pill ─── */
         .sidebar-brand-pill {
           margin: 10px 12px;
-          background: #3d2a1e;
-          border: 0.5px solid #4d3a2e;
-          border-radius: 3px; padding: 7px 10px;
-          display: flex; align-items: center; gap: 7px;
+          background: #1C1208;
+          border: 0.5px solid #2a1a0e;
+          border-radius: 3px;
+          padding: 7px 10px;
+          display: flex;
+          align-items: center;
+          gap: 7px;
           font-family: 'Outfit', sans-serif;
-          font-size: 11px; font-weight: 300; color: #C4A090;
-          overflow: hidden; cursor: pointer;
-          transition: border-color 0.2s;
+          font-size: 11px;
+          font-weight: 300;
+          color: #8B6050;
+          overflow: hidden;
           flex-shrink: 0;
+          transition: border-color 0.18s;
         }
-        .sidebar-brand-pill:hover { border-color: #6d4a3e; }
-
+        .sidebar-brand-pill:hover { border-color: #C4836A; }
         .sidebar-brand-dot {
           width: 5px; height: 5px;
-          border-radius: 50%; background: #C4836A; flex-shrink: 0;
+          border-radius: 50%;
+          background: #C4836A;
+          flex-shrink: 0;
         }
 
         /* ─── Nav ─── */
         .sidebar-nav {
-          flex: 1; padding: 8px 10px;
-          display: flex; flex-direction: column; gap: 1px;
+          flex: 1;
+          padding: 8px 0;
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
           overflow-y: auto;
         }
 
         .sidebar-nav-item {
-          display: flex; align-items: center; gap: 9px;
-          padding: 9px 12px; border-radius: 2px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 20px;
           font-family: 'Outfit', sans-serif;
-          font-size: 11px; font-weight: 300;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: #C4A090;                      /* ✅ #C4A090 inactive */
+          font-size: 11px;
+          font-weight: 300;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #6b4030;
           text-decoration: none;
-          transition: all 0.18s ease;
+          transition: color 0.15s, background 0.15s;
           border-left: 2px solid transparent;
         }
-
         .sidebar-nav-item:hover {
-          color: #F5E6D8;                      /* ✅ #F5E6D8 on hover */
-          background: rgba(196,131,106,0.07);
+          color: #8B6050;
+          background: rgba(196,131,106,0.04);
         }
-
         .sidebar-nav-item.active {
-          color: #F5E6D8;                      /* ✅ #F5E6D8 active */
+          color: #C4A090;
           border-left-color: #C4836A;
-          background: rgba(196,131,106,0.10);
+          padding-left: calc(20px - 2px);
+          background: rgba(196,131,106,0.06);
         }
 
-        /* ─── Footer ─── */
-        .sidebar-footer {
-          padding: 14px 12px;
-          border-top: 0.5px solid #3d2a1e;
+        /* ─── Footer / Benchmark indicator ─── */
+        .sidebar-benchmark {
+          padding: 14px 20px;
+          border-top: 0.5px solid #2a1a0e;
+          display: flex;
+          align-items: center;
+          gap: 7px;
           flex-shrink: 0;
         }
-
-        .sidebar-benchmark-badge {
-          display: flex; align-items: center; gap: 7px;
+        .sidebar-benchmark-dot {
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: #10B981;
+          flex-shrink: 0;
+          animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0.4; }
+        }
+        .sidebar-benchmark-text {
           font-family: 'Outfit', sans-serif;
-          font-size: 10px; font-weight: 300;
-          letter-spacing: 0.08em; color: #7A5A48;
+          font-size: 8px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #4a2e1e;
         }
       `}</style>
     </>

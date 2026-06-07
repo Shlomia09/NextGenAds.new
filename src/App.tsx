@@ -21,11 +21,12 @@ const queryClient = new QueryClient({
 });
 
 const LoadingScreen: React.FC = () => (
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-primary)', gap: 12 }}>
-    <div className="animate-spin" style={{ width: 18, height: 18, border: '1.5px solid var(--border-light)', borderTopColor: 'var(--rose-gold)', borderRadius: '50%' }} />
-    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, color: 'var(--text-muted)' }}>Loading…</span>
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#0F0A07', gap: 12 }}>
+    <div className="animate-spin" style={{ width: 18, height: 18, border: '1.5px solid #2a1a0e', borderTopColor: '#C4836A', borderRadius: '50%' }} />
+    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, color: '#6b4030', letterSpacing: '0.1em' }}>Loading…</span>
   </div>
 );
+
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
