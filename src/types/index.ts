@@ -1,6 +1,13 @@
-// Brand & Account Types
+// ============================================================
+// NextGenAds — Type Definitions
+// ============================================================
+
 export type Platform = 'meta' | 'google';
 export type BrandStage = 'new' | 'scaling' | 'mature';
+export type BusinessType = 'ecommerce' | 'clinic' | 'spa' | 'salon' | 'wholesale';
+export type BusinessGoal = 'purchases' | 'leads' | 'bookings' | 'inquiries';
+export type BenchmarkAvailability = 'full' | 'partial';
+
 export type RecommendationPriority = 'critical' | 'high' | 'medium';
 export type RecommendationStatus = 'pending' | 'approved' | 'executed' | 'dismissed';
 export type RecommendationType =
@@ -15,11 +22,29 @@ export interface Brand {
   user_id: string;
   name: string;
   category: string;
+  // Ecommerce
   aov_min: number;
   aov_max: number;
   currency: string;
+  // All types
+  business_type: BusinessType;
   markets: string[];
   stage: BrandStage;
+  goal?: BusinessGoal;
+  ad_spend_range?: string;
+  biggest_challenge?: string;
+  // Clinic/Spa
+  avg_treatment_value?: number;
+  booking_platform?: string;
+  services?: string[];
+  // Salon
+  avg_ticket?: number;
+  // Wholesale
+  avg_wholesale_order?: number;
+  target_buyers?: string[];
+  // Integrations
+  crm_platform?: string;
+  ecom_platform?: string;
   created_at: string;
 }
 
@@ -49,9 +74,19 @@ export interface Campaign {
   spend: number;
   impressions: number;
   clicks: number;
+  // Ecommerce
   purchases: number;
   revenue: number;
   roas: number;
+  // Lead gen (clinic/spa/salon/wholesale)
+  leads: number;
+  cpl: number;
+  lead_quality_rate: number;
+  qualified_leads: number;
+  bookings: number;
+  // Local (salon)
+  reach: number;
+  frequency: number;
   date_start: string;
   date_end?: string;
   synced_at: string;

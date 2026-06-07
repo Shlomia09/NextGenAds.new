@@ -67,14 +67,18 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         <span className="bm-bench-value">{formatVal(benchmarkValue)}</span>
       </div>
 
-      {/* Delta pill */}
+      {/* Delta pill — correct semantics for cost vs performance metrics */}
       <div className={`metric-benchmark ${statusClass}`} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         {isNeutral ? (
           <><Minus size={10} /> At benchmark</>
         ) : isBeating ? (
-          <><TrendingUp size={10} /> +{Math.abs(diffPct).toFixed(1)}% above</>
+          higherIsBetter
+            ? <><TrendingUp size={10} /> +{Math.abs(diffPct).toFixed(1)}% above benchmark</>
+            : <><TrendingDown size={10} /> {Math.abs(diffPct).toFixed(1)}% below benchmark ✓</>
         ) : (
-          <><TrendingDown size={10} /> {Math.abs(diffPct).toFixed(1)}% below</>
+          higherIsBetter
+            ? <><TrendingDown size={10} /> {Math.abs(diffPct).toFixed(1)}% below benchmark</>
+            : <><TrendingUp size={10} /> {Math.abs(diffPct).toFixed(1)}% above benchmark ↑</>
         )}
       </div>
 
