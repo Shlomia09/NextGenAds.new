@@ -267,10 +267,14 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .single();
 
-    const chatLimit = (subData?.plans as { chat_queries_monthly?: number } | null)?.chat_queries_monthly ?? 0;
+    // If no subscription row → user is on a grace period, don't enforce limit.
+    // chatLimit = -1 means unlimited. chatLimit = 0 means no access (shouldn't happen in practice).
+    const chatLimit = subData
+      ? ((subData.plans as { chat_queries_monthly?: number } | null)?.chat_queries_monthly ?? -1)
+      : -1; // No subscription record = no limit enforced
 
-    if (chatLimit !== -1) {
-      // Not unlimited — check current usage
+    if (chatLimit !== -1 && chatLimit > 0) {
+      // Has a plan with a finite chat quota — check usage
       const { data: usageData } = await supabaseService
         .from('usage')
         .select('chat_queries_used')
@@ -283,7 +287,9 @@ serve(async (req) => {
         return new Response(
           JSON.stringify({
             error: 'CHAT_LIMIT_REACHED',
-            message: `You have used ${used}/${chatLimit} Intelligence Chat queries this month. Upgrade to Growth for unlimited queries.`,
+            message: `You've used all ${chatLimit} Intelligence Chat queries this month. Upgrade to Growth for unlimited queries.`,
+            used,
+            limit: chatLimit,
             upgrade_to: 'growth',
           }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

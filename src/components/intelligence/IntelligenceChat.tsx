@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, User, MessageSquare, Plus } from 'lucide-react';
 
 import type { ChatMessage, Brand, Campaign } from '../../types';
-import { sendChatMessage } from '../../lib/claude-api';
+import { sendChatMessage, ChatLimitError } from '../../lib/claude-api';
 
 interface IntelligenceChatProps {
   brand: Brand;
@@ -85,13 +85,23 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch {
-      const errorMsg: ChatMessage = {
-        role: 'assistant',
-        content: 'Unable to connect to the Intelligence Engine. Please check your API configuration.',
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, errorMsg]);
+    } catch (err) {
+      // ── Chat limit reached ───────────────────────────────
+      if (err instanceof ChatLimitError) {
+        const limitMsg: ChatMessage = {
+          role: 'assistant',
+          content: `__LIMIT__${err.used}__${err.limit}`,
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, limitMsg]);
+      } else {
+        const errorMsg: ChatMessage = {
+          role: 'assistant',
+          content: 'Unable to connect to the Intelligence Engine. Please check your API configuration.',
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, errorMsg]);
+      }
     } finally {
       setLoading(false);
     }
@@ -404,9 +414,46 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                       }
                 }
               >
-                {msg.role === 'assistant'
-                  ? renderAIContent(msg.content)
-                  : msg.content}
+                {/* Limit reached special card */}
+                {msg.role === 'assistant' && msg.content.startsWith('__LIMIT__')
+                  ? (() => {
+                      const [, used, limit] = msg.content.split('__');
+                      return (
+                        <div style={{
+                          background: 'rgba(196,131,106,0.08)',
+                          border: '0.5px solid rgba(196,131,106,0.3)',
+                          borderRadius: 4, padding: '12px 14px',
+                          marginRight: '10%',
+                        }}>
+                          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C4836A', marginBottom: 6 }}>
+                            Monthly limit reached
+                          </div>
+                          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 500, color: '#C4836A', marginBottom: 4 }}>
+                            {used} / {limit} queries
+                          </div>
+                          <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: '0 0 12px' }}>
+                            You've used all {limit} Intelligence Chat queries for this month.
+                            Upgrade to Growth for unlimited queries.
+                          </p>
+                          <a
+                            href="/pricing"
+                            style={{
+                              display: 'inline-block',
+                              background: '#C4836A', color: '#0F0A07',
+                              borderRadius: 3, padding: '7px 16px',
+                              fontFamily: "'Outfit', sans-serif", fontSize: 9,
+                              fontWeight: 500, letterSpacing: '0.12em',
+                              textTransform: 'uppercase', textDecoration: 'none',
+                            }}
+                          >
+                            Upgrade to Growth →
+                          </a>
+                        </div>
+                      );
+                    })()
+                  : msg.role === 'assistant'
+                    ? renderAIContent(msg.content)
+                    : msg.content}
               </div>
 
               {/* Timestamp */}
