@@ -1,4 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, Component } from 'react';
+
+// ── Error boundary — shows actual error instead of blank screen ──
+class ConnectErrorBoundary extends Component<{ children: React.ReactNode }, { error: string | null }> {
+  state = { error: null };
+  static getDerivedStateFromError(e: Error) { return { error: e.message }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ minHeight: '100vh', background: '#0F0A07', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+          <div style={{ background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: 24, maxWidth: 600, width: '100%' }}>
+            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#EF4444', marginBottom: 8 }}>RENDER ERROR</div>
+            <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 13, color: '#F5E6D8', wordBreak: 'break-all' }}>{this.state.error}</div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Globe, Search, Mail, CheckCircle, AlertCircle,
@@ -614,4 +633,10 @@ const Connect: React.FC = () => {
   );
 };
 
-export default Connect;
+const ConnectWithBoundary: React.FC = () => (
+  <ConnectErrorBoundary>
+    <Connect />
+  </ConnectErrorBoundary>
+);
+
+export default ConnectWithBoundary;
