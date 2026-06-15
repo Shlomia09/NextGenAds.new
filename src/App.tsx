@@ -15,6 +15,7 @@ import Settings from './pages/Settings';
 import DemoDashboard from './pages/DemoDashboard';
 import Pricing from './pages/Pricing';
 import Audit from './pages/Audit';
+import MetaCallback from './pages/MetaCallback';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,6 +55,9 @@ const AppRoutes: React.FC = () => (
     <Route path="/demo"    element={<DemoDashboard />} />
     <Route path="/pricing" element={<Pricing />} />
     <Route path="/audit"   element={<Audit />} />
+
+    {/* ── OAuth Callbacks (public, no sidebar) ── */}
+    <Route path="/connect/meta/callback" element={<MetaCallback />} />
 
     {/* ── Onboarding (auth, no sidebar) ── */}
     <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />

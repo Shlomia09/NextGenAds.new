@@ -6,9 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const META_APP_ID = Deno.env.get('META_APP_ID');
+const META_APP_ID     = Deno.env.get('META_APP_ID');
 const META_APP_SECRET = Deno.env.get('META_APP_SECRET');
-const APP_URL = Deno.env.get('APP_URL') || 'http://localhost:5173';
+const APP_URL         = Deno.env.get('APP_URL') || 'https://next-gen-ads-new.vercel.app';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -16,67 +16,120 @@ serve(async (req) => {
   }
 
   try {
-    const url = new URL(req.url);
-    const code = url.searchParams.get('code');
-    const userId = url.searchParams.get('state'); // Pass user ID as state param
+    const url    = new URL(req.url);
+    const code   = url.searchParams.get('code');
+    const userId = url.searchParams.get('state'); // user ID passed as state
 
     if (!code || !userId) {
-      return Response.redirect(`${APP_URL}/connect?error=missing_params`);
+      return new Response(
+        JSON.stringify({ error: 'missing_params', message: 'Missing code or state parameter' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Exchange code for access token
+    // ── Exchange code for access token ──────────────────────────
+    const redirectUri = `${APP_URL}/connect/meta/callback`;
     const tokenUrl = new URL('https://graph.facebook.com/v19.0/oauth/access_token');
-    tokenUrl.searchParams.set('client_id', META_APP_ID!);
+    tokenUrl.searchParams.set('client_id',     META_APP_ID!);
     tokenUrl.searchParams.set('client_secret', META_APP_SECRET!);
-    tokenUrl.searchParams.set('redirect_uri', `${APP_URL}/connect/meta/callback`);
-    tokenUrl.searchParams.set('code', code);
+    tokenUrl.searchParams.set('redirect_uri',  redirectUri);
+    tokenUrl.searchParams.set('code',          code);
 
-    const tokenRes = await fetch(tokenUrl.toString());
+    const tokenRes  = await fetch(tokenUrl.toString());
     const tokenData = await tokenRes.json();
 
     if (tokenData.error) {
-      console.error('Meta token error:', tokenData.error);
-      return Response.redirect(`${APP_URL}/connect?error=token_exchange_failed`);
+      console.error('Meta token exchange error:', tokenData.error);
+      return new Response(
+        JSON.stringify({ error: 'token_exchange_failed', message: tokenData.error.message }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const accessToken = tokenData.access_token;
 
-    // Get ad accounts for this token
-    const accountsRes = await fetch(
-      `https://graph.facebook.com/v19.0/me/adaccounts?fields=account_id,name,account_status&access_token=${accessToken}`
+    // ── Get long-lived token (optional but recommended) ──────────
+    // Short-lived tokens expire in ~1 hour; long-lived in 60 days
+    let longLivedToken = accessToken;
+    try {
+      const extendUrl = new URL('https://graph.facebook.com/v19.0/oauth/access_token');
+      extendUrl.searchParams.set('grant_type',        'fb_exchange_token');
+      extendUrl.searchParams.set('client_id',         META_APP_ID!);
+      extendUrl.searchParams.set('client_secret',     META_APP_SECRET!);
+      extendUrl.searchParams.set('fb_exchange_token', accessToken);
+
+      const extendRes  = await fetch(extendUrl.toString());
+      const extendData = await extendRes.json();
+      if (extendData.access_token) longLivedToken = extendData.access_token;
+    } catch (e) {
+      console.warn('Could not extend token, using short-lived:', e);
+    }
+
+    // ── Fetch ad accounts ────────────────────────────────────────
+    const accountsRes  = await fetch(
+      `https://graph.facebook.com/v19.0/me/adaccounts?fields=account_id,name,account_status,currency,timezone_name&access_token=${longLivedToken}`
     );
     const accountsData = await accountsRes.json();
+
+    if (accountsData.error) {
+      return new Response(
+        JSON.stringify({ error: 'accounts_fetch_failed', message: accountsData.error.message }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const adAccounts = accountsData.data || [];
 
     if (adAccounts.length === 0) {
-      return Response.redirect(`${APP_URL}/connect?error=no_ad_accounts`);
+      return new Response(
+        JSON.stringify({ error: 'no_ad_accounts', message: 'No ad accounts found on this Meta account.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Use service role to store tokens (bypass RLS)
+    // ── Store in Supabase (service role bypasses RLS) ────────────
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    // Store the first ad account (or all of them)
-    for (const account of adAccounts.slice(0, 1)) {
-      await supabase.from('ad_accounts').upsert({
-        user_id: userId,
-        platform: 'meta',
-        account_id: account.account_id,
-        account_name: account.name,
-        access_token: accessToken,
-        status: account.account_status === 1 ? 'active' : 'error',
-        connected_at: new Date().toISOString(),
-      }, {
-        onConflict: 'user_id,platform,account_id',
-      });
+    const stored = [];
+    for (const account of adAccounts) {
+      const { error: upsertError } = await supabase
+        .from('ad_accounts')
+        .upsert({
+          user_id:      userId,
+          platform:     'meta',
+          account_id:   account.account_id,
+          account_name: account.name,
+          access_token: longLivedToken,
+          status:       account.account_status === 1 ? 'active' : 'error',
+          connected_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id,platform,account_id',
+        });
+
+      if (!upsertError) stored.push(account.account_id);
+      else console.error('Upsert error:', upsertError);
     }
 
-    return Response.redirect(`${APP_URL}/connect?success=meta_connected`);
+    return new Response(
+      JSON.stringify({
+        success:       true,
+        accounts_stored: stored.length,
+        accounts:      adAccounts.map((a: { account_id: string; name: string }) => ({
+          account_id: a.account_id,
+          name:       a.name,
+        })),
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
 
   } catch (error) {
-    console.error('Meta OAuth error:', error);
-    return Response.redirect(`${APP_URL}/connect?error=${error.message}`);
+    console.error('meta-oauth error:', error);
+    return new Response(
+      JSON.stringify({ error: 'internal_error', message: error instanceof Error ? error.message : String(error) }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 });
