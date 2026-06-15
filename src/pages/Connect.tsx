@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Globe, Search, Mail, CheckCircle, AlertCircle,
-  ArrowRight, RefreshCw, Zap, Clock
+  ArrowRight, RefreshCw, Zap,
 } from 'lucide-react';
+
 import { getAdAccounts, supabase } from '../lib/supabase';
 import { initiateMetaOAuth, syncMetaCampaigns } from '../lib/meta-api';
 import { useAuth } from '../hooks/useAuth';
