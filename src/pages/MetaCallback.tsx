@@ -90,67 +90,25 @@ const MetaCallback: React.FC = () => {
           throw new Error(body.error || body.message || `HTTP ${res.status}`);
         }
 
-        // ── Use the accounts returned in the edge function response ─────
+        // ── Build picker directly from edge function response (no DB needed) ──
+        // The edge function returns: { accounts: [{account_id, name}] }
+        // We show these in the picker WITHOUT querying the DB.
+        // This works regardless of whether the edge function's upsert succeeded.
         const responseAccounts: { account_id: string; name: string }[] = body.accounts || [];
 
         if (responseAccounts.length === 0) {
           throw new Error('No ad accounts found on this Meta account.');
         }
 
-        // Query DB rows by account_id (works regardless of status)
-        const accountIdList = responseAccounts.map(a => a.account_id);
-        const { data: dbAccounts, error: dbError } = await supabase
-          .from('ad_accounts')
-          .select('id, account_id, account_name, status')
-          .eq('user_id', user.id)
-          .eq('platform', 'meta')
-          .in('account_id', accountIdList)
-          .order('account_name');
+        // Build picker items using account_id as the picker key
+        const pickerAccounts = responseAccounts.map(a => ({
+          id:           a.account_id,   // use account_id as key throughout
+          account_id:   a.account_id,
+          account_name: a.name,
+          status:       'active' as const,
+        }));
 
-        if (dbError) {
-          console.error('DB query error:', dbError);
-        }
-
-        // Fallback: if DB upsert failed (missing unique constraint etc.),
-        // re-insert accounts directly so the picker can proceed
-        let finalAccounts = dbAccounts && dbAccounts.length > 0 ? dbAccounts : null;
-
-        if (!finalAccounts) {
-          // Attempt direct insert for accounts not yet in DB
-          const inserts = responseAccounts.map(a => ({
-            user_id: user.id,
-            platform: 'meta',
-            account_id: a.account_id,
-            account_name: a.name,
-            status: 'active',
-            connected_at: new Date().toISOString(),
-          }));
-
-          const { data: inserted, error: insertErr } = await supabase
-            .from('ad_accounts')
-            .upsert(inserts, { onConflict: 'user_id,platform,account_id' })
-            .select('id, account_id, account_name, status');
-
-          if (insertErr) {
-            console.error('Insert fallback error:', insertErr);
-            // Last resort: build from response without DB ids
-            // We'll use account_id as key (handleConfirm will match by account_id)
-            finalAccounts = responseAccounts.map(a => ({
-              id: a.account_id,
-              account_id: a.account_id,
-              account_name: a.name,
-              status: 'active',
-            }));
-          } else {
-            finalAccounts = inserted || [];
-          }
-        }
-
-        if (!finalAccounts || finalAccounts.length === 0) {
-          throw new Error('Could not load your ad accounts. Please try again.');
-        }
-
-        setAccounts(finalAccounts);
+        setAccounts(pickerAccounts);
         setSelected(new Set());
         setStatus('selecting');
 
@@ -207,33 +165,45 @@ const MetaCallback: React.FC = () => {
   const handleConfirm = async () => {
     setStatus('saving');
 
-    const selectedIds   = accounts.filter(a =>  selected.has(a.id)).map(a => a.id);
-    const unselectedIds = accounts.filter(a => !selected.has(a.id)).map(a => a.id);
-
-    // 1. Activate selected accounts with config
+    // cfg.id = account_id (external Meta ID, e.g. "380949088921209")
+    // Use upsert by (user_id, platform, account_id) — works whether
+    // the edge function stored the row or not.
     for (const cfg of configs) {
       await supabase
         .from('ad_accounts')
-        .update({
-          status:          'active',
+        .upsert({
+          user_id:         userId,
+          platform:        'meta',
+          account_id:      cfg.id,          // Meta external account_id
+          account_name:    cfg.account_name,
           display_name:    cfg.display_name,
           brand_id:        cfg.brand_id || null,
           conversion_type: cfg.conversion_type,
-        })
-        .eq('id', cfg.id);
+          status:          'active',
+          connected_at:    new Date().toISOString(),
+        }, { onConflict: 'user_id,platform,account_id' });
+      // Note: upsert preserves existing access_token if row exists
     }
 
-    // 2. Delete the accounts the user did NOT select
-    if (unselectedIds.length > 0) {
-      await supabase.from('ad_accounts').delete().in('id', unselectedIds);
-    }
+    // Delete unselected accounts by account_id
+    const unselectedAccountIds = accounts
+      .filter(a => !selected.has(a.id))
+      .map(a => a.account_id);
 
-    // Suppress unused var warning
-    void selectedIds;
+    if (unselectedAccountIds.length > 0) {
+      await supabase
+        .from('ad_accounts')
+        .delete()
+        .eq('user_id', userId)
+        .eq('platform', 'meta')
+        .in('account_id', unselectedAccountIds);
+    }
 
     setStatus('success');
     setTimeout(() => navigate('/connect?success=meta_connected'), 1200);
   };
+
+
 
 
   // ── Card wrapper ───────────────────────────────────────────
