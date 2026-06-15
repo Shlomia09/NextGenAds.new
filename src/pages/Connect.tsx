@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Globe, Search, Mail, CheckCircle, AlertCircle,
-  ArrowRight, RefreshCw, Zap,
+  ArrowRight, RefreshCw, Zap, Trash2, Link2Off,
 } from 'lucide-react';
+
 
 import { getAdAccounts, supabase } from '../lib/supabase';
 import { initiateMetaOAuth, syncMetaCampaigns } from '../lib/meta-api';
@@ -21,6 +22,11 @@ const Connect: React.FC = () => {
   const [syncingId,  setSyncingId]  = useState<string | null>(null);
   const [syncResults, setSyncResults] = useState<Record<string, { synced: number; total: number }>>({});
   const [syncErrors,  setSyncErrors]  = useState<Record<string, string>>({});
+
+  // Disconnect modal
+  const [disconnectTarget, setDisconnectTarget] = useState<{ id: string; name: string } | null>(null);
+  const [disconnecting, setDisconnecting] = useState(false);
+
 
   const successParam = searchParams.get('success');
   const errorParam   = searchParams.get('error');
@@ -63,13 +69,135 @@ const Connect: React.FC = () => {
   };
 
   // ── Disconnect a specific account ────────────────────────────
-  const handleDisconnect = async (accountId: string) => {
-    await supabase.from('ad_accounts').delete().eq('id', accountId);
-    refetchAccounts();
+  const handleDisconnect = async (deleteData: boolean) => {
+    if (!disconnectTarget) return;
+    setDisconnecting(true);
+    const { id: accountId } = disconnectTarget;
+
+    try {
+      if (deleteData) {
+        // Delete all campaigns associated with this account's brand
+        const { data: brands } = await supabase
+          .from('brands').select('id').eq('user_id', user!.id);
+        if (brands && brands.length > 0) {
+          await supabase.from('campaigns')
+            .delete()
+            .in('brand_id', brands.map((b: { id: string }) => b.id));
+        }
+      }
+      // Always remove the ad account record
+      await supabase.from('ad_accounts').delete().eq('id', accountId);
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+      refetchAccounts();
+    } finally {
+      setDisconnecting(false);
+      setDisconnectTarget(null);
+    }
   };
+
 
   return (
     <div className="page-container">
+
+      {/* ── Disconnect Confirmation Modal ── */}
+      {disconnectTarget && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+        }}>
+          <div style={{
+            background: '#1C1208', border: '0.5px solid #2a1a0e',
+            borderRadius: 8, padding: '32px 36px',
+            maxWidth: 440, width: '100%',
+            display: 'flex', flexDirection: 'column', gap: 20,
+          }}>
+            {/* Icon + title */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{
+                width: 42, height: 42, background: 'rgba(239,68,68,0.08)',
+                border: '0.5px solid rgba(239,68,68,0.25)', borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <Link2Off size={18} color="#EF4444" strokeWidth={1.5} />
+              </div>
+              <div>
+                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: '#F5E6D8', marginBottom: 3 }}>
+                  Disconnect account?
+                </div>
+                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#4a2e1e' }}>
+                  {disconnectTarget.name}
+                </div>
+              </div>
+            </div>
+
+            <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: '#8B6050', lineHeight: 1.65, margin: 0 }}>
+              Do you want to keep the campaign data already synced to NextAdsGen, or delete everything?
+            </p>
+
+            {/* Two action buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {/* Keep data — just disconnect token */}
+              <button
+                onClick={() => handleDisconnect(false)}
+                disabled={disconnecting}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  background: 'rgba(196,131,106,0.08)', border: '0.5px solid rgba(196,131,106,0.3)',
+                  borderRadius: 5, padding: '13px 16px', cursor: 'pointer',
+                  textAlign: 'left', width: '100%', transition: 'background 0.15s',
+                }}
+              >
+                <Link2Off size={16} color="#C4836A" strokeWidth={1.5} style={{ flexShrink: 0 }} />
+                <div>
+                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 500, color: '#C4836A', marginBottom: 2 }}>
+                    Disconnect only
+                  </div>
+                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, fontWeight: 300, color: '#8B6050' }}>
+                    Keep all campaign data — just remove the connection
+                  </div>
+                </div>
+              </button>
+
+              {/* Delete everything */}
+              <button
+                onClick={() => handleDisconnect(true)}
+                disabled={disconnecting}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.2)',
+                  borderRadius: 5, padding: '13px 16px', cursor: 'pointer',
+                  textAlign: 'left', width: '100%', transition: 'background 0.15s',
+                }}
+              >
+                <Trash2 size={16} color="#EF4444" strokeWidth={1.5} style={{ flexShrink: 0 }} />
+                <div>
+                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 500, color: '#EF4444', marginBottom: 2 }}>
+                    Delete all data
+                  </div>
+                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, fontWeight: 300, color: '#8B6050' }}>
+                    Remove connection + delete all synced campaigns
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Cancel */}
+            <button
+              onClick={() => setDisconnectTarget(null)}
+              disabled={disconnecting}
+              style={{
+                background: 'none', border: 'none', fontFamily: "'Outfit', sans-serif",
+                fontSize: 10, color: '#4a2e1e', cursor: 'pointer', alignSelf: 'center',
+                letterSpacing: '0.06em',
+              }}
+            >
+              {disconnecting ? 'Processing…' : 'Cancel'}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="page-header">
         <div className="section-eyebrow">Integrations</div>
         <h1 className="page-title">Connect Your Accounts</h1>
@@ -148,7 +276,7 @@ const Connect: React.FC = () => {
                       </div>
                       {/* Disconnect */}
                       <button
-                        onClick={() => handleDisconnect(account.id)}
+                        onClick={() => setDisconnectTarget({ id: account.id, name: account.account_name })}
                         title="Disconnect this account"
                         style={{
                           background: 'none', border: '0.5px solid #2a1a0e',
