@@ -16,33 +16,29 @@ const Connect: React.FC = () => {
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
 
-  const [syncing, setSyncing] = useState(false);
-  const [syncResult, setSyncResult] = useState<{ synced: number; total: number } | null>(null);
-  const [syncError, setSyncError] = useState('');
+  // Per-account sync state
+  const [syncingId,  setSyncingId]  = useState<string | null>(null);
+  const [syncResults, setSyncResults] = useState<Record<string, { synced: number; total: number }>>({});
+  const [syncErrors,  setSyncErrors]  = useState<Record<string, string>>({});
 
   const successParam = searchParams.get('success');
   const errorParam   = searchParams.get('error');
 
-  const { data: adAccounts = [] } = useQuery({
+  const { data: adAccounts = [], refetch: refetchAccounts } = useQuery({
     queryKey: ['adAccounts', user?.id],
     queryFn:  () => getAdAccounts(user!.id),
     enabled:  !!user,
   });
 
-  const metaAccount = adAccounts.find((a) => a.platform === 'meta');
+  const metaAccounts = adAccounts.filter((a) => a.platform === 'meta');
 
-  // ── Sync Now ────────────────────────────────────────────────
-  const handleSync = async () => {
-    if (!metaAccount) return;
-
-    // We need a brand to associate the campaigns with.
-    // For now, get the first brand from the query cache or prompt user.
-    setSyncing(true);
-    setSyncResult(null);
-    setSyncError('');
+  // ── Sync a specific account ──────────────────────────────────
+  const handleSync = async (accountId: string) => {
+    setSyncingId(accountId);
+    setSyncResults(prev => { const n = { ...prev }; delete n[accountId]; return n; });
+    setSyncErrors(prev  => { const n = { ...prev }; delete n[accountId]; return n; });
 
     try {
-      // Fetch brands to find the active brand_id
       const { data: brands } = await supabase
         .from('brands')
         .select('id')
@@ -51,20 +47,24 @@ const Connect: React.FC = () => {
         .single();
 
       if (!brands?.id) {
-        setSyncError('No brand found. Complete onboarding first.');
+        setSyncErrors(prev => ({ ...prev, [accountId]: 'No brand found. Complete onboarding first.' }));
         return;
       }
 
-      const result = await syncMetaCampaigns(brands.id, metaAccount.id);
-      setSyncResult({ synced: result.synced, total: result.total });
-
-      // Invalidate campaigns query so dashboards refresh
+      const result = await syncMetaCampaigns(brands.id, accountId);
+      setSyncResults(prev => ({ ...prev, [accountId]: { synced: result.synced, total: result.total } }));
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
     } catch (err) {
-      setSyncError(err instanceof Error ? err.message : 'Sync failed. Please try again.');
+      setSyncErrors(prev => ({ ...prev, [accountId]: err instanceof Error ? err.message : 'Sync failed.' }));
     } finally {
-      setSyncing(false);
+      setSyncingId(null);
     }
+  };
+
+  // ── Disconnect a specific account ────────────────────────────
+  const handleDisconnect = async (accountId: string) => {
+    await supabase.from('ad_accounts').delete().eq('id', accountId);
+    refetchAccounts();
   };
 
   return (
@@ -104,7 +104,7 @@ const Connect: React.FC = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
 
         {/* ── Meta Ads ── */}
-        <div className="conn-card" style={metaAccount ? { borderColor: 'rgba(16,185,129,0.35)' } : {}}>
+        <div className="conn-card" style={metaAccounts.length > 0 ? { borderColor: 'rgba(16,185,129,0.35)', gridColumn: metaAccounts.length > 1 ? 'span 2' : undefined } : {}}>
           <div className="conn-header">
             <div className="conn-icon" style={{ background: '#1877F2' }}>
               <Globe size={18} strokeWidth={1.5} />
@@ -113,95 +113,93 @@ const Connect: React.FC = () => {
               <div className="conn-name">Meta Ads</div>
               <div className="conn-desc">Facebook & Instagram campaigns</div>
             </div>
-            {metaAccount
+            {metaAccounts.length > 0
               ? <span className="badge badge-success" style={{ marginLeft: 'auto' }}>
-                  <CheckCircle size={9} strokeWidth={1.5} />Connected
+                  <CheckCircle size={9} strokeWidth={1.5} />{metaAccounts.length} account{metaAccounts.length !== 1 ? 's' : ''} connected
                 </span>
               : <span className="badge badge-neutral" style={{ marginLeft: 'auto' }}>
                   <AlertCircle size={9} strokeWidth={1.5} />Not connected
                 </span>}
           </div>
 
-          {metaAccount ? (
+          {metaAccounts.length > 0 ? (
             <>
-              {/* Connected info */}
-              <div className="conn-account-info">
-                <div className="conn-account-name">{metaAccount.account_name}</div>
-                <div className="conn-account-id">ID: {metaAccount.account_id}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                  <div className="live-dot" />
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--success)' }}>
-                    Connected {new Date(metaAccount.connected_at).toLocaleDateString()}
-                  </span>
-                </div>
+              {/* Account list */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {metaAccounts.map(account => (
+                  <div key={account.id} style={{
+                    background: 'var(--app-bg, #0F0A07)',
+                    border: '0.5px solid var(--app-border, #2a1a0e)',
+                    borderRadius: 5, padding: '12px 14px',
+                    display: 'flex', flexDirection: 'column', gap: 10,
+                  }}>
+                    {/* Account info row */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                      <div>
+                        <div className="conn-account-name">{account.account_name}</div>
+                        <div className="conn-account-id">ID: {account.account_id}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                          <div className="live-dot" />
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--success, #10B981)' }}>
+                            Connected {new Date(account.connected_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      {/* Disconnect */}
+                      <button
+                        onClick={() => handleDisconnect(account.id)}
+                        title="Disconnect this account"
+                        style={{
+                          background: 'none', border: '0.5px solid #2a1a0e',
+                          borderRadius: 3, padding: '3px 8px',
+                          fontFamily: "'Outfit', sans-serif", fontSize: 9,
+                          color: '#8B6050', cursor: 'pointer', flexShrink: 0,
+                          letterSpacing: '0.06em',
+                        }}
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+
+                    {/* Sync result / error for this account */}
+                    {syncResults[account.id] && (
+                      <div style={{ background: 'rgba(16,185,129,0.06)', border: '0.5px solid rgba(16,185,129,0.2)', borderRadius: 4, padding: '7px 11px', fontFamily: "'Outfit', sans-serif", fontSize: 11, color: '#10B981', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <CheckCircle size={11} strokeWidth={1.5} />
+                        Synced {syncResults[account.id].synced} / {syncResults[account.id].total} campaigns
+                      </div>
+                    )}
+                    {syncErrors[account.id] && (
+                      <div style={{ background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.2)', borderRadius: 4, padding: '7px 11px', fontFamily: "'Outfit', sans-serif", fontSize: 11, color: '#EF4444', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <AlertCircle size={11} strokeWidth={1.5} />{syncErrors[account.id]}
+                      </div>
+                    )}
+
+                    {/* Sync button */}
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => handleSync(account.id)}
+                      disabled={syncingId === account.id}
+                    >
+                      {syncingId === account.id
+                        ? <><RefreshCw size={12} strokeWidth={1.5} style={{ animation: 'spin 1s linear infinite' }} />Syncing…</>
+                        : <><Zap size={12} strokeWidth={1.5} />Sync Now</>}
+                    </button>
+                  </div>
+                ))}
               </div>
 
-              {/* Sync result / error */}
-              {syncResult && (
-                <div style={{
-                  background: 'rgba(16,185,129,0.06)', border: '0.5px solid rgba(16,185,129,0.2)',
-                  borderRadius: 4, padding: '8px 12px',
-                  fontFamily: "'Outfit', sans-serif", fontSize: 11, color: '#10B981',
-                  display: 'flex', alignItems: 'center', gap: 6,
-                }}>
-                  <CheckCircle size={12} strokeWidth={1.5} />
-                  Synced {syncResult.synced} / {syncResult.total} campaigns successfully
-                </div>
-              )}
-              {syncError && (
-                <div style={{
-                  background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.2)',
-                  borderRadius: 4, padding: '8px 12px',
-                  fontFamily: "'Outfit', sans-serif", fontSize: 11, color: '#EF4444',
-                  display: 'flex', alignItems: 'center', gap: 6,
-                }}>
-                  <AlertCircle size={12} strokeWidth={1.5} />
-                  {syncError}
-                </div>
-              )}
-
-              {/* Action buttons */}
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {/* Sync Now */}
-                <button
-                  className="btn btn-primary"
-                  onClick={handleSync}
-                  disabled={syncing}
-                  style={{ flex: 1 }}
-                >
-                  {syncing
-                    ? <><RefreshCw size={12} strokeWidth={1.5} style={{ animation: 'spin 1s linear infinite' }} />Syncing…</>
-                    : <><Zap size={12} strokeWidth={1.5} />Sync Now</>
-                  }
-                </button>
-
-                {/* Reconnect */}
-                <button
-                  className="btn btn-ghost btn-sm"
-                  onClick={initiateMetaOAuth}
-                  title="Reconnect with a different account"
-                >
-                  <RefreshCw size={11} strokeWidth={1.5} />
-                  Reconnect
-                </button>
-              </div>
-
-              {/* Last sync info */}
-              {metaAccount.synced_at && (
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  fontFamily: "'DM Mono', monospace", fontSize: 9, color: 'var(--text-hint)',
-                }}>
-                  <Clock size={9} strokeWidth={1.5} />
-                  Last synced {new Date(metaAccount.synced_at).toLocaleString()}
-                </div>
-              )}
+              {/* Add another account */}
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={initiateMetaOAuth}
+                style={{ alignSelf: 'flex-start' }}
+              >
+                <Globe size={11} strokeWidth={1.5} />
+                + Add another Meta account
+              </button>
 
               {/* Go to dashboard */}
-              <button
-                className="btn btn-secondary btn-sm"
-                onClick={() => navigate('/dashboard')}
-              >
+              <button className="btn btn-secondary btn-sm" onClick={() => navigate('/dashboard')}>
                 View Intelligence Dashboard
                 <ArrowRight size={11} strokeWidth={1.5} />
               </button>
