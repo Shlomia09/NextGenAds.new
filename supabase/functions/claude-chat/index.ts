@@ -45,6 +45,73 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// ── Per-conversion-type benchmark context (mirrors src/lib/conversionConfig.ts) ──
+const BENCHMARK_CONTEXT: Record<string, string> = {
+  ecommerce: `
+## Benchmark Context: eCommerce / Sales
+You are analyzing a SALES & ROAS optimization account.
+Key benchmarks (Beauty & Cosmetics, 9-year dataset):
+- AOV €80-120 bracket → Target ROAS: 3.0-4.0x
+- AOV €120-200 bracket → Target ROAS: 4.0-6.0x
+- CAC benchmark: €25-45 for skincare, €35-60 for cosmetics
+- CPM benchmark: €8-14 cold audience, €6-10 retargeting
+- Scaling rule: increase budget +20% ONLY when ROAS stable for 7 consecutive days
+- Cold audience CTR: ≥1.5% acceptable, >2.5% excellent
+- Retargeting window: 7-14 days optimal for skincare
+- Kill rule: CPM >€18 for cold audience = kill or creative refresh
+Primary optimization KPIs: ROAS, CAC, Revenue, Purchase Volume
+`,
+  leads: `
+## Benchmark Context: Lead Generation
+You are analyzing a LEAD GENERATION account.
+Key benchmarks (Beauty clinics, spas, salons, 9-year dataset):
+- Clinic CPL benchmark: €28-45 (good), <€25 (excellent), >€55 (concerning)
+- Spa CPL benchmark: €20-35 (good), >€50 (concerning)
+- Salon CPL benchmark: €15-28 (good), >€40 (concerning)
+- Lead Quality Rate target: ≥35% (qualified/total leads)
+- Show Rate benchmark: 40-60% of leads should convert to booked appointments
+- Cost per Booking: €80-120 for clinics, €50-80 for spas/salons
+- Instant Forms → lower CPL but 20-30% lower quality vs Landing Page
+- CPM benchmark: €8-14 cold, frequency cap: 2-3x for local audiences
+Primary optimization KPIs: CPL, Lead Quality Rate, Cost per Booking, Show Rate
+`,
+  bookings: `
+## Benchmark Context: Direct Bookings
+You are analyzing a BOOKING CONVERSION account.
+Key benchmarks (Beauty service businesses):
+- Cost per Booking: €60-100 acceptable, <€60 excellent
+- Show Rate: 50-65% industry benchmark (no-show = wasted ad spend)
+- Lead-to-Booking conversion: target ≥40%
+- LTV consideration: focus on new client acquisition, not just bookings
+- Best performing ad formats: Video testimonials, before/after, seasonal offers
+- Gift voucher campaigns: 3.2x better performance Oct-Dec
+Primary optimization KPIs: Cost per Booking, Show Rate, Lead-to-Booking Rate
+`,
+  awareness: `
+## Benchmark Context: Brand Awareness / Reach
+You are analyzing a BRAND AWARENESS account.
+Key benchmarks (Beauty & Cosmetics):
+- CPM benchmark: €6-12 (awareness campaigns typically lower than conversion)
+- Optimal frequency: 2.5-4.0x per week for brand recall
+- Frequency >5x = creative fatigue, especially for local audiences
+- Reach objective works best paired with retargeting (conversion funnel)
+- Awareness campaigns alone don't drive ROI — always pair with conversion layer
+- Video view rate benchmark: >15% for 3-second view, >3% for 50% completion
+Primary optimization KPIs: Reach, CPM, Frequency, Video View Rate
+`,
+  app: `
+## Benchmark Context: App Installs
+You are analyzing an APP INSTALL campaign.
+Key benchmarks:
+- CPI (Cost per Install) benchmark: €1.50-4.00 for beauty/lifestyle apps
+- D1 retention rate target: ≥25%
+- CTR benchmark: ≥1.0% for app install ads
+- Best performing creative: short video (6-15 sec), showing app UI
+- Target: lookalike of existing app users (1-3% similarity)
+Primary optimization KPIs: CPI, CTR, Install Volume
+`,
+};
+
 // ============================================================
 // THE INTELLIGENCE SYSTEM PROMPT — CORE IP (NEVER CLIENT-SIDE)
 // ============================================================
@@ -277,7 +344,7 @@ serve(async (req) => {
   }
 
   try {
-    const { brand_id, messages, campaigns: requestCampaigns } = await req.json();
+    const { brand_id, messages, campaigns: requestCampaigns, conversion_type } = await req.json();
     const campaigns = (requestCampaigns || []) as {name: string; objective: string; spend: number}[];
 
     // Auth check
@@ -352,7 +419,10 @@ serve(async (req) => {
       .limit(10);
 
     // Build context-enriched system prompt
+    const conversionBenchmark = BENCHMARK_CONTEXT[conversion_type || 'ecommerce'] || BENCHMARK_CONTEXT.ecommerce;
     const contextualSystemPrompt = `${INTELLIGENCE_SYSTEM_PROMPT}
+
+${conversionBenchmark}
 
 ## Current Brand Context
 

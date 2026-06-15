@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Sparkles, BarChart3, Plug, Tag, Settings, Menu, X,
 } from 'lucide-react';
 import type { Brand } from '../../types';
+import AccountSwitcher from './AccountSwitcher';
 
 interface SidebarProps { brand?: Brand | null; }
 
@@ -44,6 +45,11 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
             </button>
           </div>
           <div className="sidebar-tagline">Campaign Intelligence</div>
+        </div>
+
+        {/* ── Account Switcher ── */}
+        <div style={{ padding: '0 16px 8px', borderBottom: '0.5px solid #1a0e05' }}>
+          <AccountSwitcher />
         </div>
 
         {/* ── Active brand pill ── */}

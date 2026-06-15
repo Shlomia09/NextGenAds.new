@@ -10,6 +10,7 @@ export interface ClaudeChatRequest {
   brand_id: string;
   messages: ClaudeMessage[];
   campaigns?: { name: string; objective: string; spend: number }[];
+  conversion_type?: string;
 }
 
 // Custom error for chat limit reached

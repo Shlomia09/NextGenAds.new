@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, XCircle, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import type { ConversionType } from '../types';
+import { CONVERSION_META } from '../lib/conversionConfig';
 
-type Status = 'loading' | 'selecting' | 'saving' | 'success' | 'error';
+type Status = 'loading' | 'selecting' | 'configuring' | 'saving' | 'success' | 'error';
 
 interface AdAccount {
   id: string;
@@ -11,6 +13,19 @@ interface AdAccount {
   account_name: string;
   status: string;
 }
+
+interface Brand {
+  id: string;
+  name: string;
+}
+
+type AccountConfig = {
+  id: string;
+  account_name: string;
+  display_name: string;
+  brand_id: string;
+  conversion_type: ConversionType;
+};
 
 const T = {
   bg:      '#0F0A07',
@@ -22,12 +37,24 @@ const T = {
   hint:    '#4a2e1e',
 };
 
+const CONVERSION_OPTIONS: { type: ConversionType; label: string; emoji: string }[] = [
+  { type: 'ecommerce', label: 'eCommerce / Sales',        emoji: '🛒' },
+  { type: 'leads',     label: 'Lead Generation',          emoji: '📋' },
+  { type: 'bookings',  label: 'Bookings / Appointments',  emoji: '📅' },
+  { type: 'app',       label: 'App Installs',             emoji: '📱' },
+  { type: 'awareness', label: 'Brand Awareness',          emoji: '👁' },
+];
+
 const MetaCallback: React.FC = () => {
   const navigate = useNavigate();
   const [status,   setStatus]   = useState<Status>('loading');
   const [accounts, setAccounts] = useState<AdAccount[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [configs,  setConfigs]  = useState<AccountConfig[]>([]);
+  const [brands,   setBrands]   = useState<Brand[]>([]);
+  const [brandsLoading, setBrandsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [userId,   setUserId]   = useState('');
 
   useEffect(() => {
     const run = async () => {
@@ -45,6 +72,7 @@ const MetaCallback: React.FC = () => {
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate('/login'); return; }
+      setUserId(user.id);
 
       try {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -79,8 +107,6 @@ const MetaCallback: React.FC = () => {
         setSelected(new Set()); // Start with nothing selected — user must choose
         setStatus('selecting');
 
-
-
       } catch (err) {
         setStatus('error');
         setErrorMsg(err instanceof Error ? err.message : 'Connection failed.');
@@ -99,25 +125,63 @@ const MetaCallback: React.FC = () => {
     });
   };
 
-  const handleConfirm = async () => {
+  // ── Step 1 → Step 2: move to configuring ──────────────────────
+  const handleProceedToConfigure = async () => {
     if (selected.size === 0) return;
+
+    // Fetch brands for this user
+    setBrandsLoading(true);
+    const { data: brandData } = await supabase
+      .from('brands')
+      .select('id, name')
+      .eq('user_id', userId);
+    setBrands(brandData ?? []);
+    setBrandsLoading(false);
+
+    // Initialize configs for each selected account
+    const selectedAccounts = accounts.filter(a => selected.has(a.id));
+    setConfigs(selectedAccounts.map(a => ({
+      id:              a.id,
+      account_name:    a.account_name,
+      display_name:    a.account_name,
+      brand_id:        brandData?.[0]?.id ?? '',
+      conversion_type: 'leads' as ConversionType,
+    })));
+
+    setStatus('configuring');
+  };
+
+  const updateConfig = (id: string, patch: Partial<AccountConfig>) => {
+    setConfigs(prev => prev.map(c => c.id === id ? { ...c, ...patch } : c));
+  };
+
+  // ── Step 2 → Step 3: save to DB ───────────────────────────────
+  const handleConfirm = async () => {
     setStatus('saving');
 
     const selectedIds   = accounts.filter(a =>  selected.has(a.id)).map(a => a.id);
     const unselectedIds = accounts.filter(a => !selected.has(a.id)).map(a => a.id);
 
-    // 1. Activate the selected accounts
-    if (selectedIds.length > 0) {
+    // 1. Activate selected accounts with config
+    for (const cfg of configs) {
       await supabase
         .from('ad_accounts')
-        .update({ status: 'active' })
-        .in('id', selectedIds);
+        .update({
+          status:          'active',
+          display_name:    cfg.display_name,
+          brand_id:        cfg.brand_id || null,
+          conversion_type: cfg.conversion_type,
+        })
+        .eq('id', cfg.id);
     }
 
     // 2. Delete the accounts the user did NOT select
     if (unselectedIds.length > 0) {
       await supabase.from('ad_accounts').delete().in('id', unselectedIds);
     }
+
+    // Suppress unused var warning
+    void selectedIds;
 
     setStatus('success');
     setTimeout(() => navigate('/connect?success=meta_connected'), 1200);
@@ -230,7 +294,7 @@ const MetaCallback: React.FC = () => {
 
         {/* Confirm button */}
         <button
-          onClick={handleConfirm}
+          onClick={handleProceedToConfigure}
           disabled={selected.size === 0}
           style={{
             width: '100%', background: selected.size > 0 ? T.accent : T.hint,
@@ -241,7 +305,7 @@ const MetaCallback: React.FC = () => {
             transition: 'background 0.15s',
           }}
         >
-          Connect {selected.size} account{selected.size !== 1 ? 's' : ''} →
+          Configure {selected.size} account{selected.size !== 1 ? 's' : ''} →
         </button>
 
         <button onClick={() => navigate('/connect')}
@@ -249,6 +313,202 @@ const MetaCallback: React.FC = () => {
           Cancel
         </button>
       </div>
+    </div>
+  );
+
+  // ── Configuring ────────────────────────────────────────────
+  if (status === 'configuring') return (
+    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ maxWidth: 600, width: '100%' }}>
+
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.accent, marginBottom: 8 }}>
+            Step 2 of 2 · Configure Accounts
+          </div>
+          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: T.text, marginBottom: 8 }}>
+            Set up each account
+          </div>
+          <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.55, margin: 0 }}>
+            Assign a brand and conversion objective to each ad account.
+          </p>
+        </div>
+
+        {/* No brands notice */}
+        {!brandsLoading && brands.length === 0 && (
+          <div style={{
+            background: 'rgba(196,131,106,0.08)', border: T.border, borderRadius: 8,
+            padding: '16px 20px', marginBottom: 20, textAlign: 'center',
+          }}>
+            <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, color: T.muted, margin: '0 0 12px' }}>
+              No brands yet — create one first before linking ad accounts.
+            </p>
+            <button
+              onClick={() => navigate('/brands')}
+              style={{
+                background: T.accent, color: '#0F0A07', border: 'none', borderRadius: 4,
+                padding: '9px 20px', fontFamily: "'Outfit', sans-serif",
+                fontSize: 10, fontWeight: 500, letterSpacing: '0.12em',
+                textTransform: 'uppercase', cursor: 'pointer',
+              }}
+            >
+              Create a Brand →
+            </button>
+          </div>
+        )}
+
+        {/* Account config cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
+          {configs.map((cfg, idx) => (
+            <div key={cfg.id} style={{
+              background: T.surface, border: T.border, borderRadius: 8,
+              padding: '24px 28px',
+            }}>
+              {/* Card header */}
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.muted, marginBottom: 4 }}>
+                  Account {idx + 1}
+                </div>
+                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: T.text }}>
+                  {cfg.account_name}
+                </div>
+              </div>
+
+              {/* Display Name */}
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.muted, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
+                  Display Name
+                </label>
+                <input
+                  type="text"
+                  value={cfg.display_name}
+                  onChange={e => updateConfig(cfg.id, { display_name: e.target.value })}
+                  placeholder={cfg.account_name}
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    background: T.bg, border: T.border, borderRadius: 5,
+                    padding: '10px 12px', fontFamily: "'Outfit', sans-serif",
+                    fontSize: 13, color: T.text, outline: 'none',
+                  }}
+                />
+              </div>
+
+              {/* Brand selector */}
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.muted, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
+                  Brand
+                </label>
+                {brands.length > 0 ? (
+                  <select
+                    value={cfg.brand_id}
+                    onChange={e => updateConfig(cfg.id, { brand_id: e.target.value })}
+                    style={{
+                      width: '100%', background: T.bg, border: T.border, borderRadius: 5,
+                      padding: '10px 12px', fontFamily: "'Outfit', sans-serif",
+                      fontSize: 13, color: cfg.brand_id ? T.text : T.muted, outline: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <option value="">— Select a brand —</option>
+                    {brands.map(b => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, color: T.hint, fontStyle: 'italic' }}>
+                    No brands available
+                  </div>
+                )}
+              </div>
+
+              {/* Conversion type */}
+              <div>
+                <label style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.muted, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>
+                  Conversion Objective
+                </label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {CONVERSION_OPTIONS.map(opt => {
+                    const isActive = cfg.conversion_type === opt.type;
+                    const meta = CONVERSION_META[opt.type];
+                    return (
+                      <div
+                        key={opt.type}
+                        onClick={() => updateConfig(cfg.id, { conversion_type: opt.type })}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 12,
+                          background: isActive ? meta.bg : 'transparent',
+                          border: isActive ? `0.5px solid ${meta.color}40` : T.border,
+                          borderRadius: 6, padding: '10px 14px',
+                          cursor: 'pointer', transition: 'all 0.15s',
+                        }}
+                      >
+                        {/* Radio indicator */}
+                        <div style={{
+                          width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
+                          border: isActive ? `4px solid ${meta.color}` : `1px solid ${T.hint}`,
+                          background: isActive ? meta.color + '22' : 'transparent',
+                          transition: 'all 0.15s',
+                        }} />
+                        <span style={{ fontSize: 16 }}>{opt.emoji}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, color: isActive ? T.text : T.muted, fontWeight: isActive ? 500 : 400 }}>
+                            {opt.label}
+                          </div>
+                          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.hint, marginTop: 1 }}>
+                            {meta.description}
+                          </div>
+                        </div>
+                        {isActive && (
+                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: meta.color, flexShrink: 0 }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Action buttons */}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={() => setStatus('selecting')}
+            style={{
+              flex: 1, background: 'transparent', border: T.border, borderRadius: 5,
+              padding: '13px 0', fontFamily: "'Outfit', sans-serif",
+              fontSize: 11, fontWeight: 500, letterSpacing: '0.12em',
+              textTransform: 'uppercase', cursor: 'pointer', color: T.muted,
+            }}
+          >
+            ← Back
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={brands.length === 0 || configs.some(c => !c.brand_id)}
+            style={{
+              flex: 3,
+              background: (brands.length === 0 || configs.some(c => !c.brand_id)) ? T.hint : T.accent,
+              color: '#0F0A07', border: 'none', borderRadius: 5,
+              padding: '13px 0', fontFamily: "'Outfit', sans-serif",
+              fontSize: 11, fontWeight: 500, letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              cursor: (brands.length === 0 || configs.some(c => !c.brand_id)) ? 'not-allowed' : 'pointer',
+              transition: 'background 0.15s',
+            }}
+          >
+            Connect {configs.length} account{configs.length !== 1 ? 's' : ''} →
+          </button>
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 12 }}>
+          <button onClick={() => navigate('/connect')}
+            style={{ background: 'none', border: 'none', fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.hint, cursor: 'pointer' }}>
+            Cancel
+          </button>
+        </div>
+      </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 

@@ -3,6 +3,7 @@ import { Send, Sparkles, User, MessageSquare, Plus } from 'lucide-react';
 
 import type { ChatMessage, Brand, Campaign } from '../../types';
 import { sendChatMessage, ChatLimitError } from '../../lib/claude-api';
+import { useActiveAccount } from '../../contexts/ActiveAccountContext';
 
 interface IntelligenceChatProps {
   brand: Brand;
@@ -49,6 +50,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
   const [inputFocused, setInputFocused] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const { activeAccount } = useActiveAccount();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -77,6 +79,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
         brand_id: brand.id,
         messages: apiMessages,
         campaigns: campaigns?.map(c => ({ name: c.name, objective: c.objective, spend: c.spend })) || [],
+        conversion_type: activeAccount?.conversion_type ?? 'ecommerce',
       });
 
       const assistantMsg: ChatMessage = {

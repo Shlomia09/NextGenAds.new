@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { RefreshCw, Sparkles } from 'lucide-react';
 import { getBrands, getCampaigns, getRecommendations, updateRecommendationStatus } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { useActiveAccount } from '../contexts/ActiveAccountContext';
+import { CONVERSION_META } from '../lib/conversionConfig';
 import EcommerceDashboard from '../components/dashboard/EcommerceDashboard';
 import ClinicDashboard from '../components/dashboard/ClinicDashboard';
 import SpaDashboard from '../components/dashboard/SpaDashboard';
@@ -14,6 +16,11 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [learnMoreRec, setLearnMoreRec] = useState<Recommendation | null>(null);
+  const { activeAccount } = useActiveAccount();
+
+  // Derive KPI config for active account's conversion type
+  const convType = activeAccount?.conversion_type ?? 'ecommerce';
+  const convMeta = CONVERSION_META[convType];
 
   const { data: brands, isLoading: brandsLoading } = useQuery({
     queryKey: ['brands', user?.id],
@@ -95,6 +102,43 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
+      {/* Account indicator header */}
+      {activeAccount && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '10px 24px 0',
+          marginBottom: -4,
+        }}>
+          <span style={{
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: 10,
+            fontWeight: 300,
+            color: '#6b4030',
+            letterSpacing: '0.04em',
+          }}>
+            {activeAccount.display_name}
+          </span>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            background: convMeta.bg,
+            border: `0.5px solid ${convMeta.color}30`,
+            borderRadius: 3,
+            padding: '2px 7px',
+            fontFamily: "'DM Mono', monospace",
+            fontSize: 8,
+            color: convMeta.color,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase' as const,
+          }}>
+            {convMeta.emoji} {convMeta.label}
+          </span>
+        </div>
+      )}
+
       {renderDashboard(activeBrand.business_type as BusinessType | undefined)}
 
       {/* Learn More Modal — shared across all dashboard types */}

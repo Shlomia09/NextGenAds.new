@@ -7,6 +7,7 @@ export type BrandStage = 'new' | 'scaling' | 'mature';
 export type BusinessType = 'ecommerce' | 'clinic' | 'spa' | 'salon' | 'wholesale';
 export type BusinessGoal = 'purchases' | 'leads' | 'bookings' | 'inquiries';
 export type BenchmarkAvailability = 'full' | 'partial';
+export type ConversionType = 'ecommerce' | 'leads' | 'bookings' | 'app' | 'awareness';
 
 export type RecommendationPriority = 'critical' | 'high' | 'medium';
 export type RecommendationStatus = 'pending' | 'approved' | 'executed' | 'dismissed';
@@ -58,6 +59,9 @@ export interface AdAccount {
   refresh_token?: string;
   connected_at: string;
   status: 'active' | 'error' | 'disconnected';
+  brand_id?: string;
+  conversion_type: ConversionType;
+  display_name?: string;
 }
 
 export interface Campaign {

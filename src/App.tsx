@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './hooks/useAuth';
+import { ActiveAccountProvider } from './contexts/ActiveAccountContext';
 import Sidebar from './components/ui/Sidebar';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -75,11 +76,13 @@ const AppRoutes: React.FC = () => (
 );
 
 const App: React.FC = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
-  </QueryClientProvider>
+  <ActiveAccountProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </QueryClientProvider>
+  </ActiveAccountProvider>
 );
 
 export default App;
