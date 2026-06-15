@@ -1,7 +1,30 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './hooks/useAuth';
+
+// ── Global crash reporter ──
+class AppErrorBoundary extends Component<{ children: React.ReactNode }, { error: string | null; stack: string | null }> {
+  state = { error: null, stack: null };
+  static getDerivedStateFromError(e: Error) {
+    return { error: e.message, stack: e.stack ?? null };
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ minHeight: '100vh', background: '#0F0A07', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 }}>
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#EF4444', letterSpacing: '0.2em' }}>APP CRASH</div>
+          <div style={{ background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: 24, maxWidth: 700, width: '100%' }}>
+            <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 14, color: '#F5E6D8', marginBottom: 12 }}>{this.state.error}</div>
+            {this.state.stack && <pre style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: '#8B6050', overflow: 'auto', maxHeight: 300, margin: 0 }}>{this.state.stack}</pre>}
+          </div>
+          <button onClick={() => window.location.reload()} style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, color: '#C4836A', background: 'rgba(196,131,106,0.08)', border: '0.5px solid rgba(196,131,106,0.3)', borderRadius: 4, padding: '8px 16px', cursor: 'pointer' }}>Reload</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 import { ActiveAccountProvider } from './contexts/ActiveAccountContext';
 import Sidebar from './components/ui/Sidebar';
 import Landing from './pages/Landing';
@@ -78,13 +101,15 @@ const AppRoutes: React.FC = () => (
 );
 
 const App: React.FC = () => (
-  <ActiveAccountProvider>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </QueryClientProvider>
-  </ActiveAccountProvider>
+  <AppErrorBoundary>
+    <ActiveAccountProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ActiveAccountProvider>
+  </AppErrorBoundary>
 );
 
 export default App;
