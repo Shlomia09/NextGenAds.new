@@ -62,22 +62,24 @@ const MetaCallback: React.FC = () => {
           throw new Error(body.error || body.message || `HTTP ${res.status}`);
         }
 
-        // ── Fetch all stored accounts for this user ────────────
-        const { data: storedAccounts } = await supabase
+        // ── Fetch the PENDING accounts stored by edge function ─────
+        const { data: pendingAccounts } = await supabase
           .from('ad_accounts')
           .select('id, account_id, account_name, status')
           .eq('user_id', user.id)
           .eq('platform', 'meta')
+          .eq('status', 'pending')
           .order('account_name');
 
-        if (!storedAccounts || storedAccounts.length === 0) {
+        if (!pendingAccounts || pendingAccounts.length === 0) {
           throw new Error('No ad accounts found on this Meta account.');
         }
 
-        setAccounts(storedAccounts);
-        // Pre-select all accounts by default
-        setSelected(new Set(storedAccounts.map((a: AdAccount) => a.id)));
+        setAccounts(pendingAccounts);
+        setSelected(new Set()); // Start with nothing selected — user must choose
         setStatus('selecting');
+
+
 
       } catch (err) {
         setStatus('error');
@@ -101,15 +103,26 @@ const MetaCallback: React.FC = () => {
     if (selected.size === 0) return;
     setStatus('saving');
 
-    // Remove accounts the user did NOT select
-    const toRemove = accounts.filter(a => !selected.has(a.id)).map(a => a.id);
-    if (toRemove.length > 0) {
-      await supabase.from('ad_accounts').delete().in('id', toRemove);
+    const selectedIds   = accounts.filter(a =>  selected.has(a.id)).map(a => a.id);
+    const unselectedIds = accounts.filter(a => !selected.has(a.id)).map(a => a.id);
+
+    // 1. Activate the selected accounts
+    if (selectedIds.length > 0) {
+      await supabase
+        .from('ad_accounts')
+        .update({ status: 'active' })
+        .in('id', selectedIds);
+    }
+
+    // 2. Delete the accounts the user did NOT select
+    if (unselectedIds.length > 0) {
+      await supabase.from('ad_accounts').delete().in('id', unselectedIds);
     }
 
     setStatus('success');
     setTimeout(() => navigate('/connect?success=meta_connected'), 1200);
   };
+
 
   // ── Card wrapper ───────────────────────────────────────────
   const Card = ({ children }: { children: React.ReactNode }) => (

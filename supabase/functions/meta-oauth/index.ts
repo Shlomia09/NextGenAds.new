@@ -93,6 +93,15 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
+    // ── First clean up any stale pending accounts for this user ──
+    await supabase
+      .from('ad_accounts')
+      .delete()
+      .eq('user_id', userId)
+      .eq('platform', 'meta')
+      .eq('status', 'pending');
+
+    // ── Store all accounts as 'pending' — user picks in the UI ────
     const stored = [];
     for (const account of adAccounts) {
       const { error: upsertError } = await supabase
@@ -103,7 +112,7 @@ serve(async (req) => {
           account_id:   account.account_id,
           account_name: account.name,
           access_token: longLivedToken,
-          status:       account.account_status === 1 ? 'active' : 'error',
+          status:       'pending',          // ← picker will activate selected ones
           connected_at: new Date().toISOString(),
         }, {
           onConflict: 'user_id,platform,account_id',

@@ -94,15 +94,17 @@ export const updateRecommendationStatus = async (
   return data;
 };
 
-// Ad accounts
+// Ad accounts — only returns accounts the user actively selected (status=active)
 export const getAdAccounts = async (userId: string) => {
   const { data, error } = await supabase
     .from('ad_accounts')
     .select('*')
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .eq('status', 'active');       // excludes 'pending' (not yet picked by user)
   if (error) throw error;
   return data;
 };
+
 
 // Intelligence sessions
 export const getIntelligenceSessions = async (brandId: string) => {
