@@ -165,16 +165,16 @@ const MetaCallback: React.FC = () => {
   const handleConfirm = async () => {
     setStatus('saving');
 
-    // cfg.id = account_id (external Meta ID, e.g. "380949088921209")
-    // Use upsert by (user_id, platform, account_id) — works whether
-    // the edge function stored the row or not.
+    const errors: string[] = [];
+
     for (const cfg of configs) {
-      await supabase
+      // ── Attempt 1: full upsert with new columns ──
+      const { error: upsertErr } = await supabase
         .from('ad_accounts')
         .upsert({
           user_id:         userId,
           platform:        'meta',
-          account_id:      cfg.id,          // Meta external account_id
+          account_id:      cfg.id,
           account_name:    cfg.account_name,
           display_name:    cfg.display_name,
           brand_id:        cfg.brand_id || null,
@@ -182,10 +182,36 @@ const MetaCallback: React.FC = () => {
           status:          'active',
           connected_at:    new Date().toISOString(),
         }, { onConflict: 'user_id,platform,account_id' });
-      // Note: upsert preserves existing access_token if row exists
+
+      if (upsertErr) {
+        console.warn('Full upsert failed, trying minimal:', upsertErr.message);
+
+        // ── Attempt 2: minimal upsert (only original columns) ──
+        const { error: minErr } = await supabase
+          .from('ad_accounts')
+          .upsert({
+            user_id:     userId,
+            platform:    'meta',
+            account_id:  cfg.id,
+            account_name: cfg.account_name,
+            status:      'active',
+            connected_at: new Date().toISOString(),
+          }, { onConflict: 'user_id,platform,account_id' });
+
+        if (minErr) {
+          console.error('Minimal upsert also failed:', minErr.message);
+          errors.push(`${cfg.account_name}: ${minErr.message}`);
+        }
+      }
     }
 
-    // Delete unselected accounts by account_id
+    if (errors.length > 0) {
+      setStatus('error');
+      setErrorMsg(`Save failed:\n${errors.join('\n')}`);
+      return;
+    }
+
+    // Delete unselected accounts
     const unselectedAccountIds = accounts
       .filter(a => !selected.has(a.id))
       .map(a => a.account_id);
@@ -202,6 +228,9 @@ const MetaCallback: React.FC = () => {
     setStatus('success');
     setTimeout(() => navigate('/connect?success=meta_connected'), 1200);
   };
+
+
+
 
 
 
