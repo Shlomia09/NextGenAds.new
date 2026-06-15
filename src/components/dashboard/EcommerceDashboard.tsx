@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TrendingUp,
   AlertTriangle,
@@ -14,6 +14,8 @@ import RecommendationCard from '../recommendations/RecommendationCard';
 import IntelligenceChat from '../intelligence/IntelligenceChat';
 import type { Brand, Campaign, Recommendation } from '../../types';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import TrueRoasCard from '../ui/TrueRoasCard';
+import { calculateTrueROAS, type TrueRoasResult } from '../../lib/trueRoas';
 
 // ─── Local mock ROAS trend data ───────────────────────────────
 const mockRoasTrend = Array.from({ length: 14 }, (_, i) => ({
@@ -74,11 +76,43 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
     onLearnMoreRec(rec);
   };
 
+  // ── True ROAS data ───────────────────────────────────────────
+  const [trueRoasData,    setTrueRoasData]    = useState<TrueRoasResult | null>(null);
+  const [trueRoasLoading, setTrueRoasLoading] = useState(false);
+
+  useEffect(() => {
+    if (!brand?.id) return;
+    setTrueRoasLoading(true);
+    const dateFrom = new Date();
+    dateFrom.setDate(dateFrom.getDate() - 30);
+    calculateTrueROAS(
+      brand.id,
+      dateFrom.toISOString().split('T')[0],
+      new Date().toISOString().split('T')[0],
+    )
+      .then(setTrueRoasData)
+      .catch(console.error)
+      .finally(() => setTrueRoasLoading(false));
+  }, [brand?.id]);
+
   const aovLabel = bracket?.label ?? 'AOV calibrated';
   const markets  = brand.markets ?? [];
 
   return (
     <div>
+      {/* ── True ROAS Card ────────────────────────────────────────── */}
+      {trueRoasLoading && !trueRoasData && (
+        <TrueRoasCard
+          data={{ meta_roas: 0, true_roas: 0, attribution_gap: 0, gap_pct: 0,
+                  meta_spend: 0, meta_claimed_revenue: 0, true_revenue: 0,
+                  utm_coverage_pct: 0, has_ecommerce: false }}
+          loading
+        />
+      )}
+      {trueRoasData && !trueRoasLoading && (
+        <TrueRoasCard data={trueRoasData} />
+      )}
+
       {/* ── KPI Strip ─────────────────────────────────────────── */}
       <div className="ecom-kpi-strip">
         {[

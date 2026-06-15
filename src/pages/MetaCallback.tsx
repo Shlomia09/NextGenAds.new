@@ -91,17 +91,15 @@ const MetaCallback: React.FC = () => {
         }
 
         // ── Use the accounts returned in the edge function response ─────
-        // This works regardless of whether the updated edge function is deployed.
-        // The response body contains: { accounts: [{account_id, name}] }
         const responseAccounts: { account_id: string; name: string }[] = body.accounts || [];
 
         if (responseAccounts.length === 0) {
           throw new Error('No ad accounts found on this Meta account.');
         }
 
-        // Query DB rows by account_id (not by status — avoids pending/active mismatch)
+        // Query DB rows by account_id (works regardless of status)
         const accountIdList = responseAccounts.map(a => a.account_id);
-        const { data: dbAccounts } = await supabase
+        const { data: dbAccounts, error: dbError } = await supabase
           .from('ad_accounts')
           .select('id, account_id, account_name, status')
           .eq('user_id', user.id)
@@ -109,12 +107,51 @@ const MetaCallback: React.FC = () => {
           .in('account_id', accountIdList)
           .order('account_name');
 
-        if (!dbAccounts || dbAccounts.length === 0) {
-          throw new Error('Accounts were fetched but could not be saved. Please try again.');
+        if (dbError) {
+          console.error('DB query error:', dbError);
         }
 
-        setAccounts(dbAccounts);
-        setSelected(new Set()); // user must explicitly choose
+        // Fallback: if DB upsert failed (missing unique constraint etc.),
+        // re-insert accounts directly so the picker can proceed
+        let finalAccounts = dbAccounts && dbAccounts.length > 0 ? dbAccounts : null;
+
+        if (!finalAccounts) {
+          // Attempt direct insert for accounts not yet in DB
+          const inserts = responseAccounts.map(a => ({
+            user_id: user.id,
+            platform: 'meta',
+            account_id: a.account_id,
+            account_name: a.name,
+            status: 'active',
+            connected_at: new Date().toISOString(),
+          }));
+
+          const { data: inserted, error: insertErr } = await supabase
+            .from('ad_accounts')
+            .upsert(inserts, { onConflict: 'user_id,platform,account_id' })
+            .select('id, account_id, account_name, status');
+
+          if (insertErr) {
+            console.error('Insert fallback error:', insertErr);
+            // Last resort: build from response without DB ids
+            // We'll use account_id as key (handleConfirm will match by account_id)
+            finalAccounts = responseAccounts.map(a => ({
+              id: a.account_id,
+              account_id: a.account_id,
+              account_name: a.name,
+              status: 'active',
+            }));
+          } else {
+            finalAccounts = inserted || [];
+          }
+        }
+
+        if (!finalAccounts || finalAccounts.length === 0) {
+          throw new Error('Could not load your ad accounts. Please try again.');
+        }
+
+        setAccounts(finalAccounts);
+        setSelected(new Set());
         setStatus('selecting');
 
 

@@ -10,6 +10,19 @@ import { getAdAccounts, supabase } from '../lib/supabase';
 import { initiateMetaOAuth, syncMetaCampaigns } from '../lib/meta-api';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import ShopifyConnect from '../components/connect/ShopifyConnect';
+import WooCommerceConnect from '../components/connect/WooCommerceConnect';
+
+type EcomAccount = {
+  id: string;
+  user_id: string;
+  brand_id?: string;
+  platform: string;
+  store_url: string;
+  status: string;
+  last_synced_at?: string;
+  connected_at: string;
+};
 
 
 const Connect: React.FC = () => {
@@ -38,6 +51,51 @@ const Connect: React.FC = () => {
   });
 
   const metaAccounts = adAccounts.filter((a) => a.platform === 'meta');
+
+  // ── Brands query ──────────────────────────────────────────────
+  const { data: brands = [] } = useQuery<{ id: string; name: string }[]>({
+    queryKey: ['brands', user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from('brands').select('id, name').eq('user_id', user!.id);
+      return (data || []) as { id: string; name: string }[];
+    },
+    enabled: !!user,
+  });
+
+  // ── Ecommerce accounts query ───────────────────────────────────
+  const { data: ecomAccounts = [], refetch: refetchEcom } = useQuery<EcomAccount[]>({
+    queryKey: ['ecomAccounts', user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from('ecommerce_accounts').select('*').eq('user_id', user!.id).eq('status', 'active');
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  // ── Ecommerce sync ────────────────────────────────────────────
+  const [syncingEcomId, setSyncingEcomId] = useState<string | null>(null);
+
+  const handleEcomSync = async (accountId: string) => {
+    setSyncingEcomId(accountId);
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const { data: { session } } = await supabase.auth.getSession();
+      await fetch(`${supabaseUrl}/functions/v1/ecommerce-sync`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ecommerce_account_id: accountId }),
+      });
+      refetchEcom();
+      queryClient.invalidateQueries({ queryKey: ['ecomAccounts'] });
+    } catch (err) {
+      console.error('Ecommerce sync failed:', err);
+    } finally {
+      setSyncingEcomId(null);
+    }
+  };
 
   // ── Sync a specific account ──────────────────────────────────
   const handleSync = async (accountId: string) => {
@@ -218,6 +276,17 @@ const Connect: React.FC = () => {
           Meta Ads connected successfully. Click <strong style={{ margin: '0 4px' }}>Sync Now</strong> to pull your campaigns.
         </div>
       )}
+      {successParam === 'shopify_connected' && (
+        <div style={{
+          background: 'rgba(16,185,129,0.08)', border: '0.5px solid rgba(16,185,129,0.3)',
+          borderRadius: 6, padding: '12px 16px', marginBottom: 16,
+          display: 'flex', alignItems: 'center', gap: 10,
+          fontFamily: "'Outfit', sans-serif", fontSize: 12, color: '#10B981',
+        }}>
+          <CheckCircle size={14} strokeWidth={1.5} />
+          🛍️ Shopify connected successfully! Click <strong style={{ margin: '0 4px' }}>Sync Now</strong> to import your orders.
+        </div>
+      )}
       {errorParam && (
         <div style={{
           background: 'rgba(239,68,68,0.08)', border: '0.5px solid rgba(239,68,68,0.3)',
@@ -395,6 +464,71 @@ const Connect: React.FC = () => {
             Connect Klaviyo
           </button>
         </div>
+      </div>
+
+      {/* ── eCommerce Integrations ── */}
+      <div style={{ marginTop: 32 }}>
+        <div style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: 9,
+          letterSpacing: '0.2em',
+          color: 'var(--rose-gold, #C4836A)',
+          textTransform: 'uppercase',
+          marginBottom: 16,
+        }}
+        >
+          eCommerce Integration
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <ShopifyConnect userId={user!.id} brands={brands} />
+          <WooCommerceConnect userId={user!.id} brands={brands} />
+        </div>
+
+        {/* Connected stores list */}
+        {ecomAccounts.length > 0 && (
+          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {ecomAccounts.map((account) => (
+              <div
+                key={account.id}
+                style={{
+                  background: 'var(--app-surface, #1C1208)',
+                  border: '0.5px solid rgba(16,185,129,0.3)',
+                  borderRadius: 6,
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 18 }}>{account.platform === 'shopify' ? '🛍️' : '🛒'}</span>
+                  <div>
+                    <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 500, color: '#F5E6D8' }}>
+                      {account.store_url}
+                    </div>
+                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: '#4a2e1e', marginTop: 2 }}>
+                      {account.platform.toUpperCase()} · Last synced:{' '}
+                      {account.last_synced_at
+                        ? new Date(account.last_synced_at).toLocaleDateString()
+                        : 'Never'}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => handleEcomSync(account.id)}
+                  disabled={syncingEcomId === account.id}
+                >
+                  {syncingEcomId === account.id
+                    ? <><RefreshCw size={11} strokeWidth={1.5} style={{ animation: 'spin 1s linear infinite' }} />Syncing…</>
+                    : <><Zap size={11} strokeWidth={1.5} />Sync Now</>}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── Benchmark note ── */}
