@@ -500,8 +500,8 @@ const Connect: React.FC = () => {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <ShopifyConnect userId={user!.id} brands={brands} />
-          <WooCommerceConnect userId={user!.id} brands={brands} />
+          {user && <ShopifyConnect userId={user.id} brands={brands} />}
+          {user && <WooCommerceConnect userId={user.id} brands={brands} />}
         </div>
 
         {/* Connected stores list */}
