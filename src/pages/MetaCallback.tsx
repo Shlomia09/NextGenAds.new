@@ -90,22 +90,33 @@ const MetaCallback: React.FC = () => {
           throw new Error(body.error || body.message || `HTTP ${res.status}`);
         }
 
-        // ── Fetch the PENDING accounts stored by edge function ─────
-        const { data: pendingAccounts } = await supabase
+        // ── Use the accounts returned in the edge function response ─────
+        // This works regardless of whether the updated edge function is deployed.
+        // The response body contains: { accounts: [{account_id, name}] }
+        const responseAccounts: { account_id: string; name: string }[] = body.accounts || [];
+
+        if (responseAccounts.length === 0) {
+          throw new Error('No ad accounts found on this Meta account.');
+        }
+
+        // Query DB rows by account_id (not by status — avoids pending/active mismatch)
+        const accountIdList = responseAccounts.map(a => a.account_id);
+        const { data: dbAccounts } = await supabase
           .from('ad_accounts')
           .select('id, account_id, account_name, status')
           .eq('user_id', user.id)
           .eq('platform', 'meta')
-          .eq('status', 'pending')
+          .in('account_id', accountIdList)
           .order('account_name');
 
-        if (!pendingAccounts || pendingAccounts.length === 0) {
-          throw new Error('No ad accounts found on this Meta account.');
+        if (!dbAccounts || dbAccounts.length === 0) {
+          throw new Error('Accounts were fetched but could not be saved. Please try again.');
         }
 
-        setAccounts(pendingAccounts);
-        setSelected(new Set()); // Start with nothing selected — user must choose
+        setAccounts(dbAccounts);
+        setSelected(new Set()); // user must explicitly choose
         setStatus('selecting');
+
 
       } catch (err) {
         setStatus('error');
