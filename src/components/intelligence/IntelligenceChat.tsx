@@ -37,7 +37,7 @@ const T = {
 
 const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
   brand,
-  campaigns: _campaigns,
+  campaigns,
   initialMessages = [],
   compact = false,
 }) => {
@@ -76,6 +76,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
       const response = await sendChatMessage({
         brand_id: brand.id,
         messages: apiMessages,
+        campaigns: campaigns?.map(c => ({ name: c.name, objective: c.objective, spend: c.spend })) || [],
       });
 
       const assistantMsg: ChatMessage = {

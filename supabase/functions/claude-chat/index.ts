@@ -2,6 +2,44 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import Anthropic from 'npm:@anthropic-ai/sdk';
 import { createClient } from 'npm:@supabase/supabase-js';
 
+// ── Inline objective helpers (Deno-safe, no src/lib import) ─────
+const GOAL_BENCHMARK: Record<string, string> = {
+  sales: 'SALES campaigns: target ROAS ≥3.0x, CPM €8-14, CAC ≤€35 for AOV €80-120. Scale +20% when ROAS stable 7 days.',
+  leads: 'LEAD GEN campaigns: CPL benchmark €22-55, Lead Quality Rate ≥35%, Cost per Qualified Lead ≤€160. Instant Forms = lower CPL but lower quality.',
+  traffic: 'TRAFFIC campaigns: CTR benchmark ≥1.5% (excellent >2.5%), CPC €0.30-0.80, ensure retargeting audiences are being built.',
+  awareness: 'AWARENESS campaigns: CPM benchmark €8-14, optimal frequency 2-4x, above 5x = creative fatigue. Pair with retargeting.',
+  engagement: 'ENGAGEMENT campaigns: useful for social proof and warming audiences. Consider switching to conversion objectives with enough data.',
+};
+
+const classifyObj = (o: string): string => {
+  const u = (o || '').toUpperCase();
+  if (u.includes('SALES') || u.includes('CONVERSIONS') || u.includes('PURCHASE') || u.includes('CATALOG')) return 'sales';
+  if (u.includes('LEADS') || u.includes('LEAD_GENERATION')) return 'leads';
+  if (u.includes('TRAFFIC') || u.includes('LINK_CLICKS')) return 'traffic';
+  if (u.includes('AWARENESS') || u.includes('REACH') || u.includes('BRAND')) return 'awareness';
+  if (u.includes('ENGAGEMENT')) return 'engagement';
+  return 'unknown';
+};
+
+const buildObjContext = (campaigns: {name: string; objective: string; spend: number}[]) => {
+  if (!campaigns?.length) return '';
+  const grouped: Record<string, string[]> = {};
+  campaigns.forEach(c => {
+    const g = classifyObj(c.objective);
+    if (!grouped[g]) grouped[g] = [];
+    grouped[g].push(`${c.name} (€${c.spend.toFixed(0)} spend)`);
+  });
+  const lines = ['\n## Active Campaign Context'];
+  Object.entries(grouped).forEach(([goal, camps]) => {
+    if (GOAL_BENCHMARK[goal]) {
+      lines.push(`\n### ${goal.toUpperCase()} (${camps.length} campaigns)`);
+      lines.push(GOAL_BENCHMARK[goal]);
+      lines.push('Active: ' + camps.slice(0, 4).join(', '));
+    }
+  });
+  return lines.join('\n');
+};
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -239,7 +277,8 @@ serve(async (req) => {
   }
 
   try {
-    const { brand_id, messages } = await req.json();
+    const { brand_id, messages, campaigns: requestCampaigns } = await req.json();
+    const campaigns = (requestCampaigns || []) as {name: string; objective: string; spend: number}[];
 
     // Auth check
     const authHeader = req.headers.get('Authorization');
@@ -304,8 +343,8 @@ serve(async (req) => {
       .eq('id', brand_id)
       .single();
 
-    // Fetch campaigns context
-    const { data: campaigns } = await supabase
+    // Fetch campaigns context from DB
+    const { data: dbCampaigns } = await supabase
       .from('campaigns')
       .select('name, status, objective, spend, roas, impressions, purchases')
       .eq('brand_id', brand_id)
@@ -325,11 +364,12 @@ Stage: ${brand?.stage || 'Unknown'}
 
 ## Current Campaign Performance
 
-${campaigns && campaigns.length > 0
-  ? campaigns.map((c: Record<string, unknown>) =>
+${dbCampaigns && dbCampaigns.length > 0
+  ? dbCampaigns.map((c: Record<string, unknown>) =>
     `- ${c.name}: ${c.status} | Spend: €${c.spend} | ROAS: ${c.roas}x | Objective: ${c.objective}`
   ).join('\n')
   : 'No campaigns synced yet. Ask user to sync their Meta account.'}
+${buildObjContext(campaigns)}
 
 Analyze the above data in context of the benchmark knowledge when answering.`;
 
