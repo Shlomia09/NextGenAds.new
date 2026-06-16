@@ -27,7 +27,18 @@ export const syncMetaCampaigns = async (brandId: string, adAccountId: string) =>
   const { data, error } = await supabase.functions.invoke('meta-sync', {
     body: { brand_id: brandId, ad_account_id: adAccountId },
   });
-  if (error) throw error;
+  if (error) {
+    // Extract the actual error message from the edge function response body
+    let message = error.message;
+    try {
+      // FunctionsHttpError has a context property with the raw Response
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const body = await (error as any).context?.json?.();
+      if (body?.error) message = `Edge fn: ${body.error}`;
+      else if (body?.message) message = `Edge fn: ${body.message}`;
+    } catch { /* ignore parse errors */ }
+    throw new Error(message);
+  }
   return data;
 };
 
