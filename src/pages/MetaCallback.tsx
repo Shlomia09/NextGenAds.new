@@ -113,8 +113,13 @@ const MetaCallback: React.FC = () => {
         setAccounts(pickerAccounts);
         setSelected(new Set());
 
-        // ── Read access_tokens from DB (edge function may have stored them) ──
-        // We use service-role bypassed by the auth user's own rows via RLS.
+        // ── Build token map: prefer DB pending rows, fallback to response body ──
+        // The updated edge function returns access_token in response body
+        const responseToken: string | null = body.access_token || null;
+
+        const map: Record<string, string> = {};
+
+        // 1. Read any tokens already stored in DB
         const { data: pendingRows } = await supabase
           .from('ad_accounts')
           .select('account_id, access_token')
@@ -122,13 +127,19 @@ const MetaCallback: React.FC = () => {
           .eq('platform', 'meta');
 
         if (pendingRows) {
-          const map: Record<string, string> = {};
           pendingRows.forEach(r => {
             if (r.access_token) map[r.account_id] = r.access_token;
           });
-          setTokenMap(map);
         }
 
+        // 2. Fallback: use token from edge function response for accounts not in map
+        if (responseToken) {
+          responseAccounts.forEach(a => {
+            if (!map[a.account_id]) map[a.account_id] = responseToken;
+          });
+        }
+
+        setTokenMap(map);
         setStatus('selecting');
 
 

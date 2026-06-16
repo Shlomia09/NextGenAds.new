@@ -93,7 +93,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    // ── First clean up any stale pending accounts for this user ──
+    // ── First delete ALL stale accounts for this user (pending and active) ──
+    // so we can INSERT fresh rows without constraint issues
     await supabase
       .from('ad_accounts')
       .delete()
@@ -104,29 +105,38 @@ serve(async (req) => {
     // ── Store all accounts as 'pending' — user picks in the UI ────
     const stored = [];
     for (const account of adAccounts) {
-      const { error: upsertError } = await supabase
+      // Delete existing row first (avoids unique constraint issues)
+      await supabase
         .from('ad_accounts')
-        .upsert({
+        .delete()
+        .eq('user_id', userId)
+        .eq('platform', 'meta')
+        .eq('account_id', account.account_id);
+
+      const { error: insertError } = await supabase
+        .from('ad_accounts')
+        .insert({
           user_id:      userId,
           platform:     'meta',
           account_id:   account.account_id,
           account_name: account.name,
           access_token: longLivedToken,
-          status:       'pending',          // ← picker will activate selected ones
+          status:       'pending',
           connected_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id,platform,account_id',
         });
 
-      if (!upsertError) stored.push(account.account_id);
-      else console.error('Upsert error:', upsertError);
+      if (!insertError) stored.push(account.account_id);
+      else console.error('Insert error:', insertError);
     }
 
     return new Response(
       JSON.stringify({
-        success:       true,
+        success:         true,
         accounts_stored: stored.length,
-        accounts:      adAccounts.map((a: { account_id: string; name: string }) => ({
+        // Return the token so the frontend can save it directly
+        // (fallback if DB insert failed for any account)
+        access_token:    longLivedToken,
+        accounts:        adAccounts.map((a: { account_id: string; name: string }) => ({
           account_id: a.account_id,
           name:       a.name,
         })),
