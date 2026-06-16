@@ -55,6 +55,8 @@ const MetaCallback: React.FC = () => {
   const [brandsLoading, setBrandsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [userId,   setUserId]   = useState('');
+  // Map of account_id → access_token (read from DB after OAuth)
+  const [tokenMap, setTokenMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const run = async () => {
@@ -110,6 +112,23 @@ const MetaCallback: React.FC = () => {
 
         setAccounts(pickerAccounts);
         setSelected(new Set());
+
+        // ── Read access_tokens from DB (edge function may have stored them) ──
+        // We use service-role bypassed by the auth user's own rows via RLS.
+        const { data: pendingRows } = await supabase
+          .from('ad_accounts')
+          .select('account_id, access_token')
+          .eq('user_id', user.id)
+          .eq('platform', 'meta');
+
+        if (pendingRows) {
+          const map: Record<string, string> = {};
+          pendingRows.forEach(r => {
+            if (r.access_token) map[r.account_id] = r.access_token;
+          });
+          setTokenMap(map);
+        }
+
         setStatus('selecting');
 
 
@@ -161,45 +180,67 @@ const MetaCallback: React.FC = () => {
     setConfigs(prev => prev.map(c => c.id === id ? { ...c, ...patch } : c));
   };
 
-  // ── Step 2 → Step 3: save to DB ───────────────────────────────
+  // ── Step 2 → Step 3: save to DB ─────────────────────────────────────────
+  // Strategy: DELETE any existing row for this account, then INSERT fresh.
+  // This bypasses onConflict/unique-constraint issues and ALWAYS sets the token.
   const handleConfirm = async () => {
     setStatus('saving');
 
     const errors: string[] = [];
 
     for (const cfg of configs) {
-      // ── Attempt 1: full upsert with new columns ──
-      const { error: upsertErr } = await supabase
+      const token = tokenMap[cfg.id] || null;
+
+      // Step A: delete any existing row(s) for this account
+      await supabase
         .from('ad_accounts')
-        .upsert({
-          user_id:         userId,
-          platform:        'meta',
-          account_id:      cfg.id,
-          account_name:    cfg.account_name,
-          display_name:    cfg.display_name,
-          brand_id:        cfg.brand_id || null,
-          conversion_type: cfg.conversion_type,
-          status:          'active',
-          connected_at:    new Date().toISOString(),
-        }, { onConflict: 'user_id,platform,account_id' });
+        .delete()
+        .eq('user_id', userId)
+        .eq('platform', 'meta')
+        .eq('account_id', cfg.id);
 
-      if (upsertErr) {
-        console.warn('Full upsert failed, trying minimal:', upsertErr.message);
+      // Step B: insert fresh row WITH the token (if we have it)
+      const payload: Record<string, unknown> = {
+        user_id:     userId,
+        platform:    'meta',
+        account_id:  cfg.id,
+        account_name: cfg.account_name,
+        status:      'active',
+        connected_at: new Date().toISOString(),
+      };
 
-        // ── Attempt 2: minimal upsert (only original columns) ──
+      // Only add new columns if they exist (try/catch per column not possible,
+      // so we include them all — they were added via migration)
+      payload.display_name    = cfg.display_name;
+      payload.brand_id        = cfg.brand_id || null;
+      payload.conversion_type = cfg.conversion_type;
+
+      // Always include the token (null is allowed now)
+      if (token) payload.access_token = token;
+
+      const { error: insertErr } = await supabase
+        .from('ad_accounts')
+        .insert(payload);
+
+      if (insertErr) {
+        console.error('Insert failed:', insertErr.message);
+        // Fallback: try minimal insert without new columns
+        const minPayload: Record<string, unknown> = {
+          user_id:     userId,
+          platform:    'meta',
+          account_id:  cfg.id,
+          account_name: cfg.account_name,
+          status:      'active',
+          connected_at: new Date().toISOString(),
+        };
+        if (token) minPayload.access_token = token;
+
         const { error: minErr } = await supabase
           .from('ad_accounts')
-          .upsert({
-            user_id:     userId,
-            platform:    'meta',
-            account_id:  cfg.id,
-            account_name: cfg.account_name,
-            status:      'active',
-            connected_at: new Date().toISOString(),
-          }, { onConflict: 'user_id,platform,account_id' });
+          .insert(minPayload);
 
         if (minErr) {
-          console.error('Minimal upsert also failed:', minErr.message);
+          console.error('Minimal insert also failed:', minErr.message);
           errors.push(`${cfg.account_name}: ${minErr.message}`);
         }
       }
@@ -207,27 +248,14 @@ const MetaCallback: React.FC = () => {
 
     if (errors.length > 0) {
       setStatus('error');
-      setErrorMsg(`Save failed:\n${errors.join('\n')}`);
+      setErrorMsg(`Save failed: ${errors.join('; ')}\n\nPlease run the DB migration and try again.`);
       return;
-    }
-
-    // Delete unselected accounts
-    const unselectedAccountIds = accounts
-      .filter(a => !selected.has(a.id))
-      .map(a => a.account_id);
-
-    if (unselectedAccountIds.length > 0) {
-      await supabase
-        .from('ad_accounts')
-        .delete()
-        .eq('user_id', userId)
-        .eq('platform', 'meta')
-        .in('account_id', unselectedAccountIds);
     }
 
     setStatus('success');
     setTimeout(() => navigate('/connect?success=meta_connected'), 1200);
   };
+
 
 
 
