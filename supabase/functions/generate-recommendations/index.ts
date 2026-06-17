@@ -194,7 +194,7 @@ Be direct and confident. If CPL is excellent, say so and recommend scaling.`;
     const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') });
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 3000,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -238,3 +238,4 @@ Be direct and confident. If CPL is excellent, say so and recommend scaling.`;
     );
   }
 });
+
