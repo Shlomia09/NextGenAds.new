@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   X, ExternalLink, TrendingUp, TrendingDown, Minus,
   Sparkles, AlertTriangle, CheckCircle,
-  Send, Pause, Play, ArrowUpRight, Loader2,
+  Send, Pause, Play, ArrowUpRight, Loader2, PlusCircle,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatCurrency, formatNumber } from '../../lib/benchmarks';
@@ -72,6 +73,7 @@ const MetricVsBenchmark: React.FC<{
 
 // ─── Quick Actions ──────────────────────────────────────────────
 const QuickActions: React.FC<{ campaign: Campaign; onAction: (msg: string) => void }> = ({ campaign, onAction }) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<string | null>(null);
   const [feedback, setFeedback] = useState('');
 
@@ -149,6 +151,29 @@ const QuickActions: React.FC<{ campaign: Campaign; onAction: (msg: string) => vo
             Scale Budget +20%
           </button>
         )}
+
+        <button
+          onClick={() => navigate('/creative-studio', {
+            state: {
+              prefill: {
+                brandId: campaign.brand_id,
+                conversionType: campaign.objective?.toLowerCase().includes('lead') ? 'leads'
+                  : campaign.objective?.toLowerCase().includes('sale') ? 'ecommerce' : 'leads',
+                target_countries: ['IT'],
+                age_min: 25, age_max: 55, gender: 'all',
+              }
+            }
+          })}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px',
+            background: 'rgba(167,139,250,0.08)', border: '0.5px solid rgba(167,139,250,0.3)',
+            borderRadius: 6, cursor: 'pointer',
+            fontFamily: 'var(--font-sans)', fontSize: 10, color: '#a78bfa',
+          }}
+        >
+          <PlusCircle size={11} />
+          New Campaign from this
+        </button>
       </div>
       {feedback && (
         <div style={{
