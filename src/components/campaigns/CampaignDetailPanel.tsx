@@ -134,9 +134,14 @@ Be specific with numbers. Speak like a consultant, not a chatbot.`;
       });
 
       const body = await res.json();
-      if (!res.ok) throw new Error(body.error || 'Analysis failed');
+      if (!res.ok) throw new Error(typeof body.error === 'string' ? body.error : JSON.stringify(body.error || body));
 
-      setAnalysis(body.content?.[0]?.text || body.message || body.response || JSON.stringify(body));
+      // claude-chat edge fn returns { content: string }
+      setAnalysis(
+        typeof body.content === 'string'
+          ? body.content
+          : body.content?.[0]?.text || body.message || body.response || JSON.stringify(body)
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate analysis');
     } finally {

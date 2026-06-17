@@ -493,7 +493,7 @@ Analyze the above data in context of the benchmark knowledge when answering.`;
     const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') });
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-sonnet-4-5-20250929',
       max_tokens: 1024,
       system: contextualSystemPrompt,
       messages: messages,
@@ -519,4 +519,5 @@ Analyze the above data in context of the benchmark knowledge when answering.`;
     );
   }
 });
+
 
