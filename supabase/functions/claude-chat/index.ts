@@ -21,7 +21,30 @@ const classifyObj = (o: string): string => {
   return 'unknown';
 };
 
-const buildObjContext = (campaigns: {name: string; objective: string; spend: number}[]) => {
+interface CampaignPayload {
+  name: string;
+  status?: string;
+  objective: string;
+  spend: number;
+  impressions?: number;
+  clicks?: number;
+  // Ecommerce
+  purchases?: number;
+  revenue?: number;
+  roas?: number;
+  // Lead gen
+  leads?: number;
+  cpl?: number;
+  lead_quality_rate?: number;
+  qualified_leads?: number;
+  bookings?: number;
+  // Local
+  reach?: number;
+  frequency?: number;
+  budget_daily?: number;
+}
+
+const buildObjContext = (campaigns: CampaignPayload[]) => {
   if (!campaigns?.length) return '';
   const grouped: Record<string, string[]> = {};
   campaigns.forEach(c => {
@@ -344,8 +367,8 @@ serve(async (req) => {
   }
 
   try {
-    const { brand_id, messages, campaigns: requestCampaigns, conversion_type } = await req.json();
-    const campaigns = (requestCampaigns || []) as {name: string; objective: string; spend: number}[];
+    const { brand_id, messages, campaigns: requestCampaigns, campaign_context_summary, conversion_type } = await req.json();
+    const campaigns = (requestCampaigns || []) as CampaignPayload[];
 
     // Auth check
     const authHeader = req.headers.get('Authorization');
@@ -413,13 +436,38 @@ serve(async (req) => {
     // Fetch campaigns context from DB
     const { data: dbCampaigns } = await supabase
       .from('campaigns')
-      .select('name, status, objective, spend, roas, impressions, purchases')
+      .select('name, status, objective, spend, roas, impressions, clicks, purchases, revenue, leads, cpl, lead_quality_rate, qualified_leads, bookings, reach, frequency, budget_daily')
       .eq('brand_id', brand_id)
       .order('spend', { ascending: false })
       .limit(10);
 
+
     // Build context-enriched system prompt
     const conversionBenchmark = BENCHMARK_CONTEXT[conversion_type || 'ecommerce'] || BENCHMARK_CONTEXT.ecommerce;
+
+    // Build rich campaign context from client payload (has all KPIs)
+    let richCampaignBlock = '';
+    if (campaign_context_summary) {
+      // Client sent a pre-built readable summary
+      richCampaignBlock = campaign_context_summary;
+    } else if (campaigns.length > 0) {
+      // Fallback: build summary from the payload fields
+      richCampaignBlock = `The user has ${campaigns.length} campaign(s):\n` +
+        campaigns.map((c: CampaignPayload) => `- ${c.name} [${c.status ?? 'UNKNOWN'}] | Spend: €${(c.spend ?? 0).toFixed(2)} | Objective: ${c.objective}`).join('\n');
+    }
+
+    // Merge DB campaigns (may have more/updated data)
+    const dbBlock = dbCampaigns && dbCampaigns.length > 0
+      ? dbCampaigns.map((c: Record<string, unknown>) => {
+          const parts = [`- ${c.name}: ${c.status} | Spend: €${c.spend} | ROAS: ${c.roas}x | Objective: ${c.objective}`];
+          if ((c.leads as number) > 0) {
+            const cpl = (c.cpl as number) ?? ((c.spend as number) / (c.leads as number));
+            parts.push(`  Leads: ${c.leads} | CPL: €${Number(cpl).toFixed(2)} | Purchases: ${c.purchases}`);
+          }
+          return parts.join('\n');
+        }).join('\n')
+      : null;
+
     const contextualSystemPrompt = `${INTELLIGENCE_SYSTEM_PROMPT}
 
 ${conversionBenchmark}
@@ -434,11 +482,9 @@ Stage: ${brand?.stage || 'Unknown'}
 
 ## Current Campaign Performance
 
-${dbCampaigns && dbCampaigns.length > 0
-  ? dbCampaigns.map((c: Record<string, unknown>) =>
-    `- ${c.name}: ${c.status} | Spend: €${c.spend} | ROAS: ${c.roas}x | Objective: ${c.objective}`
-  ).join('\n')
-  : 'No campaigns synced yet. Ask user to sync their Meta account.'}
+${richCampaignBlock || dbBlock || 'No campaigns synced yet. Ask user to sync their Meta account.'}
+
+${dbBlock && richCampaignBlock ? `### DB Snapshot (for cross-reference)\n${dbBlock}` : ''}
 ${buildObjContext(campaigns)}
 
 Analyze the above data in context of the benchmark knowledge when answering.`;

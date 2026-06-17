@@ -7,6 +7,7 @@ import { syncMetaCampaigns } from '../lib/meta-api';
 import { useAuth } from '../hooks/useAuth';
 import { formatCurrency, formatNumber } from '../lib/benchmarks';
 import { classifyObjective, GOAL_META } from '../lib/objective';
+import CampaignDetailPanel from '../components/campaigns/CampaignDetailPanel';
 import type { GoalType } from '../lib/objective';
 import type { Campaign } from '../types';
 
@@ -85,14 +86,19 @@ const ConversionCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ camp
   }
 };
 
-// ─── Campaign row ─────────────────────────────────────────────
-const CampaignRow: React.FC<{ campaign: Campaign; showBrand?: string }> = ({ campaign, showBrand }) => {
+// ─── Campaign row ───────────────────────────────────────────────
+const CampaignRow: React.FC<{ campaign: Campaign; showBrand?: string; onClick: () => void }> = ({ campaign, showBrand, onClick }) => {
   const goal = classifyObjective(campaign.objective);
   const meta = GOAL_META[goal];
   const cpm  = campaign.impressions > 0 ? (campaign.spend / campaign.impressions) * 1000 : 0;
 
   return (
-    <tr>
+    <tr
+      onClick={onClick}
+      style={{ cursor: 'pointer', transition: 'background 0.15s' }}
+      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(196,131,106,0.04)')}
+      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+    >
       {/* Campaign name + objective badge */}
       <td style={{ minWidth: 220 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -243,6 +249,7 @@ const SmartKpis: React.FC<{ campaigns: Campaign[] }> = ({ campaigns }) => {
 const Campaigns: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [syncing,       setSyncing]       = useState(false);
   const [syncMsg,       setSyncMsg]       = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
@@ -434,11 +441,18 @@ const Campaigns: React.FC = () => {
                     key={c.id}
                     campaign={c}
                     showBrand={selectedBrand === 'all' && brands.length > 1 ? getBrandName(c.brand_id) : undefined}
+                    onClick={() => setSelectedCampaign(c)}
                   />
                 ))}
           </tbody>
         </table>
       </div>
+
+      {/* ── Campaign detail panel ── */}
+      <CampaignDetailPanel
+        campaign={selectedCampaign}
+        onClose={() => setSelectedCampaign(null)}
+      />
     </div>
   );
 };

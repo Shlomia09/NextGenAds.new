@@ -6,10 +6,37 @@ export interface ClaudeMessage {
   content: string;
 }
 
+/** Full per-campaign context sent to the edge function */
+export interface CampaignContext {
+  name: string;
+  status: string;
+  objective: string;
+  spend: number;
+  impressions: number;
+  clicks: number;
+  // Ecommerce
+  purchases: number;
+  revenue: number;
+  roas: number;
+  // Lead gen
+  leads: number;
+  cpl: number;
+  lead_quality_rate: number;
+  qualified_leads: number;
+  bookings: number;
+  // Local
+  reach: number;
+  frequency: number;
+  budget_daily?: number;
+}
+
 export interface ClaudeChatRequest {
   brand_id: string;
   messages: ClaudeMessage[];
-  campaigns?: { name: string; objective: string; spend: number }[];
+  /** Rich campaign context with all KPIs */
+  campaigns?: CampaignContext[];
+  /** Pre-built context summary string (injected into system prompt) */
+  campaign_context_summary?: string;
   conversion_type?: string;
 }
 

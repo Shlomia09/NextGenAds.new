@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, User, MessageSquare, Plus } from 'lucide-react';
+import { Send, Sparkles, User, MessageSquare, Plus, Database } from 'lucide-react';
 
 import type { ChatMessage, Brand, Campaign } from '../../types';
-import { sendChatMessage, ChatLimitError } from '../../lib/claude-api';
+import { sendChatMessage, ChatLimitError, type CampaignContext } from '../../lib/claude-api';
 import { useActiveAccount } from '../../contexts/ActiveAccountContext';
 
 interface IntelligenceChatProps {
@@ -56,6 +56,37 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  /** Build a rich human-readable context summary from campaigns */
+  const buildCampaignContextSummary = (camps: Campaign[]): string => {
+    if (!camps || camps.length === 0) return '';
+    const lines: string[] = [
+      `The user has ${camps.length} campaign(s) synced. Full performance data:`,
+      '',
+    ];
+    camps.forEach((c) => {
+      const parts: string[] = [`• ${c.name} [${c.status}] | Objective: ${c.objective}`];
+      parts.push(`  Spend: €${(c.spend ?? 0).toFixed(2)} | Impressions: ${(c.impressions ?? 0).toLocaleString()} | Clicks: ${(c.clicks ?? 0).toLocaleString()}`);
+      if ((c.roas ?? 0) > 0 || (c.purchases ?? 0) > 0) {
+        parts.push(`  Purchases: ${c.purchases ?? 0} | Revenue: €${(c.revenue ?? 0).toFixed(2)} | ROAS: ${(c.roas ?? 0).toFixed(2)}x`);
+      }
+      if ((c.leads ?? 0) > 0) {
+        const cpl = c.cpl ?? ((c.leads > 0 && c.spend > 0) ? c.spend / c.leads : 0);
+        parts.push(`  Leads: ${c.leads} | CPL: €${cpl.toFixed(2)} | Qualified leads: ${c.qualified_leads ?? 0} | Lead quality rate: ${((c.lead_quality_rate ?? 0) * 100).toFixed(0)}%`);
+      }
+      if ((c.bookings ?? 0) > 0) {
+        parts.push(`  Bookings: ${c.bookings}`);
+      }
+      if ((c.frequency ?? 0) > 0 || (c.reach ?? 0) > 0) {
+        parts.push(`  Reach: ${(c.reach ?? 0).toLocaleString()} | Frequency: ${(c.frequency ?? 0).toFixed(2)}x`);
+      }
+      if (c.budget_daily) {
+        parts.push(`  Daily budget: €${c.budget_daily.toFixed(2)}`);
+      }
+      lines.push(parts.join('\n'));
+    });
+    return lines.join('\n');
+  };
+
   const sendMessage = async (text: string) => {
     if (!text.trim() || loading) return;
 
@@ -75,10 +106,32 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
         content: m.content,
       }));
 
+      // Build rich campaign context — full KPIs
+      const richCampaigns: CampaignContext[] = (campaigns ?? []).map((c) => ({
+        name: c.name,
+        status: c.status,
+        objective: c.objective,
+        spend: c.spend ?? 0,
+        impressions: c.impressions ?? 0,
+        clicks: c.clicks ?? 0,
+        purchases: c.purchases ?? 0,
+        revenue: c.revenue ?? 0,
+        roas: c.roas ?? 0,
+        leads: c.leads ?? 0,
+        cpl: c.cpl ?? 0,
+        lead_quality_rate: c.lead_quality_rate ?? 0,
+        qualified_leads: c.qualified_leads ?? 0,
+        bookings: c.bookings ?? 0,
+        reach: c.reach ?? 0,
+        frequency: c.frequency ?? 0,
+        budget_daily: c.budget_daily,
+      }));
+
       const response = await sendChatMessage({
         brand_id: brand.id,
         messages: apiMessages,
-        campaigns: campaigns?.map(c => ({ name: c.name, objective: c.objective, spend: c.spend })) || [],
+        campaigns: richCampaigns,
+        campaign_context_summary: buildCampaignContextSummary(campaigns ?? []),
         conversion_type: activeAccount?.conversion_type ?? 'ecommerce',
       });
 
@@ -210,6 +263,35 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               Active brand context · 9yr Beauty benchmark data
             </div>
           </div>
+
+          {/* Campaign context badge */}
+          {campaigns && campaigns.length > 0 && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                background: 'rgba(196,131,106,0.08)',
+                border: '0.5px solid rgba(196,131,106,0.25)',
+                borderRadius: 4,
+                padding: '3px 8px',
+                marginLeft: 8,
+              }}
+            >
+              <Database size={9} strokeWidth={1.5} style={{ color: '#C4836A' }} />
+              <span
+                style={{
+                  fontFamily: "'DM Mono', monospace",
+                  fontSize: 8,
+                  fontWeight: 400,
+                  color: '#C4836A',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                {campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''} loaded
+              </span>
+            </div>
+          )}
         </div>
 
         {/* New button */}
