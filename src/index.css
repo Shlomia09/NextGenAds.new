@@ -72,8 +72,8 @@ input, textarea, select {
 
 .main-content {
   flex: 1;
-  margin-left: 52px;
-  min-height: 100vh;
+  margin-left: 220px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg-page);

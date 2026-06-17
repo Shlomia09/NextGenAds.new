@@ -26,7 +26,6 @@ class AppErrorBoundary extends Component<{ children: React.ReactNode }, { error:
   }
 }
 import { ActiveAccountProvider } from './contexts/ActiveAccountContext';
-import { ThemeProvider } from './context/ThemeContext';
 import Sidebar from './components/ui/Sidebar';
 import Topbar from './components/ui/Topbar';
 import Landing from './pages/Landing';
@@ -71,7 +70,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <Sidebar />
     <div className="main-content">
       <Topbar />
-      <div style={{ flex: 1 }}>{children}</div>
+      <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>{children}</div>
     </div>
   </div>
 );
@@ -107,15 +106,13 @@ const AppRoutes: React.FC = () => (
 
 const App: React.FC = () => (
   <AppErrorBoundary>
-    <ThemeProvider>
-      <ActiveAccountProvider>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </QueryClientProvider>
-      </ActiveAccountProvider>
-    </ThemeProvider>
+    <ActiveAccountProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ActiveAccountProvider>
   </AppErrorBoundary>
 );
 
