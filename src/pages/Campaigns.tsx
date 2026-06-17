@@ -95,15 +95,15 @@ const CampaignRow: React.FC<{ campaign: Campaign; showBrand?: string; onClick: (
   return (
     <tr
       onClick={onClick}
-      style={{ cursor: 'pointer', transition: 'background 0.15s' }}
+      style={{ cursor: 'pointer', transition: 'background 0.15s', height: 48 }}
       onMouseEnter={e => (e.currentTarget.style.background = '#F8F6F3')}
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
     >
       {/* Campaign name + objective badge */}
-      <td style={{ minWidth: 220 }}>
+      <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {statusIcon[campaign.status] || null}
-          <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 400, color: 'var(--text-primary)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 400, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {campaign.name}
           </span>
         </div>
@@ -124,22 +124,34 @@ const CampaignRow: React.FC<{ campaign: Campaign; showBrand?: string; onClick: (
       </td>
 
       {/* Status */}
-      <td>
-        <span className={`${campaign.status === 'ACTIVE' ? 'status-active' : campaign.status === 'PAUSED' ? 'status-paused' : 'status-learning'}`}>
-          {campaign.status}
-        </span>
+      <td style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {campaign.status === 'ACTIVE' ? (
+          <span style={{ background: 'var(--positive-bg)', color: 'var(--positive-text)', borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--positive-text)', flexShrink: 0 }} />
+            {campaign.status}
+          </span>
+        ) : campaign.status === 'PAUSED' ? (
+          <span style={{ background: 'var(--bg-secondary)', color: 'var(--text-2)', borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--text-2)', flexShrink: 0 }} />
+            {campaign.status}
+          </span>
+        ) : (
+          <span className="status-learning" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            {campaign.status}
+          </span>
+        )}
       </td>
 
       {/* Spend */}
-      <td className="numeric">{formatCurrency(campaign.spend)}</td>
+      <td className="numeric" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formatCurrency(campaign.spend)}</td>
 
       {/* CPM */}
-      <td className="numeric" style={{ color: 'var(--text-secondary)' }}>
+      <td className="numeric" style={{ color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {cpm > 0 ? formatCurrency(cpm) : '—'}
       </td>
 
       {/* Impressions */}
-      <td className="numeric" style={{ color: 'var(--text-secondary)' }}>
+      <td className="numeric" style={{ color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {campaign.impressions > 0 ? formatNumber(campaign.impressions) : '—'}
       </td>
 
@@ -147,7 +159,7 @@ const CampaignRow: React.FC<{ campaign: Campaign; showBrand?: string; onClick: (
       <ConversionCell campaign={campaign} goal={goal} />
 
       {/* Last sync */}
-      <td style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-hint)', whiteSpace: 'nowrap' }}>
+      <td style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-hint)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         {new Date(campaign.synced_at).toLocaleString()}
       </td>
     </tr>
@@ -407,7 +419,16 @@ const Campaigns: React.FC = () => {
 
       {/* ── Table ── */}
       <div className="table-wrapper">
-        <table className="data-table">
+        <table className="data-table" style={{ tableLayout: 'fixed', width: '100%' }}>
+          <colgroup>
+            <col style={{ width: '35%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '13%' }} />
+            <col style={{ width: '10%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '20%' }} />
+            <col style={{ width: 'auto' }} />
+          </colgroup>
           <thead>
             <tr>
               <th>Campaign</th>

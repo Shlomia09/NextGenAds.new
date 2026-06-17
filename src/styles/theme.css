@@ -1,0 +1,174 @@
+/* ============================================================
+   NEXTGENADS — DUAL THEME TOKENS
+   Apply data-theme="dark" or data-theme="light" on <html>
+   ============================================================ */
+
+/* ── BRAND — never changes ── */
+:root {
+  --copper:         #C4836A;
+  --copper-dark:    #9A6A4A;
+  --copper-bg:      #FDF6F0;
+  --copper-border:  rgba(196,131,106,0.3);
+  
+  /* Font families */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans:  'Outfit', system-ui, sans-serif;
+  --font-mono:  'DM Mono', 'Courier New', monospace;
+
+  /* Radii */
+  --radius-sm: 3px;
+  --radius:    6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* Transitions */
+  --transition: 180ms ease;
+}
+
+/* ── DARK THEME (default) ── */
+:root,
+:root[data-theme="dark"] {
+  --bg-page:        #0F0A07;
+  --bg-card:        #1A1208;
+  --bg-secondary:   #231810;
+  --bg-selected:    #2C1F12;
+  --bg-hover:       #231810;
+
+  --border:         #2E2018;
+  --border-strong:  #3D2B1A;
+
+  --text-1:         #F0E8DF;
+  --text-2:         #9A8A7A;
+  --text-3:         #5A4A42;
+
+  --sidebar-bg:     #0F0A07;
+  --sidebar-icon:   #5A4A42;
+  --sidebar-active: #C4836A;
+
+  --positive:       #5DB83A;
+  --positive-bg:    #0F2A08;
+  --positive-text:  #9FD876;
+  --negative:       #E05555;
+  --negative-bg:    #2A0808;
+  --negative-text:  #F09090;
+  --warning:        #EF9F27;
+  --warning-bg:     #2A1A04;
+  --warning-text:   #FAC775;
+  --info:           #5B9BD5;
+  --info-bg:        #0A1A2A;
+  --info-text:      #90C4F0;
+  --alert-dot:      #EF9F27;
+
+  --shadow-sm:  0 1px 4px rgba(0,0,0,0.4);
+  --shadow:     0 2px 12px rgba(0,0,0,0.5);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.6);
+
+  /* Legacy aliases — keeps existing components working */
+  --app-bg:            var(--bg-page);
+  --app-surface:       var(--bg-card);
+  --app-surface-2:     var(--bg-secondary);
+  --app-border:        var(--border);
+  --app-border-subtle: var(--border);
+  --text-primary:      var(--text-1);
+  --text-secondary:    var(--text-2);
+  --text-muted:        var(--text-3);
+  --text-hint:         var(--text-3);
+  --text-disabled:     var(--text-3);
+  --success:           var(--positive);
+  --success-bg:        var(--positive-bg);
+  --danger:            var(--negative);
+  --danger-bg:         var(--negative-bg);
+  --color-text-primary:    var(--text-1);
+  --color-text-secondary:  var(--text-2);
+  --color-text-tertiary:   var(--text-3);
+  --color-surface-primary:   var(--bg-card);
+  --color-surface-secondary: var(--bg-secondary);
+  --color-surface-brand:     var(--copper-bg);
+  --color-border-default:    var(--border);
+  --color-border-subtle:     var(--border);
+  --color-positive:    var(--positive);
+  --color-negative:    var(--negative);
+  --benchmark-good:    var(--positive);
+  --benchmark-bad:     var(--negative);
+  --benchmark-neutral: var(--copper);
+  --rose-gold:         var(--copper);
+  --rose:              var(--copper);
+}
+
+/* ── LIGHT THEME ── */
+:root[data-theme="light"] {
+  --bg-page:        #F8F6F3;
+  --bg-card:        #FFFFFF;
+  --bg-secondary:   #F3EFE9;
+  --bg-selected:    #FDF6F0;
+  --bg-hover:       #F3EFE9;
+
+  --border:         #E8E4DF;
+  --border-strong:  #D4CFC9;
+
+  --text-1:         #1A1410;
+  --text-2:         #6B6560;
+  --text-3:         #A09890;
+
+  --sidebar-bg:     #0F0A07;
+  --sidebar-icon:   #5A4A42;
+  --sidebar-active: #C4836A;
+
+  --positive:       #3B6D11;
+  --positive-bg:    #EAF3DE;
+  --positive-text:  #27500A;
+  --negative:       #A32D2D;
+  --negative-bg:    #FCEBEB;
+  --negative-text:  #791F1F;
+  --warning:        #BA7517;
+  --warning-bg:     #FAEEDA;
+  --warning-text:   #633806;
+  --info:           #0C447C;
+  --info-bg:        #E6F1FB;
+  --info-text:      #0C447C;
+  --alert-dot:      #EF9F27;
+
+  --shadow-sm:  0 1px 4px rgba(26,20,16,0.06);
+  --shadow:     0 2px 12px rgba(26,20,16,0.08);
+  --shadow-lg:  0 8px 32px rgba(26,20,16,0.12);
+
+  /* Legacy aliases */
+  --app-bg:            var(--bg-page);
+  --app-surface:       var(--bg-card);
+  --app-surface-2:     var(--bg-secondary);
+  --app-border:        var(--border);
+  --app-border-subtle: var(--border);
+  --text-primary:      var(--text-1);
+  --text-secondary:    var(--text-2);
+  --text-muted:        var(--text-3);
+  --text-hint:         var(--text-3);
+  --text-disabled:     var(--text-3);
+  --success:           var(--positive);
+  --success-bg:        var(--positive-bg);
+  --danger:            var(--negative);
+  --danger-bg:         var(--negative-bg);
+  --color-text-primary:    var(--text-1);
+  --color-text-secondary:  var(--text-2);
+  --color-text-tertiary:   var(--text-3);
+  --color-surface-primary:   var(--bg-card);
+  --color-surface-secondary: var(--bg-secondary);
+  --color-surface-brand:     var(--copper-bg);
+  --color-border-default:    var(--border);
+  --color-border-subtle:     var(--border);
+  --color-positive:    var(--positive);
+  --color-negative:    var(--negative);
+  --benchmark-good:    var(--positive);
+  --benchmark-bad:     var(--negative);
+  --benchmark-neutral: var(--copper);
+  --rose-gold:         var(--copper);
+  --rose:              var(--copper);
+}
+
+/* ── Theme transition ── */
+*, *::before, *::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+/* But don't animate everything that shouldn't animate */
+svg *, [class*="animate-"], [class*="skeleton"] {
+  transition: none;
+}

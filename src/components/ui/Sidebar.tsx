@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Sparkles, BarChart3, Plug, Tag, Settings, Menu, X, Wand2,
+  LayoutDashboard, Sparkles, BarChart3, Wrench, Store, Plug, Settings, Menu, X,
 } from 'lucide-react';
 import type { Brand } from '../../types';
 import AccountSwitcher from './AccountSwitcher';
+import ThemeToggle from './ThemeToggle';
 
 interface SidebarProps { brand?: Brand | null; }
 
 const navItems = [
-  { path: '/dashboard',       icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/intelligence',    icon: Sparkles,        label: 'Intelligence' },
-  { path: '/campaigns',       icon: BarChart3,       label: 'Campaigns' },
-  { path: '/campaign-workshop', icon: Wand2,           label: 'Campaign Workshop' },
-  { path: '/brands',          icon: Tag,             label: 'Brands' },
-  { path: '/connect',         icon: Plug,            label: 'Connect' },
-  { path: '/settings',        icon: Settings,        label: 'Settings' },
+  { path: '/dashboard',         icon: LayoutDashboard, label: 'Dashboard' },
+  { path: '/intelligence',      icon: Sparkles,        label: 'Intelligence' },
+  { path: '/campaigns',         icon: BarChart3,       label: 'Campaigns' },
+  { path: '/campaign-workshop', icon: Wrench,          label: 'Campaign Workshop' },
+  { path: '/brands',            icon: Store,           label: 'Brands' },
+  { path: '/connect',           icon: Plug,            label: 'Connect' },
+  { path: '/settings',          icon: Settings,        label: 'Settings' },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
@@ -37,9 +38,29 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
         {/* ── Logo ── */}
         <div className="sidebar-logo-wrap">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            {/* "NextAds" regular + "Gen" italic rose gold — per spec */}
-            <div className="sidebar-logo">
-              NextAds<em>Gen</em>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {/* 30×30 brand box */}
+              <div style={{
+                width: '30px',
+                height: '30px',
+                background: '#C4836A',
+                color: '#FFFFFF',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: "'Playfair Display', serif",
+                fontSize: '16px',
+                fontWeight: 600,
+                flexShrink: 0,
+                lineHeight: 1,
+              }}>
+                N
+              </div>
+              {/* Wordmark */}
+              <div className="sidebar-logo">
+                NextAds<em>Gen</em>
+              </div>
             </div>
             <button className="sb-close-btn" onClick={() => setOpen(false)} aria-label="Close">
               <X size={15} strokeWidth={1.5} />
@@ -79,10 +100,22 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           })}
         </nav>
 
-        {/* ── Footer — 9yr benchmark indicator ── */}
-        <div className="sidebar-benchmark">
-          <span className="sidebar-benchmark-dot" />
-          <span className="sidebar-benchmark-text">9-Year Benchmark Active</span>
+        {/* ── Bottom Section ── */}
+        <div className="sidebar-bottom">
+          {/* 1. ThemeToggle */}
+          <div className="sidebar-theme-toggle-wrap">
+            <ThemeToggle />
+          </div>
+
+          {/* 2. Separator */}
+          <div style={{ borderTop: '0.5px solid #2E2018', margin: '0' }} />
+
+          {/* 3. 9YR BENCH ACTIVE badge — vertical layout */}
+          <div className="sidebar-benchmark-badge">
+            <span>9YR</span>
+            <span>BENCH</span>
+            <span>ACTIVE</span>
+          </div>
         </div>
 
       </aside>
@@ -144,7 +177,6 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           flex-shrink: 0;
         }
 
-        /* "NextAds" regular + "Gen" italic rose gold */
         .sidebar-logo {
           font-family: 'Playfair Display', serif;
           font-size: 18px;
@@ -164,7 +196,7 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           letter-spacing: 0.22em;
           text-transform: uppercase;
           color: #4a2e1e;
-          margin-top: 5px;
+          margin-top: 8px;
         }
 
         /* ─── Brand pill ─── */
@@ -213,48 +245,58 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           font-weight: 300;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #6b4030;
+          color: #5A4A42;
           text-decoration: none;
           transition: color 0.15s, background 0.15s;
           border-left: 2px solid transparent;
         }
+        .sidebar-nav-item svg { opacity: 1; }
         .sidebar-nav-item:hover {
-          color: #8B6050;
-          background: rgba(196,131,106,0.04);
-        }
-        .sidebar-nav-item.active {
-          color: #C4A090;
-          border-left-color: #C4836A;
-          padding-left: calc(20px - 2px);
+          color: #C4836A;
           background: rgba(196,131,106,0.06);
         }
+        .sidebar-nav-item.active {
+          color: #C4836A;
+          border-left-color: #C4836A;
+          padding-left: calc(20px - 2px);
+          background: rgba(196,131,106,0.08);
+        }
 
-        /* ─── Footer / Benchmark indicator ─── */
-        .sidebar-benchmark {
-          padding: 14px 20px;
-          border-top: 0.5px solid #2a1a0e;
+        /* ─── Bottom Section ─── */
+        .sidebar-bottom {
+          flex-shrink: 0;
           display: flex;
+          flex-direction: column;
+        }
+
+        .sidebar-theme-toggle-wrap {
+          display: flex;
+          justify-content: center;
           align-items: center;
-          gap: 7px;
-          flex-shrink: 0;
+          padding: 12px 16px;
         }
-        .sidebar-benchmark-dot {
-          width: 6px; height: 6px;
-          border-radius: 50%;
-          background: #10B981;
-          flex-shrink: 0;
-          animation: pulse 2s infinite;
+
+        /* ─── 9YR BENCH ACTIVE badge ─── */
+        .sidebar-benchmark-badge {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          padding: 10px 0;
+          font-family: 'DM Mono', 'Courier New', monospace;
+          font-size: 8px;
+          letter-spacing: 0.15em;
+          color: #C4836A;
+          line-height: 1.7;
         }
+        .sidebar-benchmark-badge span {
+          display: block;
+          text-transform: uppercase;
+        }
+
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50%       { opacity: 0.4; }
-        }
-        .sidebar-benchmark-text {
-          font-family: 'Outfit', sans-serif;
-          font-size: 8px;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: #4a2e1e;
         }
       `}</style>
     </>
