@@ -20,18 +20,18 @@ const QUICK_QUESTIONS = [
   'Am I ready to increase budget?',
 ];
 
-// ─── After-Dark token palette (inline-only, no CSS vars) ──────────────────────
+// ─── Light token palette (inline-only, no CSS vars) ──────────────────────────
 const T = {
-  bgDeep:      '#0F0A07',
-  bgContainer: '#1C1208',
-  border:      '0.5px solid #2a1a0e',
-  borderColor: '#2a1a0e',
+  bgDeep:      '#F8F6F3',
+  bgContainer: '#FFFFFF',
+  border:      '0.5px solid #E8E4DF',
+  borderColor: '#E8E4DF',
   accent:      '#C4836A',
   accentHover: '#A86B52',
-  textPrimary: '#F5E6D8',
-  textBody:    '#C4A090',
+  textPrimary: '#1A1410',
+  textBody:    '#3D2B1F',
   textMuted:   '#8B6050',
-  textHint:    '#4a2e1e',
+  textHint:    '#A09890',
   radius:      '5px',
   transition:  'all 0.18s ease',
 } as const;
@@ -264,27 +264,27 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             </div>
           </div>
 
-          {/* Campaign context badge */}
+          {/* Campaign context badge — light amber */}
           {campaigns && campaigns.length > 0 && (
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
-                background: 'rgba(196,131,106,0.08)',
+                background: '#FAEEDA',
                 border: '0.5px solid rgba(196,131,106,0.25)',
                 borderRadius: 4,
                 padding: '3px 8px',
                 marginLeft: 8,
               }}
             >
-              <Database size={9} strokeWidth={1.5} style={{ color: '#C4836A' }} />
+              <Database size={9} strokeWidth={1.5} style={{ color: '#633806' }} />
               <span
                 style={{
                   fontFamily: "'DM Mono', monospace",
                   fontSize: 8,
                   fontWeight: 400,
-                  color: '#C4836A',
+                  color: '#633806',
                   letterSpacing: '0.04em',
                 }}
               >
@@ -328,7 +328,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: 12,
-          background: 'transparent',
+          background: T.bgDeep,
         }}
       >
         {/* Empty state */}
@@ -388,7 +388,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               Full context of your brand, campaigns, and 9 years of benchmark data
             </p>
 
-            {/* Suggested questions */}
+            {/* Suggested questions chips */}
             <div
               style={{
                 display: 'flex',
@@ -406,14 +406,14 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                   onMouseLeave={() => setHoveredQuick(null)}
                   onClick={() => sendMessage(q)}
                   style={{
-                    background: hoveredQuick === q ? 'rgba(196,131,106,0.05)' : T.bgDeep,
-                    border: hoveredQuick === q ? `0.5px solid ${T.accent}` : T.border,
+                    background: hoveredQuick === q ? 'rgba(196,131,106,0.05)' : '#FDF6F0',
+                    border: hoveredQuick === q ? `0.5px solid ${T.accent}` : '0.5px solid #C4836A',
                     borderRadius: T.radius,
                     padding: '7px 12px',
                     fontFamily: "'Outfit', sans-serif",
                     fontSize: 10,
                     fontWeight: 300,
-                    color: T.textMuted,
+                    color: '#C4836A',
                     textAlign: 'left',
                     cursor: 'pointer',
                     transition: T.transition,
@@ -448,8 +448,9 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                background: msg.role === 'user' ? T.accent : T.bgDeep,
-                color: msg.role === 'user' ? T.bgDeep : T.accent,
+                // user avatar stays dark (intentional contrast), AI avatar light
+                background: msg.role === 'user' ? '#1A1410' : T.bgContainer,
+                color: msg.role === 'user' ? '#FFFFFF' : T.accent,
               }}
             >
               {msg.role === 'user'
@@ -472,8 +473,9 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 style={
                   msg.role === 'user'
                     ? {
-                        background: T.accent,
-                        color: T.bgDeep,
+                        // User bubble: dark for intentional contrast
+                        background: '#1A1410',
+                        color: '#FFFFFF',
                         borderRadius: T.radius,
                         padding: '8px 12px',
                         fontFamily: "'Outfit', sans-serif",
@@ -485,8 +487,9 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                         marginLeft: '20%',
                       }
                     : {
-                        background: T.bgDeep,
-                        border: T.border,
+                        // AI bubble: white with light border
+                        background: '#FFFFFF',
+                        border: '0.5px solid #E8E4DF',
                         color: T.textBody,
                         borderRadius: T.radius,
                         padding: '9px 13px',
@@ -525,7 +528,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                             href="/pricing"
                             style={{
                               display: 'inline-block',
-                              background: '#C4836A', color: '#0F0A07',
+                              background: '#C4836A', color: '#FFFFFF',
                               borderRadius: 3, padding: '7px 16px',
                               fontFamily: "'Outfit', sans-serif", fontSize: 9,
                               fontWeight: 500, letterSpacing: '0.12em',
@@ -579,7 +582,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                background: T.bgDeep,
+                background: T.bgContainer,
                 color: T.accent,
               }}
             >
@@ -588,7 +591,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
 
             <div
               style={{
-                background: T.bgDeep,
+                background: '#FFFFFF',
                 border: T.border,
                 borderRadius: T.radius,
                 padding: '9px 13px',
@@ -652,8 +655,8 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           rows={2}
           style={{
             flex: 1,
-            background: T.bgDeep,
-            border: inputFocused ? `0.5px solid ${T.accent}` : T.border,
+            background: '#FFFFFF',
+            border: inputFocused ? `1px solid ${T.accent}` : '1px solid #E8E4DF',
             borderRadius: T.radius,
             padding: '8px 12px',
             color: T.textPrimary,
@@ -674,13 +677,13 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           style={{
             width: 32,
             height: 32,
-            background: sendHovered && input.trim() && !loading ? T.accentHover : T.accent,
+            background: sendHovered && input.trim() && !loading ? T.accentHover : '#C4836A',
             border: 'none',
             borderRadius: T.radius,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: T.bgDeep,
+            color: '#FFFFFF',
             cursor: !input.trim() || loading ? 'not-allowed' : 'pointer',
             opacity: !input.trim() || loading ? 0.35 : 1,
             flexShrink: 0,
@@ -698,7 +701,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
           40%            { transform: translateY(-4px); opacity: 1; }
         }
-        .ic-container textarea::placeholder { color: #4a2e1e; }
+        .ic-container textarea::placeholder { color: #A09890; }
       `}</style>
     </div>
   );

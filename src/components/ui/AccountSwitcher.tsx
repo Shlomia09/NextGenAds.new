@@ -109,8 +109,8 @@ const AccountSwitcher: React.FC = () => {
           alignItems: 'center',
           gap: 6,
           width: '100%',
-          background: '#1C1208',
-          border: open ? '0.5px solid #C4836A' : '0.5px solid #2a1a0e',
+          background: '#FFFFFF',
+          border: open ? '0.5px solid #C4836A' : '0.5px solid #E8E4DF',
           borderRadius: 4,
           padding: '7px 10px',
           cursor: 'pointer',
@@ -128,7 +128,7 @@ const AccountSwitcher: React.FC = () => {
             fontFamily: "'Outfit', sans-serif",
             fontSize: 11,
             fontWeight: 300,
-            color: activeAccount ? '#C4A090' : '#6b4030',
+            color: activeAccount ? '#1A1410' : '#A09890',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -141,7 +141,7 @@ const AccountSwitcher: React.FC = () => {
           size={11}
           strokeWidth={1.5}
           style={{
-            color: '#6b4030',
+            color: '#A09890',
             flexShrink: 0,
             transform: open ? 'rotate(180deg)' : 'none',
             transition: 'transform 0.15s',
@@ -157,12 +157,12 @@ const AccountSwitcher: React.FC = () => {
             top: 'calc(100% + 4px)',
             left: 0,
             right: 0,
-            background: '#1C1208',
-            border: '0.5px solid #2a1a0e',
+            background: '#FFFFFF',
+            border: '0.5px solid #E8E4DF',
             borderRadius: 4,
             zIndex: 200,
             overflow: 'hidden',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
             minWidth: 188,
           }}
         >
@@ -172,7 +172,7 @@ const AccountSwitcher: React.FC = () => {
                 padding: '10px 12px',
                 fontFamily: "'Outfit', sans-serif",
                 fontSize: 10,
-                color: '#4a2e1e',
+                color: '#A09890',
                 fontWeight: 300,
               }}
             >
@@ -185,7 +185,7 @@ const AccountSwitcher: React.FC = () => {
                   <div
                     style={{
                       height: '0.5px',
-                      background: '#2a1a0e',
+                      background: '#E8E4DF',
                       margin: '4px 0',
                     }}
                   />
@@ -198,7 +198,7 @@ const AccountSwitcher: React.FC = () => {
                     fontSize: 8,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
-                    color: '#4a2e1e',
+                    color: '#A09890',
                     fontWeight: 400,
                   }}
                 >
@@ -222,14 +222,14 @@ const AccountSwitcher: React.FC = () => {
                         gap: 6,
                         width: '100%',
                         padding: '6px 12px',
-                        background: isActive ? 'rgba(196,131,106,0.12)' : 'transparent',
+                        background: isActive ? 'rgba(196,131,106,0.08)' : 'transparent',
                         border: 'none',
                         cursor: 'pointer',
                         textAlign: 'left',
                         transition: 'background 0.12s',
                       }}
                       onMouseEnter={e => {
-                        if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,131,106,0.05)';
+                        if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,131,106,0.04)';
                       }}
                       onMouseLeave={e => {
                         if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
@@ -250,7 +250,7 @@ const AccountSwitcher: React.FC = () => {
                             fontFamily: "'Outfit', sans-serif",
                             fontSize: 11,
                             fontWeight: isActive ? 400 : 300,
-                            color: isActive ? '#C4A090' : '#8B6050',
+                            color: isActive ? '#1A1410' : '#5C4035',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -262,7 +262,7 @@ const AccountSwitcher: React.FC = () => {
                           style={{
                             fontFamily: "'DM Mono', monospace",
                             fontSize: 9,
-                            color: '#4a2e1e',
+                            color: '#A09890',
                             marginTop: 1,
                           }}
                         >
@@ -277,7 +277,7 @@ const AccountSwitcher: React.FC = () => {
           )}
 
           {/* Separator */}
-          <div style={{ height: '0.5px', background: '#2a1a0e', margin: '4px 0' }} />
+          <div style={{ height: '0.5px', background: '#E8E4DF', margin: '4px 0' }} />
 
           {/* Connect new account */}
           <button
