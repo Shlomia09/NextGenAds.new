@@ -22,14 +22,14 @@ html {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #FDF6F0;
+  background: var(--bg-page);
 }
 
 body {
   font-family: var(--font-sans);
   font-weight: 300;
-  background: #FDF6F0;
-  color: var(--color-text-primary);
+  background: var(--bg-page);
+  color: var(--text-1);
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
@@ -57,9 +57,9 @@ input, textarea, select {
 }
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--color-surface-secondary); }
-::-webkit-scrollbar-thumb { background: var(--color-border-default); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #C4836A40; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(196,131,106,0.4); }
 
 /* ============================================================
    APP SHELL
@@ -67,17 +67,18 @@ input, textarea, select {
 .app-layout {
   display: flex;
   min-height: 100vh;
-  background: var(--app-bg);
+  background: var(--bg-page);
 }
 
 .main-content {
   flex: 1;
-  margin-left: 220px;
+  margin-left: 52px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--color-surface-secondary);
+  background: var(--bg-page);
   min-width: 0;
+  overflow: hidden;
 }
 
 .page-container {
@@ -85,8 +86,8 @@ input, textarea, select {
   padding: 28px 32px;
   max-width: 1600px;
   min-width: 0;
-  background: var(--color-surface-secondary);
-  color: var(--color-text-primary);
+  background: var(--bg-page);
+  color: var(--text-1);
 }
 
 @media (max-width: 900px) {

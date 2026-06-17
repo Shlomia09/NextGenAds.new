@@ -20,9 +20,39 @@ class ConnectErrorBoundary extends Component<{ children: React.ReactNode }, { er
 }
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  Globe, Search, Mail, CheckCircle, AlertCircle,
+  Globe, CheckCircle, AlertCircle,
   ArrowRight, RefreshCw, Zap, Trash2, Link2Off,
 } from 'lucide-react';
+
+
+// ── Platform Logo Components ───────────────────────────────────
+const MetaLogo = () => (
+  <div style={{ width: 40, height: 40, background: '#0082FB', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+      <path d="M13.397 20.997v-8.196h2.765l.411-3.209h-3.176V7.548c0-.926.258-1.56 1.587-1.56h1.684V3.127A22.336 22.336 0 0 0 14.201 3c-2.444 0-4.122 1.492-4.122 4.231v2.355H7.332v3.209h2.753v8.202h3.312z"/>
+    </svg>
+  </div>
+);
+
+const GoogleAdsLogo = () => (
+  <div style={{ width: 40, height: 40, background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <svg width="22" height="22" viewBox="0 0 48 48">
+      <path fill="#4285F4" d="M45 20H25v8h11.3C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-8 20-20 0-1.3-.2-2.7-.5-4z"/>
+      <path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3.1 0 5.9 1.1 8.1 2.9l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/>
+      <path fill="#FBBC05" d="M24 44c5.2 0 9.8-1.8 13.4-4.7l-6.2-5c-2 1.4-4.5 2.2-7.2 2.2-6.1 0-11.2-4.1-13-9.6l-6.5 5.1C8 38.4 15.4 44 24 44z"/>
+      <path fill="#EA4335" d="M45 20H25v8h11.3c-.8 2.2-2.3 4.1-4.3 5.5l6.2 5c3.7-3.4 6-8.5 6-14.5 0-1.3-.2-2.7-.5-4z"/>
+    </svg>
+  </div>
+);
+
+const KlaviyoLogo = () => (
+  <div style={{ width: 40, height: 40, background: '#000000', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <svg width="22" height="22" viewBox="0 0 30 30" fill="white">
+      <path d="M6 4h8.5L22 12l-7.5 8H6v-5.5l5-2.5-5-2.5V4z"/>
+    </svg>
+  </div>
+);
+
 
 
 import { getAdAccounts, supabase } from '../lib/supabase';
@@ -321,21 +351,19 @@ const Connect: React.FC = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
 
         {/* ── Meta Ads ── */}
-        <div className="conn-card" style={metaAccounts.length > 0 ? { borderColor: 'rgba(16,185,129,0.35)', gridColumn: metaAccounts.length > 1 ? 'span 2' : undefined } : {}}>
+        <div className="conn-card" style={metaAccounts.length > 0 ? { background: 'var(--bg-card)', borderColor: 'rgba(16,185,129,0.35)', gridColumn: metaAccounts.length > 1 ? 'span 2' : undefined } : { background: 'var(--bg-card)', border: '0.5px solid var(--border)' }}>
           <div className="conn-header">
-            <div className="conn-icon" style={{ background: '#1877F2' }}>
-              <Globe size={18} strokeWidth={1.5} />
-            </div>
+            <MetaLogo />
             <div>
               <div className="conn-name">Meta Ads</div>
               <div className="conn-desc">Facebook & Instagram campaigns</div>
             </div>
             {metaAccounts.length > 0
-              ? <span className="badge badge-success" style={{ marginLeft: 'auto' }}>
-                  <CheckCircle size={9} strokeWidth={1.5} />{metaAccounts.length} account{metaAccounts.length !== 1 ? 's' : ''} connected
+              ? <span style={{ marginLeft: 'auto', background: 'var(--positive-bg)', color: 'var(--positive-text)', border: '0.5px solid var(--positive)', fontSize: 11, fontWeight: 500, borderRadius: 6, padding: '3px 10px' }}>
+                  {metaAccounts.length} Account{metaAccounts.length !== 1 ? 's' : ''} Connected
                 </span>
-              : <span className="badge badge-neutral" style={{ marginLeft: 'auto' }}>
-                  <AlertCircle size={9} strokeWidth={1.5} />Not connected
+              : <span style={{ marginLeft: 'auto', background: 'var(--bg-secondary)', color: 'var(--text-3)', border: '0.5px solid var(--border)', fontSize: 11, fontWeight: 500, borderRadius: 6, padding: '3px 10px' }}>
+                  Not connected
                 </span>}
           </div>
 
@@ -429,8 +457,10 @@ const Connect: React.FC = () => {
                 <li>AI recommendations from your live data</li>
                 <li>One-click campaign execution (Growth plan)</li>
               </ul>
-              <button className="btn btn-primary" onClick={initiateMetaOAuth}>
-                <Globe size={13} strokeWidth={1.5} />
+              <button
+                onClick={initiateMetaOAuth}
+                style={{ background: 'var(--copper)', color: '#FFFFFF', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', fontSize: 13 }}
+              >
                 Connect Meta Ads
                 <ArrowRight size={13} strokeWidth={1.5} />
               </button>
@@ -439,16 +469,14 @@ const Connect: React.FC = () => {
         </div>
 
         {/* ── Google Ads (Coming Soon) ── */}
-        <div className="conn-card conn-soon">
+        <div className="conn-card conn-soon" style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border)' }}>
           <div className="conn-header">
-            <div className="conn-icon" style={{ background: '#4285F4' }}>
-              <Search size={18} strokeWidth={1.5} />
-            </div>
+            <GoogleAdsLogo />
             <div>
               <div className="conn-name">Google Ads</div>
               <div className="conn-desc">Search & Display campaigns</div>
             </div>
-            <span className="badge badge-neutral" style={{ marginLeft: 'auto' }}>Coming Soon</span>
+            <span style={{ marginLeft: 'auto', background: 'var(--bg-secondary)', color: 'var(--text-3)', border: '0.5px solid var(--border)', fontSize: 11, fontWeight: 500, borderRadius: 6, padding: '3px 10px' }}>Coming Soon</span>
           </div>
           <ul className="conn-features" style={{ opacity: 0.4 }}>
             <li>Google Search + Brand campaigns</li>
@@ -456,22 +484,19 @@ const Connect: React.FC = () => {
             <li>Intent capture analysis</li>
           </ul>
           <button className="btn btn-secondary" disabled>
-            <Search size={13} strokeWidth={1.5} />
             Connect Google Ads
           </button>
         </div>
 
         {/* ── Klaviyo (Coming Soon) ── */}
-        <div className="conn-card conn-soon">
+        <div className="conn-card conn-soon" style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border)' }}>
           <div className="conn-header">
-            <div className="conn-icon" style={{ background: '#231F20' }}>
-              <Mail size={18} strokeWidth={1.5} />
-            </div>
+            <KlaviyoLogo />
             <div>
               <div className="conn-name">Klaviyo</div>
               <div className="conn-desc">Email flows & revenue attribution</div>
             </div>
-            <span className="badge badge-neutral" style={{ marginLeft: 'auto' }}>Coming Soon</span>
+            <span style={{ marginLeft: 'auto', background: 'var(--bg-secondary)', color: 'var(--text-3)', border: '0.5px solid var(--border)', fontSize: 11, fontWeight: 500, borderRadius: 6, padding: '3px 10px' }}>Coming Soon</span>
           </div>
           <ul className="conn-features" style={{ opacity: 0.4 }}>
             <li>Email sequence analysis</li>
@@ -479,7 +504,6 @@ const Connect: React.FC = () => {
             <li>High-AOV closing sequence optimizer</li>
           </ul>
           <button className="btn btn-secondary" disabled>
-            <Mail size={13} strokeWidth={1.5} />
             Connect Klaviyo
           </button>
         </div>
