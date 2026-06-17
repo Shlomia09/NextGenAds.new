@@ -139,7 +139,7 @@ const PreflightModal: React.FC<Props> = ({
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
               {(['campaign_id', 'adset_id', 'ad_id'] as const).map(key => success[key] && (
-                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 6 }}>
+                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 12px', background: '#F8F6F3', borderRadius: 6 }}>
                   <span style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--text-hint)', textTransform: 'uppercase' }}>{key.replace('_', ' ')}</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-secondary)' }}>{String(success[key])}</span>
                 </div>
@@ -252,7 +252,7 @@ const PreflightModal: React.FC<Props> = ({
           </div>
 
           {/* Campaign details */}
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '0.5px solid var(--app-border)', borderRadius: 10, padding: '14px 16px' }}>
+          <div style={{ background: '#F8F6F3', border: '0.5px solid #E8E4DF', borderRadius: 10, padding: '14px 16px' }}>
             <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Campaign Settings</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[

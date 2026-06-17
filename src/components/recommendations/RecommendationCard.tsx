@@ -13,24 +13,24 @@ const priorityConfig = {
   critical: {
     icon: <AlertTriangle size={10} strokeWidth={1.5} />,
     label: 'Critical',
-    borderColor: '#EF4444',
-    badgeBg: 'rgba(239,68,68,0.12)',
-    badgeColor: '#EF4444',
-    badgeBorder: 'rgba(239,68,68,0.25)',
+    borderColor: '#E24B4A',
+    badgeBg: '#FCEBEB',
+    badgeColor: '#791F1F',
+    badgeBorder: 'rgba(226,75,74,0.25)',
   },
   high: {
     icon: <Zap size={10} strokeWidth={1.5} />,
     label: 'High',
-    borderColor: '#F59E0B',
-    badgeBg: 'rgba(245,158,11,0.12)',
-    badgeColor: '#F59E0B',
-    badgeBorder: 'rgba(245,158,11,0.25)',
+    borderColor: '#C4836A',
+    badgeBg: '#FAEEDA',
+    badgeColor: '#633806',
+    badgeBorder: 'rgba(196,131,106,0.35)',
   },
   medium: {
     icon: <Info size={10} strokeWidth={1.5} />,
     label: 'Medium',
     borderColor: '#C4836A',
-    badgeBg: 'rgba(196,131,106,0.12)',
+    badgeBg: '#FDF6F0',
     badgeColor: '#C4836A',
     badgeBorder: 'rgba(196,131,106,0.25)',
   },
@@ -56,8 +56,8 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   return (
     <div
       style={{
-        background: '#1C1208',
-        border: '0.5px solid #2a1a0e',
+        background: '#FFFFFF',
+        border: '0.5px solid #E8E4DF',
         borderLeft: `2.5px solid ${config.borderColor}`,
         borderRadius: 6,
         padding: '12px 14px',
@@ -91,9 +91,9 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           </span>
           {/* Type badge */}
           <span style={{
-            background: 'rgba(107,64,48,0.15)',
-            color: '#6b4030',
-            border: '0.5px solid #2a1a0e',
+            background: '#F8F6F3',
+            color: '#6B5044',
+            border: '0.5px solid #E8E4DF',
             fontFamily: "'Outfit', sans-serif",
             fontSize: 8,
             fontWeight: 400,
@@ -110,15 +110,15 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           style={{
             background: 'transparent',
             border: 'none',
-            color: '#4a2e1e',
+            color: '#8B6A5A',
             cursor: 'pointer',
             padding: '3px',
             display: 'flex',
             alignItems: 'center',
             transition: 'color 0.15s',
           }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#8B6050')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#4a2e1e')}
+          onMouseEnter={e => (e.currentTarget.style.color = '#C4836A')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#8B6A5A')}
         >
           {expanded ? <ChevronUp size={13} strokeWidth={1.5} /> : <ChevronDown size={13} strokeWidth={1.5} />}
         </button>
@@ -129,7 +129,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         fontFamily: "'Playfair Display', serif",
         fontSize: 13,
         fontWeight: 400,
-        color: '#F5E6D8',
+        color: '#1A1410',
         lineHeight: 1.35,
       }}>
         {rec.title}
@@ -140,7 +140,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         fontFamily: "'Outfit', sans-serif",
         fontSize: 11,
         fontWeight: 300,
-        color: '#8B6050',
+        color: '#6B5044',
         lineHeight: 1.6,
         margin: 0,
       }}>
@@ -171,25 +171,25 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             flexDirection: 'column',
             gap: 10,
             padding: '10px 12px',
-            background: '#0F0A07',
+            background: '#F8F6F3',
             borderRadius: 4,
-            border: '0.5px solid #2a1a0e',
+            border: '0.5px solid #E8E4DF',
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#4a2e1e' }}>
+            <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6A5A' }}>
               Recommended Action
             </div>
-            <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: 0 }}>
+            <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#6B5044', lineHeight: 1.55, margin: 0 }}>
               {rec.action}
             </p>
           </div>
           {rec.reasoning && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#4a2e1e' }}>
+              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6A5A' }}>
                 AI Reasoning
               </div>
-              <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: 0 }}>
+              <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#6B5044', lineHeight: 1.55, margin: 0 }}>
                 {rec.reasoning}
               </p>
             </div>
@@ -204,13 +204,13 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         gap: 6,
         flexWrap: 'wrap',
         paddingTop: 6,
-        borderTop: '0.5px solid #2a1a0e',
+        borderTop: '0.5px solid #E8E4DF',
       }}>
         <button
           onClick={() => onApprove(rec.id)}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
-            background: '#10B981', color: '#0F0A07',
+            background: '#10B981', color: '#FFFFFF',
             border: 'none', borderRadius: 2,
             padding: '6px 12px',
             fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 500,
@@ -227,15 +227,15 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           onClick={() => onLearnMore(rec)}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
-            background: 'transparent', color: '#6b4030',
-            border: '0.5px solid #2a1a0e', borderRadius: 2,
+            background: 'transparent', color: '#6B5044',
+            border: '0.5px solid #E8E4DF', borderRadius: 2,
             padding: '6px 12px',
             fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 400,
             letterSpacing: '0.1em', textTransform: 'uppercase',
             cursor: 'pointer', transition: 'all 0.15s',
           }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = '#C4836A'; e.currentTarget.style.color = '#C4836A'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = '#2a1a0e'; e.currentTarget.style.color = '#6b4030'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8E4DF'; e.currentTarget.style.color = '#6B5044'; }}
         >
           <Info size={11} strokeWidth={1.5} />
           Details
@@ -245,15 +245,15 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           style={{
             marginLeft: 'auto',
             display: 'inline-flex', alignItems: 'center', gap: 5,
-            background: 'transparent', color: '#4a2e1e',
+            background: 'transparent', color: '#8B6A5A',
             border: 'none',
             padding: '6px',
             fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 400,
             letterSpacing: '0.1em', textTransform: 'uppercase',
             cursor: 'pointer', transition: 'color 0.15s',
           }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#8B6050')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#4a2e1e')}
+          onMouseEnter={e => (e.currentTarget.style.color = '#C4836A')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#8B6A5A')}
         >
           <XCircle size={11} strokeWidth={1.5} />
           Dismiss

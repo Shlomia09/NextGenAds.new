@@ -31,8 +31,8 @@ const eyebrowStyle: React.CSSProperties = {
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '9px 12px',
-  background: 'rgba(255,255,255,0.04)',
-  border: '0.5px solid var(--app-border)',
+  background: '#FFFFFF',
+  border: '0.5px solid #E8E4DF',
   borderRadius: 8,
   color: 'var(--text-primary)',
   fontFamily: 'var(--font-sans)',
@@ -60,7 +60,7 @@ const warningStyle: React.CSSProperties = {
 
 const dividerStyle: React.CSSProperties = {
   height: '0.5px',
-  background: 'rgba(255,255,255,0.06)',
+  background: '#F0ECE8',
   margin: '4px 0',
 };
 
@@ -108,8 +108,8 @@ export default function CampaignSetup({ brandId, draft, onUpdate, onPreview }: P
   const toggleButtonStyle = (active: boolean): React.CSSProperties => ({
     padding: '6px 14px',
     borderRadius: 6,
-    border: active ? '1px solid var(--rose-gold)' : '0.5px solid var(--app-border)',
-    background: active ? 'rgba(196,131,106,0.1)' : 'rgba(255,255,255,0.03)',
+    border: active ? '1px solid var(--rose-gold)' : '0.5px solid #E8E4DF',
+    background: active ? 'rgba(196,131,106,0.1)' : '#FFFFFF',
     color: active ? 'var(--rose-gold)' : 'var(--text-secondary)',
     fontFamily: 'var(--font-sans)',
     fontSize: 12,
@@ -121,8 +121,8 @@ export default function CampaignSetup({ brandId, draft, onUpdate, onPreview }: P
   const chipStyle = (active: boolean): React.CSSProperties => ({
     padding: '4px 10px',
     borderRadius: 20,
-    border: active ? '1px solid var(--rose-gold)' : '0.5px solid var(--app-border)',
-    background: active ? 'rgba(196,131,106,0.1)' : 'rgba(255,255,255,0.03)',
+    border: active ? '1px solid var(--rose-gold)' : '0.5px solid #E8E4DF',
+    background: active ? 'rgba(196,131,106,0.1)' : '#FFFFFF',
     color: active ? 'var(--rose-gold)' : 'var(--text-secondary)',
     fontFamily: 'var(--font-sans)',
     fontSize: 11,
@@ -347,7 +347,7 @@ export default function CampaignSetup({ brandId, draft, onUpdate, onPreview }: P
           border: 'none',
           background: canPublish
             ? 'linear-gradient(135deg, var(--rose-gold), #a0554a)'
-            : 'rgba(255,255,255,0.07)',
+            : '#F0ECE8',
           color: canPublish ? '#fff' : 'var(--text-muted)',
           fontFamily: 'var(--font-sans)',
           fontSize: 14,

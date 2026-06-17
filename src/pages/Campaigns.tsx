@@ -29,10 +29,10 @@ const ConversionCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ camp
       return (
         <td className="numeric">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <span style={{ color: campaign.roas >= 3 ? 'var(--success)' : campaign.roas >= 1.5 ? 'var(--warning)' : 'var(--danger)', fontWeight: 500 }}>
+            <span style={{ color: campaign.roas >= 3 ? '#27500A' : campaign.roas >= 1.5 ? '#633806' : '#791F1F', fontWeight: 500, fontFamily: 'var(--font-mono)' }}>
               {campaign.roas > 0 ? `${campaign.roas.toFixed(2)}x` : '—'}
             </span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-hint)' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--color-text-tertiary)' }}>
               {campaign.purchases > 0 ? `${campaign.purchases} purch.` : 'no sales'}
             </span>
           </div>
@@ -96,7 +96,7 @@ const CampaignRow: React.FC<{ campaign: Campaign; showBrand?: string; onClick: (
     <tr
       onClick={onClick}
       style={{ cursor: 'pointer', transition: 'background 0.15s' }}
-      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(196,131,106,0.04)')}
+      onMouseEnter={e => (e.currentTarget.style.background = '#F8F6F3')}
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
     >
       {/* Campaign name + objective badge */}
@@ -125,7 +125,7 @@ const CampaignRow: React.FC<{ campaign: Campaign; showBrand?: string; onClick: (
 
       {/* Status */}
       <td>
-        <span className={`badge ${campaign.status === 'ACTIVE' ? 'badge-success' : campaign.status === 'PAUSED' ? 'badge-high' : 'badge-neutral'}`}>
+        <span className={`${campaign.status === 'ACTIVE' ? 'status-active' : campaign.status === 'PAUSED' ? 'status-paused' : 'status-learning'}`}>
           {campaign.status}
         </span>
       </td>

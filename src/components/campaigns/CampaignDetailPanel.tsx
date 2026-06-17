@@ -56,7 +56,7 @@ const MetricVsBenchmark: React.FC<{
     format === 'percent'  ? `${v.toFixed(2)}%` :
     `${v.toFixed(2)}x`;
   return (
-    <div style={{ background: 'rgba(255,255,255,0.03)', border: '0.5px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px' }}>
+    <div style={{ background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '12px 14px' }}>
       <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 4 }}>
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text-primary)' }}>{fmt(value)}</span>
@@ -153,7 +153,7 @@ const QuickActions: React.FC<{ campaign: Campaign; onAction: (msg: string) => vo
         )}
 
         <button
-          onClick={() => navigate('/campaign-workshop', {
+          onClick={() => navigate('/creative-studio', {
             state: {
               prefill: {
                 brandId: campaign.brand_id,
@@ -230,13 +230,7 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
 
-      const systemContext = `You are an expert Meta Ads strategist. The user is asking about a specific campaign. Here is the campaign data:
-
-${campaignSummary}
-
-Industry benchmarks: CPL €32, CPM €11.2, CTR 2.1% for beauty leads campaigns.
-
-Be concise, specific to this campaign's numbers, and actionable. If asked about ads/ad-sets level data, explain you see campaign-level data and suggest what to check in Meta Ads Manager.`;
+      const systemContext = `You are an expert Meta Ads strategist. The user is asking about a specific campaign. Here is the campaign data:\n\n${campaignSummary}\n\nIndustry benchmarks: CPL €32, CPM €11.2, CTR 2.1% for beauty leads campaigns.\n\nBe concise, specific to this campaign's numbers, and actionable. If asked about ads/ad-sets level data, explain you see campaign-level data and suggest what to check in Meta Ads Manager.`;
 
       const result = await callEdge('claude-chat', {
         messages: newMessages.map(m => ({ role: m.role, content: m.content })),
@@ -307,8 +301,8 @@ Be concise, specific to this campaign's numbers, and actionable. If asked about 
               <div style={{
                 background: m.role === 'user'
                   ? 'linear-gradient(135deg, rgba(196,131,106,0.15), rgba(160,85,74,0.1))'
-                  : 'rgba(255,255,255,0.04)',
-                border: `0.5px solid ${m.role === 'user' ? 'rgba(196,131,106,0.2)' : 'rgba(255,255,255,0.07)'}`,
+                  : '#FFFFFF',
+                border: `0.5px solid ${m.role === 'user' ? 'rgba(196,131,106,0.2)' : '#E8E4DF'}`,
                 borderRadius: m.role === 'user' ? '10px 10px 2px 10px' : '10px 10px 10px 2px',
                 padding: '8px 12px',
                 fontFamily: 'var(--font-sans)', fontSize: 11,
@@ -321,7 +315,7 @@ Be concise, specific to this campaign's numbers, and actionable. If asked about 
           {loading && (
             <div style={{ alignSelf: 'flex-start' }}>
               <div style={{
-                background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.07)',
+                background: '#FFFFFF', border: '0.5px solid #E8E4DF',
                 borderRadius: '10px 10px 10px 2px', padding: '8px 14px',
                 display: 'flex', gap: 5, alignItems: 'center',
               }}>
@@ -347,8 +341,8 @@ Be concise, specific to this campaign's numbers, and actionable. If asked about 
           placeholder="Ask about this campaign…"
           disabled={loading}
           style={{
-            flex: 1, background: 'rgba(255,255,255,0.04)',
-            border: '0.5px solid var(--app-border)',
+            flex: 1, background: '#FFFFFF',
+            border: '0.5px solid #E8E4DF',
             borderRadius: 8, padding: '8px 12px',
             fontFamily: 'var(--font-sans)', fontSize: 11,
             color: 'var(--text-primary)', outline: 'none',
@@ -494,16 +488,16 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>Total Spend</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--rose-gold)', marginTop: 4 }}>{formatCurrency(campaign.spend)}</div>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.03)', border: '0.5px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px' }}>
+              <div style={{ background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '12px 14px' }}>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>Impressions</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text-primary)', marginTop: 4 }}>{formatNumber(campaign.impressions)}</div>
               </div>
               {campaign.leads > 0 && <>
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '0.5px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px' }}>
+                <div style={{ background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '12px 14px' }}>
                   <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>Leads</div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: '#a78bfa', marginTop: 4 }}>{formatNumber(campaign.leads)}</div>
                 </div>
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '0.5px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px' }}>
+                <div style={{ background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '12px 14px' }}>
                   <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>CPL</div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, marginTop: 4, color: campaign.cpl < (bench.cpl || 32) ? '#4ade80' : '#fbbf24' }}>
                     {formatCurrency(campaign.cpl)}
@@ -511,20 +505,20 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
                 </div>
               </>}
               {campaign.purchases > 0 && <>
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '0.5px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px' }}>
+                <div style={{ background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '12px 14px' }}>
                   <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>ROAS</div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, marginTop: 4, color: campaign.roas >= 3 ? '#4ade80' : '#fbbf24' }}>{campaign.roas.toFixed(2)}x</div>
                 </div>
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '0.5px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px' }}>
+                <div style={{ background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '12px 14px' }}>
                   <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>Revenue</div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: '#4ade80', marginTop: 4 }}>{formatCurrency(campaign.revenue)}</div>
                 </div>
               </>}
-              <div style={{ background: 'rgba(255,255,255,0.03)', border: '0.5px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px' }}>
+              <div style={{ background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '12px 14px' }}>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>CPM</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text-secondary)', marginTop: 4 }}>{cpm > 0 ? formatCurrency(cpm) : '—'}</div>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.03)', border: '0.5px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px' }}>
+              <div style={{ background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '12px 14px' }}>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>CTR</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text-secondary)', marginTop: 4 }}>{ctr > 0 ? `${ctr.toFixed(2)}%` : '—'}</div>
               </div>

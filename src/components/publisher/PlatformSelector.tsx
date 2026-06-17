@@ -79,7 +79,7 @@ export default function PlatformSelector({ brandId, selected, selectedAccountId,
               color: 'var(--text-hint)',
               marginTop: 4,
               display: 'block',
-              background: 'rgba(255,255,255,0.06)',
+              background: '#F0ECE8',
               borderRadius: 4,
               padding: '1px 5px',
             }}>
@@ -129,10 +129,10 @@ export default function PlatformSelector({ brandId, selected, selectedAccountId,
               borderRadius: 10,
               border: isSelected
                 ? '1px solid var(--rose-gold)'
-                : '0.5px solid var(--app-border)',
+                : '0.5px solid #E8E4DF',
               background: isSelected
                 ? 'rgba(196,131,106,0.08)'
-                : 'rgba(255,255,255,0.03)',
+                : '#FFFFFF',
               cursor: isDisabled ? 'not-allowed' : 'pointer',
               opacity: isDisabled ? 0.5 : 1,
               display: 'flex',

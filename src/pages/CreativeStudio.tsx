@@ -123,7 +123,7 @@ const VariantCard: React.FC<{
           )}
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={() => setEditing(e => !e)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 5, background: 'rgba(255,255,255,0.05)', border: '0.5px solid var(--app-border)', fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-secondary)', cursor: 'pointer' }}>
+          <button onClick={() => setEditing(e => !e)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 5, background: '#F8F6F3', border: '0.5px solid #E8E4DF', fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-secondary)', cursor: 'pointer' }}>
             <Edit3 size={9} />{editing ? 'Done' : 'Edit'}
           </button>
           <button onClick={() => copyToClipboard(`${primary}\n\n${body}\n\n${cta}`, 'all')} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 5, background: copied === 'all' ? 'rgba(74,222,128,0.1)' : 'rgba(196,131,106,0.1)', border: `0.5px solid ${copied === 'all' ? 'rgba(74,222,128,0.3)' : 'rgba(196,131,106,0.25)'}`, fontFamily: 'var(--font-sans)', fontSize: 9, color: copied === 'all' ? '#4ade80' : 'var(--rose-gold)', cursor: 'pointer' }}>
@@ -152,8 +152,8 @@ const VariantCard: React.FC<{
             </div>
             {editing ? (
               key === 'body'
-                ? <textarea value={value} onChange={e => set(e.target.value)} rows={3} style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '0.5px solid var(--app-border)', borderRadius: 6, padding: '8px 10px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.6, outline: 'none', resize: 'vertical' }} />
-                : <input value={value} onChange={e => set(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '0.5px solid var(--app-border)', borderRadius: 6, padding: '7px 10px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', outline: 'none' }} />
+                ? <textarea value={value} onChange={e => set(e.target.value)} rows={3} style={{ width: '100%', boxSizing: 'border-box', background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 6, padding: '8px 10px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.6, outline: 'none', resize: 'vertical' }} />
+                : <input value={value} onChange={e => set(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 6, padding: '7px 10px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', outline: 'none' }} />
             ) : (
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: key === 'cta' ? 11 : 12, color: key === 'cta' ? 'var(--rose-gold)' : 'var(--text-secondary)', lineHeight: 1.6, fontWeight: key === 'cta' ? 500 : 400 }}>
                 {value}{key === 'cta' && ' →'}
@@ -164,7 +164,7 @@ const VariantCard: React.FC<{
       </div>
 
       {/* "Use this copy" button */}
-      <div style={{ marginTop: 14, borderTop: '0.5px solid rgba(255,255,255,0.05)', paddingTop: 12 }}>
+      <div style={{ marginTop: 14, borderTop: '0.5px solid #F0ECE8', paddingTop: 12 }}>
         <button
           onClick={() => onUseThis(currentVariant)}
           style={{
@@ -187,7 +187,7 @@ const VariantCard: React.FC<{
 };
 
 // ── Main Page ────────────────────────────────────────────────────
-const CampaignWorkshop: React.FC = () => {
+const CreativeStudio: React.FC = () => {
   const { user }     = useAuth();
   const location     = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -378,7 +378,7 @@ const CampaignWorkshop: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <Sparkles size={16} style={{ color: 'var(--rose-gold)' }} />
           <h1 style={{ fontFamily: 'var(--font-sans)', fontSize: 20, fontWeight: 400, color: 'var(--text-primary)', margin: 0 }}>
-            Campaign Workshop
+            Creative Studio
           </h1>
           {draftSaving && <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)' }}>Saving draft…</span>}
           {draft.id && !draftSaving && <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: '#4ade80', display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={9} /> Draft saved</span>}
@@ -395,7 +395,7 @@ const CampaignWorkshop: React.FC = () => {
 
           {/* Upload area */}
           <div ref={dropRef} onDrop={onDrop} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onClick={() => !file && fileInputRef.current?.click()}
-            style={{ background: dragging ? 'rgba(196,131,106,0.08)' : 'rgba(255,255,255,0.02)', border: `1px dashed ${dragging ? 'rgba(196,131,106,0.5)' : file ? 'rgba(196,131,106,0.3)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 12, cursor: file ? 'default' : 'pointer', overflow: 'hidden', transition: 'all 0.2s ease', minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+            style={{ background: dragging ? '#FDF6F0' : file ? '#FFFFFF' : '#F8F6F3', border: `1.5px dashed ${dragging ? 'rgba(196,131,106,0.5)' : file ? 'rgba(196,131,106,0.3)' : '#C4836A'}`, borderRadius: 12, cursor: file ? 'default' : 'pointer', overflow: 'hidden', transition: 'all 0.2s ease', minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
             {preview ? (
               <>
                 <img src={preview} alt="Creative preview" style={{ width: '100%', display: 'block', objectFit: 'contain', maxHeight: 260 }} />
@@ -420,7 +420,7 @@ const CampaignWorkshop: React.FC = () => {
             <div>
               <label style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>Conversion Goal</label>
               <div style={{ position: 'relative' }}>
-                <select value={conversionType} onChange={e => setConvType(e.target.value as ConversionType)} style={{ width: '100%', appearance: 'none', background: 'rgba(255,255,255,0.04)', border: '0.5px solid var(--app-border)', borderRadius: 8, padding: '9px 32px 9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}>
+                <select value={conversionType} onChange={e => setConvType(e.target.value as ConversionType)} style={{ width: '100%', appearance: 'none', background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '9px 32px 9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}>
                   {CONVERSION_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.emoji} {o.label}</option>)}
                 </select>
                 <ChevronDown size={13} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-hint)', pointerEvents: 'none' }} />
@@ -430,7 +430,7 @@ const CampaignWorkshop: React.FC = () => {
               <div>
                 <label style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>Brand</label>
                 <div style={{ position: 'relative' }}>
-                  <select value={brandId} onChange={e => setBrandId(e.target.value)} style={{ width: '100%', appearance: 'none', background: 'rgba(255,255,255,0.04)', border: '0.5px solid var(--app-border)', borderRadius: 8, padding: '9px 32px 9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}>
+                  <select value={brandId} onChange={e => setBrandId(e.target.value)} style={{ width: '100%', appearance: 'none', background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '9px 32px 9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}>
                     <option value="">No brand selected</option>
                     {brands.map((b: Brand) => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </select>
@@ -441,7 +441,7 @@ const CampaignWorkshop: React.FC = () => {
           </div>
 
           {/* Analyze button */}
-          <button onClick={analyze} disabled={!file || loading} style={{ background: !file ? 'rgba(255,255,255,0.04)' : 'linear-gradient(135deg, var(--rose-gold) 0%, #a0554a 100%)', border: !file ? '0.5px solid var(--app-border)' : 'none', borderRadius: 10, padding: '13px 20px', fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500, color: !file ? 'var(--text-hint)' : 'white', cursor: !file || loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s ease' }}>
+          <button onClick={analyze} disabled={!file || loading} style={{ background: !file ? '#F8F6F3' : 'linear-gradient(135deg, var(--rose-gold) 0%, #a0554a 100%)', border: !file ? '0.5px solid #E8E4DF' : 'none', borderRadius: 10, padding: '13px 20px', fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500, color: !file ? 'var(--text-hint)' : 'white', cursor: !file || loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s ease' }}>
             {loading ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />Analyzing creative…</> : <><Sparkles size={14} />Analyze Creative & Generate Copy</>}
           </button>
 
@@ -532,4 +532,4 @@ const CampaignWorkshop: React.FC = () => {
   );
 };
 
-export default CampaignWorkshop;
+export default CreativeStudio;

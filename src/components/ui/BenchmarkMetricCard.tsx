@@ -27,13 +27,13 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
 
   const statusClass = isNeutral ? 'neutral' : isBeating ? 'above' : 'below';
 
-  // Derive your-value color per After-Dark rules
+  // Light mode value colors: above benchmark = dark green, below = red, neutral = copper
   const yourValueColor = (() => {
-    if (isNeutral) return '#F5E6D8';
+    if (isNeutral) return '#C4836A';
     if (higherIsBetter) {
-      return yourValue >= benchmarkValue ? '#10B981' : '#EF4444';
+      return yourValue >= benchmarkValue ? '#3B6D11' : '#E24B4A';
     } else {
-      return yourValue <= benchmarkValue ? '#10B981' : '#EF4444';
+      return yourValue <= benchmarkValue ? '#3B6D11' : '#E24B4A';
     }
   })();
 
@@ -57,8 +57,8 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           }
 
           .bm-card {
-            background: #1C1208;
-            border: 0.5px solid #2a1a0e;
+            background: #FFFFFF;
+            border: 0.5px solid #E8E4DF;
             border-radius: 4px;
             padding: 14px 16px;
             display: flex;
@@ -68,7 +68,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
 
           .skeleton {
             border-radius: 3px;
-            background: linear-gradient(90deg, #1C1208 25%, #120C08 50%, #1C1208 75%);
+            background: linear-gradient(90deg, #F8F6F3 25%, #FFFFFF 50%, #F8F6F3 75%);
             background-size: 200% 100%;
             animation: shimmer 1.8s infinite;
           }
@@ -122,8 +122,8 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .bm-card {
-          background: #1C1208;
-          border: 0.5px solid #2a1a0e;
+          background: #FFFFFF;
+          border: 0.5px solid #E8E4DF;
           border-radius: 4px;
           padding: 14px 16px;
           display: flex;
@@ -146,7 +146,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           font-weight: 400;
           letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: #4a2e1e;
+          color: var(--text-secondary, #6B5044);
         }
 
         .live-dot {
@@ -169,7 +169,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           align-items: center;
           justify-content: space-between;
           padding: 5px 8px;
-          background: #0F0A07;
+          background: #F0ECE8;
           border-radius: 2px;
         }
 
@@ -177,14 +177,14 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           font-family: 'Outfit', sans-serif;
           font-size: 8px;
           font-weight: 300;
-          color: #4a2e1e;
+          color: var(--text-secondary, #6B5044);
         }
 
         .bm-bench-value {
           font-family: 'DM Mono', monospace;
           font-size: 8px;
           font-weight: 400;
-          color: #6b4030;
+          color: var(--text-hint, #8B6A5A);
         }
 
         .metric-benchmark {
@@ -200,32 +200,32 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .metric-benchmark.above {
-          background: rgba(16, 185, 129, 0.12);
-          color: #10B981;
+          background: #EAF3DE;
+          color: #27500A;
         }
 
         .metric-benchmark.below {
-          background: rgba(239, 68, 68, 0.12);
-          color: #EF4444;
+          background: #FCEBEB;
+          color: #791F1F;
         }
 
         .metric-benchmark.neutral {
-          background: rgba(245, 230, 216, 0.08);
-          color: #F5E6D8;
+          background: rgba(196,131,106,0.10);
+          color: #C4836A;
         }
 
         .bm-source {
           font-family: 'Outfit', sans-serif;
           font-size: 7px;
           font-weight: 300;
-          color: #2a1a0e;
+          color: var(--text-hint, #8B6A5A);
           font-style: italic;
           margin-top: 2px;
         }
 
         .skeleton {
           border-radius: 3px;
-          background: linear-gradient(90deg, #1C1208 25%, #120C08 50%, #1C1208 75%);
+          background: linear-gradient(90deg, #F8F6F3 25%, #FFFFFF 50%, #F8F6F3 75%);
           background-size: 200% 100%;
           animation: shimmer 1.8s infinite;
         }
