@@ -12,7 +12,7 @@ const navItems = [
   { path: '/dashboard',       icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/intelligence',    icon: Sparkles,        label: 'Intelligence' },
   { path: '/campaigns',       icon: BarChart3,       label: 'Campaigns' },
-  { path: '/creative-studio', icon: Wand2,           label: 'Creative Studio' },
+  { path: '/campaign-workshop', icon: Wand2,           label: 'Campaign Workshop' },
   { path: '/brands',          icon: Tag,             label: 'Brands' },
   { path: '/connect',         icon: Plug,            label: 'Connect' },
   { path: '/settings',        icon: Settings,        label: 'Settings' },

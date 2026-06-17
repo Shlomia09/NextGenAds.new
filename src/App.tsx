@@ -41,7 +41,7 @@ import Pricing from './pages/Pricing';
 import Audit from './pages/Audit';
 import MetaCallback from './pages/MetaCallback';
 import ShopifyCallback from './pages/ShopifyCallback';
-import CreativeStudio from './pages/CreativeStudio';
+import CampaignWorkshop from './pages/CreativeStudio';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -96,7 +96,7 @@ const AppRoutes: React.FC = () => (
     <Route path="/brands"      element={<ProtectedRoute><AppLayout><Brands /></AppLayout></ProtectedRoute>} />
     <Route path="/connect"     element={<ProtectedRoute><AppLayout><Connect /></AppLayout></ProtectedRoute>} />
     <Route path="/settings"        element={<ProtectedRoute><AppLayout><Settings /></AppLayout></ProtectedRoute>} />
-    <Route path="/creative-studio" element={<ProtectedRoute><AppLayout><CreativeStudio /></AppLayout></ProtectedRoute>} />
+    <Route path="/campaign-workshop" element={<ProtectedRoute><AppLayout><CampaignWorkshop /></AppLayout></ProtectedRoute>} />
 
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>

@@ -187,7 +187,7 @@ const VariantCard: React.FC<{
 };
 
 // ── Main Page ────────────────────────────────────────────────────
-const CreativeStudio: React.FC = () => {
+const CampaignWorkshop: React.FC = () => {
   const { user }     = useAuth();
   const location     = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -378,7 +378,7 @@ const CreativeStudio: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <Sparkles size={16} style={{ color: 'var(--rose-gold)' }} />
           <h1 style={{ fontFamily: 'var(--font-sans)', fontSize: 20, fontWeight: 400, color: 'var(--text-primary)', margin: 0 }}>
-            Creative Studio
+            Campaign Workshop
           </h1>
           {draftSaving && <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)' }}>Saving draft…</span>}
           {draft.id && !draftSaving && <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: '#4ade80', display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={9} /> Draft saved</span>}
@@ -532,4 +532,4 @@ const CreativeStudio: React.FC = () => {
   );
 };
 
-export default CreativeStudio;
+export default CampaignWorkshop;

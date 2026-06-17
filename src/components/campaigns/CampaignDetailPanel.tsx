@@ -153,7 +153,7 @@ const QuickActions: React.FC<{ campaign: Campaign; onAction: (msg: string) => vo
         )}
 
         <button
-          onClick={() => navigate('/creative-studio', {
+          onClick={() => navigate('/campaign-workshop', {
             state: {
               prefill: {
                 brandId: campaign.brand_id,
