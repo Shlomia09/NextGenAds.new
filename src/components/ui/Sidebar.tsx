@@ -245,7 +245,7 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           font-weight: 300;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #5A4A42;
+          color: #D4C4BC;
           text-decoration: none;
           transition: color 0.15s, background 0.15s;
           border-left: 2px solid transparent;
