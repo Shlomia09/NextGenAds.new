@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Sparkles, BarChart3, Plug, Tag, Settings, Menu, X,
+  LayoutDashboard, Sparkles, BarChart3, Plug, Tag, Settings, Menu, X, Wand2,
 } from 'lucide-react';
 import type { Brand } from '../../types';
 import AccountSwitcher from './AccountSwitcher';
@@ -9,12 +9,13 @@ import AccountSwitcher from './AccountSwitcher';
 interface SidebarProps { brand?: Brand | null; }
 
 const navItems = [
-  { path: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/intelligence', icon: Sparkles,         label: 'Intelligence' },
-  { path: '/campaigns',    icon: BarChart3,        label: 'Campaigns' },
-  { path: '/brands',       icon: Tag,              label: 'Brands' },
-  { path: '/connect',      icon: Plug,             label: 'Connect' },
-  { path: '/settings',     icon: Settings,         label: 'Settings' },
+  { path: '/dashboard',       icon: LayoutDashboard, label: 'Dashboard' },
+  { path: '/intelligence',    icon: Sparkles,        label: 'Intelligence' },
+  { path: '/campaigns',       icon: BarChart3,       label: 'Campaigns' },
+  { path: '/creative-studio', icon: Wand2,           label: 'Creative Studio' },
+  { path: '/brands',          icon: Tag,             label: 'Brands' },
+  { path: '/connect',         icon: Plug,            label: 'Connect' },
+  { path: '/settings',        icon: Settings,        label: 'Settings' },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
