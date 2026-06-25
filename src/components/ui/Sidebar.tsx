@@ -38,19 +38,19 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
         {/* ── Logo ── */}
         <div className="sidebar-logo-wrap">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {/* 30×30 brand box */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '11px' }}>
+              {/* 38×38 logo box */}
               <div style={{
-                width: '30px',
-                height: '30px',
-                background: '#C4836A',
-                color: '#FFFFFF',
-                borderRadius: '6px',
+                width: '38px',
+                height: '38px',
+                background: 'var(--logo-grad)',
+                color: '#2A1A12',
+                borderRadius: '10px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontFamily: "'Playfair Display', serif",
-                fontSize: '16px',
+                fontFamily: "'Fraunces', serif",
+                fontSize: '20px',
                 fontWeight: 600,
                 flexShrink: 0,
                 lineHeight: 1,
@@ -58,19 +58,19 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
                 N
               </div>
               {/* Wordmark */}
-              <div className="sidebar-logo">
-                NextAds<em>Gen</em>
+              <div>
+                <div className="sidebar-logo">NextAds<em>Gen</em></div>
+                <div className="sidebar-tagline">Campaign Intelligence</div>
               </div>
             </div>
             <button className="sb-close-btn" onClick={() => setOpen(false)} aria-label="Close">
               <X size={15} strokeWidth={1.5} />
             </button>
           </div>
-          <div className="sidebar-tagline">Campaign Intelligence</div>
         </div>
 
         {/* ── Account Switcher ── */}
-        <div style={{ padding: '0 16px 8px', borderBottom: '0.5px solid #1a0e05' }}>
+        <div style={{ padding: '10px 10px 4px' }}>
           <AccountSwitcher />
         </div>
 
@@ -78,7 +78,9 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
         {brand && (
           <div className="sidebar-brand-pill">
             <div className="sidebar-brand-dot" />
-            <span className="truncate">{brand.name}</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {brand.name}
+            </span>
           </div>
         )}
 
@@ -93,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
                 className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
                 onClick={() => setOpen(false)}
               >
-                <Icon size={13} strokeWidth={1.5} />
+                <Icon size={18} strokeWidth={1.5} />
                 <span>{label}</span>
               </NavLink>
             );
@@ -102,15 +104,12 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
 
         {/* ── Bottom Section ── */}
         <div className="sidebar-bottom">
-          {/* 1. ThemeToggle */}
+          {/* ThemeToggle */}
           <div className="sidebar-theme-toggle-wrap">
             <ThemeToggle />
           </div>
 
-          {/* 2. Separator */}
-          <div style={{ borderTop: '0.5px solid #2E2018', margin: '0' }} />
-
-          {/* 3. 9YR BENCH ACTIVE badge — vertical layout */}
+          {/* 9YR BENCH ACTIVE badge */}
           <div className="sidebar-benchmark-badge">
             <span>9YR</span>
             <span>BENCH</span>
@@ -121,30 +120,30 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
       </aside>
 
       <style>{`
-        /* ─── Shell ─── */
+        /* ── Shell ── */
         .sidebar {
-          width: 220px;
-          background: #0F0A07;
-          border-right: 0.5px solid #2a1a0e;
+          width: 230px;
+          background: var(--bg-sidebar);
+          border-right: 1px solid var(--border);
           position: fixed;
           left: 0; top: 0; bottom: 0;
           display: flex;
           flex-direction: column;
           z-index: 100;
           overflow: hidden;
-          transition: transform 0.26s ease;
+          transition: transform 0.26s ease, background 0.35s ease, border-color 0.35s ease;
         }
 
-        /* ─── Mobile controls ─── */
+        /* ── Mobile controls ── */
         .sb-hamburger {
           display: none;
           position: fixed;
           top: 12px; left: 14px;
           z-index: 110;
-          background: #0F0A07;
-          border: 0.5px solid #2a1a0e;
-          border-radius: 4px;
-          color: #8B6050;
+          background: var(--bg-sidebar);
+          border: 1px solid var(--border);
+          border-radius: 9px;
+          color: var(--text-2);
           width: 36px; height: 36px;
           align-items: center; justify-content: center;
           cursor: pointer;
@@ -152,152 +151,136 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
         .sb-overlay {
           display: none;
           position: fixed; inset: 0;
-          background: rgba(0,0,0,0.6);
+          background: rgba(0,0,0,0.5);
           z-index: 99;
           backdrop-filter: blur(4px);
         }
         .sb-close-btn {
           display: none;
           background: none; border: none;
-          color: #4a2e1e; cursor: pointer;
+          color: var(--text-3); cursor: pointer;
           padding: 2px; line-height: 1;
         }
         @media (max-width: 900px) {
           .sidebar { transform: translateX(-100%); }
-          .sidebar.sidebar-open { transform: translateX(0); box-shadow: 8px 0 40px rgba(0,0,0,0.5); }
+          .sidebar.sidebar-open { transform: translateX(0); box-shadow: 8px 0 40px rgba(0,0,0,0.4); }
           .sb-hamburger { display: flex; }
           .sb-overlay { display: block; }
           .sb-close-btn { display: flex; }
         }
 
-        /* ─── Logo ─── */
+        /* ── Logo ── */
         .sidebar-logo-wrap {
-          padding: 22px 20px 16px;
-          border-bottom: 0.5px solid #2a1a0e;
+          padding: 22px 20px 14px;
+          border-bottom: 1px solid var(--border);
           flex-shrink: 0;
         }
-
         .sidebar-logo {
-          font-family: 'Playfair Display', serif;
-          font-size: 18px;
-          font-weight: 400;
-          color: #F5E6D8;
-          letter-spacing: 0.03em;
-          line-height: 1;
+          font-family: 'Inter', sans-serif;
+          font-size: 17px;
+          font-weight: 500;
+          color: var(--text);
+          letter-spacing: 0.2px;
+          line-height: 1.2;
         }
         .sidebar-logo em {
-          font-style: italic;
-          color: #C4836A;
+          font-style: normal;
+          color: var(--accent);
         }
-
         .sidebar-tagline {
-          font-family: 'Outfit', sans-serif;
-          font-size: 7px;
-          letter-spacing: 0.22em;
+          font-family: 'Inter', sans-serif;
+          font-size: 8.5px;
+          letter-spacing: 2.5px;
           text-transform: uppercase;
-          color: #4a2e1e;
-          margin-top: 8px;
+          color: var(--text-3);
+          margin-top: 3px;
         }
 
-        /* ─── Brand pill ─── */
+        /* ── Brand pill ── */
         .sidebar-brand-pill {
-          margin: 10px 12px;
-          background: #1C1208;
-          border: 0.5px solid #2a1a0e;
-          border-radius: 3px;
-          padding: 7px 10px;
+          margin: 6px 10px 2px;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 9px;
+          padding: 7px 11px;
           display: flex;
           align-items: center;
-          gap: 7px;
-          font-family: 'Outfit', sans-serif;
-          font-size: 11px;
-          font-weight: 300;
-          color: #8B6050;
+          gap: 8px;
+          font-family: 'Inter', sans-serif;
+          font-size: 12px;
+          font-weight: 400;
+          color: var(--text-2);
           overflow: hidden;
           flex-shrink: 0;
-          transition: border-color 0.18s;
+          transition: background 0.15s, color 0.15s;
+          cursor: pointer;
         }
-        .sidebar-brand-pill:hover { border-color: #C4836A; }
+        .sidebar-brand-pill:hover { background: var(--surface-hover); color: var(--text); }
         .sidebar-brand-dot {
           width: 5px; height: 5px;
           border-radius: 50%;
-          background: #C4836A;
+          background: var(--accent);
           flex-shrink: 0;
         }
 
-        /* ─── Nav ─── */
+        /* ── Nav ── */
         .sidebar-nav {
           flex: 1;
-          padding: 8px 0;
+          padding: 6px 10px;
           display: flex;
           flex-direction: column;
-          gap: 1px;
+          gap: 2px;
           overflow-y: auto;
         }
-
         .sidebar-nav-item {
           display: flex;
           align-items: center;
-          gap: 10px;
-          padding: 8px 20px;
-          font-family: 'Outfit', sans-serif;
-          font-size: 11px;
-          font-weight: 300;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: #D4C4BC;
+          gap: 12px;
+          padding: 10px 12px;
+          border-radius: 9px;
+          font-family: 'Inter', sans-serif;
+          font-size: 13.5px;
+          font-weight: 500;
+          letter-spacing: 0.3px;
+          color: var(--text-2);
           text-decoration: none;
-          transition: color 0.15s, background 0.15s;
-          border-left: 2px solid transparent;
+          transition: background 0.15s, color 0.15s;
         }
-        .sidebar-nav-item svg { opacity: 1; }
         .sidebar-nav-item:hover {
-          color: #C4836A;
-          background: rgba(196,131,106,0.06);
+          background: var(--surface-hover);
+          color: var(--text);
         }
         .sidebar-nav-item.active {
-          color: #C4836A;
-          border-left-color: #C4836A;
-          padding-left: calc(20px - 2px);
-          background: rgba(196,131,106,0.08);
+          background: var(--accent-soft);
+          color: var(--accent);
         }
 
-        /* ─── Bottom Section ─── */
+        /* ── Bottom ── */
         .sidebar-bottom {
           flex-shrink: 0;
           display: flex;
           flex-direction: column;
+          border-top: 1px solid var(--border);
         }
-
         .sidebar-theme-toggle-wrap {
           display: flex;
           justify-content: center;
           align-items: center;
           padding: 12px 16px;
         }
-
-        /* ─── 9YR BENCH ACTIVE badge ─── */
         .sidebar-benchmark-badge {
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
-          padding: 10px 0;
-          font-family: 'DM Mono', 'Courier New', monospace;
+          padding: 6px 0 12px;
+          font-family: 'JetBrains Mono', monospace;
           font-size: 8px;
-          letter-spacing: 0.15em;
-          color: #C4836A;
-          line-height: 1.7;
+          letter-spacing: 3px;
+          color: var(--text-3);
+          line-height: 2;
         }
-        .sidebar-benchmark-badge span {
-          display: block;
-          text-transform: uppercase;
-        }
-
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0.4; }
-        }
+        .sidebar-benchmark-badge span { display: block; text-transform: uppercase; }
       `}</style>
     </>
   );

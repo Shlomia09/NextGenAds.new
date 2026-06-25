@@ -106,32 +106,42 @@ export const getAdAccounts = async (userId: string) => {
 };
 
 
-// Intelligence sessions
+// ── Intelligence sessions ────────────────────────────────────────
+
 export const getIntelligenceSessions = async (brandId: string) => {
   const { data, error } = await supabase
     .from('intelligence_sessions')
-    .select('*')
+    .select('id, brand_id, user_id, title, messages, created_at, updated_at')
     .eq('brand_id', brandId)
-    .order('created_at', { ascending: false });
+    .order('updated_at', { ascending: false });
   if (error) throw error;
-  return data;
+  return data ?? [];
 };
 
 export const createIntelligenceSession = async (session: {
   brand_id: string;
   user_id: string;
-  messages: unknown[];
+  title?: string;
+  messages?: unknown[];
 }) => {
   const { data, error } = await supabase
     .from('intelligence_sessions')
-    .insert(session)
+    .insert({
+      brand_id: session.brand_id,
+      user_id:  session.user_id,
+      title:    session.title ?? 'New Session',
+      messages: session.messages ?? [],
+    })
     .select()
     .single();
   if (error) throw error;
   return data;
 };
 
-export const updateIntelligenceSession = async (id: string, messages: unknown[]) => {
+export const updateIntelligenceSession = async (
+  id: string,
+  messages: unknown[],
+) => {
   const { data, error } = await supabase
     .from('intelligence_sessions')
     .update({ messages })
@@ -140,4 +150,47 @@ export const updateIntelligenceSession = async (id: string, messages: unknown[])
     .single();
   if (error) throw error;
   return data;
+};
+
+export const updateSessionTitle = async (id: string, title: string) => {
+  const { error } = await supabase
+    .from('intelligence_sessions')
+    .update({ title })
+    .eq('id', id);
+  if (error) console.warn('Could not update session title:', error.message);
+};
+
+/**
+ * Returns up to `limit` recent sessions for a brand (excluding current session),
+ * each with just the first user message (used as memory context for the AI).
+ */
+export const getRecentSessionContext = async (
+  brandId: string,
+  excludeSessionId?: string,
+  limit = 4,
+): Promise<{ title: string; firstMessage: string; date: string }[]> => {
+  let q = supabase
+    .from('intelligence_sessions')
+    .select('title, messages, created_at')
+    .eq('brand_id', brandId)
+    .order('updated_at', { ascending: false })
+    .limit(limit + 1);
+
+  if (excludeSessionId) q = q.neq('id', excludeSessionId);
+
+  const { data, error } = await q;
+  if (error || !data) return [];
+
+  return data
+    .filter((s) => Array.isArray(s.messages) && s.messages.length > 0)
+    .slice(0, limit)
+    .map((s) => {
+      const msgs = s.messages as { role: string; content: string }[];
+      const firstUser = msgs.find((m) => m.role === 'user');
+      return {
+        title:        s.title ?? 'Session',
+        firstMessage: firstUser?.content?.substring(0, 200) ?? '',
+        date:         s.created_at ?? '',
+      };
+    });
 };

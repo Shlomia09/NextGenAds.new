@@ -1,174 +1,165 @@
 /* ============================================================
-   NEXTGENADS — DUAL THEME TOKENS
-   Apply data-theme="dark" or data-theme="light" on <html>
+   NextAdsGen Design System v2.0
+   Beauty-Tech · Campaign Intelligence Platform
    ============================================================ */
 
-/* ── BRAND — never changes ── */
+/* ── Fonts ── */
 :root {
-  --copper:         #C4836A;
-  --copper-dark:    #9A6A4A;
-  --copper-bg:      #FDF6F0;
-  --copper-border:  rgba(196,131,106,0.3);
-  
-  /* Font families */
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-sans:  'Outfit', system-ui, sans-serif;
-  --font-mono:  'DM Mono', 'Courier New', monospace;
+  --font-display: 'Fraunces', serif;
+  --font-ui:      'Inter', -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
 
-  /* Radii */
-  --radius-sm: 3px;
-  --radius:    6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-
-  /* Transitions */
-  --transition: 180ms ease;
+  /* Legacy aliases — keep for components that haven't been updated yet */
+  --font-serif: var(--font-display);
+  --font-sans:  var(--font-ui);
 }
 
-/* ── DARK THEME (default) ── */
+/* ============================================================
+   DARK THEME (default)
+   ============================================================ */
 :root,
-:root[data-theme="dark"] {
-  --bg-page:        #0F0A07;
-  --bg-card:        #1A1208;
-  --bg-secondary:   #231810;
-  --bg-selected:    #2C1F12;
-  --bg-hover:       #231810;
+[data-theme="dark"] {
+  /* Surfaces */
+  --bg:             #0E0C0B;
+  --bg-sidebar:     #0A0908;
+  --surface:        #161312;
+  --surface-2:      #1B1716;
+  --surface-hover:  #201B19;
 
-  --border:         #2E2018;
-  --border-strong:  #3D2B1A;
+  /* Borders */
+  --border:         #262120;
+  --border-soft:    #1C1918;
 
-  --text-1:         #F0E8DF;
-  --text-2:         #9A8A7A;
-  --text-3:         #5A4A42;
+  /* Text */
+  --text:           #F1EBE4;
+  --text-2:         #8A817A;
+  --text-3:         #675F58;
 
-  --sidebar-bg:     #0F0A07;
-  --sidebar-icon:   #5A4A42;
-  --sidebar-active: #C4836A;
+  /* Accent — Rose Gold */
+  --accent:         #E3A88E;
+  --accent-deep:    #C97B5E;
+  --accent-soft:    rgba(227, 168, 142, 0.10);
 
-  --positive:       #5DB83A;
-  --positive-bg:    #0F2A08;
-  --positive-text:  #9FD876;
-  --negative:       #E05555;
-  --negative-bg:    #2A0808;
-  --negative-text:  #F09090;
-  --warning:        #EF9F27;
-  --warning-bg:     #2A1A04;
-  --warning-text:   #FAC775;
-  --info:           #5B9BD5;
-  --info-bg:        #0A1A2A;
-  --info-text:      #90C4F0;
-  --alert-dot:      #EF9F27;
+  /* Semantic */
+  --green:          #6BBF8A;
+  --green-soft:     rgba(107, 191, 138, 0.12);
+  --champagne:      #C99A6A;
+  --champagne-soft: rgba(201, 154, 106, 0.10);
+  --red:            #D9776B;
+  --red-soft:       rgba(217, 119, 107, 0.12);
+  --blue:           #7FA8D9;
 
-  --shadow-sm:  0 1px 4px rgba(0,0,0,0.4);
-  --shadow:     0 2px 12px rgba(0,0,0,0.5);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,0.6);
+  /* Logo gradient — constant across themes */
+  --logo-grad: linear-gradient(135deg, #E3A88E, #C97B5E);
 
-  /* Legacy aliases — keeps existing components working */
-  --app-bg:            var(--bg-page);
-  --app-surface:       var(--bg-card);
-  --app-surface-2:     var(--bg-secondary);
-  --app-border:        var(--border);
-  --app-border-subtle: var(--border);
-  --text-primary:      var(--text-1);
-  --text-secondary:    var(--text-2);
-  --text-muted:        var(--text-3);
-  --text-hint:         var(--text-3);
-  --text-disabled:     var(--text-3);
-  --success:           var(--positive);
-  --success-bg:        var(--positive-bg);
-  --danger:            var(--negative);
-  --danger-bg:         var(--negative-bg);
-  --color-text-primary:    var(--text-1);
-  --color-text-secondary:  var(--text-2);
-  --color-text-tertiary:   var(--text-3);
-  --color-surface-primary:   var(--bg-card);
-  --color-surface-secondary: var(--bg-secondary);
-  --color-surface-brand:     var(--copper-bg);
+  /* ── Legacy aliases (map old names → new tokens) ── */
+  --bg-page:              var(--bg);
+  --bg-card:              var(--surface);
+  --bg-secondary:         var(--surface-2);
+  --bg-selected:          var(--accent-soft);
+  --bg-hover:             var(--surface-hover);
+  --border-strong:        var(--border);
+  --text-1:               var(--text);
+  --text-muted:           var(--text-3);
+  --copper:               var(--accent);
+  --rose-gold:            var(--accent);
+  --rose-gold-light:      var(--accent-soft);
+  --rose-gold-dark:       var(--accent-deep);
+  --positive:             var(--green);
+  --positive-bg:          var(--green-soft);
+  --positive-text:        var(--green);
+  --negative:             var(--red);
+  --negative-bg:          var(--red-soft);
+  --negative-text:        var(--red);
+  --sidebar-bg:           var(--bg-sidebar);
+  --sidebar-active:       var(--accent);
+  --app-bg:               var(--bg);
+  --app-surface:          var(--surface);
+  --app-surface-2:        var(--surface-2);
+  --app-border:           var(--border);
+  --app-border-subtle:    var(--border-soft);
+  --text-primary:         var(--text);
+  --text-secondary:       var(--text-2);
+  --text-hint:            var(--text-3);
+  --text-disabled:        var(--text-3);
+  --color-text-primary:   var(--text);
+  --color-text-secondary: var(--text-2);
+  --color-text-tertiary:  var(--text-3);
+  --color-surface-primary:   var(--surface);
+  --color-surface-secondary: var(--surface-2);
   --color-border-default:    var(--border);
-  --color-border-subtle:     var(--border);
-  --color-positive:    var(--positive);
-  --color-negative:    var(--negative);
-  --benchmark-good:    var(--positive);
-  --benchmark-bad:     var(--negative);
-  --benchmark-neutral: var(--copper);
-  --rose-gold:         var(--copper);
-  --rose:              var(--copper);
+  --border-light:            var(--border-soft);
+  --border-rose:             var(--accent-deep);
 }
 
-/* ── LIGHT THEME ── */
-:root[data-theme="light"] {
-  --bg-page:        #F8F6F3;
-  --bg-card:        #FFFFFF;
-  --bg-secondary:   #F3EFE9;
-  --bg-selected:    #FDF6F0;
-  --bg-hover:       #F3EFE9;
+/* ============================================================
+   LIGHT THEME
+   ============================================================ */
+[data-theme="light"] {
+  --bg:             #FAF7F3;
+  --bg-sidebar:     #FFFFFF;
+  --surface:        #FFFFFF;
+  --surface-2:      #FBF8F4;
+  --surface-hover:  #F5EFE8;
 
-  --border:         #E8E4DF;
-  --border-strong:  #D4CFC9;
+  --border:         #EBE3DA;
+  --border-soft:    #F0EAE2;
 
-  --text-1:         #1A1410;
-  --text-2:         #6B6560;
-  --text-3:         #A09890;
+  --text:           #211C18;
+  --text-2:         #8A7F74;
+  --text-3:         #ABA197;
 
-  --sidebar-bg:     #0F0A07;
-  --sidebar-icon:   #5A4A42;
-  --sidebar-active: #C4836A;
+  /* Accent — darker rose-gold for contrast on white */
+  --accent:         #BC6A48;
+  --accent-deep:    #9E5436;
+  --accent-soft:    #F7EBE3;
 
-  --positive:       #3B6D11;
-  --positive-bg:    #EAF3DE;
-  --positive-text:  #27500A;
-  --negative:       #A32D2D;
-  --negative-bg:    #FCEBEB;
-  --negative-text:  #791F1F;
-  --warning:        #BA7517;
-  --warning-bg:     #FAEEDA;
-  --warning-text:   #633806;
-  --info:           #0C447C;
-  --info-bg:        #E6F1FB;
-  --info-text:      #0C447C;
-  --alert-dot:      #EF9F27;
+  --green:          #3D8A5E;
+  --green-soft:     #E8F2EB;
+  --champagne:      #A9763C;
+  --champagne-soft: #F6EEE2;
+  --red:            #C0503F;
+  --red-soft:       #F8E9E6;
+  --blue:           #3E6FA3;
 
-  --shadow-sm:  0 1px 4px rgba(26,20,16,0.06);
-  --shadow:     0 2px 12px rgba(26,20,16,0.08);
-  --shadow-lg:  0 8px 32px rgba(26,20,16,0.12);
+  --logo-grad: linear-gradient(135deg, #E3A88E, #C97B5E);
 
-  /* Legacy aliases */
-  --app-bg:            var(--bg-page);
-  --app-surface:       var(--bg-card);
-  --app-surface-2:     var(--bg-secondary);
-  --app-border:        var(--border);
-  --app-border-subtle: var(--border);
-  --text-primary:      var(--text-1);
-  --text-secondary:    var(--text-2);
-  --text-muted:        var(--text-3);
-  --text-hint:         var(--text-3);
-  --text-disabled:     var(--text-3);
-  --success:           var(--positive);
-  --success-bg:        var(--positive-bg);
-  --danger:            var(--negative);
-  --danger-bg:         var(--negative-bg);
-  --color-text-primary:    var(--text-1);
-  --color-text-secondary:  var(--text-2);
-  --color-text-tertiary:   var(--text-3);
-  --color-surface-primary:   var(--bg-card);
-  --color-surface-secondary: var(--bg-secondary);
-  --color-surface-brand:     var(--copper-bg);
+  /* ── Legacy aliases ── */
+  --bg-page:              var(--bg);
+  --bg-card:              var(--surface);
+  --bg-secondary:         var(--surface-2);
+  --bg-selected:          var(--accent-soft);
+  --bg-hover:             var(--surface-hover);
+  --border-strong:        var(--border);
+  --text-1:               var(--text);
+  --text-muted:           var(--text-3);
+  --copper:               var(--accent);
+  --rose-gold:            var(--accent);
+  --rose-gold-light:      var(--accent-soft);
+  --rose-gold-dark:       var(--accent-deep);
+  --positive:             var(--green);
+  --positive-bg:          var(--green-soft);
+  --positive-text:        var(--green);
+  --negative:             var(--red);
+  --negative-bg:          var(--red-soft);
+  --negative-text:        var(--red);
+  --sidebar-bg:           var(--bg-sidebar);
+  --sidebar-active:       var(--accent);
+  --app-bg:               var(--bg);
+  --app-surface:          var(--surface);
+  --app-surface-2:        var(--surface-2);
+  --app-border:           var(--border);
+  --app-border-subtle:    var(--border-soft);
+  --text-primary:         var(--text);
+  --text-secondary:       var(--text-2);
+  --text-hint:            var(--text-3);
+  --text-disabled:        var(--text-3);
+  --color-text-primary:   var(--text);
+  --color-text-secondary: var(--text-2);
+  --color-text-tertiary:  var(--text-3);
+  --color-surface-primary:   var(--surface);
+  --color-surface-secondary: var(--surface-2);
   --color-border-default:    var(--border);
-  --color-border-subtle:     var(--border);
-  --color-positive:    var(--positive);
-  --color-negative:    var(--negative);
-  --benchmark-good:    var(--positive);
-  --benchmark-bad:     var(--negative);
-  --benchmark-neutral: var(--copper);
-  --rose-gold:         var(--copper);
-  --rose:              var(--copper);
-}
-
-/* ── Theme transition ── */
-*, *::before, *::after {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-/* But don't animate everything that shouldn't animate */
-svg *, [class*="animate-"], [class*="skeleton"] {
-  transition: none;
+  --border-light:            var(--border-soft);
+  --border-rose:             var(--accent-deep);
 }

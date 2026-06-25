@@ -1,12 +1,6 @@
 @import './styles/theme.css';
 
-/* ============================================================
-   NEXTGENADS — LIGHT MODE DESIGN SYSTEM
-   Sidebar: dark (#0F0A07) — stays dark
-   App content: warm white — light, clean, professional
-   Rose Gold (#C4836A) — the constant thread
-   ============================================================ */
-
+/* NextAdsGen Design System v2.0 — Beauty-Tech · Campaign Intelligence */
 
 
 /* ============================================================
@@ -22,17 +16,18 @@ html {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--bg-page);
+  background: var(--bg);
 }
 
 body {
-  font-family: var(--font-sans);
-  font-weight: 300;
-  background: var(--bg-page);
-  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-weight: 400;
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background 0.35s ease, color 0.35s ease;
 }
 
 #root { min-height: 100vh; }
@@ -57,9 +52,9 @@ input, textarea, select {
 }
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-track { background: var(--surface-2); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(196,131,106,0.4); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-deep); }
 
 /* ============================================================
    APP SHELL
@@ -67,27 +62,28 @@ input, textarea, select {
 .app-layout {
   display: flex;
   min-height: 100vh;
-  background: var(--bg-page);
+  background: var(--bg);
 }
 
 .main-content {
   flex: 1;
-  margin-left: 220px;
+  margin-left: 230px;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--bg-page);
+  background: var(--bg);
   min-width: 0;
   overflow: hidden;
+  transition: background 0.35s ease;
 }
 
 .page-container {
   flex: 1;
-  padding: 28px 32px;
-  max-width: 1600px;
+  padding: 30px 36px;
+  max-width: 1400px;
   min-width: 0;
-  background: var(--bg-page);
-  color: var(--text-1);
+  background: var(--bg);
+  color: var(--text);
 }
 
 @media (max-width: 900px) {
