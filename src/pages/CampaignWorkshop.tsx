@@ -10,8 +10,8 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Wand2, CheckCircle2, ArrowLeft, ArrowRight, Rocket, CloudUpload, Sparkles, Info, CheckCheck, Globe } from 'lucide-react';
-import { getBrands, getAdAccounts, supabase } from '../lib/supabase';
+import { Wand2, CheckCircle2, ArrowLeft, ArrowRight, Rocket, CloudUpload, Sparkles, Info, CheckCheck, Globe, Brain, X, Search } from 'lucide-react';
+import { getBrands, getAdAccounts, getCampaigns, supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 
 // ─── Types ─────────────────────────────────────────────────────
@@ -38,6 +38,7 @@ interface FormState {
   ageMin:       string;
   ageMax:       string;
   gender:       'all' | 'women' | 'men';
+  interests:    string[];
   destinationUrl: string;
 }
 
@@ -48,15 +49,84 @@ const GOALS = [
   { value: 'awareness', label: 'Awareness' },
 ];
 
-const COUNTRIES = [
-  { code: 'IT', name: 'Italy' },
-  { code: 'ES', name: 'Spain' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'FR', name: 'France' },
-  { code: 'GB', name: 'UK' },
-  { code: 'NL', name: 'Netherlands' },
-  { code: 'PT', name: 'Portugal' },
-  { code: 'US', name: 'United States' },
+// ─── Full country list (Meta-compatible ISO-3166-1 alpha-2) ──────
+const ALL_COUNTRIES = [
+  // Europe
+  { code: 'AT', name: 'Austria',        region: 'europe' },
+  { code: 'BE', name: 'Belgium',         region: 'europe' },
+  { code: 'BG', name: 'Bulgaria',        region: 'europe' },
+  { code: 'HR', name: 'Croatia',         region: 'europe' },
+  { code: 'CY', name: 'Cyprus',          region: 'europe' },
+  { code: 'CZ', name: 'Czech Republic',  region: 'europe' },
+  { code: 'DK', name: 'Denmark',         region: 'europe' },
+  { code: 'EE', name: 'Estonia',         region: 'europe' },
+  { code: 'FI', name: 'Finland',         region: 'europe' },
+  { code: 'FR', name: 'France',          region: 'europe' },
+  { code: 'DE', name: 'Germany',         region: 'europe' },
+  { code: 'GR', name: 'Greece',          region: 'europe' },
+  { code: 'HU', name: 'Hungary',         region: 'europe' },
+  { code: 'IE', name: 'Ireland',         region: 'europe' },
+  { code: 'IT', name: 'Italy',           region: 'europe' },
+  { code: 'LV', name: 'Latvia',          region: 'europe' },
+  { code: 'LT', name: 'Lithuania',       region: 'europe' },
+  { code: 'LU', name: 'Luxembourg',      region: 'europe' },
+  { code: 'MT', name: 'Malta',           region: 'europe' },
+  { code: 'NL', name: 'Netherlands',     region: 'europe' },
+  { code: 'NO', name: 'Norway',          region: 'europe' },
+  { code: 'PL', name: 'Poland',          region: 'europe' },
+  { code: 'PT', name: 'Portugal',        region: 'europe' },
+  { code: 'RO', name: 'Romania',         region: 'europe' },
+  { code: 'SK', name: 'Slovakia',        region: 'europe' },
+  { code: 'SI', name: 'Slovenia',        region: 'europe' },
+  { code: 'ES', name: 'Spain',           region: 'europe' },
+  { code: 'SE', name: 'Sweden',          region: 'europe' },
+  { code: 'CH', name: 'Switzerland',     region: 'europe' },
+  { code: 'GB', name: 'United Kingdom',  region: 'europe' },
+  // Americas
+  { code: 'AR', name: 'Argentina',       region: 'americas' },
+  { code: 'BR', name: 'Brazil',          region: 'americas' },
+  { code: 'CA', name: 'Canada',          region: 'americas' },
+  { code: 'CL', name: 'Chile',           region: 'americas' },
+  { code: 'CO', name: 'Colombia',        region: 'americas' },
+  { code: 'MX', name: 'Mexico',          region: 'americas' },
+  { code: 'US', name: 'United States',   region: 'americas' },
+  // Asia Pacific
+  { code: 'AU', name: 'Australia',       region: 'apac' },
+  { code: 'IN', name: 'India',           region: 'apac' },
+  { code: 'ID', name: 'Indonesia',       region: 'apac' },
+  { code: 'JP', name: 'Japan',           region: 'apac' },
+  { code: 'KR', name: 'South Korea',     region: 'apac' },
+  { code: 'MY', name: 'Malaysia',        region: 'apac' },
+  { code: 'NZ', name: 'New Zealand',     region: 'apac' },
+  { code: 'PH', name: 'Philippines',     region: 'apac' },
+  { code: 'SG', name: 'Singapore',       region: 'apac' },
+  { code: 'TH', name: 'Thailand',        region: 'apac' },
+  // MENA
+  { code: 'AE', name: 'UAE',             region: 'mena' },
+  { code: 'SA', name: 'Saudi Arabia',    region: 'mena' },
+  { code: 'EG', name: 'Egypt',           region: 'mena' },
+  { code: 'IL', name: 'Israel',          region: 'mena' },
+  { code: 'ZA', name: 'South Africa',    region: 'mena' },
+  { code: 'MA', name: 'Morocco',         region: 'mena' },
+];
+
+// Region presets — like Meta's location targeting groups
+const REGIONS = [
+  { id: 'all_europe',   emoji: '🌍', label: 'All Europe',    codes: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','NO','PL','PT','RO','SK','SI','ES','SE','CH','GB'] },
+  { id: 'west_eu',      emoji: '',   label: 'Western EU',    codes: ['FR','DE','NL','BE','AT','CH','LU','IE','GB'] },
+  { id: 'south_eu',     emoji: '',   label: 'Southern EU',   codes: ['IT','ES','PT','GR','HR','MT','CY'] },
+  { id: 'north_eu',     emoji: '',   label: 'Northern EU',   codes: ['NO','SE','DK','FI','EE','LV','LT'] },
+  { id: 'americas',     emoji: '🌎', label: 'Americas',      codes: ['US','CA','BR','MX','AR','CL','CO'] },
+  { id: 'apac',         emoji: '🌏', label: 'Asia Pacific',  codes: ['AU','JP','SG','KR','IN','NZ','MY','TH','PH','ID'] },
+  { id: 'mena',         emoji: '🌍', label: 'MENA',          codes: ['AE','SA','EG','IL','ZA','MA'] },
+];
+
+// Interest categories for beauty/wellness targeting
+const INTEREST_GROUPS = [
+  { cat: 'Beauty', items: ['Beauty & Personal Care','Skincare','Luxury Beauty','Organic & Natural Beauty','Makeup & Cosmetics','Hair Care'] },
+  { cat: 'Aesthetic & Wellness', items: ['Spa & Wellness Services','Aesthetic Medicine','Anti-aging Treatments','Body Treatments','Medical Aesthetics','Cosmetic Surgery'] },
+  { cat: 'Health & Lifestyle', items: ['Health & Fitness','Weight Loss & Nutrition','Yoga & Mindfulness','Healthy Lifestyle','Diet & Wellness'] },
+  { cat: 'Lifestyle', items: ["Women's Fashion",'Luxury & Lifestyle','Travel Enthusiasts','High-end Retail'] },
 ];
 
 const today = new Date().toISOString().split('T')[0];
@@ -150,6 +220,10 @@ const CampaignWorkshop: React.FC = () => {
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished]   = useState(false);
   const [stepKey, setStepKey]       = useState(0); // forces re-mount for animation
+  const [aiLoading, setAiLoading]   = useState(false);
+  const [aiInsight, setAiInsight]   = useState<string | null>(null);
+  const [countrySearch, setCountrySearch] = useState('');
+  const [activeGeoTab, setActiveGeoTab]   = useState<string>('europe');
 
   // ── Queries ─────────────────────────────────────────────────
   const { data: brands = [] } = useQuery({
@@ -168,7 +242,8 @@ const CampaignWorkshop: React.FC = () => {
   const metaConnected   = useMemo(() => (adAccounts as { platform: string }[]).some(a => a.platform === 'meta'), [adAccounts]);
   const googleConnected = useMemo(() => (adAccounts as { platform: string }[]).some(a => a.platform === 'google'), [adAccounts]);
 
-  // ── Form state ───────────────────────────────────────────────
+
+  // ── Form state ─────────────────────────────────────────────────
   const [form, setForm] = useState<FormState>({
     creativeFile: null, creativeUrl: '',
     headline: '', primaryText: '',
@@ -176,7 +251,7 @@ const CampaignWorkshop: React.FC = () => {
     keywords: '', ctaText: 'Book now',
     goal: 'leads', brandId: '', platform: 'meta',
     campaignName: '', dailyBudget: '30', startDate: today,
-    countries: [], ageMin: '25', ageMax: '55', gender: 'all',
+    countries: [], ageMin: '25', ageMax: '55', gender: 'all', interests: [],
     destinationUrl: '',
   });
 
@@ -209,6 +284,95 @@ const CampaignWorkshop: React.FC = () => {
     if (!metaConnected && googleConnected) upd('platform', 'google');
     else if (metaConnected) upd('platform', 'meta');
   }, [metaConnected, googleConnected]);
+
+  // ── Campaigns (for AI audience suggestion context) ─────────────
+  const { data: campaigns = [] } = useQuery({
+    queryKey: ['campaigns', form.brandId],
+    queryFn:  () => getCampaigns(form.brandId),
+    enabled:  !!form.brandId,
+  });
+
+  // ── AI Audience Builder ──────────────────────────────────────
+  const handleAISuggest = async () => {
+    const activeBrand = brands.find(b => b.id === form.brandId);
+    if (!activeBrand) return;
+    setAiLoading(true);
+    setAiInsight(null);
+    try {
+      const topCampaigns = [...campaigns]
+        .filter(c => (c.leads ?? 0) > 0)
+        .sort((a, b) => ((a.cpl ?? 999) - (b.cpl ?? 999)))
+        .slice(0, 5);
+
+      const systemPrompt = `You are an expert digital advertising strategist specializing in beauty and wellness, with 9 years of benchmark data. Respond ONLY with a valid JSON object — no markdown, no explanation outside the JSON.`;
+
+      const userMsg = `Recommend optimal audience targeting for this campaign:
+
+Brand: ${activeBrand.name}
+Type: ${(activeBrand as { business_type?: string }).business_type ?? 'beauty'}
+Markets: ${((activeBrand as { markets?: string[] }).markets ?? []).join(', ') || 'not set'}
+Avg order value: €${(((activeBrand as { aov_min?: number; aov_max?: number }).aov_min ?? 0) + ((activeBrand as { aov_min?: number; aov_max?: number }).aov_max ?? 0)) / 2}
+
+Campaign goal: ${GOALS.find(g => g.value === form.goal)?.label}
+Platform: ${form.platform}
+Daily budget: €${form.dailyBudget}
+
+${topCampaigns.length ? `Past campaigns (best CPL):\n${topCampaigns.map(c => `- ${c.name}: ${c.leads} leads, CPL €${((c as { cpl?: number }).cpl ?? 0).toFixed(2)}, spend €${((c as { spend?: number }).spend ?? 0).toFixed(0)}`).join('\n')}` : 'No past campaign data yet.'}
+
+Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
+{
+  "countries": ["IT", "ES"],
+  "ageMin": 28,
+  "ageMax": 52,
+  "gender": "women",
+  "interests": ["Beauty & Personal Care", "Skincare"],
+  "reasoning": "2-3 sentences explaining this audience choice"
+}`;
+
+      const { data, error } = await supabase.functions.invoke('claude-chat', {
+        body: { messages: [{ role: 'user', content: userMsg }], system: systemPrompt, brand_id: form.brandId },
+      });
+
+      if (error) throw new Error(error.message);
+      const content: string = data?.content ?? data?.message ?? data?.response ?? JSON.stringify(data);
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON found in response');
+      const s = JSON.parse(jsonMatch[0]);
+
+      if (Array.isArray(s.countries)) {
+        const valid = s.countries.filter((c: string) => ALL_COUNTRIES.some(x => x.code === c));
+        if (valid.length) upd('countries', valid);
+      }
+      if (s.ageMin) upd('ageMin', String(s.ageMin));
+      if (s.ageMax) upd('ageMax', String(s.ageMax));
+      if (s.gender && ['all', 'women', 'men'].includes(s.gender)) upd('gender', s.gender as 'all' | 'women' | 'men');
+      if (Array.isArray(s.interests)) upd('interests', s.interests);
+      if (s.reasoning) setAiInsight(s.reasoning);
+    } catch (err) {
+      console.error('AI audience error:', err);
+      setAiInsight('Could not generate suggestion. Please set targeting manually.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // ── Region helpers ───────────────────────────────────────────
+  const applyRegion = (regionId: string) => {
+    const region = REGIONS.find(r => r.id === regionId);
+    if (!region) return;
+    const already = region.codes.every(c => form.countries.includes(c));
+    if (already) {
+      upd('countries', form.countries.filter(c => !region.codes.includes(c)));
+    } else {
+      const merged = Array.from(new Set([...form.countries, ...region.codes]));
+      upd('countries', merged);
+    }
+  };
+
+  const toggleInterest = (interest: string) => {
+    const has = form.interests.includes(interest);
+    upd('interests', has ? form.interests.filter(i => i !== interest) : [...form.interests, interest]);
+  };
 
   // ── Stepper navigation ───────────────────────────────────────
   const goTo = (n: number) => {
@@ -277,7 +441,7 @@ const CampaignWorkshop: React.FC = () => {
   // ── Derived review values ─────────────────────────────────────
   const activeBrand = brands.find(b => b.id === form.brandId);
   const selectedCountriesLabel = form.countries.length
-    ? COUNTRIES.filter(c => form.countries.includes(c.code)).map(c => c.code).join(', ')
+    ? ALL_COUNTRIES.filter((c: { code: string }) => form.countries.includes(c.code)).map((c: { code: string }) => c.code).join(', ')
     : '—';
 
   // ── Published success state ───────────────────────────────────
@@ -604,43 +768,170 @@ const CampaignWorkshop: React.FC = () => {
               </>
             )}
 
-            {/* ════ STEP 4 — AUDIENCE ══════════════════════════ */}
+            {/* ════ STEP 4 — AUDIENCE (full geo + AI) ══════════ */}
             {step === 4 && (
               <>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Audience</div>
-                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 20 }}>Who should see this ad.</div>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 16 }}>Who should see this ad.</div>
 
+                {/* ── AI Build Audience button ── */}
+                <div style={{ marginBottom: 20, padding: '14px 16px', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 13, display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: 'var(--accent-soft)', border: '1px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Brain size={18} style={{ color: 'var(--accent)' }} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>Build audience with AI</div>
+                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>
+                      Uses your brand profile + past campaign performance to suggest the best targeting
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleAISuggest}
+                    disabled={aiLoading || !form.brandId}
+                    style={{
+                      background: 'var(--accent)', color: 'var(--ink)', border: 'none',
+                      fontFamily: 'var(--font-ui)', fontSize: 12.5, fontWeight: 500,
+                      padding: '9px 16px', borderRadius: 9, cursor: aiLoading ? 'not-allowed' : 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0,
+                      opacity: aiLoading ? 0.7 : 1,
+                    }}
+                    onMouseEnter={e => { if (!aiLoading) e.currentTarget.style.background = 'var(--accent-deep)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent)'; }}
+                  >
+                    {aiLoading
+                      ? <><span style={{ display: 'inline-block', animation: 'wspin 1s linear infinite' }}>⟳</span> Building…</>
+                      : <><Sparkles size={13} /> Build audience</>}
+                  </button>
+                </div>
+
+                {/* AI reasoning */}
+                {aiInsight && (
+                  <div style={{ marginBottom: 16, padding: '11px 14px', background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 11, fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6, position: 'relative' }}>
+                    <Brain size={12} style={{ color: 'var(--accent)', marginRight: 7, verticalAlign: 'middle' }} />
+                    <strong style={{ color: 'var(--accent)' }}>AI insight: </strong>{aiInsight}
+                    <button onClick={() => setAiInsight(null)} style={{ position: 'absolute', top: 9, right: 10, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)' }}>
+                      <X size={13} />
+                    </button>
+                  </div>
+                )}
+
+                {/* ── Geo targeting ── */}
                 <MB>
-                  <FL>COUNTRIES</FL>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {COUNTRIES.map(c => {
-                      const sel = form.countries.includes(c.code);
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <FL>LOCATIONS</FL>
+                    {form.countries.length > 0 && (
+                      <button onClick={() => upd('countries', [])} style={{ background: 'none', border: 'none', fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <X size={11} /> Clear all ({form.countries.length})
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Region preset pills */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+                    {REGIONS.map(r => {
+                      const allSel = r.codes.every(c => form.countries.includes(c));
+                      const someSel = r.codes.some(c => form.countries.includes(c));
                       return (
                         <button
-                          key={c.code}
-                          onClick={() => {
-                            const next = sel
-                              ? form.countries.filter(x => x !== c.code)
-                              : [...form.countries, c.code];
-                            upd('countries', next);
-                          }}
+                          key={r.id}
+                          onClick={() => applyRegion(r.id)}
                           style={{
-                            border: `1px solid ${sel ? 'var(--accent)' : 'var(--border)'}`,
-                            borderRadius: 30, padding: '6px 13px',
-                            background: sel ? 'var(--accent-soft)' : 'var(--field)',
-                            color: sel ? 'var(--accent)' : 'var(--text-2)',
-                            fontFamily: 'var(--font-ui)', fontSize: 12.5, cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', gap: 6, transition: '.12s',
+                            border: `1px solid ${allSel ? 'var(--accent)' : someSel ? 'var(--amber)' : 'var(--border)'}`,
+                            borderRadius: 8, padding: '5px 11px',
+                            background: allSel ? 'var(--accent-soft)' : someSel ? 'rgba(217,176,106,0.1)' : 'var(--field)',
+                            color: allSel ? 'var(--accent)' : someSel ? 'var(--amber)' : 'var(--text-2)',
+                            fontFamily: 'var(--font-ui)', fontSize: 11.5, fontWeight: 500, cursor: 'pointer', transition: '.12s',
                           }}
                         >
-                          {c.name}
-                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: sel ? 'var(--accent-deep)' : 'var(--text-3)', textTransform: 'uppercase' }}>{c.code}</span>
+                          {r.emoji && <span style={{ marginRight: 4 }}>{r.emoji}</span>}{r.label}
                         </button>
                       );
                     })}
                   </div>
+
+                  {/* Geo tab navigation */}
+                  <div style={{ display: 'flex', background: 'var(--field)', border: '1px solid var(--border)', borderRadius: 9, padding: 3, gap: 3, marginBottom: 12, flexWrap: 'wrap' }}>
+                    {[{ id: 'europe', label: '🌍 Europe' }, { id: 'americas', label: '🌎 Americas' }, { id: 'apac', label: '🌏 Asia Pacific' }, { id: 'mena', label: 'MENA' }].map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => { setActiveGeoTab(tab.id); setCountrySearch(''); }}
+                        style={{
+                          border: 'none', fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500,
+                          padding: '6px 12px', borderRadius: 7, cursor: 'pointer', transition: '.12s',
+                          background: activeGeoTab === tab.id ? 'var(--accent-soft)' : 'transparent',
+                          color: activeGeoTab === tab.id ? 'var(--accent)' : 'var(--text-2)',
+                        }}
+                      >
+                        {tab.label}
+                        {(() => { const n = ALL_COUNTRIES.filter(c => c.region === tab.id && form.countries.includes(c.code)).length; return n > 0 ? <span style={{ marginLeft: 5, background: 'var(--accent)', color: 'var(--ink)', borderRadius: 10, padding: '1px 6px', fontSize: 9, fontFamily: 'var(--font-mono)' }}>{n}</span> : null; })()}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Country search */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--field)', border: '1px solid var(--border)', borderRadius: 9, padding: '8px 12px', marginBottom: 10 }}>
+                    <Search size={13} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+                    <input
+                      placeholder="Search countries…"
+                      value={countrySearch}
+                      onChange={e => setCountrySearch(e.target.value)}
+                      style={{ background: 'none', border: 'none', outline: 'none', fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text)', width: '100%' }}
+                    />
+                    {countrySearch && <button onClick={() => setCountrySearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)' }}><X size={12} /></button>}
+                  </div>
+
+                  {/* Country chips */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, maxHeight: 160, overflowY: 'auto', padding: '2px 0' }}>
+                    {ALL_COUNTRIES
+                      .filter(c => countrySearch
+                        ? c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.toLowerCase().includes(countrySearch.toLowerCase())
+                        : c.region === activeGeoTab
+                      )
+                      .map(c => {
+                        const sel = form.countries.includes(c.code);
+                        return (
+                          <button
+                            key={c.code}
+                            onClick={() => {
+                              const next = sel ? form.countries.filter(x => x !== c.code) : [...form.countries, c.code];
+                              upd('countries', next);
+                            }}
+                            style={{
+                              border: `1px solid ${sel ? 'var(--accent)' : 'var(--border)'}`,
+                              borderRadius: 30, padding: '5px 12px',
+                              background: sel ? 'var(--accent-soft)' : 'var(--field)',
+                              color: sel ? 'var(--accent)' : 'var(--text-2)',
+                              fontFamily: 'var(--font-ui)', fontSize: 12, cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', gap: 5, transition: '.1s', flexShrink: 0,
+                            }}
+                          >
+                            {c.name}
+                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8.5, color: sel ? 'var(--accent-deep)' : 'var(--text-3)', textTransform: 'uppercase' }}>{c.code}</span>
+                          </button>
+                        );
+                      })
+                    }
+                    {ALL_COUNTRIES.filter(c => countrySearch ? c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.toLowerCase().includes(countrySearch.toLowerCase()) : c.region === activeGeoTab).length === 0 && (
+                      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)', padding: '8px 0' }}>No countries match "{countrySearch}"</div>
+                    )}
+                  </div>
+
+                  {/* Selected summary */}
+                  {form.countries.length > 0 && (
+                    <div style={{ marginTop: 10, padding: '8px 12px', background: 'var(--surface-2)', borderRadius: 9, border: '1px solid var(--border-soft)' }}>
+                      <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>
+                        Selected: </span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent)', fontWeight: 500 }}>
+                        {form.countries.length} countr{form.countries.length === 1 ? 'y' : 'ies'}
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>
+                        {' — '}{form.countries.slice(0, 6).join(', ')}{form.countries.length > 6 ? ` +${form.countries.length - 6} more` : ''}
+                      </span>
+                    </div>
+                  )}
                 </MB>
 
+                {/* ── Age + Gender ── */}
                 <MB>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div>
@@ -672,6 +963,44 @@ const CampaignWorkshop: React.FC = () => {
                   </div>
                 </MB>
 
+                {/* ── Interests (Meta only) ── */}
+                {form.platform === 'meta' && (
+                  <MB>
+                    <FL>INTERESTS & BEHAVIORS</FL>
+                    {INTEREST_GROUPS.map(group => (
+                      <div key={group.cat} style={{ marginBottom: 10 }}>
+                        <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', letterSpacing: '0.5px', marginBottom: 6 }}>{group.cat.toUpperCase()}</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                          {group.items.map(interest => {
+                            const sel = form.interests.includes(interest);
+                            return (
+                              <button
+                                key={interest}
+                                onClick={() => toggleInterest(interest)}
+                                style={{
+                                  border: `1px solid ${sel ? 'var(--accent)' : 'var(--border)'}`,
+                                  borderRadius: 30, padding: '5px 12px',
+                                  background: sel ? 'var(--accent-soft)' : 'var(--field)',
+                                  color: sel ? 'var(--accent)' : 'var(--text-2)',
+                                  fontFamily: 'var(--font-ui)', fontSize: 11.5, cursor: 'pointer', transition: '.1s',
+                                }}
+                              >
+                                {sel && '✓ '}{interest}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                    {form.interests.length > 0 && (
+                      <div style={{ marginTop: 6, fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>
+                        {form.interests.length} interest{form.interests.length > 1 ? 's' : ''} selected
+                      </div>
+                    )}
+                  </MB>
+                )}
+
+                {/* ── Destination URL ── */}
                 <MB>
                   <FL>{form.platform === 'google' ? 'LANDING PAGE URL' : 'DESTINATION URL'}</FL>
                   <Field type="url" value={form.destinationUrl} onChange={e => upd('destinationUrl', e.target.value)} placeholder="https://yourbrand.com/book" />
