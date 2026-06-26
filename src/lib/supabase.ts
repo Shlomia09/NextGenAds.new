@@ -194,3 +194,58 @@ export const getRecentSessionContext = async (
       };
     });
 };
+
+// ── Daily stats (for 30-day trend chart) ─────────────────────────────────
+// Aggregates spend + leads per day across ALL campaigns for a brand
+export const getDailyStats = async (brandId: string, days = 30): Promise<{ date: string; spend: number; leads: number }[]> => {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  const { data, error } = await supabase
+    .from('campaign_daily_stats')
+    .select('date, spend, leads')
+    .eq('brand_id', brandId)
+    .gte('date', since.toISOString().split('T')[0])
+    .order('date', { ascending: true });
+  if (error) {
+    console.warn('getDailyStats error:', error.message);
+    return [];
+  }
+  // Aggregate multiple campaigns per day
+  const map = new Map<string, { spend: number; leads: number }>();
+  (data ?? []).forEach(row => {
+    const existing = map.get(row.date) ?? { spend: 0, leads: 0 };
+    map.set(row.date, { spend: existing.spend + (row.spend ?? 0), leads: existing.leads + (row.leads ?? 0) });
+  });
+  return Array.from(map.entries()).map(([date, v]) => ({ date, ...v })).sort((a, b) => a.date.localeCompare(b.date));
+};
+
+// ── Top creatives (for Top Creative card) ────────────────────────────────
+export const getTopCreatives = async (brandId: string, limit = 3) => {
+  const { data, error } = await supabase
+    .from('ad_creatives')
+    .select('id, ad_name, campaign_id, spend, impressions, clicks, leads, ctr, cpl, thumbnail_url, synced_at')
+    .eq('brand_id', brandId)
+    .gt('spend', 0)
+    .order('leads', { ascending: false })
+    .limit(limit);
+  if (error) {
+    console.warn('getTopCreatives error:', error.message);
+    return [];
+  }
+  return data ?? [];
+};
+
+// ── System events (for Live Activity feed) ───────────────────────────────
+export const getSystemEvents = async (brandId: string, limit = 10) => {
+  const { data, error } = await supabase
+    .from('system_events')
+    .select('id, type, label, metadata, created_at')
+    .eq('brand_id', brandId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) {
+    console.warn('getSystemEvents error:', error.message);
+    return [];
+  }
+  return data ?? [];
+};

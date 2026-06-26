@@ -21,6 +21,18 @@ const classifyObj = (o: string): string => {
   return 'unknown';
 };
 
+// ── Helper: extract lead count from a Meta actions array ──
+const extractLeads = (actions: Array<{ action_type: string; value: string }> | undefined): number => {
+  if (!actions) return 0;
+  const leadAction = actions.find(
+    (a) =>
+      a.action_type === 'lead' ||
+      a.action_type === 'onsite_conversion.lead_grouped' ||
+      a.action_type === 'offsite_conversion.fb_pixel_lead'
+  );
+  return parseInt(leadAction?.value || '0');
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -171,8 +183,152 @@ serve(async (req) => {
       if (!upsertError) synced++;
     }
 
+    // ── Step 3: Daily breakdown per campaign (last 30 days) ──
+    let dailyCount = 0;
+
+    // Build map: campaign_id_external → DB internal UUID
+    const { data: dbCampaigns } = await supabase
+      .from('campaigns')
+      .select('id, campaign_id_external')
+      .eq('brand_id', brand_id);
+
+    const externalToUuid = new Map<string, string>(
+      (dbCampaigns || []).map((c: { id: string; campaign_id_external: string }) => [
+        c.campaign_id_external,
+        c.id,
+      ])
+    );
+
+    for (const campaign of campaigns) {
+      try {
+        const dailyUrl = new URL(`${META_API_BASE}/${campaign.id}/insights`);
+        dailyUrl.searchParams.set('access_token', accessToken);
+        dailyUrl.searchParams.set('date_preset', 'last_30d');
+        dailyUrl.searchParams.set('time_increment', '1');
+        dailyUrl.searchParams.set('fields', 'date_start,spend,impressions,clicks,actions');
+
+        const dailyRes = await fetch(dailyUrl.toString());
+        const dailyData = await dailyRes.json();
+        const dailyRows = dailyData.data || [];
+
+        const campaignUuid = externalToUuid.get(campaign.id);
+        if (!campaignUuid) continue;
+
+        const rows = dailyRows.map((row: {
+          date_start: string;
+          spend?: string;
+          impressions?: string;
+          clicks?: string;
+          actions?: Array<{ action_type: string; value: string }>;
+        }) => ({
+          campaign_id: campaignUuid,
+          brand_id,
+          date: row.date_start,
+          spend: parseFloat(row.spend || '0'),
+          impressions: parseInt(row.impressions || '0'),
+          clicks: parseInt(row.clicks || '0'),
+          leads: extractLeads(row.actions),
+        }));
+
+        if (rows.length > 0) {
+          const { error: dailyError } = await supabase
+            .from('campaign_daily_stats')
+            .upsert(rows, { onConflict: 'campaign_id,date' });
+
+          if (!dailyError) dailyCount += rows.length;
+        }
+      } catch (dailyErr) {
+        console.error(`Daily stats fetch failed for campaign ${campaign.id}:`, dailyErr);
+      }
+    }
+
+    // ── Step 4: Ad-level insights ──
+    let adsCount = 0;
+
+    try {
+      const adsUrl = new URL(`${META_API_BASE}/act_${adAccount.account_id}/ads`);
+      adsUrl.searchParams.set('access_token', accessToken);
+      adsUrl.searchParams.set(
+        'fields',
+        'id,name,campaign_id,insights.date_preset(last_30d){spend,impressions,clicks,ctr,actions}'
+      );
+      adsUrl.searchParams.set('limit', '100');
+
+      const adsRes = await fetch(adsUrl.toString());
+      const adsData = await adsRes.json();
+      const ads = adsData.data || [];
+
+      const adRows = ads
+        .map((ad: {
+          id: string;
+          name: string;
+          campaign_id: string;
+          insights?: { data?: Array<{
+            spend?: string;
+            impressions?: string;
+            clicks?: string;
+            ctr?: string;
+            actions?: Array<{ action_type: string; value: string }>;
+          }> };
+        }) => {
+          const campaignUuid = externalToUuid.get(ad.campaign_id);
+          if (!campaignUuid) return null;
+
+          const insight = ad.insights?.data?.[0] || {};
+          const adSpend = parseFloat(insight.spend || '0');
+          const adImpressions = parseInt(insight.impressions || '0');
+          const adClicks = parseInt(insight.clicks || '0');
+          const adCtr = parseFloat(insight.ctr || '0');
+          const adLeads = extractLeads(insight.actions);
+          const adCpl = adLeads > 0 ? adSpend / adLeads : 0;
+
+          return {
+            campaign_id: campaignUuid,
+            brand_id,
+            ad_id_external: ad.id,
+            ad_name: ad.name,
+            spend: adSpend,
+            impressions: adImpressions,
+            clicks: adClicks,
+            leads: adLeads,
+            ctr: adCtr,
+            cpl: adCpl,
+            synced_at: new Date().toISOString(),
+          };
+        })
+        .filter(Boolean);
+
+      if (adRows.length > 0) {
+        const { error: adsError } = await supabase
+          .from('ad_creatives')
+          .upsert(adRows, { onConflict: 'campaign_id,ad_id_external' });
+
+        if (!adsError) adsCount = adRows.length;
+      }
+    } catch (adsErr) {
+      console.error('Ad-level insights fetch failed:', adsErr);
+    }
+
+    // ── Step 5: Log system event ──
+    try {
+      await supabase.from('system_events').insert({
+        brand_id,
+        type: 'sync',
+        label: `${synced} campaigns synced with Meta`,
+        metadata: { synced, total: campaigns.length },
+      });
+    } catch (eventErr) {
+      console.error('System event logging failed:', eventErr);
+    }
+
     return new Response(
-      JSON.stringify({ success: true, synced, total: campaigns.length }),
+      JSON.stringify({
+        success: true,
+        synced,
+        total: campaigns.length,
+        daily_days: dailyCount,
+        ads: adsCount,
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
