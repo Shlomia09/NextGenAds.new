@@ -11,6 +11,7 @@ import {
 import { getCampaigns, getBrands, getAdAccounts } from '../lib/supabase';
 import { syncMetaCampaigns } from '../lib/meta-api';
 import { useAuth } from '../hooks/useAuth';
+import { useBrand } from '../contexts/BrandContext';
 import { formatCurrency, formatNumber } from '../lib/benchmarks';
 import { classifyObjective, GOAL_META } from '../lib/objective';
 import CampaignDetailPanel from '../components/campaigns/CampaignDetailPanel';
@@ -616,6 +617,17 @@ const Campaigns: React.FC = () => {
     queryFn:  () => getBrands(user!.id),
     enabled:  !!user,
   });
+
+  // Sync selectedBrand with global BrandContext (sidebar brand switcher)
+  const { activeBrand: ctxActiveBrand } = useBrand();
+  useEffect(() => {
+    if (ctxActiveBrand && selectedBrand === 'all') {
+      setSelectedBrand(ctxActiveBrand.id);
+    } else if (ctxActiveBrand && selectedBrand !== 'all') {
+      setSelectedBrand(ctxActiveBrand.id);
+    }
+  }, [ctxActiveBrand?.id]);
+
   const { data: adAccounts = [] } = useQuery({
     queryKey: ['adAccounts', user?.id],
     queryFn:  () => getAdAccounts(user!.id),

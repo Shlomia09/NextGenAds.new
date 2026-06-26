@@ -11,8 +11,9 @@ import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Wand2, CheckCircle2, ArrowLeft, ArrowRight, Rocket, CloudUpload, Sparkles, Info, CheckCheck, Globe, Brain, X, Search } from 'lucide-react';
-import { getBrands, getAdAccounts, getCampaigns, supabase } from '../lib/supabase';
+import { getAdAccounts, getCampaigns, getBrands, supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { useBrand } from '../contexts/BrandContext';
 
 // ─── Types ─────────────────────────────────────────────────────
 interface FormState {
@@ -338,12 +339,12 @@ const STEPS = [
   { n: 4, label: 'Audience' },
   { n: 5, label: 'Review & publish' },
 ];
-
 // ─── Main Component ─────────────────────────────────────────────
 const CampaignWorkshop: React.FC = () => {
   const { user }     = useAuth();
   const navigate     = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { activeBrand: ctxActiveBrand } = useBrand();
   const [step, setStep]         = useState(1);
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished]   = useState(false);
@@ -386,16 +387,26 @@ const CampaignWorkshop: React.FC = () => {
   const upd = useCallback(<K extends keyof FormState>(key: K, val: FormState[K]) =>
     setForm(prev => ({ ...prev, [key]: val })), []);
 
-  // Set default brand when brands load
+  // Set default brand from BrandContext (sidebar selection) or first brand
   useEffect(() => {
-    if (brands.length > 0 && !form.brandId) {
-      const b = brands[0];
-      const markets = (b.markets ?? []) as string[];
-      upd('brandId', b.id);
+    const defaultBrand = ctxActiveBrand ?? (brands.length > 0 ? brands[0] : null);
+    if (defaultBrand && !form.brandId) {
+      const markets = (defaultBrand.markets ?? []) as string[];
+      upd('brandId', defaultBrand.id);
       upd('countries', markets.length ? markets : ['IT']);
-      upd('destinationUrl', b.website ?? '');
+      upd('destinationUrl', (defaultBrand as { website?: string }).website ?? '');
     }
-  }, [brands]);
+  }, [brands, ctxActiveBrand]);
+
+  // When activeBrand changes in sidebar, update form
+  useEffect(() => {
+    if (ctxActiveBrand && form.brandId && form.brandId !== ctxActiveBrand.id) {
+      const markets = (ctxActiveBrand.markets ?? []) as string[];
+      upd('brandId', ctxActiveBrand.id);
+      upd('countries', markets.length ? markets : ['IT']);
+      upd('destinationUrl', (ctxActiveBrand as { website?: string }).website ?? '');
+    }
+  }, [ctxActiveBrand?.id]);
 
   // Auto-generate campaign name
   useEffect(() => {

@@ -1,26 +1,19 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Sparkles, Plus, MessageSquare } from 'lucide-react';
-import { getBrands, getCampaigns } from '../lib/supabase';
-import { useAuth } from '../hooks/useAuth';
+import { getCampaigns } from '../lib/supabase';
+import { useBrand } from '../contexts/BrandContext';
 import IntelligenceChat from '../components/intelligence/IntelligenceChat';
 
 const Intelligence: React.FC = () => {
-  const { user } = useAuth();
-
-  const { data: brands } = useQuery({
-    queryKey: ['brands', user?.id],
-    queryFn:  () => getBrands(user!.id),
-    enabled:  !!user,
-  });
-
-  const activeBrand = brands?.[0];
+  const { activeBrand } = useBrand();
 
   const { data: campaigns = [] } = useQuery({
     queryKey: ['campaigns', activeBrand?.id],
     queryFn:  () => getCampaigns(activeBrand!.id),
     enabled:  !!activeBrand,
   });
+
 
   return (
     <div className="page-container" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 48px)' }}>
@@ -63,7 +56,7 @@ const Intelligence: React.FC = () => {
         {/* Chat */}
         <div style={{ minHeight: 0 }}>
           {activeBrand ? (
-            <IntelligenceChat brand={activeBrand} campaigns={campaigns} />
+            <IntelligenceChat brand={activeBrand as any} campaigns={campaigns} />
           ) : (
             <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', gap: 14 }}>
               <Sparkles size={28} strokeWidth={1.5} style={{ color: 'var(--rose-gold)' }} />

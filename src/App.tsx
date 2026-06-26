@@ -26,6 +26,7 @@ class AppErrorBoundary extends Component<{ children: React.ReactNode }, { error:
   }
 }
 import { ActiveAccountProvider } from './contexts/ActiveAccountContext';
+import { BrandProvider } from './contexts/BrandContext';
 import Sidebar from './components/ui/Sidebar';
 import Topbar from './components/ui/Topbar';
 import Landing from './pages/Landing';
@@ -109,7 +110,9 @@ const App: React.FC = () => (
     <ActiveAccountProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <AppRoutes />
+          <BrandProvider>
+            <AppRoutes />
+          </BrandProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </ActiveAccountProvider>

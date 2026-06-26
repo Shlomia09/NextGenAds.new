@@ -3,11 +3,11 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Sparkles, BarChart3, Wrench, Store, Plug, Settings, Menu, X,
 } from 'lucide-react';
-import type { Brand } from '../../types';
-import AccountSwitcher from './AccountSwitcher';
+import BrandSwitcher from './BrandSwitcher';
 import ThemeToggle from './ThemeToggle';
+import { useBrand } from '../../contexts/BrandContext';
 
-interface SidebarProps { brand?: Brand | null; }
+interface SidebarProps { brand?: import('../../types').Brand | null; }
 
 const navItems = [
   { path: '/dashboard',         icon: LayoutDashboard, label: 'Dashboard' },
@@ -19,9 +19,10 @@ const navItems = [
   { path: '/settings',          icon: Settings,        label: 'Settings' },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
+const Sidebar: React.FC<SidebarProps> = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const { activeBrand, brands } = useBrand();
 
   return (
     <>
@@ -69,17 +70,20 @@ const Sidebar: React.FC<SidebarProps> = ({ brand }) => {
           </div>
         </div>
 
-        {/* ── Account Switcher ── */}
+        {/* ── Brand Switcher ── */}
         <div style={{ padding: '10px 10px 4px' }}>
-          <AccountSwitcher />
+          <BrandSwitcher />
         </div>
 
-        {/* ── Active brand pill ── */}
-        {brand && (
+        {/* ── Active brand pill (shows count if multiple brands) ── */}
+        {brands.length > 1 && activeBrand && (
           <div className="sidebar-brand-pill">
             <div className="sidebar-brand-dot" />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {brand.name}
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+              {activeBrand.name}
+            </span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-3)', flexShrink: 0 }}>
+              {brands.length} brands
             </span>
           </div>
         )}

@@ -20,11 +20,12 @@ import {
 } from 'lucide-react';
 
 import {
-  getBrands, getCampaigns, getRecommendations, getAdAccounts,
+  getCampaigns, getRecommendations, getAdAccounts,
   getIntelligenceSessions, updateRecommendationStatus,
   getDailyStats, getTopCreatives, getSystemEvents,
 } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { useBrand } from '../contexts/BrandContext';
 import {
   getBenchmarkMetricsByType,
   formatCurrency, formatNumber,
@@ -227,14 +228,9 @@ const Dashboard: React.FC = () => {
   const queryClient    = useQueryClient();
   const [learnMoreRec, setLearnMoreRec] = useState<Recommendation | null>(null);
 
-  // ── Core queries ─────────────────────────────────────────────
-  const { data: brands, isLoading: brandsLoading } = useQuery({
-    queryKey: ['brands', user?.id],
-    queryFn:  () => getBrands(user!.id),
-    enabled:  !!user,
-  });
-
-  const activeBrand = brands?.[0];
+  // ── Core queries ──────────────────────────────────────
+  // activeBrand comes from global BrandContext (brand switcher in sidebar)
+  const { activeBrand, loading: brandsLoading } = useBrand();
 
   const { data: campaigns = [], isLoading: campaignsLoading } = useQuery({
     queryKey: ['campaigns', activeBrand?.id],
@@ -288,7 +284,7 @@ const Dashboard: React.FC = () => {
 
   // ── Derived data ─────────────────────────────────────────────
   const businessType  = (activeBrand?.business_type as BusinessType) ?? 'ecommerce';
-  const aov           = activeBrand ? (activeBrand.aov_min + activeBrand.aov_max) / 2 : 0;
+  const aov           = activeBrand ? ((activeBrand.aov_min ?? 0) + (activeBrand.aov_max ?? 0)) / 2 : 0;
   const benchmarks    = useMemo(() => activeBrand ? getBenchmarkMetricsByType(businessType, aov, campaigns) : [], [activeBrand, campaigns, businessType, aov]);
 
   const totalSpend       = campaigns.reduce((s, c) => s + (c.spend ?? 0), 0);
