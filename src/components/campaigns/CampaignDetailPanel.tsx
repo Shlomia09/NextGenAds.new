@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   X, ExternalLink, TrendingUp, TrendingDown, Minus,
   Sparkles, AlertTriangle, CheckCircle,
-  Send, Pause, Play, ArrowUpRight, Loader2, PlusCircle,
+  Send, Pause, Play, ArrowUpRight, Loader2, PlusCircle, Maximize2, Minimize2,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatCurrency, formatNumber } from '../../lib/benchmarks';
@@ -19,11 +19,11 @@ const BENCHMARKS: Record<string, { cpl?: number; cpm?: number; ctr?: number; roa
   default:  { cpm: 11, ctr: 1.8 },
 };
 
-// ─── Helpers ───────────────────────────────────────────────────
+// ─── Edge function helper ──────────────────────────────────────
 const callEdge = async (fn: string, body: object, accessToken: string) => {
-  const url   = import.meta.env.VITE_SUPABASE_URL;
-  const anon  = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  const res   = await fetch(`${url}/functions/v1/${fn}`, {
+  const url  = import.meta.env.VITE_SUPABASE_URL;
+  const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const res  = await fetch(`${url}/functions/v1/${fn}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}`, apikey: anon },
     body: JSON.stringify(body),
@@ -33,14 +33,165 @@ const callEdge = async (fn: string, body: object, accessToken: string) => {
   return data;
 };
 
-const renderMarkdown = (text: string) =>
-  text.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
-    part.startsWith('**') && part.endsWith('**')
-      ? <strong key={i} style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{part.slice(2, -2)}</strong>
-      : part
+// ─── Inline markdown parser (bold, italic) ────────────────────
+const parseInline = (text: string): React.ReactNode[] =>
+  text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/).map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**'))
+      return <strong key={i} style={{ fontWeight: 500, color: 'var(--text)' }}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith('*') && part.endsWith('*'))
+      return <em key={i} style={{ fontStyle: 'italic' }}>{part.slice(1, -1)}</em>;
+    return part;
+  });
+
+// ─── StyledAIOutput (§35) — replaces raw markdown ────────────
+// Parses markdown to structured React elements.
+// Detects "working" / "critical" headings → side-bordered blocks.
+const StyledAIOutput: React.FC<{ content: string; compact?: boolean }> = ({ content, compact }) => {
+  const baseFontSize   = compact ? 13 : 14;
+  const headFontSize   = compact ? 13.5 : 15;
+  const lineHeight     = 1.65;
+  const paraGap        = compact ? 8 : 12;
+  const headMarginTop  = compact ? 14 : 18;
+
+  const isPositiveHeader = (t: string) => /work|performing|strength|winning|positive|good|great|excellent/i.test(t);
+  const isNegativeHeader = (t: string) => /critical|issue|fix|concern|problem|warning|lower|worst|bad|fail/i.test(t);
+
+  const lines = content.split('\n');
+  const nodes: React.ReactNode[] = [];
+  let i = 0;
+
+  const collectUntilHeading = (startIdx: number): [string[], number] => {
+    const collected: string[] = [];
+    let j = startIdx;
+    while (j < lines.length && !lines[j].startsWith('#')) {
+      collected.push(lines[j]);
+      j++;
+    }
+    return [collected, j];
+  };
+
+  const renderBulletBlock = (items: string[], bulletColor: string) => (
+    <ul style={{ paddingLeft: 0, listStyle: 'none', margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {items.map((item, idx) => {
+        const text = item.replace(/^[-*]\s+/, '').trim();
+        if (!text) return null;
+        return (
+          <li key={idx} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: baseFontSize, lineHeight, color: 'var(--text-2)', fontFamily: 'var(--font-ui)' }}>
+            <span style={{ color: bulletColor, flexShrink: 0, marginTop: 4, fontSize: 6, lineHeight: 0 }}>●</span>
+            <span>{parseInline(text)}</span>
+          </li>
+        );
+      })}
+    </ul>
   );
 
-// ─── Metric vs Benchmark ────────────────────────────────────────
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // H2 / H3 headings
+    if (line.startsWith('## ') || line.startsWith('### ')) {
+      const level = line.startsWith('### ') ? 3 : 2;
+      const heading = line.slice(level + 1).trim();
+      const isPos = isPositiveHeader(heading);
+      const isNeg = isNegativeHeader(heading);
+
+      if (isPos || isNeg) {
+        // Collect block content
+        const [blockLines, nextIdx] = collectUntilHeading(i + 1);
+        const bulletItems = blockLines.filter(l => l.trim().startsWith('-') || l.trim().startsWith('*'));
+        const paraLines   = blockLines.filter(l => !l.trim().startsWith('-') && !l.trim().startsWith('*') && l.trim());
+
+        const borderColor = isPos ? 'var(--green)' : isNeg ? 'var(--amber)' : 'var(--border)';
+        const bgColor     = isPos ? 'var(--green-soft)' : isNeg ? 'var(--amber-soft)' : 'var(--surface-2)';
+        const iconColor   = isPos ? 'var(--green)' : isNeg ? 'var(--amber)' : 'var(--text-3)';
+        const bulletColor = isPos ? 'var(--green)' : isNeg ? 'var(--amber)' : 'var(--text-3)';
+        const Icon        = isPos ? CheckCircle : AlertTriangle;
+
+        nodes.push(
+          <div key={nodes.length} style={{
+            borderLeft: `3px solid ${borderColor}`,
+            background: bgColor,
+            borderRadius: '0 8px 8px 0',
+            padding: '12px 14px',
+            marginTop: headMarginTop,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 9 }}>
+              <Icon size={13} style={{ color: iconColor, flexShrink: 0 }} />
+              <span style={{ fontFamily: 'var(--font-ui)', fontSize: headFontSize, fontWeight: 500, color: 'var(--text)' }}>
+                {heading}
+              </span>
+            </div>
+            {paraLines.length > 0 && (
+              <p style={{ margin: '0 0 8px', fontSize: baseFontSize, lineHeight, color: 'var(--text-2)', fontFamily: 'var(--font-ui)' }}>
+                {parseInline(paraLines.join(' '))}
+              </p>
+            )}
+            {bulletItems.length > 0 && renderBulletBlock(bulletItems, bulletColor)}
+          </div>
+        );
+        i = nextIdx;
+        continue;
+
+      } else {
+        // Regular heading
+        nodes.push(
+          <div key={nodes.length} style={{
+            fontFamily: 'var(--font-ui)', fontSize: headFontSize, fontWeight: 500,
+            color: 'var(--text)', marginTop: headMarginTop, marginBottom: 6,
+          }}>
+            {parseInline(heading)}
+          </div>
+        );
+      }
+
+    // Bullet list
+    } else if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+      const items: string[] = [line];
+      while (i + 1 < lines.length && (lines[i + 1].trim().startsWith('- ') || lines[i + 1].trim().startsWith('* '))) {
+        i++;
+        items.push(lines[i]);
+      }
+      nodes.push(
+        <div key={nodes.length} style={{ marginBottom: paraGap }}>
+          {renderBulletBlock(items, 'var(--accent)')}
+        </div>
+      );
+
+    // Empty line — paragraph break
+    } else if (line.trim() === '') {
+      // just space
+
+    // Paragraph text
+    } else if (line.trim()) {
+      // Accumulate contiguous non-empty non-special lines
+      const paraLines = [line];
+      while (i + 1 < lines.length && lines[i + 1].trim() && !lines[i + 1].startsWith('#') && !lines[i + 1].trim().startsWith('-') && !lines[i + 1].trim().startsWith('*')) {
+        i++;
+        paraLines.push(lines[i]);
+      }
+      nodes.push(
+        <p key={nodes.length} style={{
+          margin: `0 0 ${paraGap}px`,
+          fontFamily: 'var(--font-ui)', fontSize: baseFontSize,
+          lineHeight, color: 'var(--text-2)',
+        }}>
+          {parseInline(paraLines.join(' '))}
+        </p>
+      );
+    }
+
+    i++;
+  }
+
+  return (
+    <div style={{ fontFamily: 'var(--font-ui)', fontSize: baseFontSize, lineHeight, color: 'var(--text-2)' }}>
+      {nodes}
+    </div>
+  );
+};
+
+// ─── Metric vs Benchmark card (§35.2) ─────────────────────────
+// All colors via CSS variables.
 const MetricVsBenchmark: React.FC<{
   label: string; value: number; benchmark: number;
   unit: string; higherIsBetter: boolean; format?: 'currency' | 'percent' | 'multiplier';
@@ -49,37 +200,93 @@ const MetricVsBenchmark: React.FC<{
   const diff    = ((value - benchmark) / benchmark) * 100;
   const better  = higherIsBetter ? diff > 0 : diff < 0;
   const neutral = Math.abs(diff) < 5;
-  const color   = neutral ? 'var(--text-secondary)' : better ? '#4ade80' : '#f87171';
-  const Icon    = neutral ? Minus : better ? TrendingUp : TrendingDown;
+
+  // CSS variable-based colors (§2 tokens)
+  const tagBg    = neutral ? 'var(--surface-2)' : better ? 'var(--green-soft)' : 'var(--red-soft)';
+  const tagColor = neutral ? 'var(--text-3)'    : better ? 'var(--green)'      : 'var(--red)';
+  const Icon     = neutral ? Minus : better ? TrendingUp : TrendingDown;
+
   const fmt = (v: number) =>
     format === 'currency' ? formatCurrency(v) :
     format === 'percent'  ? `${v.toFixed(2)}%` :
     `${v.toFixed(2)}x`;
+
   return (
-    <div style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--app-border)', borderRadius: 8, padding: '12px 14px' }}>
-      <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 4 }}>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text-primary)' }}>{fmt(value)}</span>
-        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)' }}>{unit}</span>
+    <div style={{
+      background: 'var(--surface-2)', border: '1px solid var(--border-soft)',
+      borderRadius: 10, padding: '13px 15px',
+    }}>
+      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>
+        {label}
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 4 }}>
-        <Icon size={10} style={{ color }} />
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color }}>{Math.abs(diff).toFixed(0)}% {better ? 'better' : 'worse'}</span>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-hint)' }}>(bench: {fmt(benchmark)})</span>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>
+          {fmt(value)}
+        </span>
+        <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)' }}>{unit}</span>
+        {/* Comparison tag */}
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          background: tagBg, color: tagColor,
+          borderRadius: 20, padding: '2px 8px',
+          fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 500,
+        }}>
+          <Icon size={9} />
+          {Math.abs(diff).toFixed(0)}% {better ? 'better' : neutral ? '~same' : 'worse'}
+        </span>
+      </div>
+      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginTop: 4 }}>
+        Benchmark: {fmt(benchmark)}
       </div>
     </div>
   );
 };
 
-// ─── Quick Actions ──────────────────────────────────────────────
+// ─── Signal alert (§35.4 + §14) — CSS vars ────────────────────
+const SignalAlert: React.FC<{ type: 'good' | 'warning' | 'error'; children: React.ReactNode }> = ({ type, children }) => {
+  const bg    = type === 'good'    ? 'var(--green-soft)'     : type === 'warning' ? 'var(--champagne-soft)' : 'var(--red-soft)';
+  const color = type === 'good'    ? 'var(--green)'          : type === 'warning' ? 'var(--champagne)'      : 'var(--red)';
+  const Icon  = type === 'good'    ? CheckCircle             : AlertTriangle;
+  return (
+    <div style={{
+      display: 'flex', gap: 8, alignItems: 'flex-start',
+      padding: '9px 12px', background: bg, borderRadius: 8,
+    }}>
+      <Icon size={12} style={{ color, flexShrink: 0, marginTop: 1 }} />
+      <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5 }}>{children}</span>
+    </div>
+  );
+};
+
+// ─── Status pill ──────────────────────────────────────────────
+const StatusPill: React.FC<{ status: string }> = ({ status }) => {
+  const isActive = status === 'ACTIVE';
+  const isPaused = status === 'PAUSED';
+  const bg    = isActive ? 'var(--green-soft)'     : isPaused ? 'var(--champagne-soft)' : 'var(--surface-2)';
+  const color = isActive ? 'var(--green)'           : isPaused ? 'var(--champagne)'      : 'var(--text-3)';
+  const dot   = isActive ? 'var(--green)'           : isPaused ? 'var(--champagne)'      : 'var(--text-3)';
+  const label = isActive ? 'Active' : isPaused ? 'Paused' : status.charAt(0) + status.slice(1).toLowerCase();
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      padding: '3px 9px', borderRadius: 30,
+      background: bg, color,
+      fontSize: 11, fontWeight: 500, fontFamily: 'var(--font-ui)',
+    }}>
+      <span style={{ width: 5, height: 5, borderRadius: '50%', background: dot, flexShrink: 0 }} />
+      {label}
+    </span>
+  );
+};
+
+// ─── Quick Actions (§35.5) — CSS variable colors ──────────────
 const QuickActions: React.FC<{ campaign: Campaign; onAction: (msg: string) => void }> = ({ campaign, onAction }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<string | null>(null);
   const [feedback, setFeedback] = useState('');
 
   const execAction = async (action: string, label: string, value?: number) => {
-    setLoading(action);
-    setFeedback('');
+    setLoading(action); setFeedback('');
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
@@ -93,95 +300,75 @@ const QuickActions: React.FC<{ campaign: Campaign; onAction: (msg: string) => vo
       onAction(`Action "${label}" was executed: ${result.message}`);
     } catch (err) {
       setFeedback(`✗ ${err instanceof Error ? err.message : 'Action failed'}`);
-    } finally {
-      setLoading(null);
-    }
+    } finally { setLoading(null); }
   };
 
   const isActive = campaign.status === 'ACTIVE';
 
+  // Secondary-style buttons with colored borders (§35.5)
+  const actionBtn = (
+    label: string, icon: React.ReactNode, onClick: () => void,
+    borderColor: string, textColor: string, disabled = false
+  ) => (
+    <button
+      onClick={onClick}
+      disabled={disabled || loading !== null}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        padding: '8px 14px', borderRadius: 9,
+        background: 'var(--surface)',
+        border: `1px solid ${borderColor}`,
+        color: textColor,
+        fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500,
+        cursor: disabled || loading !== null ? 'not-allowed' : 'pointer',
+        opacity: disabled || loading !== null ? 0.6 : 1,
+        transition: 'all 0.15s',
+      }}
+    >
+      {icon} {label}
+    </button>
+  );
+
   return (
     <div>
-      <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
+      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>
         Quick Actions
       </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {isActive ? (
-          <button
-            onClick={() => execAction('pause_campaign', 'Pause')}
-            disabled={loading !== null}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px',
-              background: 'rgba(251,191,36,0.08)', border: '0.5px solid rgba(251,191,36,0.3)',
-              borderRadius: 6, cursor: loading ? 'not-allowed' : 'pointer',
-              fontFamily: 'var(--font-sans)', fontSize: 10, color: '#fbbf24',
-            }}
-          >
-            {loading === 'pause_campaign' ? <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> : <Pause size={11} />}
-            Pause Campaign
-          </button>
-        ) : (
-          <button
-            onClick={() => execAction('activate_campaign', 'Activate')}
-            disabled={loading !== null}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px',
-              background: 'rgba(74,222,128,0.08)', border: '0.5px solid rgba(74,222,128,0.3)',
-              borderRadius: 6, cursor: loading ? 'not-allowed' : 'pointer',
-              fontFamily: 'var(--font-sans)', fontSize: 10, color: '#4ade80',
-            }}
-          >
-            {loading === 'activate_campaign' ? <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> : <Play size={11} />}
-            Activate Campaign
-          </button>
-        )}
+        {isActive
+          ? actionBtn('Pause Campaign',
+              loading === 'pause_campaign' ? <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> : <Pause size={11} />,
+              () => execAction('pause_campaign', 'Pause'),
+              'var(--champagne)', 'var(--champagne)')
+          : actionBtn('Activate Campaign',
+              loading === 'activate_campaign' ? <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> : <Play size={11} />,
+              () => execAction('activate_campaign', 'Activate'),
+              'var(--green)', 'var(--green)')}
 
-        {isActive && (
-          <button
-            onClick={() => execAction('scale_budget', 'Scale +20%', 1.2)}
-            disabled={loading !== null}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px',
-              background: 'rgba(196,131,106,0.08)', border: '0.5px solid rgba(196,131,106,0.3)',
-              borderRadius: 6, cursor: loading ? 'not-allowed' : 'pointer',
-              fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--rose-gold)',
-            }}
-          >
-            {loading === 'scale_budget' ? <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> : <ArrowUpRight size={11} />}
-            Scale Budget +20%
-          </button>
-        )}
+        {isActive && actionBtn('Scale +20%',
+          loading === 'scale_budget' ? <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> : <ArrowUpRight size={11} />,
+          () => execAction('scale_budget', 'Scale +20%', 1.2),
+          'var(--accent)', 'var(--accent)')}
 
-        <button
-          onClick={() => navigate('/creative-studio', {
-            state: {
-              prefill: {
-                brandId: campaign.brand_id,
-                conversionType: campaign.objective?.toLowerCase().includes('lead') ? 'leads'
-                  : campaign.objective?.toLowerCase().includes('sale') ? 'ecommerce' : 'leads',
-                target_countries: ['IT'],
-                age_min: 25, age_max: 55, gender: 'all',
-              }
-            }
-          })}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px',
-            background: 'rgba(167,139,250,0.08)', border: '0.5px solid rgba(167,139,250,0.3)',
-            borderRadius: 6, cursor: 'pointer',
-            fontFamily: 'var(--font-sans)', fontSize: 10, color: '#a78bfa',
-          }}
-        >
-          <PlusCircle size={11} />
-          New Campaign from this
-        </button>
+        {actionBtn('New from this',
+          <PlusCircle size={11} />,
+          () => navigate('/creative-studio', {
+            state: { prefill: {
+              brandId: campaign.brand_id,
+              conversionType: campaign.objective?.toLowerCase().includes('lead') ? 'leads'
+                : campaign.objective?.toLowerCase().includes('sale') ? 'ecommerce' : 'leads',
+              target_countries: ['IT'], age_min: 25, age_max: 55, gender: 'all',
+            }}
+          }),
+          'var(--blue)', 'var(--blue)')}
       </div>
       {feedback && (
         <div style={{
-          marginTop: 8, fontFamily: 'var(--font-sans)', fontSize: 10, padding: '6px 10px',
-          background: feedback.startsWith('✓') ? 'rgba(74,222,128,0.06)' : 'rgba(248,113,113,0.06)',
-          border: `0.5px solid ${feedback.startsWith('✓') ? 'rgba(74,222,128,0.2)' : 'rgba(248,113,113,0.2)'}`,
-          borderRadius: 5,
-          color: feedback.startsWith('✓') ? '#4ade80' : '#f87171',
+          marginTop: 8, padding: '7px 11px', borderRadius: 7,
+          background: feedback.startsWith('✓') ? 'var(--green-soft)' : 'var(--red-soft)',
+          border: `1px solid ${feedback.startsWith('✓') ? 'var(--green)' : 'var(--red)'}`,
+          fontFamily: 'var(--font-ui)', fontSize: 11,
+          color: feedback.startsWith('✓') ? 'var(--green)' : 'var(--red)',
         }}>
           {feedback}
         </div>
@@ -190,7 +377,7 @@ const QuickActions: React.FC<{ campaign: Campaign; onAction: (msg: string) => vo
   );
 };
 
-// ─── Campaign Chat ──────────────────────────────────────────────
+// ─── Campaign Chat (§35.6) ─────────────────────────────────────
 interface ChatMsg { role: 'user' | 'assistant'; content: string }
 
 const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ campaign, initialMsg }) => {
@@ -200,14 +387,14 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
   const bottomRef               = useRef<HTMLDivElement>(null);
 
   const cpm = campaign.impressions > 0 ? (campaign.spend / campaign.impressions) * 1000 : 0;
-  const ctr = campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100 : 0;
+  const ctr = campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100  : 0;
 
   const campaignSummary = [
     `Campaign: "${campaign.name}"`,
     `Status: ${campaign.status} | Objective: ${campaign.objective}`,
     `Spend: ${formatCurrency(campaign.spend)} | Impressions: ${formatNumber(campaign.impressions)}`,
     `CPM: ${formatCurrency(cpm)} | CTR: ${ctr.toFixed(2)}%`,
-    campaign.leads > 0   ? `Leads: ${campaign.leads} | CPL: ${formatCurrency(campaign.cpl)}` : '',
+    campaign.leads     > 0 ? `Leads: ${campaign.leads} | CPL: ${formatCurrency(campaign.cpl)}` : '',
     campaign.purchases > 0 ? `Purchases: ${campaign.purchases} | ROAS: ${campaign.roas.toFixed(2)}x | Revenue: ${formatCurrency(campaign.revenue)}` : '',
     campaign.frequency > 0 ? `Reach: ${formatNumber(campaign.reach)} | Frequency: ${campaign.frequency.toFixed(1)}x` : '',
   ].filter(Boolean).join('\n');
@@ -219,7 +406,7 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
     'Is my audience saturated?',
   ];
 
-  const sendMessage = async (text: string) => {
+  const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || loading) return;
     const userMsg: ChatMsg = { role: 'user', content: text };
     const newMessages = [...messages, userMsg];
@@ -229,8 +416,7 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
-
-      const systemContext = `You are an expert Meta Ads strategist. The user is asking about a specific campaign. Here is the campaign data:\n\n${campaignSummary}\n\nIndustry benchmarks: CPL €32, CPM €11.2, CTR 2.1% for beauty leads campaigns.\n\nBe concise, specific to this campaign's numbers, and actionable. If asked about ads/ad-sets level data, explain you see campaign-level data and suggest what to check in Meta Ads Manager.`;
+      const systemContext = `You are an expert Meta Ads strategist. The user is asking about a specific campaign.\n\n${campaignSummary}\n\nIndustry benchmarks: CPL €32, CPM €11.2, CTR 2.1% for beauty leads campaigns.\n\nBe concise, specific, and actionable. Format your response with markdown: use ## for sections, - for bullet points. Start with a "## What's working" section if there are positives, then "## What to fix" for issues.`;
 
       const result = await callEdge('claude-chat', {
         messages: newMessages.map(m => ({ role: m.role, content: m.content })),
@@ -243,42 +429,38 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
 
       setMessages(prev => [...prev, { role: 'assistant', content: assistantContent }]);
     } catch (err) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${err instanceof Error ? err.message : 'Failed'}` }]);
-    } finally {
-      setLoading(false);
-    }
-  };
+      setMessages(prev => [...prev, { role: 'assistant', content: `Analysis unavailable: ${err instanceof Error ? err.message : 'Connection failed'}` }]);
+    } finally { setLoading(false); }
+  }, [messages, loading, campaignSummary]);
 
-  // Scroll to bottom when messages update
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
-
-  // Handle initialMsg from actions
   useEffect(() => {
     if (initialMsg) sendMessage(`[System] ${initialMsg}`);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialMsg]);
 
   return (
-    <div style={{ borderTop: '0.5px solid var(--app-border)', paddingTop: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-        <Sparkles size={12} style={{ color: 'var(--rose-gold)' }} />
-        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 500, color: 'var(--text-primary)' }}>
+    <div style={{ borderTop: '1px solid var(--border-soft)', paddingTop: 18 }}>
+      {/* Section header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+        <Sparkles size={12} style={{ color: 'var(--accent)' }} />
+        <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)' }}>
           Campaign Intelligence Chat
         </span>
       </div>
 
-      {/* Quick suggestions (shown only when no messages) */}
+      {/* Quick suggestion pills */}
       {messages.length === 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
           {QUICK_QUESTIONS.map(q => (
             <button
               key={q}
               onClick={() => sendMessage(q)}
               style={{
-                padding: '4px 10px', borderRadius: 20,
-                background: 'var(--bg-secondary)', border: '0.5px solid var(--app-border)',
-                fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--text-secondary)',
-                cursor: 'pointer',
+                padding: '5px 11px', borderRadius: 20,
+                background: 'var(--surface-2)', border: '1px solid var(--border-soft)',
+                fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-2)',
+                cursor: 'pointer', transition: 'all 0.15s',
               }}
             >
               {q}
@@ -290,39 +472,49 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
       {/* Message history */}
       {messages.length > 0 && (
         <div style={{
-          maxHeight: 300, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 10,
-          paddingRight: 4,
+          maxHeight: 400, overflowY: 'auto', display: 'flex', flexDirection: 'column',
+          gap: 10, marginBottom: 12, paddingRight: 2,
         }}>
-          {messages.map((m, i) => (
-            <div key={i} style={{
+          {messages.map((m, idx) => (
+            <div key={idx} style={{
               alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '88%',
+              maxWidth: '90%',
             }}>
-              <div style={{
-                background: m.role === 'user'
-                  ? 'linear-gradient(135deg, rgba(196,131,106,0.15), rgba(160,85,74,0.1))'
-                  : 'var(--bg-secondary)',
-                border: `0.5px solid ${m.role === 'user' ? 'rgba(196,131,106,0.2)' : 'var(--app-border)'}`,
-
-                borderRadius: m.role === 'user' ? '10px 10px 2px 10px' : '10px 10px 10px 2px',
-                padding: '8px 12px',
-                fontFamily: 'var(--font-sans)', fontSize: 11,
-                color: 'var(--text-secondary)', lineHeight: 1.6,
-              }}>
-                {m.role === 'assistant' ? renderMarkdown(m.content) : m.content}
-              </div>
+              {m.role === 'user' ? (
+                /* User bubble: accent-soft bg, right-aligned (§35.6) */
+                <div style={{
+                  background: 'var(--accent-soft)',
+                  border: '1px solid var(--accent)',
+                  borderRadius: '12px 12px 2px 12px',
+                  padding: '9px 13px',
+                  fontFamily: 'var(--font-ui)', fontSize: 13,
+                  color: 'var(--text)', lineHeight: 1.5,
+                }}>
+                  {m.content}
+                </div>
+              ) : (
+                /* AI bubble: surface-2 bg, styled output (§35.6) */
+                <div style={{
+                  background: 'var(--surface-2)',
+                  border: '1px solid var(--border-soft)',
+                  borderRadius: '12px 12px 12px 2px',
+                  padding: '11px 14px',
+                }}>
+                  <StyledAIOutput content={m.content} compact />
+                </div>
+              )}
             </div>
           ))}
           {loading && (
             <div style={{ alignSelf: 'flex-start' }}>
               <div style={{
-                background: 'var(--bg-secondary)', border: '0.5px solid var(--app-border)',
-                borderRadius: '10px 10px 10px 2px', padding: '8px 14px',
+                background: 'var(--surface-2)', border: '1px solid var(--border-soft)',
+                borderRadius: '12px 12px 12px 2px', padding: '10px 16px',
                 display: 'flex', gap: 5, alignItems: 'center',
               }}>
-                {[0,1,2].map(d => (
+                {[0, 1, 2].map(d => (
                   <div key={d} style={{
-                    width: 5, height: 5, borderRadius: '50%', background: 'var(--rose-gold)',
+                    width: 5, height: 5, borderRadius: '50%', background: 'var(--accent)',
                     animation: `pulse 1.2s ${d * 0.2}s ease-in-out infinite`,
                   }} />
                 ))}
@@ -333,7 +525,7 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
         </div>
       )}
 
-      {/* Input */}
+      {/* Sticky input row (§35.6: dark icon on --accent bg) */}
       <div style={{ display: 'flex', gap: 8 }}>
         <input
           value={input}
@@ -342,42 +534,50 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
           placeholder="Ask about this campaign…"
           disabled={loading}
           style={{
-            flex: 1, background: 'var(--bg-secondary)',
-            border: '0.5px solid var(--app-border)',
-            borderRadius: 8, padding: '8px 12px',
-            fontFamily: 'var(--font-sans)', fontSize: 11,
-            color: 'var(--text-primary)', outline: 'none',
+            flex: 1, background: 'var(--surface-2)',
+            border: '1px solid var(--border)', borderRadius: 9,
+            padding: '9px 13px',
+            fontFamily: 'var(--font-ui)', fontSize: 13,
+            color: 'var(--text)', outline: 'none',
+            transition: 'border-color 0.15s',
           }}
+          onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
+          onBlur={e  => (e.target.style.borderColor = 'var(--border)')}
         />
+        {/* Send button — dark icon on accent bg (§34, §35.6) */}
         <button
           onClick={() => sendMessage(input)}
           disabled={loading || !input.trim()}
           style={{
-            background: 'linear-gradient(135deg, var(--rose-gold), #a0554a)',
-            border: 'none', borderRadius: 8, width: 36, height: 36,
+            background: loading || !input.trim() ? 'var(--border)' : 'var(--accent)',
+            border: 'none', borderRadius: 9, width: 38, height: 38,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-            opacity: loading || !input.trim() ? 0.5 : 1,
-            flexShrink: 0,
+            flexShrink: 0, transition: 'background 0.15s',
           }}
+          onMouseEnter={e => { if (!loading && input.trim()) (e.currentTarget.style.background = 'var(--accent-deep)'); }}
+          onMouseLeave={e => { if (!loading && input.trim()) (e.currentTarget.style.background = 'var(--accent)'); }}
         >
-          {loading ? <Loader2 size={13} color="white" style={{ animation: 'spin 1s linear infinite' }} /> : <Send size={13} color="white" />}
+          {loading
+            ? <Loader2 size={14} color="#2A1A12" style={{ animation: 'spin 1s linear infinite' }} />
+            : <Send size={14} color="#2A1A12" />}
         </button>
       </div>
     </div>
   );
 };
 
-// ─── Main Panel ─────────────────────────────────────────────────
+// ─── Main Drawer (§33) ──────────────────────────────────────────
 interface Props { campaign: Campaign | null; onClose: () => void }
 
 const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
-  const [visible, setVisible]     = useState(false);
+  const [visible,   setVisible]   = useState(false);
+  const [expanded,  setExpanded]  = useState(false);   // 480px → 720px
   const [actionMsg, setActionMsg] = useState<string | undefined>();
 
   useEffect(() => {
-    if (campaign) setTimeout(() => setVisible(true), 10);
-    else { setVisible(false); setActionMsg(undefined); }
+    if (campaign) { setExpanded(false); setTimeout(() => setVisible(true), 10); }
+    else           { setVisible(false); setActionMsg(undefined); }
   }, [campaign]);
 
   useEffect(() => {
@@ -391,11 +591,13 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
   const goal  = classifyObjective(campaign.objective);
   const meta  = GOAL_META[goal];
   const cpm   = campaign.impressions > 0 ? (campaign.spend / campaign.impressions) * 1000 : 0;
-  const ctr   = campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100 : 0;
+  const ctr   = campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100  : 0;
   const bench = BENCHMARKS[goal] || BENCHMARKS.default;
 
-  const statusColor = campaign.status === 'ACTIVE' ? '#4ade80' : campaign.status === 'PAUSED' ? '#fbbf24' : 'var(--text-hint)';
-  const metaUrl     = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${campaign.ad_account_id}`;
+  const metaUrl = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${campaign.ad_account_id}`;
+
+  // §33: 480px default, 720px expanded
+  const drawerWidth = expanded ? 720 : 480;
 
   return (
     <>
@@ -404,73 +606,94 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
         onClick={onClose}
         style={{
           position: 'fixed', inset: 0, zIndex: 50,
-          background: 'rgba(0,0,0,0.4)',
+          background: 'rgba(0,0,0,0.45)',
           opacity: visible ? 1 : 0,
           transition: 'opacity 0.25s ease',
           pointerEvents: visible ? 'auto' : 'none',
         }}
       />
 
-      {/* Panel */}
+      {/* Drawer panel (§33) */}
       <div style={{
         position: 'fixed', top: 0, right: 0, bottom: 0,
-        width: 'min(500px, 92vw)',
-        background: 'var(--app-surface)',
-        borderLeft: '0.5px solid var(--app-border)',
+        width: `min(${drawerWidth}px, 96vw)`,
+        background: 'var(--surface)',
+        borderLeft: '1px solid var(--border)',
+        /* §33: deep shadow */
+        boxShadow: '0 0 40px rgba(0,0,0,0.50)',
         zIndex: 51,
         transform: visible ? 'translateX(0)' : 'translateX(100%)',
-        transition: 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
+        transition: 'transform 0.3s cubic-bezier(0.32,0.72,0,1), width 0.25s ease',
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden',
       }}>
 
-        {/* Header */}
+        {/* §33: Sticky header */}
         <div style={{
-          padding: '16px 20px 12px',
-          borderBottom: '0.5px solid var(--app-border)',
+          padding: '16px 20px 14px',
+          borderBottom: '1px solid var(--border)',
           display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12,
           flexShrink: 0,
+          background: 'var(--surface)',
+          position: 'sticky', top: 0, zIndex: 2,
         }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+            {/* Goal badge + status pill */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 7, flexWrap: 'wrap' }}>
               <span style={{
-                fontFamily: 'var(--font-sans)', fontSize: 9,
+                fontFamily: 'var(--font-ui)', fontSize: 10,
                 background: meta.bg, color: meta.color,
-                borderRadius: 3, padding: '1px 6px', border: `0.5px solid ${meta.color}22`,
+                borderRadius: 5, padding: '2px 8px',
+                border: `0.5px solid ${meta.color}22`, fontWeight: 500,
               }}>
                 {meta.emoji} {meta.label}
               </span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: statusColor, textTransform: 'uppercase' }}>
-                ● {campaign.status}
-              </span>
+              <StatusPill status={campaign.status} />
             </div>
+            {/* §33: Campaign name in Fraunces 20px */}
             <h2 style={{
-              fontFamily: 'var(--font-sans)', fontSize: 14, fontWeight: 400,
-              color: 'var(--text-primary)', margin: 0,
+              fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 500,
+              color: 'var(--text)', margin: 0, letterSpacing: -0.2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {campaign.name}
             </h2>
           </div>
-          <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+
+          {/* Action buttons */}
+          <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'center' }}>
             <a
               href={metaUrl} target="_blank" rel="noopener noreferrer"
               style={{
-                display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px',
-                borderRadius: 4, border: '0.5px solid var(--app-border)',
-                fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-secondary)',
-                textDecoration: 'none',
+                display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px',
+                borderRadius: 7, border: '1px solid var(--border)',
+                fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-2)',
+                textDecoration: 'none', transition: 'all 0.15s',
               }}
             >
-              <ExternalLink size={10} />Ads Manager
+              <ExternalLink size={11} />
+              Ads Manager
             </a>
+            {/* §33: Expand/Collapse button (ti-arrows-diagonal equiv → Maximize2/Minimize2) */}
+            <button
+              onClick={() => setExpanded(prev => !prev)}
+              title={expanded ? 'Collapse' : 'Expand to 720px'}
+              style={{
+                background: 'var(--surface-2)', border: '1px solid var(--border)',
+                borderRadius: 7, width: 30, height: 30,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: 'var(--text-3)', transition: 'all 0.15s',
+              }}
+            >
+              {expanded ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+            </button>
             <button
               onClick={onClose}
               style={{
-                background: 'transparent', border: '0.5px solid var(--app-border)',
-                borderRadius: 4, width: 28, height: 28,
+                background: 'transparent', border: '1px solid var(--border)',
+                borderRadius: 7, width: 30, height: 30,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: 'var(--text-hint)',
+                cursor: 'pointer', color: 'var(--text-3)', transition: 'all 0.15s',
               }}
             >
               <X size={13} />
@@ -478,143 +701,167 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
           </div>
         </div>
 
-        {/* Scrollable body */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {/* Scrollable body — padding 22px (§33) */}
+        <div style={{
+          flex: 1, overflowY: 'auto',
+          padding: '22px 24px 32px',
+          display: 'flex', flexDirection: 'column', gap: 22,
+        }}>
 
-          {/* KPIs */}
+          {/* ── Key Metrics grid ────────────────────────── */}
           <div>
-            <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Key Metrics</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              <div style={{ background: 'rgba(196,131,106,0.06)', border: '0.5px solid rgba(196,131,106,0.2)', borderRadius: 8, padding: '12px 14px' }}>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>Total Spend</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--copper)', marginTop: 4 }}>{formatCurrency(campaign.spend)}</div>
+            <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 12 }}>
+              Key Metrics
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
+              {/* Spend — hero metric */}
+              <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 11, padding: '13px 15px' }}>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-2)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Spend</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(campaign.spend)}</div>
               </div>
-              <div style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--app-border)', borderRadius: 8, padding: '12px 14px' }}>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>Impressions</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text-primary)', marginTop: 4 }}>{formatNumber(campaign.impressions)}</div>
+              {/* Impressions */}
+              <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Impressions</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>{formatNumber(campaign.impressions)}</div>
               </div>
+              {/* Leads + CPL */}
               {campaign.leads > 0 && <>
-                <div style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--app-border)', borderRadius: 8, padding: '12px 14px' }}>
-                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>Leads</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: '#a78bfa', marginTop: 4 }}>{formatNumber(campaign.leads)}</div>
+                <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Leads</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(campaign.leads)}</div>
                 </div>
-                <div style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--app-border)', borderRadius: 8, padding: '12px 14px' }}>
-                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>CPL</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, marginTop: 4, color: campaign.cpl < (bench.cpl || 32) ? '#4ade80' : '#fbbf24' }}>
-                    {formatCurrency(campaign.cpl)}
+                <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CPL</div>
+                  <div style={{
+                    fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, marginTop: 0,
+                    color: campaign.cpl < (bench.cpl || 32) ? 'var(--green)' : 'var(--champagne)',
+                  }}>{formatCurrency(campaign.cpl)}</div>
+                </div>
+              </>}
+              {/* ROAS + Revenue */}
+              {campaign.purchases > 0 && <>
+                <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>ROAS</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: campaign.roas >= 3 ? 'var(--green)' : 'var(--champagne)' }}>
+                    {campaign.roas.toFixed(2)}x
                   </div>
                 </div>
-              </>}
-              {campaign.purchases > 0 && <>
-                <div style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--app-border)', borderRadius: 8, padding: '12px 14px' }}>
-                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>ROAS</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, marginTop: 4, color: campaign.roas >= 3 ? '#4ade80' : '#fbbf24' }}>{campaign.roas.toFixed(2)}x</div>
-                </div>
-                <div style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--app-border)', borderRadius: 8, padding: '12px 14px' }}>
-                  <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>Revenue</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: '#4ade80', marginTop: 4 }}>{formatCurrency(campaign.revenue)}</div>
+                <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Revenue</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatCurrency(campaign.revenue)}</div>
                 </div>
               </>}
-              <div style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--app-border)', borderRadius: 8, padding: '12px 14px' }}>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>CPM</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text-secondary)', marginTop: 4 }}>{cpm > 0 ? formatCurrency(cpm) : '—'}</div>
+              {/* CPM + CTR */}
+              <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CPM</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: cpm > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
+                  {cpm > 0 ? formatCurrency(cpm) : '—'}
+                </div>
               </div>
-              <div style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--app-border)', borderRadius: 8, padding: '12px 14px' }}>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-muted)' }}>CTR</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text-secondary)', marginTop: 4 }}>{ctr > 0 ? `${ctr.toFixed(2)}%` : '—'}</div>
+              <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CTR</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: ctr > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
+                  {ctr > 0 ? `${ctr.toFixed(2)}%` : '—'}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Benchmarks */}
+          {/* ── vs Industry Benchmark (§35.2) ──────────── */}
           {campaign.spend > 0 && (
             <div>
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>vs Industry Benchmark</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {campaign.cpl > 0 && bench.cpl && <MetricVsBenchmark label="CPL" value={campaign.cpl} benchmark={bench.cpl} unit="€/lead" higherIsBetter={false} />}
-                {campaign.roas > 0 && bench.roas && <MetricVsBenchmark label="ROAS" value={campaign.roas} benchmark={bench.roas} unit="x" higherIsBetter format="multiplier" />}
-                {cpm > 0 && bench.cpm && <MetricVsBenchmark label="CPM" value={cpm} benchmark={bench.cpm} unit="€/1k" higherIsBetter={false} />}
-                {ctr > 0 && bench.ctr && <MetricVsBenchmark label="CTR" value={ctr} benchmark={bench.ctr} unit="%" higherIsBetter format="percent" />}
+              <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 12 }}>
+                vs Industry Benchmark
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+                {campaign.cpl > 0 && bench.cpl  && <MetricVsBenchmark label="CPL"  value={campaign.cpl}   benchmark={bench.cpl}  unit="€/lead" higherIsBetter={false} />}
+                {campaign.roas > 0 && bench.roas && <MetricVsBenchmark label="ROAS" value={campaign.roas}  benchmark={bench.roas} unit="x"     higherIsBetter format="multiplier" />}
+                {cpm > 0 && bench.cpm            && <MetricVsBenchmark label="CPM"  value={cpm}            benchmark={bench.cpm}  unit="€/1k"  higherIsBetter={false} />}
+                {ctr > 0 && bench.ctr            && <MetricVsBenchmark label="CTR"  value={ctr}            benchmark={bench.ctr}  unit="%"     higherIsBetter format="percent" />}
               </div>
             </div>
           )}
 
-          {/* Performance signals */}
+          {/* ── Signals (§35.4) — CSS var colors ──────── */}
           {campaign.spend > 0 && (campaign.cpl > 0 || ctr > 0) && (
             <div>
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Signals</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>
+                Signals
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
                 {campaign.cpl > 0 && bench.cpl && campaign.cpl < bench.cpl * 0.8 && (
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '8px 10px', background: 'rgba(74,222,128,0.06)', border: '0.5px solid rgba(74,222,128,0.15)', borderRadius: 6 }}>
-                    <CheckCircle size={12} style={{ color: '#4ade80', flexShrink: 0, marginTop: 1 }} />
-                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--text-secondary)' }}>
-                      Excellent CPL — {Math.round((1 - campaign.cpl / bench.cpl) * 100)}% below benchmark. Consider scaling budget now.
-                    </span>
-                  </div>
+                  <SignalAlert type="good">
+                    Excellent CPL — {Math.round((1 - campaign.cpl / bench.cpl) * 100)}% below benchmark. Consider scaling budget now.
+                  </SignalAlert>
                 )}
                 {campaign.cpl > 0 && bench.cpl && campaign.cpl > bench.cpl * 1.3 && (
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '8px 10px', background: 'rgba(251,191,36,0.06)', border: '0.5px solid rgba(251,191,36,0.15)', borderRadius: 6 }}>
-                    <AlertTriangle size={12} style={{ color: '#fbbf24', flexShrink: 0, marginTop: 1 }} />
-                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--text-secondary)' }}>
-                      CPL {Math.round((campaign.cpl / bench.cpl - 1) * 100)}% above benchmark. Test new creatives or narrow audience.
-                    </span>
-                  </div>
+                  <SignalAlert type="warning">
+                    CPL {Math.round((campaign.cpl / bench.cpl - 1) * 100)}% above benchmark. Test new creatives or narrow the audience.
+                  </SignalAlert>
                 )}
                 {ctr > 0 && bench.ctr && ctr < bench.ctr * 0.7 && (
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '8px 10px', background: 'rgba(251,191,36,0.06)', border: '0.5px solid rgba(251,191,36,0.15)', borderRadius: 6 }}>
-                    <AlertTriangle size={12} style={{ color: '#fbbf24', flexShrink: 0, marginTop: 1 }} />
-                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--text-secondary)' }}>
-                      CTR {ctr.toFixed(2)}% below benchmark {bench.ctr}%. Creative refresh needed.
-                    </span>
-                  </div>
+                  <SignalAlert type="warning">
+                    CTR {ctr.toFixed(2)}% is below benchmark {bench.ctr}%. A creative refresh is needed.
+                  </SignalAlert>
+                )}
+                {cpm > 0 && bench.cpm && cpm > bench.cpm * 1.4 && (
+                  <SignalAlert type="error">
+                    CPM {formatCurrency(cpm)} is {Math.round((cpm / bench.cpm - 1) * 100)}% above benchmark. Audience may be too narrow.
+                  </SignalAlert>
                 )}
               </div>
             </div>
           )}
 
-          {/* Generate AI Analysis CTA */}
+          {/* ── Generate AI Analysis CTA (§34: dark text on accent) ── */}
           <button
-            onClick={() => setActionMsg('Please give me a full performance analysis of this campaign with specific recommendations.')}
+            onClick={() => setActionMsg('Please give me a full performance analysis of this campaign with specific recommendations. Use ## What\'s working and ## What to fix sections with bullet points.')}
             style={{
-              background: 'var(--copper)',
-              color: '#FFFFFF',
-              borderRadius: 8,
+              background: 'var(--accent)',
+              color: '#2A1A12',        /* §34: dark-ink text on rose-gold */
+              borderRadius: 10,
               width: '100%',
-              fontFamily: 'var(--font-serif)',
-              fontSize: 13,
-              padding: '11px 16px',
+              fontFamily: 'var(--font-ui)',
+              fontSize: 13, fontWeight: 500,
+              padding: '12px 16px',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 6,
+              gap: 7,
+              transition: 'background 0.15s',
             }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-deep)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent)')}
           >
-            <Sparkles size={13} />
+            {/* Icon also dark (§34) */}
+            <Sparkles size={14} color="#2A1A12" />
             Generate AI Analysis
           </button>
 
-          {/* Quick Actions */}
+          {/* ── Quick Actions (§35.5) ────────────────── */}
           <QuickActions campaign={campaign} onAction={msg => setActionMsg(msg)} />
 
-          {/* Campaign Chat */}
+          {/* ── Campaign Chat (§35.6) ────────────────── */}
           <CampaignChat campaign={campaign} initialMsg={actionMsg} />
 
-          {/* Details */}
-          <div style={{ borderTop: '0.5px solid var(--app-border)', paddingTop: 16 }}>
-            <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Details</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          {/* ── Details ──────────────────────────────── */}
+          <div style={{ borderTop: '1px solid var(--border-soft)', paddingTop: 18 }}>
+            <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>
+              Details
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[
-                ['ID', campaign.campaign_id_external],
-                ['Last Sync', new Date(campaign.synced_at).toLocaleString()],
-                ['Start', campaign.date_start ? new Date(campaign.date_start).toLocaleDateString() : '—'],
-                ['Daily Budget', campaign.budget_daily ? formatCurrency(campaign.budget_daily) : '—'],
+                ['Campaign ID', campaign.campaign_id_external],
+                ['Last Sync',   new Date(campaign.synced_at).toLocaleString()],
+                ['Start date',  campaign.date_start ? new Date(campaign.date_start).toLocaleDateString() : '—'],
+                ['Daily Budget', campaign.budget_daily   ? formatCurrency(campaign.budget_daily)   : '—'],
                 ['Lifetime Budget', campaign.budget_lifetime ? formatCurrency(campaign.budget_lifetime) : '—'],
               ].map(([k, v]) => (
                 <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--text-hint)' }}>{k}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-secondary)', textAlign: 'right' }}>{v}</span>
+                  <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>{k}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-2)', textAlign: 'right' }}>{v}</span>
                 </div>
               ))}
             </div>
