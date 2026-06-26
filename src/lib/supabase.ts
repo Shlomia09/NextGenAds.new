@@ -249,3 +249,103 @@ export const getSystemEvents = async (brandId: string, limit = 10) => {
   }
   return data ?? [];
 };
+
+// ── Campaign Drafts (Workshop) ────────────────────────────────────────────
+
+export interface CampaignDraftRow {
+  id: string;
+  user_id: string;
+  brand_id: string;
+  platform: string;
+  goal: string | null;
+  campaign_name: string | null;
+  status: 'draft' | 'published';
+  draft_data: Record<string, unknown>;
+  published_campaign_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Upsert a draft — pass draftId to update existing, omit to create new */
+export const saveDraft = async (payload: {
+  draftId?: string;
+  userId: string;
+  brandId: string;
+  platform: string;
+  goal: string;
+  campaignName: string;
+  draftData: Record<string, unknown>;
+}): Promise<CampaignDraftRow> => {
+  const row = {
+    user_id:       payload.userId,
+    brand_id:      payload.brandId,
+    platform:      payload.platform,
+    goal:          payload.goal,
+    campaign_name: payload.campaignName,
+    status:        'draft' as const,
+    draft_data:    payload.draftData,
+  };
+
+  if (payload.draftId) {
+    // Update existing
+    const { data, error } = await supabase
+      .from('campaign_drafts')
+      .update({ ...row })
+      .eq('id', payload.draftId)
+      .select()
+      .single();
+    if (error) throw error;
+    return data as CampaignDraftRow;
+  } else {
+    // Insert new
+    const { data, error } = await supabase
+      .from('campaign_drafts')
+      .insert(row)
+      .select()
+      .single();
+    if (error) throw error;
+    return data as CampaignDraftRow;
+  }
+};
+
+/** Fetch all drafts for a brand (both draft + published via workshop) */
+export const getDrafts = async (brandId: string): Promise<CampaignDraftRow[]> => {
+  const { data, error } = await supabase
+    .from('campaign_drafts')
+    .select('*')
+    .eq('brand_id', brandId)
+    .order('updated_at', { ascending: false });
+  if (error) {
+    console.warn('getDrafts error:', error.message);
+    return [];
+  }
+  return (data ?? []) as CampaignDraftRow[];
+};
+
+/** Publish a draft — mark it published and link to campaigns row */
+export const publishDraft = async (
+  draftId: string,
+  publishedCampaignId?: string,
+): Promise<CampaignDraftRow> => {
+  const { data, error } = await supabase
+    .from('campaign_drafts')
+    .update({
+      status: 'published',
+      published_campaign_id: publishedCampaignId ?? null,
+    })
+    .eq('id', draftId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as CampaignDraftRow;
+};
+
+/** Delete a draft */
+export const deleteDraft = async (draftId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('campaign_drafts')
+    .delete()
+    .eq('id', draftId);
+  if (error) throw error;
+};
+

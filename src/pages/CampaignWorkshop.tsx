@@ -9,9 +9,10 @@
 
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Wand2, CheckCircle2, ArrowLeft, ArrowRight, Rocket, CloudUpload, Sparkles, Info, CheckCheck, Globe, Brain, X, Search } from 'lucide-react';
-import { getAdAccounts, getCampaigns, getBrands, supabase } from '../lib/supabase';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Wand2, CheckCircle2, ArrowLeft, ArrowRight, Rocket, CloudUpload, Sparkles, Info, CheckCheck, Globe, Brain, X, Search, Save, Edit3, Copy, Trash2 } from 'lucide-react';
+import { getAdAccounts, getCampaigns, getBrands, saveDraft, getDrafts, publishDraft, deleteDraft, supabase } from '../lib/supabase';
+import type { CampaignDraftRow } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useBrand } from '../contexts/BrandContext';
 
@@ -344,7 +345,21 @@ const CampaignWorkshop: React.FC = () => {
   const { user }     = useAuth();
   const navigate     = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // ── Brand context (global sidebar selection) ────────────────
   const { activeBrand: ctxActiveBrand } = useBrand();
+  const queryClient = useQueryClient();
+
+  // ── Draft tracking ──────────────────────────────────────────
+  const [draftId,      setDraftId]      = useState<string | null>(null);
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+  const [savingDraft,  setSavingDraft]  = useState(false);
+  const [toast,        setToast]        = useState<{ msg: string; type: 'ok' | 'err' } | null>(null);
+
+  const showToast = (msg: string, type: 'ok' | 'err' = 'ok') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+  
   const [step, setStep]         = useState(1);
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished]   = useState(false);
@@ -354,7 +369,7 @@ const CampaignWorkshop: React.FC = () => {
   const [countrySearch, setCountrySearch] = useState('');
   const [activeGeoTab, setActiveGeoTab]   = useState<string>('europe');
 
-  // ── Queries ─────────────────────────────────────────────────
+  // ── Queries ──────────────────────────────────────────
   const { data: brands = [] } = useQuery({
     queryKey: ['brands', user?.id],
     queryFn:  () => getBrands(user!.id),
@@ -428,6 +443,13 @@ const CampaignWorkshop: React.FC = () => {
   const { data: campaigns = [] } = useQuery({
     queryKey: ['campaigns', form.brandId],
     queryFn:  () => getCampaigns(form.brandId),
+    enabled:  !!form.brandId,
+  });
+
+  // ── Workshop drafts (\"Your campaigns\" table) ────────────────────
+  const { data: draftsList = [] } = useQuery({
+    queryKey: ['drafts', form.brandId],
+    queryFn:  () => getDrafts(form.brandId),
     enabled:  !!form.brandId,
   });
 
@@ -543,6 +565,103 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
     handleFileChange(f);
   };
 
+  // ── Save Draft ──────────────────────────────────────────
+  const handleSaveDraft = async () => {
+    if (!user?.id || !form.brandId) {
+      showToast('Select a brand first', 'err');
+      return;
+    }
+    setSavingDraft(true);
+    try {
+      // Serialize full form state (exclude File object — not serializable)
+      const draftData: Record<string, unknown> = {
+        ...form,
+        creativeFile: null,   // File objects can't be JSON-serialized
+        step,
+      };
+      const result = await saveDraft({
+        draftId:      draftId ?? undefined,
+        userId:       user.id,
+        brandId:      form.brandId,
+        platform:     form.platform,
+        goal:         form.goal,
+        campaignName: form.campaignName,
+        draftData,
+      });
+      setDraftId(result.id);
+      setDraftSavedAt(result.updated_at);
+      showToast('Draft saved');
+      // Refresh drafts list
+      queryClient.invalidateQueries({ queryKey: ['drafts', form.brandId] });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Save failed';
+      showToast(msg, 'err');
+    } finally {
+      setSavingDraft(false);
+    }
+  };
+
+  // ── Load draft into Wizard ────────────────────────────────
+  const loadDraft = (draft: CampaignDraftRow) => {
+    const d = draft.draft_data as Partial<typeof form>;
+    setForm(prev => ({ ...prev, ...d, creativeFile: null, creativeUrl: d.creativeUrl ?? '' }));
+    setDraftId(draft.id);
+    setDraftSavedAt(draft.updated_at);
+    setStep((d.step as number) || 1);
+    setStepKey(k => k + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // ── Publish a draft directly from the table ─────────────────
+  const handlePublishDraft = async (draft: CampaignDraftRow) => {
+    if (!confirm(`Publish "${draft.campaign_name ?? 'this campaign'}"? This will submit it to your ad platform.`)) return;
+    try {
+      await publishDraft(draft.id);
+      showToast('Campaign published!');
+      queryClient.invalidateQueries({ queryKey: ['drafts', draft.brand_id] });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Publish failed';
+      showToast(msg, 'err');
+    }
+  };
+
+  // ── Duplicate draft ──────────────────────────────────────
+  const handleDuplicateDraft = async (draft: CampaignDraftRow) => {
+    if (!user?.id) return;
+    try {
+      await saveDraft({
+        userId:       user.id,
+        brandId:      draft.brand_id,
+        platform:     draft.platform,
+        goal:         draft.goal ?? '',
+        campaignName: `${draft.campaign_name ?? 'Campaign'} (copy)`,
+        draftData:    { ...draft.draft_data, campaignName: `${draft.campaign_name ?? 'Campaign'} (copy)` },
+      });
+      showToast('Campaign duplicated');
+      queryClient.invalidateQueries({ queryKey: ['drafts', draft.brand_id] });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Duplicate failed';
+      showToast(msg, 'err');
+    }
+  };
+
+  // ── Delete draft ─────────────────────────────────────────
+  const handleDeleteDraft = async (draft: CampaignDraftRow) => {
+    if (!confirm(`Delete "${draft.campaign_name ?? 'this draft'}"? This cannot be undone.`)) return;
+    try {
+      await deleteDraft(draft.id);
+      showToast('Draft deleted');
+      queryClient.invalidateQueries({ queryKey: ['drafts', draft.brand_id] });
+      if (draftId === draft.id) {
+        setDraftId(null);
+        setDraftSavedAt(null);
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Delete failed';
+      showToast(msg, 'err');
+    }
+  };
+
   // ── Publish ──────────────────────────────────────────────────
   const handlePublish = async () => {
     setPublishing(true);
@@ -569,6 +688,11 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
           destination_url: form.destinationUrl,
         },
       });
+      // Mark draft as published (if we have one)
+      if (draftId) {
+        await publishDraft(draftId).catch(() => {});
+        queryClient.invalidateQueries({ queryKey: ['drafts', form.brandId] });
+      }
       setPublished(true);
     } catch (e) {
       console.error('Publish error:', e);
@@ -576,6 +700,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
       setPublishing(false);
     }
   };
+
 
   // ── Derived review values ─────────────────────────────────────
   const activeBrand = brands.find(b => b.id === form.brandId);
@@ -619,7 +744,9 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             Campaign Workshop
           </h1>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 20, padding: '3px 10px', fontSize: 11, fontFamily: 'var(--font-ui)', color: 'var(--text-3)' }}>
-            Draft
+            {draftSavedAt
+              ? <>Saved · <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10 }}>{new Date(draftSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></>
+              : 'Draft'}
           </span>
         </div>
         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-2)' }}>
@@ -1267,13 +1394,22 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             </button>
 
             <button
+              onClick={handleSaveDraft}
+              disabled={savingDraft}
               style={{
+                display: 'flex', alignItems: 'center', gap: 6,
                 background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-2)',
                 fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 500,
-                padding: '12px 18px', borderRadius: 10, cursor: 'pointer',
+                padding: '12px 18px', borderRadius: 10,
+                cursor: savingDraft ? 'not-allowed' : 'pointer',
+                opacity: savingDraft ? 0.6 : 1, transition: '.15s',
               }}
+              onMouseEnter={e => { if (!savingDraft) e.currentTarget.style.borderColor = 'var(--accent)'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
             >
-              Save draft
+              {savingDraft
+                ? <><span style={{ display: 'inline-block', animation: 'wspin 1s linear infinite' }}>⟳</span> Saving…</>
+                : <><Save size={13} /> Save draft</>}
             </button>
 
             <button
@@ -1386,6 +1522,171 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
         </div>
 
       </div>{/* /grid */}
+
+      {/* ══ Toast notification ═══════════════════════════════════════ */}
+      {toast && (
+        <div style={{
+          position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
+          background: toast.type === 'ok' ? 'var(--surface)' : '#3D1515',
+          border: `1px solid ${toast.type === 'ok' ? 'var(--green)' : '#EF4444'}`,
+          borderRadius: 12, padding: '12px 20px', zIndex: 999,
+          display: 'flex', alignItems: 'center', gap: 10,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+          animation: 'wsfade .2s ease',
+          fontFamily: 'var(--font-ui)', fontSize: 13.5, fontWeight: 500,
+          color: toast.type === 'ok' ? 'var(--text)' : '#FCA5A5',
+        }}>
+          <span style={{ fontSize: 16 }}>{toast.type === 'ok' ? '✓' : '✕'}</span>
+          {toast.msg}
+        </div>
+      )}
+
+      {/* ══ Your campaigns table ══════════════════════════════════════ */}
+      <div style={{ marginTop: 40, paddingBottom: 40 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div>
+            <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, letterSpacing: '1px', color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 4 }}>Workshop</div>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 500, color: 'var(--text)', margin: 0 }}>Your campaigns</h2>
+          </div>
+        </div>
+
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
+          {/* Table header */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 110px 100px 140px 120px',
+            gap: 0,
+            borderBottom: '1px solid var(--border)',
+            padding: '11px 18px',
+            background: 'var(--field)',
+          }}>
+            {['CAMPAIGN NAME', 'PLATFORM', 'STATUS', 'LAST EDITED', 'ACTIONS'].map(h => (
+              <div key={h} style={{ fontFamily: 'var(--font-ui)', fontSize: 9.5, letterSpacing: '0.8px', color: 'var(--text-3)', fontWeight: 500 }}>{h}</div>
+            ))}
+          </div>
+
+          {draftsList.length === 0 ? (
+            /* Empty state */
+            <div style={{ padding: '48px 24px', textAlign: 'center' }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>✦</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 500, color: 'var(--text-2)', marginBottom: 8 }}>
+                No campaigns yet
+              </div>
+              <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-3)' }}>
+                Build your first campaign above — it will appear here as a draft.
+              </div>
+            </div>
+          ) : (
+            draftsList.map((draft, idx) => {
+              const isDraft = draft.status === 'draft';
+              const editedAt = new Date(draft.updated_at);
+              const now = new Date();
+              const diffMs = now.getTime() - editedAt.getTime();
+              const diffM = Math.floor(diffMs / 60000);
+              const diffH = Math.floor(diffM / 60);
+              const diffD = Math.floor(diffH / 24);
+              const relTime = diffM < 1 ? 'Just now' : diffM < 60 ? `${diffM}m ago` : diffH < 24 ? `${diffH}h ago` : `${diffD}d ago`;
+              const platformLabel = draft.platform === 'meta' ? '📘 Meta' : draft.platform === 'google' ? '🔍 Google' : draft.platform;
+              return (
+                <div
+                  key={draft.id}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 110px 100px 140px 120px',
+                    gap: 0, padding: '14px 18px', alignItems: 'center',
+                    borderBottom: idx < draftsList.length - 1 ? '1px solid var(--border)' : 'none',
+                    transition: '.12s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-2)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                >
+                  {/* Name */}
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13.5, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 10 }}>
+                    {draft.campaign_name || 'Untitled campaign'}
+                  </div>
+                  {/* Platform */}
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-2)' }}>{platformLabel}</div>
+                  {/* Status pill */}
+                  <div>
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                      padding: '3px 10px', borderRadius: 20,
+                      fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500,
+                      background: isDraft ? 'var(--surface-2)' : 'var(--green-soft)',
+                      color: isDraft ? 'var(--text-2)' : 'var(--green)',
+                      border: `1px solid ${isDraft ? 'var(--border)' : 'var(--green)'}`,
+                    }}>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor', display: 'inline-block' }} />
+                      {isDraft ? 'Draft' : 'Published'}
+                    </span>
+                  </div>
+                  {/* Last edited */}
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-3)' }}>{relTime}</div>
+                  {/* Actions */}
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <button
+                      onClick={() => loadDraft(draft)}
+                      title="Edit"
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        background: 'var(--surface-2)', border: '1px solid var(--border)',
+                        borderRadius: 8, padding: '5px 10px',
+                        fontFamily: 'var(--font-ui)', fontSize: 11.5, fontWeight: 500,
+                        color: 'var(--accent)', cursor: 'pointer', transition: '.12s',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-soft)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface-2)'; }}
+                    >
+                      <Edit3 size={11} /> Edit
+                    </button>
+                    {isDraft && (
+                      <button
+                        onClick={() => handlePublishDraft(draft)}
+                        title="Publish"
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 4,
+                          background: 'var(--accent)', border: 'none',
+                          borderRadius: 8, padding: '5px 10px',
+                          fontFamily: 'var(--font-ui)', fontSize: 11.5, fontWeight: 500,
+                          color: 'var(--ink)', cursor: 'pointer', transition: '.12s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-deep)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent)'; }}
+                      >
+                        <Rocket size={11} /> Publish
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDuplicateDraft(draft)}
+                      title="Duplicate"
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer', padding: 5,
+                        color: 'var(--text-3)', borderRadius: 7, transition: '.12s',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-2)'; e.currentTarget.style.background = 'var(--surface-2)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.background = 'none'; }}
+                    >
+                      <Copy size={13} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteDraft(draft)}
+                      title="Delete"
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer', padding: 5,
+                        color: 'var(--text-3)', borderRadius: 7, transition: '.12s',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.background = 'none'; }}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
 
       <style>{`
         @keyframes wsfade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
