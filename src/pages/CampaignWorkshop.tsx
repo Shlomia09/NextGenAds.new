@@ -49,76 +49,204 @@ const GOALS = [
   { value: 'awareness', label: 'Awareness' },
 ];
 
-// ─── Full country list (Meta-compatible ISO-3166-1 alpha-2) ──────
-const ALL_COUNTRIES = [
+// ─── Flag emoji helper (ISO 3166-1 alpha-2 → emoji flag) ───────────
+const flag = (countryCode: string): string => {
+  const base = 0x1F1E6;
+  return [...countryCode.toUpperCase()].map(c => String.fromCodePoint(base + c.charCodeAt(0) - 65)).join('');
+};
+
+// ─── Unified location data: Countries + Regions/States ──────────
+interface GeoLoc {
+  code: string;         // 'US', 'US-CA', 'GB-ENG'
+  name: string;         // 'California', 'Italy'
+  type: 'country' | 'region';
+  parentCode?: string;  // 'US' for US-CA
+  parentName?: string;  // 'United States'
+  regionGroup: string;  // 'americas', 'europe', etc.
+  flagCode: string;     // ISO country code for flag emoji
+}
+
+const ALL_COUNTRIES: GeoLoc[] = [
   // Europe
-  { code: 'AT', name: 'Austria',        region: 'europe' },
-  { code: 'BE', name: 'Belgium',         region: 'europe' },
-  { code: 'BG', name: 'Bulgaria',        region: 'europe' },
-  { code: 'HR', name: 'Croatia',         region: 'europe' },
-  { code: 'CY', name: 'Cyprus',          region: 'europe' },
-  { code: 'CZ', name: 'Czech Republic',  region: 'europe' },
-  { code: 'DK', name: 'Denmark',         region: 'europe' },
-  { code: 'EE', name: 'Estonia',         region: 'europe' },
-  { code: 'FI', name: 'Finland',         region: 'europe' },
-  { code: 'FR', name: 'France',          region: 'europe' },
-  { code: 'DE', name: 'Germany',         region: 'europe' },
-  { code: 'GR', name: 'Greece',          region: 'europe' },
-  { code: 'HU', name: 'Hungary',         region: 'europe' },
-  { code: 'IE', name: 'Ireland',         region: 'europe' },
-  { code: 'IT', name: 'Italy',           region: 'europe' },
-  { code: 'LV', name: 'Latvia',          region: 'europe' },
-  { code: 'LT', name: 'Lithuania',       region: 'europe' },
-  { code: 'LU', name: 'Luxembourg',      region: 'europe' },
-  { code: 'MT', name: 'Malta',           region: 'europe' },
-  { code: 'NL', name: 'Netherlands',     region: 'europe' },
-  { code: 'NO', name: 'Norway',          region: 'europe' },
-  { code: 'PL', name: 'Poland',          region: 'europe' },
-  { code: 'PT', name: 'Portugal',        region: 'europe' },
-  { code: 'RO', name: 'Romania',         region: 'europe' },
-  { code: 'SK', name: 'Slovakia',        region: 'europe' },
-  { code: 'SI', name: 'Slovenia',        region: 'europe' },
-  { code: 'ES', name: 'Spain',           region: 'europe' },
-  { code: 'SE', name: 'Sweden',          region: 'europe' },
-  { code: 'CH', name: 'Switzerland',     region: 'europe' },
-  { code: 'GB', name: 'United Kingdom',  region: 'europe' },
+  { code:'AT', name:'Austria',        type:'country', regionGroup:'europe',   flagCode:'AT' },
+  { code:'BE', name:'Belgium',         type:'country', regionGroup:'europe',   flagCode:'BE' },
+  { code:'BG', name:'Bulgaria',        type:'country', regionGroup:'europe',   flagCode:'BG' },
+  { code:'HR', name:'Croatia',         type:'country', regionGroup:'europe',   flagCode:'HR' },
+  { code:'CY', name:'Cyprus',          type:'country', regionGroup:'europe',   flagCode:'CY' },
+  { code:'CZ', name:'Czech Republic',  type:'country', regionGroup:'europe',   flagCode:'CZ' },
+  { code:'DK', name:'Denmark',         type:'country', regionGroup:'europe',   flagCode:'DK' },
+  { code:'EE', name:'Estonia',         type:'country', regionGroup:'europe',   flagCode:'EE' },
+  { code:'FI', name:'Finland',         type:'country', regionGroup:'europe',   flagCode:'FI' },
+  { code:'FR', name:'France',          type:'country', regionGroup:'europe',   flagCode:'FR' },
+  { code:'DE', name:'Germany',         type:'country', regionGroup:'europe',   flagCode:'DE' },
+  { code:'GR', name:'Greece',          type:'country', regionGroup:'europe',   flagCode:'GR' },
+  { code:'HU', name:'Hungary',         type:'country', regionGroup:'europe',   flagCode:'HU' },
+  { code:'IE', name:'Ireland',         type:'country', regionGroup:'europe',   flagCode:'IE' },
+  { code:'IT', name:'Italy',           type:'country', regionGroup:'europe',   flagCode:'IT' },
+  { code:'LV', name:'Latvia',          type:'country', regionGroup:'europe',   flagCode:'LV' },
+  { code:'LT', name:'Lithuania',       type:'country', regionGroup:'europe',   flagCode:'LT' },
+  { code:'LU', name:'Luxembourg',      type:'country', regionGroup:'europe',   flagCode:'LU' },
+  { code:'MT', name:'Malta',           type:'country', regionGroup:'europe',   flagCode:'MT' },
+  { code:'NL', name:'Netherlands',     type:'country', regionGroup:'europe',   flagCode:'NL' },
+  { code:'NO', name:'Norway',          type:'country', regionGroup:'europe',   flagCode:'NO' },
+  { code:'PL', name:'Poland',          type:'country', regionGroup:'europe',   flagCode:'PL' },
+  { code:'PT', name:'Portugal',        type:'country', regionGroup:'europe',   flagCode:'PT' },
+  { code:'RO', name:'Romania',         type:'country', regionGroup:'europe',   flagCode:'RO' },
+  { code:'SK', name:'Slovakia',        type:'country', regionGroup:'europe',   flagCode:'SK' },
+  { code:'SI', name:'Slovenia',        type:'country', regionGroup:'europe',   flagCode:'SI' },
+  { code:'ES', name:'Spain',           type:'country', regionGroup:'europe',   flagCode:'ES' },
+  { code:'SE', name:'Sweden',          type:'country', regionGroup:'europe',   flagCode:'SE' },
+  { code:'CH', name:'Switzerland',     type:'country', regionGroup:'europe',   flagCode:'CH' },
+  { code:'GB', name:'United Kingdom',  type:'country', regionGroup:'europe',   flagCode:'GB' },
   // Americas
-  { code: 'AR', name: 'Argentina',       region: 'americas' },
-  { code: 'BR', name: 'Brazil',          region: 'americas' },
-  { code: 'CA', name: 'Canada',          region: 'americas' },
-  { code: 'CL', name: 'Chile',           region: 'americas' },
-  { code: 'CO', name: 'Colombia',        region: 'americas' },
-  { code: 'MX', name: 'Mexico',          region: 'americas' },
-  { code: 'US', name: 'United States',   region: 'americas' },
+  { code:'AR', name:'Argentina',       type:'country', regionGroup:'americas', flagCode:'AR' },
+  { code:'BR', name:'Brazil',          type:'country', regionGroup:'americas', flagCode:'BR' },
+  { code:'CA', name:'Canada',          type:'country', regionGroup:'americas', flagCode:'CA' },
+  { code:'CL', name:'Chile',           type:'country', regionGroup:'americas', flagCode:'CL' },
+  { code:'CO', name:'Colombia',        type:'country', regionGroup:'americas', flagCode:'CO' },
+  { code:'MX', name:'Mexico',          type:'country', regionGroup:'americas', flagCode:'MX' },
+  { code:'US', name:'United States',   type:'country', regionGroup:'americas', flagCode:'US' },
   // Asia Pacific
-  { code: 'AU', name: 'Australia',       region: 'apac' },
-  { code: 'IN', name: 'India',           region: 'apac' },
-  { code: 'ID', name: 'Indonesia',       region: 'apac' },
-  { code: 'JP', name: 'Japan',           region: 'apac' },
-  { code: 'KR', name: 'South Korea',     region: 'apac' },
-  { code: 'MY', name: 'Malaysia',        region: 'apac' },
-  { code: 'NZ', name: 'New Zealand',     region: 'apac' },
-  { code: 'PH', name: 'Philippines',     region: 'apac' },
-  { code: 'SG', name: 'Singapore',       region: 'apac' },
-  { code: 'TH', name: 'Thailand',        region: 'apac' },
+  { code:'AU', name:'Australia',       type:'country', regionGroup:'apac',     flagCode:'AU' },
+  { code:'IN', name:'India',           type:'country', regionGroup:'apac',     flagCode:'IN' },
+  { code:'ID', name:'Indonesia',       type:'country', regionGroup:'apac',     flagCode:'ID' },
+  { code:'JP', name:'Japan',           type:'country', regionGroup:'apac',     flagCode:'JP' },
+  { code:'KR', name:'South Korea',     type:'country', regionGroup:'apac',     flagCode:'KR' },
+  { code:'MY', name:'Malaysia',        type:'country', regionGroup:'apac',     flagCode:'MY' },
+  { code:'NZ', name:'New Zealand',     type:'country', regionGroup:'apac',     flagCode:'NZ' },
+  { code:'PH', name:'Philippines',     type:'country', regionGroup:'apac',     flagCode:'PH' },
+  { code:'SG', name:'Singapore',       type:'country', regionGroup:'apac',     flagCode:'SG' },
+  { code:'TH', name:'Thailand',        type:'country', regionGroup:'apac',     flagCode:'TH' },
   // MENA
-  { code: 'AE', name: 'UAE',             region: 'mena' },
-  { code: 'SA', name: 'Saudi Arabia',    region: 'mena' },
-  { code: 'EG', name: 'Egypt',           region: 'mena' },
-  { code: 'IL', name: 'Israel',          region: 'mena' },
-  { code: 'ZA', name: 'South Africa',    region: 'mena' },
-  { code: 'MA', name: 'Morocco',         region: 'mena' },
+  { code:'AE', name:'UAE',             type:'country', regionGroup:'mena',     flagCode:'AE' },
+  { code:'SA', name:'Saudi Arabia',    type:'country', regionGroup:'mena',     flagCode:'SA' },
+  { code:'EG', name:'Egypt',           type:'country', regionGroup:'mena',     flagCode:'EG' },
+  { code:'IL', name:'Israel',          type:'country', regionGroup:'mena',     flagCode:'IL' },
+  { code:'ZA', name:'South Africa',    type:'country', regionGroup:'mena',     flagCode:'ZA' },
+  { code:'MA', name:'Morocco',         type:'country', regionGroup:'mena',     flagCode:'MA' },
 ];
+
+// Regions/States — appear in search results
+const ALL_REGIONS: GeoLoc[] = [
+  // USA — 50 states
+  { code:'US-AL', name:'Alabama',        type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-AK', name:'Alaska',         type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-AZ', name:'Arizona',        type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-AR', name:'Arkansas',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-CA', name:'California',     type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-CO', name:'Colorado',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-CT', name:'Connecticut',    type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-DE', name:'Delaware',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-FL', name:'Florida',        type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-GA', name:'Georgia',        type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-HI', name:'Hawaii',         type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-ID', name:'Idaho',          type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-IL', name:'Illinois',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-IN', name:'Indiana',        type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-IA', name:'Iowa',           type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-KS', name:'Kansas',         type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-KY', name:'Kentucky',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-LA', name:'Louisiana',      type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-ME', name:'Maine',          type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-MD', name:'Maryland',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-MA', name:'Massachusetts',  type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-MI', name:'Michigan',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-MN', name:'Minnesota',      type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-MS', name:'Mississippi',    type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-MO', name:'Missouri',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-MT', name:'Montana',        type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-NE', name:'Nebraska',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-NV', name:'Nevada',         type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-NH', name:'New Hampshire',  type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-NJ', name:'New Jersey',     type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-NM', name:'New Mexico',     type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-NY', name:'New York',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-NC', name:'North Carolina', type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-ND', name:'North Dakota',   type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-OH', name:'Ohio',           type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-OK', name:'Oklahoma',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-OR', name:'Oregon',         type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-PA', name:'Pennsylvania',   type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-RI', name:'Rhode Island',   type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-SC', name:'South Carolina', type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-SD', name:'South Dakota',   type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-TN', name:'Tennessee',      type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-TX', name:'Texas',          type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-UT', name:'Utah',           type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-VT', name:'Vermont',        type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-VA', name:'Virginia',       type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-WA', name:'Washington',     type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-WV', name:'West Virginia',  type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-WI', name:'Wisconsin',      type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-WY', name:'Wyoming',        type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  { code:'US-DC', name:'Washington D.C.',type:'region', parentCode:'US', parentName:'United States', regionGroup:'americas', flagCode:'US' },
+  // UK regions
+  { code:'GB-ENG', name:'England',         type:'region', parentCode:'GB', parentName:'United Kingdom', regionGroup:'europe', flagCode:'GB' },
+  { code:'GB-SCT', name:'Scotland',         type:'region', parentCode:'GB', parentName:'United Kingdom', regionGroup:'europe', flagCode:'GB' },
+  { code:'GB-WLS', name:'Wales',            type:'region', parentCode:'GB', parentName:'United Kingdom', regionGroup:'europe', flagCode:'GB' },
+  { code:'GB-NIR', name:'Northern Ireland', type:'region', parentCode:'GB', parentName:'United Kingdom', regionGroup:'europe', flagCode:'GB' },
+  { code:'GB-LND', name:'London',           type:'region', parentCode:'GB', parentName:'United Kingdom', regionGroup:'europe', flagCode:'GB' },
+  { code:'GB-MCR', name:'Manchester',       type:'region', parentCode:'GB', parentName:'United Kingdom', regionGroup:'europe', flagCode:'GB' },
+  { code:'GB-BHM', name:'Birmingham',       type:'region', parentCode:'GB', parentName:'United Kingdom', regionGroup:'europe', flagCode:'GB' },
+  // Germany (Bundesländer)
+  { code:'DE-BY',  name:'Bavaria',                  type:'region', parentCode:'DE', parentName:'Germany', regionGroup:'europe', flagCode:'DE' },
+  { code:'DE-BE',  name:'Berlin',                   type:'region', parentCode:'DE', parentName:'Germany', regionGroup:'europe', flagCode:'DE' },
+  { code:'DE-HH',  name:'Hamburg',                  type:'region', parentCode:'DE', parentName:'Germany', regionGroup:'europe', flagCode:'DE' },
+  { code:'DE-NW',  name:'North Rhine-Westphalia',   type:'region', parentCode:'DE', parentName:'Germany', regionGroup:'europe', flagCode:'DE' },
+  { code:'DE-BW',  name:'Baden-Württemberg',       type:'region', parentCode:'DE', parentName:'Germany', regionGroup:'europe', flagCode:'DE' },
+  { code:'DE-HE',  name:'Hesse',                    type:'region', parentCode:'DE', parentName:'Germany', regionGroup:'europe', flagCode:'DE' },
+  { code:'DE-NI',  name:'Lower Saxony',             type:'region', parentCode:'DE', parentName:'Germany', regionGroup:'europe', flagCode:'DE' },
+  { code:'DE-SN',  name:'Saxony',                   type:'region', parentCode:'DE', parentName:'Germany', regionGroup:'europe', flagCode:'DE' },
+  // Italy (Regioni)
+  { code:'IT-LOM', name:'Lombardy',      type:'region', parentCode:'IT', parentName:'Italy', regionGroup:'europe', flagCode:'IT' },
+  { code:'IT-LAZ', name:'Lazio (Rome)',  type:'region', parentCode:'IT', parentName:'Italy', regionGroup:'europe', flagCode:'IT' },
+  { code:'IT-CAM', name:'Campania',      type:'region', parentCode:'IT', parentName:'Italy', regionGroup:'europe', flagCode:'IT' },
+  { code:'IT-TOS', name:'Tuscany',       type:'region', parentCode:'IT', parentName:'Italy', regionGroup:'europe', flagCode:'IT' },
+  { code:'IT-VEN', name:'Veneto',        type:'region', parentCode:'IT', parentName:'Italy', regionGroup:'europe', flagCode:'IT' },
+  { code:'IT-SIC', name:'Sicily',        type:'region', parentCode:'IT', parentName:'Italy', regionGroup:'europe', flagCode:'IT' },
+  { code:'IT-PIE', name:'Piedmont',      type:'region', parentCode:'IT', parentName:'Italy', regionGroup:'europe', flagCode:'IT' },
+  { code:'IT-EMR', name:'Emilia-Romagna',type:'region', parentCode:'IT', parentName:'Italy', regionGroup:'europe', flagCode:'IT' },
+  { code:'IT-APU', name:'Apulia',        type:'region', parentCode:'IT', parentName:'Italy', regionGroup:'europe', flagCode:'IT' },
+  // France (Régions)
+  { code:'FR-IDF', name:'Île-de-France',                  type:'region', parentCode:'FR', parentName:'France', regionGroup:'europe', flagCode:'FR' },
+  { code:'FR-PAC', name:'Provence-Alpes-Côte d\'Azur', type:'region', parentCode:'FR', parentName:'France', regionGroup:'europe', flagCode:'FR' },
+  { code:'FR-ARA', name:'Auvergne-Rhône-Alpes',        type:'region', parentCode:'FR', parentName:'France', regionGroup:'europe', flagCode:'FR' },
+  { code:'FR-OCC', name:'Occitanie',                      type:'region', parentCode:'FR', parentName:'France', regionGroup:'europe', flagCode:'FR' },
+  { code:'FR-NAQ', name:'Nouvelle-Aquitaine',             type:'region', parentCode:'FR', parentName:'France', regionGroup:'europe', flagCode:'FR' },
+  { code:'FR-NOR', name:'Normandy',                       type:'region', parentCode:'FR', parentName:'France', regionGroup:'europe', flagCode:'FR' },
+  // Spain (Comunidades Autónomas)
+  { code:'ES-MAD', name:'Madrid',       type:'region', parentCode:'ES', parentName:'Spain', regionGroup:'europe', flagCode:'ES' },
+  { code:'ES-CAT', name:'Catalonia',    type:'region', parentCode:'ES', parentName:'Spain', regionGroup:'europe', flagCode:'ES' },
+  { code:'ES-AND', name:'Andalusia',    type:'region', parentCode:'ES', parentName:'Spain', regionGroup:'europe', flagCode:'ES' },
+  { code:'ES-VAL', name:'Valencia',     type:'region', parentCode:'ES', parentName:'Spain', regionGroup:'europe', flagCode:'ES' },
+  { code:'ES-EUS', name:'Basque Country',type:'region', parentCode:'ES', parentName:'Spain', regionGroup:'europe', flagCode:'ES' },
+  // Netherlands
+  { code:'NL-NH',  name:'North Holland', type:'region', parentCode:'NL', parentName:'Netherlands', regionGroup:'europe', flagCode:'NL' },
+  { code:'NL-ZH',  name:'South Holland', type:'region', parentCode:'NL', parentName:'Netherlands', regionGroup:'europe', flagCode:'NL' },
+  // Canada (Provinces)
+  { code:'CA-ON',  name:'Ontario',         type:'region', parentCode:'CA', parentName:'Canada', regionGroup:'americas', flagCode:'CA' },
+  { code:'CA-QC',  name:'Quebec',          type:'region', parentCode:'CA', parentName:'Canada', regionGroup:'americas', flagCode:'CA' },
+  { code:'CA-BC',  name:'British Columbia',type:'region', parentCode:'CA', parentName:'Canada', regionGroup:'americas', flagCode:'CA' },
+  { code:'CA-AB',  name:'Alberta',         type:'region', parentCode:'CA', parentName:'Canada', regionGroup:'americas', flagCode:'CA' },
+  // Australia (States)
+  { code:'AU-NSW', name:'New South Wales', type:'region', parentCode:'AU', parentName:'Australia', regionGroup:'apac', flagCode:'AU' },
+  { code:'AU-VIC', name:'Victoria',        type:'region', parentCode:'AU', parentName:'Australia', regionGroup:'apac', flagCode:'AU' },
+  { code:'AU-QLD', name:'Queensland',      type:'region', parentCode:'AU', parentName:'Australia', regionGroup:'apac', flagCode:'AU' },
+  { code:'AU-WA',  name:'Western Australia',type:'region', parentCode:'AU', parentName:'Australia', regionGroup:'apac', flagCode:'AU' },
+];
+
+// Combined lookup (countries + regions/states)
+const ALL_LOCS: GeoLoc[] = [...ALL_COUNTRIES, ...ALL_REGIONS];
 
 // Region presets — like Meta's location targeting groups
 const REGIONS = [
-  { id: 'all_europe',   emoji: '🌍', label: 'All Europe',    codes: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','NO','PL','PT','RO','SK','SI','ES','SE','CH','GB'] },
-  { id: 'west_eu',      emoji: '',   label: 'Western EU',    codes: ['FR','DE','NL','BE','AT','CH','LU','IE','GB'] },
-  { id: 'south_eu',     emoji: '',   label: 'Southern EU',   codes: ['IT','ES','PT','GR','HR','MT','CY'] },
-  { id: 'north_eu',     emoji: '',   label: 'Northern EU',   codes: ['NO','SE','DK','FI','EE','LV','LT'] },
-  { id: 'americas',     emoji: '🌎', label: 'Americas',      codes: ['US','CA','BR','MX','AR','CL','CO'] },
-  { id: 'apac',         emoji: '🌏', label: 'Asia Pacific',  codes: ['AU','JP','SG','KR','IN','NZ','MY','TH','PH','ID'] },
-  { id: 'mena',         emoji: '🌍', label: 'MENA',          codes: ['AE','SA','EG','IL','ZA','MA'] },
+  { id: 'all_europe', emoji: '🌍', label: 'All Europe',   codes: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','NO','PL','PT','RO','SK','SI','ES','SE','CH','GB'] },
+  { id: 'west_eu',    emoji: '',   label: 'Western EU',  codes: ['FR','DE','NL','BE','AT','CH','LU','IE','GB'] },
+  { id: 'south_eu',   emoji: '',   label: 'Southern EU', codes: ['IT','ES','PT','GR','HR','MT','CY'] },
+  { id: 'north_eu',   emoji: '',   label: 'Northern EU', codes: ['NO','SE','DK','FI','EE','LV','LT'] },
+  { id: 'americas',   emoji: '🌎', label: 'Americas',    codes: ['US','CA','BR','MX','AR','CL','CO'] },
+  { id: 'apac',       emoji: '🌏', label: 'Asia Pacific',codes: ['AU','JP','SG','KR','IN','NZ','MY','TH','PH','ID'] },
+  { id: 'mena',       emoji: '🌍', label: 'MENA',         codes: ['AE','SA','EG','IL','ZA','MA'] },
 ];
 
 // Interest categories for beauty/wellness targeting
@@ -815,7 +943,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                   </div>
                 )}
 
-                {/* ── Geo targeting ── */}
+                {/* ── Geo targeting — Meta-style ── */}
                 <MB>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                     <FL>LOCATIONS</FL>
@@ -832,102 +960,164 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                       const allSel = r.codes.every(c => form.countries.includes(c));
                       const someSel = r.codes.some(c => form.countries.includes(c));
                       return (
-                        <button
-                          key={r.id}
-                          onClick={() => applyRegion(r.id)}
-                          style={{
-                            border: `1px solid ${allSel ? 'var(--accent)' : someSel ? 'var(--amber)' : 'var(--border)'}`,
-                            borderRadius: 8, padding: '5px 11px',
-                            background: allSel ? 'var(--accent-soft)' : someSel ? 'rgba(217,176,106,0.1)' : 'var(--field)',
-                            color: allSel ? 'var(--accent)' : someSel ? 'var(--amber)' : 'var(--text-2)',
-                            fontFamily: 'var(--font-ui)', fontSize: 11.5, fontWeight: 500, cursor: 'pointer', transition: '.12s',
-                          }}
-                        >
+                        <button key={r.id} onClick={() => applyRegion(r.id)} style={{
+                          border: `1px solid ${allSel ? 'var(--accent)' : someSel ? 'var(--amber)' : 'var(--border)'}`,
+                          borderRadius: 8, padding: '5px 11px',
+                          background: allSel ? 'var(--accent-soft)' : someSel ? 'rgba(217,176,106,0.1)' : 'var(--field)',
+                          color: allSel ? 'var(--accent)' : someSel ? 'var(--amber)' : 'var(--text-2)',
+                          fontFamily: 'var(--font-ui)', fontSize: 11.5, fontWeight: 500, cursor: 'pointer', transition: '.12s',
+                        }}>
                           {r.emoji && <span style={{ marginRight: 4 }}>{r.emoji}</span>}{r.label}
                         </button>
                       );
                     })}
                   </div>
 
-                  {/* Geo tab navigation */}
-                  <div style={{ display: 'flex', background: 'var(--field)', border: '1px solid var(--border)', borderRadius: 9, padding: 3, gap: 3, marginBottom: 12, flexWrap: 'wrap' }}>
-                    {[{ id: 'europe', label: '🌍 Europe' }, { id: 'americas', label: '🌎 Americas' }, { id: 'apac', label: '🌏 Asia Pacific' }, { id: 'mena', label: 'MENA' }].map(tab => (
-                      <button
-                        key={tab.id}
-                        onClick={() => { setActiveGeoTab(tab.id); setCountrySearch(''); }}
-                        style={{
-                          border: 'none', fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500,
-                          padding: '6px 12px', borderRadius: 7, cursor: 'pointer', transition: '.12s',
-                          background: activeGeoTab === tab.id ? 'var(--accent-soft)' : 'transparent',
-                          color: activeGeoTab === tab.id ? 'var(--accent)' : 'var(--text-2)',
-                        }}
-                      >
-                        {tab.label}
-                        {(() => { const n = ALL_COUNTRIES.filter(c => c.region === tab.id && form.countries.includes(c.code)).length; return n > 0 ? <span style={{ marginLeft: 5, background: 'var(--accent)', color: 'var(--ink)', borderRadius: 10, padding: '1px 6px', fontSize: 9, fontFamily: 'var(--font-mono)' }}>{n}</span> : null; })()}
-                      </button>
-                    ))}
-                  </div>
+                  {/* Selected chips — shown above search */}
+                  {form.countries.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+                      {form.countries.map(code => {
+                        const loc = ALL_LOCS.find(l => l.code === code);
+                        if (!loc) return null;
+                        return (
+                          <div key={code} style={{
+                            display: 'flex', alignItems: 'center', gap: 6,
+                            background: 'var(--accent-soft)', border: '1px solid var(--accent)',
+                            borderRadius: 20, padding: '4px 8px 4px 10px',
+                            fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--accent)',
+                          }}>
+                            <span style={{ fontSize: 15 }}>{flag(loc.flagCode)}</span>
+                            <span>{loc.name}</span>
+                            {loc.type === 'region' && (
+                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--accent-deep)', opacity: 0.7 }}>{loc.parentCode}</span>
+                            )}
+                            <button onClick={() => upd('countries', form.countries.filter(c => c !== code))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', padding: 0, display: 'flex', alignItems: 'center' }}>
+                              <X size={12} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
-                  {/* Country search */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--field)', border: '1px solid var(--border)', borderRadius: 9, padding: '8px 12px', marginBottom: 10 }}>
-                    <Search size={13} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+                  {/* Search box */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--field)', border: `1px solid ${countrySearch ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 9, padding: '9px 13px', transition: '.15s', boxShadow: countrySearch ? '0 0 0 3px var(--accent-soft)' : 'none' }}>
+                    <Search size={14} style={{ color: countrySearch ? 'var(--accent)' : 'var(--text-3)', flexShrink: 0 }} />
                     <input
-                      placeholder="Search countries…"
+                      placeholder="Search countries, regions, states…"
                       value={countrySearch}
                       onChange={e => setCountrySearch(e.target.value)}
                       style={{ background: 'none', border: 'none', outline: 'none', fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text)', width: '100%' }}
                     />
-                    {countrySearch && <button onClick={() => setCountrySearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)' }}><X size={12} /></button>}
+                    {countrySearch && <button onClick={() => setCountrySearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', display: 'flex' }}><X size={13} /></button>}
                   </div>
 
-                  {/* Country chips */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, maxHeight: 160, overflowY: 'auto', padding: '2px 0' }}>
-                    {ALL_COUNTRIES
-                      .filter(c => countrySearch
-                        ? c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.toLowerCase().includes(countrySearch.toLowerCase())
-                        : c.region === activeGeoTab
-                      )
-                      .map(c => {
-                        const sel = form.countries.includes(c.code);
-                        return (
-                          <button
-                            key={c.code}
-                            onClick={() => {
-                              const next = sel ? form.countries.filter(x => x !== c.code) : [...form.countries, c.code];
-                              upd('countries', next);
-                            }}
-                            style={{
-                              border: `1px solid ${sel ? 'var(--accent)' : 'var(--border)'}`,
-                              borderRadius: 30, padding: '5px 12px',
-                              background: sel ? 'var(--accent-soft)' : 'var(--field)',
-                              color: sel ? 'var(--accent)' : 'var(--text-2)',
-                              fontFamily: 'var(--font-ui)', fontSize: 12, cursor: 'pointer',
-                              display: 'flex', alignItems: 'center', gap: 5, transition: '.1s', flexShrink: 0,
-                            }}
-                          >
-                            {c.name}
-                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8.5, color: sel ? 'var(--accent-deep)' : 'var(--text-3)', textTransform: 'uppercase' }}>{c.code}</span>
-                          </button>
+                  {/* Search results / browse list */}
+                  {countrySearch ? (
+                    // ── Search results (countries + regions/states) ──
+                    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 11, overflow: 'hidden', marginTop: 8, maxHeight: 260, overflowY: 'auto' }}>
+                      {(() => {
+                        const q = countrySearch.toLowerCase();
+                        const results = ALL_LOCS.filter(l =>
+                          l.name.toLowerCase().includes(q) ||
+                          l.code.toLowerCase().includes(q) ||
+                          (l.parentName ?? '').toLowerCase().includes(q)
+                        ).slice(0, 30);
+                        if (results.length === 0) return (
+                          <div style={{ padding: '14px 16px', fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)' }}>
+                            No locations match "{countrySearch}"
+                          </div>
                         );
-                      })
-                    }
-                    {ALL_COUNTRIES.filter(c => countrySearch ? c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.toLowerCase().includes(countrySearch.toLowerCase()) : c.region === activeGeoTab).length === 0 && (
-                      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)', padding: '8px 0' }}>No countries match "{countrySearch}"</div>
-                    )}
-                  </div>
-
-                  {/* Selected summary */}
-                  {form.countries.length > 0 && (
-                    <div style={{ marginTop: 10, padding: '8px 12px', background: 'var(--surface-2)', borderRadius: 9, border: '1px solid var(--border-soft)' }}>
-                      <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>
-                        Selected: </span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent)', fontWeight: 500 }}>
-                        {form.countries.length} countr{form.countries.length === 1 ? 'y' : 'ies'}
-                      </span>
-                      <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>
-                        {' — '}{form.countries.slice(0, 6).join(', ')}{form.countries.length > 6 ? ` +${form.countries.length - 6} more` : ''}
-                      </span>
+                        return results.map(loc => {
+                          const sel = form.countries.includes(loc.code);
+                          return (
+                            <div key={loc.code}
+                              onClick={() => {
+                                const next = sel ? form.countries.filter(c => c !== loc.code) : [...form.countries, loc.code];
+                                upd('countries', next);
+                              }}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: 12,
+                                padding: '10px 16px', cursor: 'pointer', transition: '.1s',
+                                background: sel ? 'var(--accent-soft)' : 'transparent',
+                                borderBottom: '1px solid var(--border)',
+                              }}
+                              onMouseEnter={e => { if (!sel) e.currentTarget.style.background = 'var(--surface-2)'; }}
+                              onMouseLeave={e => { if (!sel) e.currentTarget.style.background = 'transparent'; }}
+                            >
+                              {/* Flag */}
+                              <span style={{ fontSize: 20, width: 28, textAlign: 'center', flexShrink: 0 }}>{flag(loc.flagCode)}</span>
+                              {/* Name + parent */}
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 500, color: sel ? 'var(--accent)' : 'var(--text)' }}>
+                                  {loc.name}
+                                </div>
+                                {loc.type === 'region' && (
+                                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)', marginTop: 1 }}>
+                                    {loc.parentName}
+                                  </div>
+                                )}
+                              </div>
+                              {/* Type badge */}
+                              <span style={{
+                                fontFamily: 'var(--font-ui)', fontSize: 9.5, fontWeight: 500, letterSpacing: '0.4px',
+                                padding: '2px 7px', borderRadius: 10,
+                                background: loc.type === 'region' ? 'rgba(106,163,217,0.15)' : 'var(--surface-2)',
+                                color: loc.type === 'region' ? 'var(--blue)' : 'var(--text-3)',
+                                border: `1px solid ${loc.type === 'region' ? 'rgba(106,163,217,0.3)' : 'var(--border)'}`,
+                              }}>
+                                {loc.type === 'region' ? 'Region' : 'Country'}
+                              </span>
+                              {/* Check */}
+                              {sel && <span style={{ color: 'var(--accent)', fontWeight: 600, fontSize: 15, flexShrink: 0 }}>✓</span>}
+                            </div>
+                          );
+                        });
+                      })()}
                     </div>
+                  ) : (
+                    // ── Browse by tab (countries only, chips style) ──
+                    <>
+                      {/* Geo tabs */}
+                      <div style={{ display: 'flex', background: 'var(--field)', border: '1px solid var(--border)', borderRadius: 9, padding: 3, gap: 3, marginTop: 10, marginBottom: 10, flexWrap: 'wrap' }}>
+                        {[{ id: 'europe', label: '🌍 Europe' }, { id: 'americas', label: '🌎 Americas' }, { id: 'apac', label: '🌏 Asia Pacific' }, { id: 'mena', label: 'MENA' }].map(tab => (
+                          <button key={tab.id} onClick={() => setActiveGeoTab(tab.id)} style={{
+                            border: 'none', fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500,
+                            padding: '6px 12px', borderRadius: 7, cursor: 'pointer', transition: '.12s',
+                            background: activeGeoTab === tab.id ? 'var(--accent-soft)' : 'transparent',
+                            color: activeGeoTab === tab.id ? 'var(--accent)' : 'var(--text-2)',
+                          }}>
+                            {tab.label}
+                            {(() => { const n = ALL_COUNTRIES.filter(c => c.regionGroup === tab.id && form.countries.includes(c.code)).length; return n > 0 ? <span style={{ marginLeft: 5, background: 'var(--accent)', color: 'var(--ink)', borderRadius: 10, padding: '1px 6px', fontSize: 9, fontFamily: 'var(--font-mono)' }}>{n}</span> : null; })()}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Country grid with flags */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 6 }}>
+                        {ALL_COUNTRIES.filter(c => c.regionGroup === activeGeoTab).map(c => {
+                          const sel = form.countries.includes(c.code);
+                          return (
+                            <div key={c.code} onClick={() => { upd('countries', sel ? form.countries.filter(x => x !== c.code) : [...form.countries, c.code]); }}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: 9,
+                                padding: '8px 11px', borderRadius: 9, cursor: 'pointer', transition: '.1s',
+                                border: `1px solid ${sel ? 'var(--accent)' : 'var(--border)'}`,
+                                background: sel ? 'var(--accent-soft)' : 'var(--field)',
+                              }}
+                              onMouseEnter={e => { if (!sel) { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.background = 'var(--surface-2)'; } }}
+                              onMouseLeave={e => { if (!sel) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--field)'; } }}
+                            >
+                              <span style={{ fontSize: 18, flexShrink: 0 }}>{flag(c.flagCode)}</span>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: sel ? 'var(--accent)' : 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
+                                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: sel ? 'var(--accent-deep)' : 'var(--text-3)' }}>{c.code}</div>
+                              </div>
+                              {sel && <span style={{ color: 'var(--accent)', fontWeight: 600, fontSize: 13, flexShrink: 0 }}>✓</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
                   )}
                 </MB>
 
