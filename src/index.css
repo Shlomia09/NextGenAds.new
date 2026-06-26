@@ -97,42 +97,43 @@ input, textarea, select {
 .page-header { margin-bottom: 24px; }
 
 .page-title {
-  font-family: var(--font-serif);
-  font-size: 22px;
+  font-family: var(--font-display);
+  font-size: 34px;
   font-weight: 500;
-  color: var(--color-text-primary);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -0.5px;
 }
 
 .page-subtitle {
-  font-family: var(--font-sans);
-  font-size: 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
   font-weight: 400;
-  color: var(--color-text-secondary);
-  margin-top: 4px;
-  letter-spacing: 0.02em;
+  color: var(--text-2);
+  margin-top: 9px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .section-eyebrow {
-  font-family: var(--font-sans);
+  font-family: var(--font-ui);
   font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.5px;
+  font-weight: 500;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--color-text-tertiary);
+  color: var(--text-3);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 12px;
 }
-
 .section-eyebrow::before {
   content: '';
   display: block;
-  width: 16px;
-  height: 0.5px;
-  background: var(--color-border-default);
+  width: 22px;
+  height: 1px;
+  background: var(--text-3);
   flex-shrink: 0;
 }
 
@@ -194,23 +195,19 @@ input, textarea, select {
    CARDS — Light
    ============================================================ */
 .card {
-  background: var(--color-surface-primary);
-  border: 0.5px solid var(--color-border-default);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 20px;
-  transition: border-color var(--transition), box-shadow var(--transition);
+  transition: border-color var(--transition);
 }
-.card:hover {
-  border-color: rgba(196,131,106,0.4);
-  box-shadow: var(--shadow-sm);
-}
+.card:hover { border-color: var(--accent-deep); }
 
 .card-elevated {
-  background: var(--color-surface-primary);
-  border: 0.5px solid var(--color-border-default);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 20px;
-  box-shadow: var(--shadow);
 }
 
 /* ============================================================
@@ -219,67 +216,65 @@ input, textarea, select {
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 9px 20px;
+  gap: 7px;
+  padding: 9px 15px;
   border-radius: var(--radius);
-  font-family: var(--font-sans);
-  font-size: 10px;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
   font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
   transition: all var(--transition);
   white-space: nowrap;
   line-height: 1;
   cursor: pointer;
+  border: 1px solid transparent;
 }
 
+/* Primary: border + text accent (per design system — NOT filled) */
 .btn-primary {
-  background: var(--rose);
-  color: #FFFFFF;
-  border: 0.5px solid transparent;
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
 }
-.btn-primary:hover { background: var(--rose-dark); }
+.btn-primary:hover { background: var(--accent-soft); }
 
 .btn-secondary {
   background: transparent;
-  color: var(--color-text-secondary);
-  border: 0.5px solid var(--color-border-default);
+  color: var(--text-2);
+  border-color: var(--border);
 }
-.btn-secondary:hover { border-color: var(--rose); color: var(--rose); }
+.btn-secondary:hover { background: var(--surface-hover); color: var(--text); }
 
 .btn-outline {
   background: transparent;
-  color: var(--color-text-secondary);
-  border: 0.5px solid var(--color-border-default);
+  color: var(--text-2);
+  border-color: var(--border);
 }
-.btn-outline:hover { border-color: var(--rose); color: var(--rose); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-text-tertiary);
-  border: 0.5px solid transparent;
+  color: var(--text-3);
+  border-color: transparent;
   padding: 6px 10px;
-  text-transform: none;
-  letter-spacing: 0;
 }
-.btn-ghost:hover { color: var(--color-text-secondary); }
+.btn-ghost:hover { color: var(--text-2); }
 
 .btn-danger {
   background: transparent;
-  color: var(--color-negative);
-  border: 0.5px solid rgba(226,75,74,0.3);
+  color: var(--red);
+  border-color: var(--red-soft);
 }
-.btn-danger:hover { background: var(--danger-bg); }
+.btn-danger:hover { background: var(--red-soft); }
 
 .btn-success {
-  background: var(--color-positive);
+  background: var(--green);
   color: #FFFFFF;
-  border: 0.5px solid transparent;
+  border-color: transparent;
 }
-.btn-success:hover { background: #2d5509; }
+.btn-success:hover { opacity: 0.9; }
 
-.btn-sm  { padding: 6px 12px; font-size: 9px; }
-.btn-lg  { padding: 12px 28px; font-size: 11px; letter-spacing: 0.16em; }
+.btn-sm  { padding: 6px 12px; font-size: 11.5px; }
+.btn-lg  { padding: 12px 24px; font-size: 14px; }
 .btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .btn-execute {
@@ -343,36 +338,82 @@ input, textarea, select {
 .tag-warning { background: #FAEEDA; color: #633806; }
 .tag-danger  { background: #FCEBEB; color: #791F1F; }
 
-/* ── Status chips (campaign table) ── */
+/* ── Status chips v2.0: dot + pill (border-radius 30px) ── */
 .status-active {
-  background: #EAF3DE;
-  color: #27500A;
-  font-family: var(--font-sans);
-  font-size: 11px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-family: var(--font-ui);
+  font-size: 11.5px;
   font-weight: 500;
-  padding: 3px 9px;
-  display: inline-block;
-  border-radius: 3px;
+  padding: 4px 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 30px;
+}
+.status-active::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
 }
 .status-paused {
-  background: #F1EFE8;
-  color: #5F5E5A;
-  font-family: var(--font-sans);
-  font-size: 11px;
+  background: var(--champagne-soft);
+  color: var(--champagne);
+  font-family: var(--font-ui);
+  font-size: 11.5px;
   font-weight: 500;
-  padding: 3px 9px;
-  display: inline-block;
-  border-radius: 3px;
+  padding: 4px 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 30px;
+}
+.status-paused::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--champagne);
+  flex-shrink: 0;
 }
 .status-learning {
-  background: #E6F1FB;
-  color: #0C447C;
-  font-family: var(--font-sans);
-  font-size: 11px;
+  background: rgba(127, 168, 217, 0.12);
+  color: var(--blue);
+  font-family: var(--font-ui);
+  font-size: 11.5px;
   font-weight: 500;
-  padding: 3px 9px;
-  display: inline-block;
-  border-radius: 3px;
+  padding: 4px 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 30px;
+}
+.status-learning::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  flex-shrink: 0;
+}
+.status-draft {
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 4px 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 30px;
+}
+.status-draft::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--text-3);
+  flex-shrink: 0;
 }
 
 /* ── Objective tags ── */
@@ -416,9 +457,9 @@ input, textarea, select {
    METRIC CARDS
    ============================================================ */
 .metric-card {
-  background: var(--color-surface-secondary);
-  border: none;
-  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  padding: 15px 17px;
   border-radius: var(--radius-lg);
 }
 
@@ -870,40 +911,22 @@ input, textarea, select {
 }
 
 /* ============================================================
-   SIDEBAR DARK SCOPE
-   Override variables inside .sidebar to keep it dark
-   even though the global tokens are now light
+   FORM ELEMENTS — theme-aware
    ============================================================ */
-.sidebar {
-  --app-bg:            #0F0A07;
-  --app-surface:       #1C1208;
-  --app-surface-2:     #120C08;
-  --app-border:        #2a1a0e;
-  --app-border-subtle: #1e1208;
-  --text-primary:      #F5E6D8;
-  --text-secondary:    #C4A090;
-  --text-muted:        #8B6050;
-  --text-hint:         #6b4030;
-  --text-disabled:     #4a2e1e;
-  --color-text-primary:   #F5E6D8;
-  --color-text-secondary: #C4A090;
-  --color-text-tertiary:  #6b4030;
-  --color-border-default: #2a1a0e;
-}
-
-/* ============================================================
-   INLINE STYLE HELPERS — Light mode overrides for components
-   that hardcode dark rgba values
-   ============================================================ */
-
-/* Ensure inputs look right in light mode */
 input[type="text"], input[type="email"], input[type="password"],
 input[type="number"], input[type="date"], input[type="url"],
 textarea, select {
-  color: var(--color-text-primary);
-  background: var(--color-surface-primary);
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border);
+}
+input::placeholder, textarea::placeholder { color: var(--text-3); }
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 /* Scrollbar in content area */
-.main-content ::-webkit-scrollbar-track { background: var(--color-surface-secondary); }
-.main-content ::-webkit-scrollbar-thumb { background: var(--color-border-default); }
+.main-content ::-webkit-scrollbar-track { background: var(--surface-2); }
+.main-content ::-webkit-scrollbar-thumb { background: var(--border); }

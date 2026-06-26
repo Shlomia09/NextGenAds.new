@@ -8,10 +8,24 @@
   --font-display: 'Fraunces', serif;
   --font-ui:      'Inter', -apple-system, sans-serif;
   --font-mono:    'JetBrains Mono', monospace;
-
-  /* Legacy aliases — keep for components that haven't been updated yet */
+  /* Legacy */
   --font-serif: var(--font-display);
   --font-sans:  var(--font-ui);
+
+  /* ── Radius ── */
+  --radius:      9px;
+  --radius-sm:   6px;
+  --radius-lg:   13px;
+  --radius-xl:   16px;
+  --radius-full: 30px;
+
+  /* ── Elevation ── */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.1);
+  --shadow:    0 2px 8px rgba(0,0,0,0.15);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
+
+  /* ── Motion ── */
+  --transition: 0.15s ease;
 }
 
 /* ============================================================
@@ -49,47 +63,59 @@
   --red-soft:       rgba(217, 119, 107, 0.12);
   --blue:           #7FA8D9;
 
-  /* Logo gradient — constant across themes */
   --logo-grad: linear-gradient(135deg, #E3A88E, #C97B5E);
 
-  /* ── Legacy aliases (map old names → new tokens) ── */
-  --bg-page:              var(--bg);
-  --bg-card:              var(--surface);
-  --bg-secondary:         var(--surface-2);
-  --bg-selected:          var(--accent-soft);
-  --bg-hover:             var(--surface-hover);
-  --border-strong:        var(--border);
-  --text-1:               var(--text);
-  --text-muted:           var(--text-3);
-  --copper:               var(--accent);
-  --rose-gold:            var(--accent);
-  --rose-gold-light:      var(--accent-soft);
-  --rose-gold-dark:       var(--accent-deep);
-  --positive:             var(--green);
-  --positive-bg:          var(--green-soft);
-  --positive-text:        var(--green);
-  --negative:             var(--red);
-  --negative-bg:          var(--red-soft);
-  --negative-text:        var(--red);
-  --sidebar-bg:           var(--bg-sidebar);
-  --sidebar-active:       var(--accent);
-  --app-bg:               var(--bg);
-  --app-surface:          var(--surface);
-  --app-surface-2:        var(--surface-2);
-  --app-border:           var(--border);
-  --app-border-subtle:    var(--border-soft);
-  --text-primary:         var(--text);
-  --text-secondary:       var(--text-2);
-  --text-hint:            var(--text-3);
-  --text-disabled:        var(--text-3);
-  --color-text-primary:   var(--text);
-  --color-text-secondary: var(--text-2);
-  --color-text-tertiary:  var(--text-3);
-  --color-surface-primary:   var(--surface);
-  --color-surface-secondary: var(--surface-2);
-  --color-border-default:    var(--border);
-  --border-light:            var(--border-soft);
-  --border-rose:             var(--accent-deep);
+  /* ── All legacy aliases ── */
+  --rose:                  var(--accent);
+  --rose-dark:             var(--accent-deep);
+  --color-positive:        var(--green);
+  --color-negative:        var(--red);
+  --danger-bg:             var(--red-soft);
+  --warning:               var(--champagne);
+  --warning-bg:            var(--champagne-soft);
+  --success:               var(--green);
+  --danger:                var(--red);
+  --text-hint:             var(--text-3);
+  --color-border-subtle:   var(--border-soft);
+  --color-surface-brand:   var(--accent-soft);
+  --gold:                  var(--champagne);
+  --bg-page:               var(--bg);
+  --bg-card:               var(--surface);
+  --bg-secondary:          var(--surface-2);
+  --bg-selected:           var(--accent-soft);
+  --bg-hover:              var(--surface-hover);
+  --border-strong:         var(--border);
+  --border-light:          var(--border-soft);
+  --border-rose:           var(--accent-deep);
+  --text-1:                var(--text);
+  --text-muted:            var(--text-3);
+  --copper:                var(--accent);
+  --rose-gold:             var(--accent);
+  --rose-gold-light:       var(--accent-soft);
+  --rose-gold-dark:        var(--accent-deep);
+  --positive:              var(--green);
+  --positive-bg:           var(--green-soft);
+  --positive-text:         var(--green);
+  --negative:              var(--red);
+  --negative-bg:           var(--red-soft);
+  --negative-text:         var(--red);
+  --sidebar-bg:            var(--bg-sidebar);
+  --sidebar-active:        var(--accent);
+  --app-bg:                var(--bg);
+  --app-surface:           var(--surface);
+  --app-surface-2:         var(--surface-2);
+  --app-border:            var(--border);
+  --app-border-subtle:     var(--border-soft);
+  --text-primary:          var(--text);
+  --text-secondary:        var(--text-2);
+  --text-hint:             var(--text-3);
+  --text-disabled:         var(--text-3);
+  --color-text-primary:    var(--text);
+  --color-text-secondary:  var(--text-2);
+  --color-text-tertiary:   var(--text-3);
+  --color-surface-primary:    var(--surface);
+  --color-surface-secondary:  var(--surface-2);
+  --color-border-default:     var(--border);
 }
 
 /* ============================================================
@@ -109,7 +135,6 @@
   --text-2:         #8A7F74;
   --text-3:         #ABA197;
 
-  /* Accent — darker rose-gold for contrast on white */
   --accent:         #BC6A48;
   --accent-deep:    #9E5436;
   --accent-soft:    #F7EBE3;
@@ -124,42 +149,55 @@
 
   --logo-grad: linear-gradient(135deg, #E3A88E, #C97B5E);
 
-  /* ── Legacy aliases ── */
-  --bg-page:              var(--bg);
-  --bg-card:              var(--surface);
-  --bg-secondary:         var(--surface-2);
-  --bg-selected:          var(--accent-soft);
-  --bg-hover:             var(--surface-hover);
-  --border-strong:        var(--border);
-  --text-1:               var(--text);
-  --text-muted:           var(--text-3);
-  --copper:               var(--accent);
-  --rose-gold:            var(--accent);
-  --rose-gold-light:      var(--accent-soft);
-  --rose-gold-dark:       var(--accent-deep);
-  --positive:             var(--green);
-  --positive-bg:          var(--green-soft);
-  --positive-text:        var(--green);
-  --negative:             var(--red);
-  --negative-bg:          var(--red-soft);
-  --negative-text:        var(--red);
-  --sidebar-bg:           var(--bg-sidebar);
-  --sidebar-active:       var(--accent);
-  --app-bg:               var(--bg);
-  --app-surface:          var(--surface);
-  --app-surface-2:        var(--surface-2);
-  --app-border:           var(--border);
-  --app-border-subtle:    var(--border-soft);
-  --text-primary:         var(--text);
-  --text-secondary:       var(--text-2);
-  --text-hint:            var(--text-3);
-  --text-disabled:        var(--text-3);
-  --color-text-primary:   var(--text);
-  --color-text-secondary: var(--text-2);
-  --color-text-tertiary:  var(--text-3);
-  --color-surface-primary:   var(--surface);
-  --color-surface-secondary: var(--surface-2);
-  --color-border-default:    var(--border);
-  --border-light:            var(--border-soft);
-  --border-rose:             var(--accent-deep);
+  /* ── All legacy aliases ── */
+  --rose:                  var(--accent);
+  --rose-dark:             var(--accent-deep);
+  --color-positive:        var(--green);
+  --color-negative:        var(--red);
+  --danger-bg:             var(--red-soft);
+  --warning:               var(--champagne);
+  --warning-bg:            var(--champagne-soft);
+  --success:               var(--green);
+  --danger:                var(--red);
+  --text-hint:             var(--text-3);
+  --color-border-subtle:   var(--border-soft);
+  --color-surface-brand:   var(--accent-soft);
+  --gold:                  var(--champagne);
+  --bg-page:               var(--bg);
+  --bg-card:               var(--surface);
+  --bg-secondary:          var(--surface-2);
+  --bg-selected:           var(--accent-soft);
+  --bg-hover:              var(--surface-hover);
+  --border-strong:         var(--border);
+  --border-light:          var(--border-soft);
+  --border-rose:           var(--accent-deep);
+  --text-1:                var(--text);
+  --text-muted:            var(--text-3);
+  --copper:                var(--accent);
+  --rose-gold:             var(--accent);
+  --rose-gold-light:       var(--accent-soft);
+  --rose-gold-dark:        var(--accent-deep);
+  --positive:              var(--green);
+  --positive-bg:           var(--green-soft);
+  --positive-text:         var(--green);
+  --negative:              var(--red);
+  --negative-bg:           var(--red-soft);
+  --negative-text:         var(--red);
+  --sidebar-bg:            var(--bg-sidebar);
+  --sidebar-active:        var(--accent);
+  --app-bg:                var(--bg);
+  --app-surface:           var(--surface);
+  --app-surface-2:         var(--surface-2);
+  --app-border:            var(--border);
+  --app-border-subtle:     var(--border-soft);
+  --text-primary:          var(--text);
+  --text-secondary:        var(--text-2);
+  --text-hint:             var(--text-3);
+  --text-disabled:         var(--text-3);
+  --color-text-primary:    var(--text);
+  --color-text-secondary:  var(--text-2);
+  --color-text-tertiary:   var(--text-3);
+  --color-surface-primary:    var(--surface);
+  --color-surface-secondary:  var(--surface-2);
+  --color-border-default:     var(--border);
 }
