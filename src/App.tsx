@@ -42,7 +42,7 @@ import Pricing from './pages/Pricing';
 import Audit from './pages/Audit';
 import MetaCallback from './pages/MetaCallback';
 import ShopifyCallback from './pages/ShopifyCallback';
-import CampaignWorkshop from './pages/CreativeStudio';
+import CampaignWorkshop from './pages/CampaignWorkshop';
 
 const queryClient = new QueryClient({
   defaultOptions: {
