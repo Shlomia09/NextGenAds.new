@@ -603,14 +603,17 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
 
   // ── Load draft into Wizard ────────────────────────────────
   const loadDraft = (draft: CampaignDraftRow) => {
-    const d = draft.draft_data as Partial<typeof form>;
-    setForm(prev => ({ ...prev, ...d, creativeFile: null, creativeUrl: d.creativeUrl ?? '' }));
+    const raw = draft.draft_data;
+    const savedStep = typeof raw.step === 'number' ? raw.step : 1;
+    const d = raw as Partial<typeof form>;
+    setForm(prev => ({ ...prev, ...d, creativeFile: null, creativeUrl: (d.creativeUrl ?? '') as string }));
     setDraftId(draft.id);
     setDraftSavedAt(draft.updated_at);
-    setStep((d.step as number) || 1);
+    setStep(savedStep);
     setStepKey(k => k + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
 
   // ── Publish a draft directly from the table ─────────────────
   const handlePublishDraft = async (draft: CampaignDraftRow) => {
