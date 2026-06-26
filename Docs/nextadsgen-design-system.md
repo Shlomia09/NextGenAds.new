@@ -538,3 +538,101 @@ your-repo/
 - [ ] עובד ב-dark וב-light?
 
 **רפרנס:** עקרונות פלט ה-AI חלים גם על מסך Intelligence (סעיף 18).
+
+
+---
+---
+
+# חלק ח' — מסך הבית (Dashboard Home) · v3
+*המסך הראשון אחרי לוגין. חייב לשדר "המערכת עובדת בשבילי כל הזמן" — הכי חי במערכת, לא הכי ריק.*
+
+## 37. עיקרון
+מסך הבית הוא לא דוח — הוא **עוזר אישי שמדווח מה קרה**. אם הוא ריק ("All caught up" באמצע מסך), זה משדר שהמערכת לא עושה כלום. כל אלמנט צריך לענות על "מה המערכת עשתה בשבילי?".
+
+## 38. מבנה (Bento Layout)
+רצועת welcome מלאה למעלה, ואז גריד 2 עמודות (1.6fr שמאל / 1fr ימין).
+
+**רצועת Welcome (מלאה):**
+- ברכה לפי שעה ("Good morning, [שם]") ב-Fraunces 26px + שורת תאריך.
+- **Today pulse** (מימin): כרטיס עם אייקon bolt — "The engine ran N optimizations today · est. €X saved". זה האלמנט הכי חשוב במסך.
+- זוהר רוז-גולד עדין בפינה.
+
+**עמודה שמאל (רחבה):**
+1. **Your accounts** — שורה לכל חשבון Meta: לוגו (ראשי תיבות), שם, מטא (קמפיינים/active), spend (accent) + leads (green). תומך 1–N חשבונות. אחד = שורה אחת נקייה.
+2. **Performance · 30 days** — גרף מגמה (סעיף 29.1).
+3. **Recent intelligence** — 3–4 שיחות AI אחרונות: אייקon sparkle, שאלה (מודגש), תקציר תשובה (שורה אחת), זמן. לחיץ.
+
+**עמודה ימin (צרה):**
+4. **Account health** — טבעת ציון (conic-gradient) + רש��מת מרכיבים (Cost efficiency / Lead volume / Creative freshness / Budget pacing) כל אחד עם דירוג צבעוני (green=טוב, amber=watch).
+5. **Needs your attention** — 2–3 כרטיסי פעולה: אייקon צבעוני (scale=green, watch=amber), כותרת, הסבר, ו-CTA ("Apply"/"Review"). הופך דוח לעוזר.
+6. **Top creative · [חודש]** — thumbnail (גרדי.ent כ-placeholder עד שיש תמונה אמיתית), תג "Winning", שם, מטריקות (CTR/leads/CPL), ושורת "outperforming because…".
+7. **Live activity** — timeline אנכי עם נקודות צבעוניות וקו מחבר: optimization applied / synced with Meta / new lead batch / benchmark refreshed + זמן. זה הדופק — מראה שהמערכת נושמת.
+
+## 39. כללים
+- כל כרטיס = רכיב מסעיף 5 (.card עם צל). אותם טוקנים, אותה טיפוגרפיה.
+- ה-Today pulse, Action items, ו-Live activity הם מה שמבדילים "מערכת חיה" מ"דוח סטטי" — חובה.
+- אם ללקוח חשבון אחד: סקשן Accounts מציג שורה אחת (לא להסתיר — זה עדיין מידע).
+- אם אין שיחות AI עדיין: empty state מזמין ("Ask your first question") עם כפתור, לא חלל ריק.
+- מספרים → Mono, כותרות → Fraunces, דירוגים צבעוניים לפי הפלטה.
+
+## 40. צ'קליסט מסך הבית
+- [ ] רצועת welcome עם today pulse (כמה המערכת עשתה היום)?
+- [ ] סקשן accounts (גם אם חשבון אחד)?
+- [ ] גרף מגמה?
+- [ ] Recent intelligence (שיחות AI)?
+- [ ] Account health עם ציון ומרכיבים?
+- [ ] Action items עם CTA?
+- [ ] Top creative ויזואלי?
+- [ ] Live activity timeline?
+- [ ] אין חלל ריק גדול? עובד dark+light?
+
+**רפרנס חי:** `Docs/nextadsgen-dashboard-home-v5.html`
+
+
+---
+---
+
+# חלק ט' — חוק-על: דאטה אמיתית בלבד (No Fake Data)
+*חל על כל מסך, כל רכיב, כל מספר במערכת. גובר על כל דבר אחר.*
+
+## 41. הכלל
+**אסור להציג נתון מומצא, hardcoded, או placeholder כאילו הוא אמיתי.** כל מספר, שם
+קמפיין, קריאטיב, ציון, או אירוע חייב להגיע ממקור הדאטה האמיתי (Meta API / Supabase).
+
+קבצי ה-HTML הרפרנס (v4, v5, drawer) משתמשים בנתוני דוגמה **רק כדי להראות עיצוב**.
+בקוד החי — אסור להעתיק את המספרים האלה. כל ערך מתחבר ל-state/endpoint אמיתי.
+
+## 42. מקור לכל אלמנט (Data Provenance)
+לכל אלמנט שמציג נתון, חייב להיות מקור ברור:
+
+| אלמנט | מקור הדאטה |
+|---|---|
+| KPI (spend/leads/CPL/CPM/CTR) | Meta Insights API → aggregation |
+| גרף מגמה 30 יום | Meta daily breakdown (time_increment=1) |
+| דונאט spend לפי קמפיין | סכום spend per campaign מהקמפיינים הקיימים |
+| Top creative | ad-level insights (ranked לפי המטריקה הנבחרת) |
+| Account health score | נוסחה על CPL/CTR/frequency/pacing מול בנצ'מרק |
+| Today's optimizations | לוג פעולות שהמערכת ביצעה (אם אין לוג — אין אלמנט) |
+| Recent intelligence | היסטוריית שיחות ה-AI מ-DB |
+| Live activity | feed אירועי מערכת (sync/import/optimization) |
+| תגי בנצ'מרק (X% better) | השוואה מול ה-9yr beauty dataset |
+
+## 43. כשאין נתון אמיתי — מה לעשות (סדר עדיפויות)
+1. **אם הנתון קיים אבל צריך חישוב** → לבנות את ה-aggregation/endpoint. לא לקצר עם dummy.
+2. **אם הנתון לא קיים עדיין ב-backend** → להציג **empty state** כן ("No optimizations logged
+   yet" / "Connect more data to unlock") — לא מספר מזויף, לא 0 מטעה.
+3. **אם פיצ'ר שלם עוד לא נתמך** → להסתיר את האלמנט או לסמן "Coming soon" במפורש,
+   לעולם לא להעמיד פנים שהוא עובד עם נתונים אמיתיים.
+4. **בכל ספק** → לעצור ולשאול את המשתמש מאיפה הנתון מגיע. לא לנחש.
+
+## 44. כלל לכל פרומט עתידי
+כל פרומט ל-Claude Code, לכל מסך, חייב לכלול את השורה:
+> "השתמש בדאטה אמיתי בלבד (Meta/Supabase). אל תעתיק מספרים מהרפרנס. נתון חסר →
+> empty state או עצור ושאל — אף פעם לא ערך מזויף."
+
+## 45. צ'קליסט No-Fake-Data
+- [ ] כל מספר במסך מתחבר ל-endpoint/state אמיתי?
+- [ ] אין אף ערך מהרפרנס שהועתק hardcoded לקוד החי?
+- [ ] לכל אלמנט יש מקור דאטה ידוע (טבלה בסעיף 42)?
+- [ ] איפה שאין נתון — empty state כן, לא מספר מזויף או 0 מטעה?
+- [ ] פיצ'רים לא-נתמכים מסומנים "Coming soon", לא מדמים עבודה אמיתית?
