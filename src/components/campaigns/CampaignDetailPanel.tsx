@@ -674,10 +674,10 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
               <ExternalLink size={11} />
               Ads Manager
             </a>
-            {/* §33: Expand/Collapse button (ti-arrows-diagonal equiv → Maximize2/Minimize2) */}
+            {/* §33: Expand/Collapse button */}
             <button
               onClick={() => setExpanded(prev => !prev)}
-              title={expanded ? 'Collapse' : 'Expand to 720px'}
+              title={expanded ? 'Collapse' : 'Expand to dual-column'}
               style={{
                 background: 'var(--surface-2)', border: '1px solid var(--border)',
                 borderRadius: 7, width: 30, height: 30,
@@ -701,176 +701,205 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
           </div>
         </div>
 
-        {/* Scrollable body — padding 22px (§33) */}
+        {/* ── Body: grid 2-col when expanded, single col when collapsed ── */}
         <div style={{
-          flex: 1, overflowY: 'auto',
-          padding: '22px 24px 32px',
-          display: 'flex', flexDirection: 'column', gap: 22,
+          flex: 1,
+          overflowY: expanded ? 'hidden' : 'auto',
+          display: expanded ? 'grid' : 'flex',
+          gridTemplateColumns: expanded ? '1fr 1fr' : undefined,
+          flexDirection: expanded ? undefined : 'column',
+          gap: expanded ? 0 : 22,
+          minHeight: 0,
         }}>
 
-          {/* ── Key Metrics grid ────────────────────────── */}
-          <div>
-            <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 12 }}>
-              Key Metrics
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
-              {/* Spend — hero metric */}
-              <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 11, padding: '13px 15px' }}>
-                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-2)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Spend</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(campaign.spend)}</div>
+          {/* ── LEFT column: data panels (Key Metrics, Benchmark, Signals, Details) ── */}
+          <div style={{
+            overflowY: expanded ? 'auto' : undefined,
+            padding: expanded ? '22px 20px 32px 24px' : '22px 24px 0px',
+            display: 'flex', flexDirection: 'column', gap: 22,
+            borderRight: expanded ? '1px solid var(--border-soft)' : 'none',
+          }}>
+
+            {/* Key Metrics */}
+            <div>
+              <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 12 }}>
+                Key Metrics
               </div>
-              {/* Impressions */}
-              <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Impressions</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>{formatNumber(campaign.impressions)}</div>
-              </div>
-              {/* Leads + CPL */}
-              {campaign.leads > 0 && <>
-                <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Leads</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(campaign.leads)}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
+                <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 11, padding: '13px 15px' }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-2)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Spend</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(campaign.spend)}</div>
                 </div>
                 <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CPL</div>
-                  <div style={{
-                    fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, marginTop: 0,
-                    color: campaign.cpl < (bench.cpl || 32) ? 'var(--green)' : 'var(--champagne)',
-                  }}>{formatCurrency(campaign.cpl)}</div>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Impressions</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>{formatNumber(campaign.impressions)}</div>
                 </div>
-              </>}
-              {/* ROAS + Revenue */}
-              {campaign.purchases > 0 && <>
+                {campaign.leads > 0 && <>
+                  <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Leads</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(campaign.leads)}</div>
+                  </div>
+                  <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CPL</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: campaign.cpl < (bench.cpl || 32) ? 'var(--green)' : 'var(--champagne)' }}>
+                      {formatCurrency(campaign.cpl)}
+                    </div>
+                  </div>
+                </>}
+                {campaign.purchases > 0 && <>
+                  <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>ROAS</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: campaign.roas >= 3 ? 'var(--green)' : 'var(--champagne)' }}>
+                      {campaign.roas.toFixed(2)}x
+                    </div>
+                  </div>
+                  <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Revenue</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatCurrency(campaign.revenue)}</div>
+                  </div>
+                </>}
                 <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>ROAS</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: campaign.roas >= 3 ? 'var(--green)' : 'var(--champagne)' }}>
-                    {campaign.roas.toFixed(2)}x
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CPM</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: cpm > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
+                    {cpm > 0 ? formatCurrency(cpm) : '—'}
                   </div>
                 </div>
                 <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Revenue</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatCurrency(campaign.revenue)}</div>
-                </div>
-              </>}
-              {/* CPM + CTR */}
-              <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CPM</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: cpm > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
-                  {cpm > 0 ? formatCurrency(cpm) : '—'}
-                </div>
-              </div>
-              <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CTR</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: ctr > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
-                  {ctr > 0 ? `${ctr.toFixed(2)}%` : '—'}
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CTR</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: ctr > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
+                    {ctr > 0 ? `${ctr.toFixed(2)}%` : '—'}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* ── vs Industry Benchmark (§35.2) ──────────── */}
-          {campaign.spend > 0 && (
-            <div>
-              <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 12 }}>
-                vs Industry Benchmark
+            {/* vs Industry Benchmark */}
+            {campaign.spend > 0 && (
+              <div>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 12 }}>
+                  vs Industry Benchmark
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+                  {campaign.cpl > 0 && bench.cpl  && <MetricVsBenchmark label="CPL"  value={campaign.cpl}   benchmark={bench.cpl}  unit="€/lead" higherIsBetter={false} />}
+                  {campaign.roas > 0 && bench.roas && <MetricVsBenchmark label="ROAS" value={campaign.roas}  benchmark={bench.roas} unit="x"     higherIsBetter format="multiplier" />}
+                  {cpm > 0 && bench.cpm            && <MetricVsBenchmark label="CPM"  value={cpm}            benchmark={bench.cpm}  unit="€/1k"  higherIsBetter={false} />}
+                  {ctr > 0 && bench.ctr            && <MetricVsBenchmark label="CTR"  value={ctr}            benchmark={bench.ctr}  unit="%"     higherIsBetter format="percent" />}
+                </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-                {campaign.cpl > 0 && bench.cpl  && <MetricVsBenchmark label="CPL"  value={campaign.cpl}   benchmark={bench.cpl}  unit="€/lead" higherIsBetter={false} />}
-                {campaign.roas > 0 && bench.roas && <MetricVsBenchmark label="ROAS" value={campaign.roas}  benchmark={bench.roas} unit="x"     higherIsBetter format="multiplier" />}
-                {cpm > 0 && bench.cpm            && <MetricVsBenchmark label="CPM"  value={cpm}            benchmark={bench.cpm}  unit="€/1k"  higherIsBetter={false} />}
-                {ctr > 0 && bench.ctr            && <MetricVsBenchmark label="CTR"  value={ctr}            benchmark={bench.ctr}  unit="%"     higherIsBetter format="percent" />}
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* ── Signals (§35.4) — CSS var colors ──────── */}
-          {campaign.spend > 0 && (campaign.cpl > 0 || ctr > 0) && (
-            <div>
+            {/* Signals */}
+            {campaign.spend > 0 && (campaign.cpl > 0 || ctr > 0) && (
+              <div>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>
+                  Signals
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                  {campaign.cpl > 0 && bench.cpl && campaign.cpl < bench.cpl * 0.8 && (
+                    <SignalAlert type="good">
+                      Excellent CPL — {Math.round((1 - campaign.cpl / bench.cpl) * 100)}% below benchmark. Consider scaling budget now.
+                    </SignalAlert>
+                  )}
+                  {campaign.cpl > 0 && bench.cpl && campaign.cpl > bench.cpl * 1.3 && (
+                    <SignalAlert type="warning">
+                      CPL {Math.round((campaign.cpl / bench.cpl - 1) * 100)}% above benchmark. Test new creatives or narrow the audience.
+                    </SignalAlert>
+                  )}
+                  {ctr > 0 && bench.ctr && ctr < bench.ctr * 0.7 && (
+                    <SignalAlert type="warning">
+                      CTR {ctr.toFixed(2)}% is below benchmark {bench.ctr}%. A creative refresh is needed.
+                    </SignalAlert>
+                  )}
+                  {cpm > 0 && bench.cpm && cpm > bench.cpm * 1.4 && (
+                    <SignalAlert type="error">
+                      CPM {formatCurrency(cpm)} is {Math.round((cpm / bench.cpm - 1) * 100)}% above benchmark. Audience may be too narrow.
+                    </SignalAlert>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Details */}
+            <div style={{ borderTop: '1px solid var(--border-soft)', paddingTop: 18 }}>
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>
-                Signals
+                Details
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                {campaign.cpl > 0 && bench.cpl && campaign.cpl < bench.cpl * 0.8 && (
-                  <SignalAlert type="good">
-                    Excellent CPL — {Math.round((1 - campaign.cpl / bench.cpl) * 100)}% below benchmark. Consider scaling budget now.
-                  </SignalAlert>
-                )}
-                {campaign.cpl > 0 && bench.cpl && campaign.cpl > bench.cpl * 1.3 && (
-                  <SignalAlert type="warning">
-                    CPL {Math.round((campaign.cpl / bench.cpl - 1) * 100)}% above benchmark. Test new creatives or narrow the audience.
-                  </SignalAlert>
-                )}
-                {ctr > 0 && bench.ctr && ctr < bench.ctr * 0.7 && (
-                  <SignalAlert type="warning">
-                    CTR {ctr.toFixed(2)}% is below benchmark {bench.ctr}%. A creative refresh is needed.
-                  </SignalAlert>
-                )}
-                {cpm > 0 && bench.cpm && cpm > bench.cpm * 1.4 && (
-                  <SignalAlert type="error">
-                    CPM {formatCurrency(cpm)} is {Math.round((cpm / bench.cpm - 1) * 100)}% above benchmark. Audience may be too narrow.
-                  </SignalAlert>
-                )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {[
+                  ['Campaign ID',      campaign.campaign_id_external],
+                  ['Last Sync',        new Date(campaign.synced_at).toLocaleString()],
+                  ['Start date',       campaign.date_start ? new Date(campaign.date_start).toLocaleDateString() : '—'],
+                  ['Daily Budget',     campaign.budget_daily     ? formatCurrency(campaign.budget_daily)     : '—'],
+                  ['Lifetime Budget',  campaign.budget_lifetime  ? formatCurrency(campaign.budget_lifetime)  : '—'],
+                ].map(([k, v]) => (
+                  <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                    <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>{k}</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-2)', textAlign: 'right' }}>{v}</span>
+                  </div>
+                ))}
               </div>
             </div>
-          )}
 
-          {/* ── Generate AI Analysis CTA (§34: dark text on accent) ── */}
-          <button
-            onClick={() => setActionMsg('Please give me a full performance analysis of this campaign with specific recommendations. Use ## What\'s working and ## What to fix sections with bullet points.')}
-            style={{
-              background: 'var(--accent)',
-              color: '#2A1A12',        /* §34: dark-ink text on rose-gold */
-              borderRadius: 10,
-              width: '100%',
-              fontFamily: 'var(--font-ui)',
-              fontSize: 13, fontWeight: 500,
-              padding: '12px 16px',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 7,
-              transition: 'background 0.15s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-deep)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent)')}
-          >
-            {/* Icon also dark (§34) */}
-            <Sparkles size={14} color="#2A1A12" />
-            Generate AI Analysis
-          </button>
+          </div>{/* /LEFT column */}
 
-          {/* ── Quick Actions (§35.5) ────────────────── */}
-          <QuickActions campaign={campaign} onAction={msg => setActionMsg(msg)} />
+          {/* ── RIGHT column: AI section ─────────────────────────────────── */}
+          {/* Collapsed: appears below left as normal flow.                   */}
+          {/* Expanded: sits right of left col, independently scrollable,    */}
+          {/*           slightly darker background to visually separate.      */}
+          <div style={{
+            overflowY: expanded ? 'auto' : undefined,
+            padding: expanded ? '22px 24px 32px 20px' : '0 24px 32px',
+            display: 'flex', flexDirection: 'column', gap: 20,
+            background: expanded ? 'var(--surface-2)' : 'transparent',
+          }}>
 
-          {/* ── Campaign Chat (§35.6) ────────────────── */}
-          <CampaignChat campaign={campaign} initialMsg={actionMsg} />
+            {/* "AI Intelligence" label — only in expanded mode */}
+            {expanded && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                paddingBottom: 14, borderBottom: '1px solid var(--border-soft)',
+              }}>
+                <Sparkles size={13} style={{ color: 'var(--accent)' }} />
+                <span style={{
+                  fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500,
+                  color: 'var(--text-2)', letterSpacing: '0.5px',
+                }}>
+                  AI Intelligence
+                </span>
+              </div>
+            )}
 
-          {/* ── Details ──────────────────────────────── */}
-          <div style={{ borderTop: '1px solid var(--border-soft)', paddingTop: 18 }}>
-            <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>
-              Details
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {[
-                ['Campaign ID', campaign.campaign_id_external],
-                ['Last Sync',   new Date(campaign.synced_at).toLocaleString()],
-                ['Start date',  campaign.date_start ? new Date(campaign.date_start).toLocaleDateString() : '—'],
-                ['Daily Budget', campaign.budget_daily   ? formatCurrency(campaign.budget_daily)   : '—'],
-                ['Lifetime Budget', campaign.budget_lifetime ? formatCurrency(campaign.budget_lifetime) : '—'],
-              ].map(([k, v]) => (
-                <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                  <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>{k}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-2)', textAlign: 'right' }}>{v}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+            {/* Generate AI Analysis CTA — §34: dark text on accent */}
+            <button
+              onClick={() => setActionMsg("Please give me a full performance analysis of this campaign with specific recommendations. Use ## What's working and ## What to fix sections with bullet points.")}
+              style={{
+                background: 'var(--accent)', color: '#2A1A12',
+                borderRadius: 10, width: '100%',
+                fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 500,
+                padding: '12px 16px', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 7, transition: 'background 0.15s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-deep)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent)')}
+            >
+              <Sparkles size={14} color="#2A1A12" />
+              Generate AI Analysis
+            </button>
 
-        </div>
-      </div>
+            {/* Quick Actions */}
+            <QuickActions campaign={campaign} onAction={msg => setActionMsg(msg)} />
+
+            {/* Campaign Chat */}
+            <CampaignChat campaign={campaign} initialMsg={actionMsg} />
+
+          </div>{/* /RIGHT column */}
+
+        </div>{/* /Body */}
+      </div>{/* /Drawer panel */}
     </>
   );
 };
 
 export default CampaignDetailPanel;
+
