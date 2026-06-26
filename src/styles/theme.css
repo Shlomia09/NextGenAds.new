@@ -1,203 +1,222 @@
 /* ============================================================
    NextAdsGen Design System v2.0
    Beauty-Tech · Campaign Intelligence Platform
+   Source of truth: Docs/nextadsgen-design-system.md §2 + §27
+   Reference impl: Docs/nextadsgen-dashboard-v4.html
    ============================================================ */
 
-/* ── Fonts ── */
+/* ── Shared: fonts, radius, motion (theme-independent) ── */
 :root {
   --font-display: 'Fraunces', serif;
   --font-ui:      'Inter', -apple-system, sans-serif;
   --font-mono:    'JetBrains Mono', monospace;
-  /* Legacy */
+  /* Legacy aliases */
   --font-serif: var(--font-display);
   --font-sans:  var(--font-ui);
 
-  /* ── Radius ── */
   --radius:      9px;
   --radius-sm:   6px;
   --radius-lg:   13px;
   --radius-xl:   16px;
   --radius-full: 30px;
 
-  /* ── Elevation ── */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.1);
-  --shadow:    0 2px 8px rgba(0,0,0,0.15);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
-
-  /* ── Motion ── */
   --transition: 0.15s ease;
 }
 
 /* ============================================================
-   DARK THEME (default)
+   DARK THEME (default) — §2.1 + §27 expanded
    ============================================================ */
 :root,
 [data-theme="dark"] {
   /* Surfaces */
   --bg:             #0E0C0B;
   --bg-sidebar:     #0A0908;
-  --surface:        #161312;
-  --surface-2:      #1B1716;
-  --surface-hover:  #201B19;
+  --surface:        #1A1614;
+  --surface-2:      #221B18;
+  --surface-hover:  #241D1A;
 
   /* Borders */
-  --border:         #262120;
-  --border-soft:    #1C1918;
+  --border:         #2E2724;
+  --border-soft:    #231D1B;
 
   /* Text */
-  --text:           #F1EBE4;
-  --text-2:         #8A817A;
-  --text-3:         #675F58;
+  --text:           #F4EEE8;
+  --text-2:         #9A9089;
+  --text-3:         #6B635B;
 
-  /* Accent — Rose Gold */
+  /* Accent — Rose Gold (brand color) */
   --accent:         #E3A88E;
   --accent-deep:    #C97B5E;
-  --accent-soft:    rgba(227, 168, 142, 0.10);
+  --accent-soft:    rgba(227, 168, 142, 0.12);
 
-  /* Semantic */
+  /* Semantic colors §2.1 + §27 palette */
   --green:          #6BBF8A;
-  --green-soft:     rgba(107, 191, 138, 0.12);
+  --green-soft:     rgba(107, 191, 138, 0.14);
+
+  --blue:           #8FB0D9;
+  --blue-soft:      rgba(143, 176, 217, 0.14);
+
+  --amber:          #D9B06A;
+  --amber-soft:     rgba(217, 176, 106, 0.14);
+
   --champagne:      #C99A6A;
-  --champagne-soft: rgba(201, 154, 106, 0.10);
+  --champagne-soft: rgba(201, 154, 106, 0.12);
+
   --red:            #D9776B;
   --red-soft:       rgba(217, 119, 107, 0.12);
-  --blue:           #7FA8D9;
 
+  /* Chart & elevation §27 */
+  --shadow:  0 6px 22px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.025) inset;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+  --grid:    rgba(255, 255, 255, 0.05);
+
+  /* Logo gradient — constant */
   --logo-grad: linear-gradient(135deg, #E3A88E, #C97B5E);
 
   /* ── All legacy aliases ── */
-  --rose:                  var(--accent);
-  --rose-dark:             var(--accent-deep);
-  --color-positive:        var(--green);
-  --color-negative:        var(--red);
-  --danger-bg:             var(--red-soft);
-  --warning:               var(--champagne);
-  --warning-bg:            var(--champagne-soft);
-  --success:               var(--green);
-  --danger:                var(--red);
-  --text-hint:             var(--text-3);
-  --color-border-subtle:   var(--border-soft);
-  --color-surface-brand:   var(--accent-soft);
-  --gold:                  var(--champagne);
-  --bg-page:               var(--bg);
-  --bg-card:               var(--surface);
-  --bg-secondary:          var(--surface-2);
-  --bg-selected:           var(--accent-soft);
-  --bg-hover:              var(--surface-hover);
-  --border-strong:         var(--border);
-  --border-light:          var(--border-soft);
-  --border-rose:           var(--accent-deep);
-  --text-1:                var(--text);
-  --text-muted:            var(--text-3);
-  --copper:                var(--accent);
-  --rose-gold:             var(--accent);
-  --rose-gold-light:       var(--accent-soft);
-  --rose-gold-dark:        var(--accent-deep);
-  --positive:              var(--green);
-  --positive-bg:           var(--green-soft);
-  --positive-text:         var(--green);
-  --negative:              var(--red);
-  --negative-bg:           var(--red-soft);
-  --negative-text:         var(--red);
-  --sidebar-bg:            var(--bg-sidebar);
-  --sidebar-active:        var(--accent);
-  --app-bg:                var(--bg);
-  --app-surface:           var(--surface);
-  --app-surface-2:         var(--surface-2);
-  --app-border:            var(--border);
-  --app-border-subtle:     var(--border-soft);
-  --text-primary:          var(--text);
-  --text-secondary:        var(--text-2);
-  --text-hint:             var(--text-3);
-  --text-disabled:         var(--text-3);
-  --color-text-primary:    var(--text);
-  --color-text-secondary:  var(--text-2);
-  --color-text-tertiary:   var(--text-3);
-  --color-surface-primary:    var(--surface);
-  --color-surface-secondary:  var(--surface-2);
-  --color-border-default:     var(--border);
+  --rose:                    var(--accent);
+  --rose-dark:               var(--accent-deep);
+  --success:                 var(--green);
+  --danger:                  var(--red);
+  --warning:                 var(--champagne);
+  --color-positive:          var(--green);
+  --color-negative:          var(--red);
+  --danger-bg:               var(--red-soft);
+  --warning-bg:              var(--champagne-soft);
+  --gold:                    var(--champagne);
+  --text-1:                  var(--text);
+  --text-hint:               var(--text-3);
+  --text-muted:              var(--text-3);
+  --text-primary:            var(--text);
+  --text-secondary:          var(--text-2);
+  --text-disabled:           var(--text-3);
+  --color-text-primary:      var(--text);
+  --color-text-secondary:    var(--text-2);
+  --color-text-tertiary:     var(--text-3);
+  --bg-page:                 var(--bg);
+  --bg-card:                 var(--surface);
+  --bg-secondary:            var(--surface-2);
+  --bg-selected:             var(--accent-soft);
+  --bg-hover:                var(--surface-hover);
+  --border-strong:           var(--border);
+  --border-light:            var(--border-soft);
+  --border-rose:             var(--accent-deep);
+  --copper:                  var(--accent);
+  --rose-gold:               var(--accent);
+  --rose-gold-light:         var(--accent-soft);
+  --rose-gold-dark:          var(--accent-deep);
+  --positive:                var(--green);
+  --positive-bg:             var(--green-soft);
+  --positive-text:           var(--green);
+  --negative:                var(--red);
+  --negative-bg:             var(--red-soft);
+  --negative-text:           var(--red);
+  --sidebar-bg:              var(--bg-sidebar);
+  --sidebar-active:          var(--accent);
+  --app-bg:                  var(--bg);
+  --app-surface:             var(--surface);
+  --app-surface-2:           var(--surface-2);
+  --app-border:              var(--border);
+  --app-border-subtle:       var(--border-soft);
+  --color-surface-primary:   var(--surface);
+  --color-surface-secondary: var(--surface-2);
+  --color-border-default:    var(--border);
+  --color-border-subtle:     var(--border-soft);
+  --color-surface-brand:     var(--accent-soft);
 }
 
 /* ============================================================
-   LIGHT THEME
+   LIGHT THEME — §2.2 + §27 expanded
    ============================================================ */
 [data-theme="light"] {
-  --bg:             #FAF7F3;
+  --bg:             #F7F3EE;
   --bg-sidebar:     #FFFFFF;
   --surface:        #FFFFFF;
-  --surface-2:      #FBF8F4;
-  --surface-hover:  #F5EFE8;
+  --surface-2:      #FBF7F2;
+  --surface-hover:  #F4EDE5;
 
-  --border:         #EBE3DA;
-  --border-soft:    #F0EAE2;
+  --border:         #EAE1D6;
+  --border-soft:    #F0E9E0;
 
   --text:           #211C18;
-  --text-2:         #8A7F74;
+  --text-2:         #857A6F;
   --text-3:         #ABA197;
 
   --accent:         #BC6A48;
   --accent-deep:    #9E5436;
-  --accent-soft:    #F7EBE3;
+  --accent-soft:    #F6E8DF;
 
   --green:          #3D8A5E;
-  --green-soft:     #E8F2EB;
+  --green-soft:     #E7F1EA;
+
+  --blue:           #4E79A8;
+  --blue-soft:      #E9EFF6;
+
+  --amber:          #B5852F;
+  --amber-soft:     #F5EEDF;
+
   --champagne:      #A9763C;
-  --champagne-soft: #F6EEE2;
+  --champagne-soft: #F5EDE1;
+
   --red:            #C0503F;
   --red-soft:       #F8E9E6;
-  --blue:           #3E6FA3;
+
+  --shadow:  0 8px 24px rgba(120,90,70,0.10), 0 1px 2px rgba(120,90,70,0.05);
+  --shadow-sm: 0 2px 8px rgba(120,90,70,0.06);
+  --shadow-lg: 0 16px 40px rgba(120,90,70,0.16);
+  --grid:    rgba(120, 90, 70, 0.08);
 
   --logo-grad: linear-gradient(135deg, #E3A88E, #C97B5E);
 
   /* ── All legacy aliases ── */
-  --rose:                  var(--accent);
-  --rose-dark:             var(--accent-deep);
-  --color-positive:        var(--green);
-  --color-negative:        var(--red);
-  --danger-bg:             var(--red-soft);
-  --warning:               var(--champagne);
-  --warning-bg:            var(--champagne-soft);
-  --success:               var(--green);
-  --danger:                var(--red);
-  --text-hint:             var(--text-3);
-  --color-border-subtle:   var(--border-soft);
-  --color-surface-brand:   var(--accent-soft);
-  --gold:                  var(--champagne);
-  --bg-page:               var(--bg);
-  --bg-card:               var(--surface);
-  --bg-secondary:          var(--surface-2);
-  --bg-selected:           var(--accent-soft);
-  --bg-hover:              var(--surface-hover);
-  --border-strong:         var(--border);
-  --border-light:          var(--border-soft);
-  --border-rose:           var(--accent-deep);
-  --text-1:                var(--text);
-  --text-muted:            var(--text-3);
-  --copper:                var(--accent);
-  --rose-gold:             var(--accent);
-  --rose-gold-light:       var(--accent-soft);
-  --rose-gold-dark:        var(--accent-deep);
-  --positive:              var(--green);
-  --positive-bg:           var(--green-soft);
-  --positive-text:         var(--green);
-  --negative:              var(--red);
-  --negative-bg:           var(--red-soft);
-  --negative-text:         var(--red);
-  --sidebar-bg:            var(--bg-sidebar);
-  --sidebar-active:        var(--accent);
-  --app-bg:                var(--bg);
-  --app-surface:           var(--surface);
-  --app-surface-2:         var(--surface-2);
-  --app-border:            var(--border);
-  --app-border-subtle:     var(--border-soft);
-  --text-primary:          var(--text);
-  --text-secondary:        var(--text-2);
-  --text-hint:             var(--text-3);
-  --text-disabled:         var(--text-3);
-  --color-text-primary:    var(--text);
-  --color-text-secondary:  var(--text-2);
-  --color-text-tertiary:   var(--text-3);
-  --color-surface-primary:    var(--surface);
-  --color-surface-secondary:  var(--surface-2);
-  --color-border-default:     var(--border);
+  --rose:                    var(--accent);
+  --rose-dark:               var(--accent-deep);
+  --success:                 var(--green);
+  --danger:                  var(--red);
+  --warning:                 var(--champagne);
+  --color-positive:          var(--green);
+  --color-negative:          var(--red);
+  --danger-bg:               var(--red-soft);
+  --warning-bg:              var(--champagne-soft);
+  --gold:                    var(--champagne);
+  --text-1:                  var(--text);
+  --text-hint:               var(--text-3);
+  --text-muted:              var(--text-3);
+  --text-primary:            var(--text);
+  --text-secondary:          var(--text-2);
+  --text-disabled:           var(--text-3);
+  --color-text-primary:      var(--text);
+  --color-text-secondary:    var(--text-2);
+  --color-text-tertiary:     var(--text-3);
+  --bg-page:                 var(--bg);
+  --bg-card:                 var(--surface);
+  --bg-secondary:            var(--surface-2);
+  --bg-selected:             var(--accent-soft);
+  --bg-hover:                var(--surface-hover);
+  --border-strong:           var(--border);
+  --border-light:            var(--border-soft);
+  --border-rose:             var(--accent-deep);
+  --copper:                  var(--accent);
+  --rose-gold:               var(--accent);
+  --rose-gold-light:         var(--accent-soft);
+  --rose-gold-dark:          var(--accent-deep);
+  --positive:                var(--green);
+  --positive-bg:             var(--green-soft);
+  --positive-text:           var(--green);
+  --negative:                var(--red);
+  --negative-bg:             var(--red-soft);
+  --negative-text:           var(--red);
+  --sidebar-bg:              var(--bg-sidebar);
+  --sidebar-active:          var(--accent);
+  --app-bg:                  var(--bg);
+  --app-surface:             var(--surface);
+  --app-surface-2:           var(--surface-2);
+  --app-border:              var(--border);
+  --app-border-subtle:       var(--border-soft);
+  --color-surface-primary:   var(--surface);
+  --color-surface-secondary: var(--surface-2);
+  --color-border-default:    var(--border);
+  --color-border-subtle:     var(--border-soft);
+  --color-surface-brand:     var(--accent-soft);
 }

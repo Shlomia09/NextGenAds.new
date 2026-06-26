@@ -1,6 +1,6 @@
 import React from 'react';
-import { ExternalLink } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
+import { Search, Mail, Bell, ExternalLink } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 // ── KPI Strip icons (inline SVG) ──────────────────────────────
 const EuroIcon   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M14.5 7.5a5 5 0 1 0 0 9"/><path d="M6 10h8M6 14h8"/></svg>;
@@ -21,70 +21,167 @@ interface TopbarProps {
   title?:          string;
 }
 
-const CONV_BADGE: Record<string, { bg: string; color: string; label: string }> = {
-  leads:     { bg: '#FAEEDA', color: '#633806', label: 'Leads'     },
-  ecommerce: { bg: '#E6F1FB', color: '#0C447C', label: 'eCommerce' },
-  bookings:  { bg: '#EAF3DE', color: '#27500A', label: 'Bookings'  },
+/** Derive two-letter initials from a Supabase user email.
+ *  'john.doe@example.com' → 'JD'
+ *  Fallback: first two chars of the local part, uppercased.
+ */
+function getInitials(email: string | undefined): string {
+  if (!email) return '??';
+  const local = email.split('@')[0];
+  const parts = local.split('.');
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return local.slice(0, 2).toUpperCase();
+}
+
+// ── Inline styles (all CSS variables, no hex except avatar gradient) ──────────
+
+const topbarStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 16,
+  padding: '13px 28px',
+  borderBottom: '1px solid var(--border)',
+  background: 'var(--bg)',
 };
 
-const Topbar: React.FC<TopbarProps> = ({ kpis, conversionType, title }) => {
-  const conv = conversionType ? CONV_BADGE[conversionType] : null;
+const searchPillStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 9,
+  padding: '9px 16px',
+  borderRadius: 30,
+  border: '1px solid var(--border)',
+  background: 'var(--surface)',
+  maxWidth: 360,
+  flex: 1,
+};
+
+const searchInputStyle: React.CSSProperties = {
+  border: 'none',
+  outline: 'none',
+  background: 'transparent',
+  color: 'var(--text)',
+  fontFamily: 'var(--font-ui)',
+  fontSize: 13,
+  width: '100%',
+};
+
+const topRightStyle: React.CSSProperties = {
+  marginLeft: 'auto',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 18,
+  flexShrink: 0,
+};
+
+const iconBtnStyle: React.CSSProperties = {
+  position: 'relative' as const,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: 'var(--text-2)',
+  textDecoration: 'none',
+  cursor: 'pointer',
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  lineHeight: 1,
+};
+
+const badgeDotStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: -1,
+  right: -1,
+  width: 6,
+  height: 6,
+  borderRadius: '50%',
+  background: 'var(--accent)',
+};
+
+const adsManagerLinkStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 5,
+  fontFamily: 'var(--font-ui)',
+  fontSize: 12,
+  color: 'var(--text-2)',
+  textDecoration: 'none',
+  transition: 'color 0.15s',
+  whiteSpace: 'nowrap' as const,
+};
+
+const avatarStyle: React.CSSProperties = {
+  width: 30,
+  height: 30,
+  borderRadius: '50%',
+  background: 'linear-gradient(135deg, #E3A88E, #C97B5E)',
+  color: '#2A1A12',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontFamily: 'var(--font-ui)',
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: '0.02em',
+  flexShrink: 0,
+  cursor: 'default',
+  userSelect: 'none' as const,
+};
+
+// ── Component ──────────────────────────────────────────────────────────────────
+
+const Topbar: React.FC<TopbarProps> = ({ kpis, conversionType: _conversionType, title: _title }) => {
+  const { user } = useAuth();
+  const initials = getInitials(user?.email);
 
   return (
     <div style={{ flexShrink: 0, zIndex: 10 }}>
-      {/* ── Main bar 44px ── */}
-      <div style={{
-        height: 44,
-        background: 'var(--bg-card)',
-        borderBottom: '0.5px solid var(--border)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 20px',
-        gap: 12,
-      }}>
-        {/* Left: optional page title */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {title && (
-            <span style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 15,
-              fontWeight: 400,
-              color: 'var(--text-1)',
-            }}>
-              {title}
-            </span>
-          )}
+      {/* ── Main bar ── */}
+      <div style={topbarStyle}>
+        {/* Search pill */}
+        <div style={searchPillStyle}>
+          <Search size={14} color="var(--text-3)" strokeWidth={2} />
+          <input
+            style={searchInputStyle}
+            placeholder="Search campaigns, brands…"
+            aria-label="Search campaigns, brands"
+          />
         </div>
 
-        {/* Right: Conversion badge + Ads Manager + ThemeToggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-          {conv && (
-            <span style={{
-              background: conv.bg, color: conv.color,
-              fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 500,
-              padding: '3px 10px', borderRadius: 20,
-            }}>
-              {conv.label}
-            </span>
-          )}
+        {/* Right cluster */}
+        <div style={topRightStyle}>
+          {/* Mail */}
+          <span style={iconBtnStyle} aria-label="Messages">
+            <Mail size={18} strokeWidth={1.75} />
+            <span style={badgeDotStyle} />
+          </span>
+
+          {/* Bell */}
+          <span style={iconBtnStyle} aria-label="Notifications">
+            <Bell size={18} strokeWidth={1.75} />
+            <span style={badgeDotStyle} />
+          </span>
+
+          {/* Ads Manager link */}
           <a
             href="https://adsmanager.facebook.com"
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 4,
-              fontFamily: 'var(--font-sans)', fontSize: 12,
-              color: 'var(--text-3)', textDecoration: 'none',
-              transition: 'color 0.15s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-2)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-3)')}
+            style={adsManagerLinkStyle}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-2)')}
+            aria-label="Open Ads Manager"
           >
-            <ExternalLink size={12} />
+            <ExternalLink size={13} strokeWidth={1.75} />
             Ads Manager
           </a>
-          <ThemeToggle placement="topbar" />
+
+          {/* Avatar */}
+          <div style={avatarStyle} title={user?.email ?? ''}>
+            {initials}
+          </div>
         </div>
       </div>
 
