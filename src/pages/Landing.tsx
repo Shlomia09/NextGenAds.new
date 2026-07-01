@@ -303,8 +303,9 @@ export default function Landing() {
           border-bottom:1px solid var(--border);padding:80px 48px;
         }
         .lp-stats-inner {
-          max-width:1100px;margin:0 auto;
-          display:grid;grid-template-columns:repeat(4,1fr);gap:30px;text-align:center;
+          max-width:700px;margin:0 auto;
+          /* 2 columns — performance stats removed until live-system data available (§56) */
+          display:grid;grid-template-columns:repeat(2,1fr);gap:30px;text-align:center;
         }
         .lp-stat .num {
           font-family:var(--font-display);font-weight:500;
@@ -510,30 +511,27 @@ export default function Landing() {
         </header>
 
         {/* ── STATS BAND ────────────────────────────────────────
-            [PLACEHOLDER NUMBERS — need sign-off before going live]
-            9 years = confirmed real
-            38% / 24/7 / ×3 = placeholder, to be replaced with verified data
+            Two factual stats only. Performance stats (CPL improvement, launch speed)
+            removed until verified data is available from live system.
+            // TODO: restore real performance stat once available from live system — see design-system §56
         ───────────────────────────────────────────────────────── */}
         <div className="lp-stats">
           <div className="lp-stats-inner">
+            {/* ✓ REAL — 9 years of beauty data is confirmed factual */}
             <div className="lp-stat reveal">
               <div className="num" data-count="9">0</div>
               <div className="lbl">Years of beauty benchmark data</div>
             </div>
+            {/* ✓ REAL — 24/7 is a system capability claim, not a measured outcome */}
             <div className="lp-stat reveal d1">
-              {/* [PLACEHOLDER] −38% CPL — verify before launch */}
-              <div className="num" data-count="38" data-suffix="%">0%</div>
-              <div className="lbl">Average drop in cost-per-lead*</div>
-            </div>
-            <div className="lp-stat reveal d2">
               <div className="num" data-count="24" data-suffix="/7">0</div>
               <div className="lbl">Always-on budget optimization</div>
             </div>
-            <div className="lp-stat reveal d3">
-              {/* [PLACEHOLDER] ×3 faster — verify before launch */}
-              <div className="num" data-count="3" data-prefix="×">×0</div>
-              <div className="lbl">Faster campaign launches*</div>
-            </div>
+            {/*
+              // TODO: restore real performance stat once available from live system — see design-system §56
+              // −38% CPL card was here — removed, unverified
+              // ×3 faster card was here — removed, unverified
+            */}
           </div>
         </div>
 

@@ -744,6 +744,21 @@ your-repo/
 
 **כשבודקים מסך חדש (Pricing / Onboarding / Billing):** חפשו את המילים free, trial, 60, ו-"Start free" — אם אחת מהן מופיעה, זה באג.
 
+### סטטוס מספרי ביצועים (Performance Stats)
+**אסור להחזיר מספרי ביצועים שיווקיים בלי אישור מפורש מהמשתמש.**
+
+| מספר | סטטוס | מה לעשות |
+|---|---|---|
+| "9 years of beauty data" | ✅ מאושר — עובדתי | נשאר בכל מסך |
+| "24/7 optimization" | ✅ מאושר — יכולת מערכת | נשאר בכל מסך |
+| "−38% CPL improvement" | ❌ הוסר — לא אומת | **לא להחזיר** בלי נתונים ממערכת חיה + אישור |
+| "×3 faster campaign launches" | ❌ הוסר — לא אומת | **לא להחזיר** בלי נתונים ממערכת חיה + אישור |
+
+**עדכון 2026-07-01:** שני ה-stat cards הביצועיים (CPL / speed) הוסרו מה-stats band ב-Landing.tsx.
+הגריד שונה מ-4 עמודות ל-2. קוד TODO מוסמן בקובץ: `// TODO: restore real performance stat once available from live system — see design-system §56`.
+כשיהיו נתונים ממערכת חיה — לפנות למשתמש לאישור לפני שמחזירים.
+
+
 ## 57. כלל שורת האמון (Trust Line) ליד כל CTA ראשי
 כל CTA ראשי (hero, CTA סופי, כפתור Pricing) חייב שורת אמון מתחתיו:
 
