@@ -724,3 +724,77 @@ your-repo/
 - [ ] כל הערך אמיתי (brands, reach, platform status) — לא מומצא?
 
 **רפרנס חי מעודכן:** `Docs/nextadsgen-workshop-v7.html` (מחליף את v6)
+
+
+---
+---
+
+# חלק י"ב — מודל עסקי, כללי קופי, ודף נחיתה (Landing Page)
+*חל על כל מסך ציבורי: Landing, Pricing, Onboarding, Settings/Billing. גובר על כל ניסוח אחר.*
+
+## 56. כללי מודל עסקי — מה מותר ומה אסור (Business Model Rules)
+**אלה כללים סופיים — לא placeholder, לא "נבדוק שוב". אסור לסטות מהם בשום מסך.**
+
+| כלל | מה מותר | מה אסור |
+|---|---|---|
+| CTA ראשי | "Get started" | "Start free" / "Try free" / "Free trial" / "Start for free" |
+| תקופת ערבות | 30 יום בדיוק | 60 יום / "30-60 days" / "money-back guarantee" בלי מספר |
+| מודל תשלום | תשלום מההתחלה | "Free plan" / freemium / tier חינמי |
+| ניסוח Guarantee | "30-day money-back guarantee" (hero: + "— no risk to try it") | כל שינוי במספר הימים |
+
+**כשבודקים מסך חדש (Pricing / Onboarding / Billing):** חפשו את המילים free, trial, 60, ו-"Start free" — אם אחת מהן מופיעה, זה באג.
+
+## 57. כלל שורת האמון (Trust Line) ליד כל CTA ראשי
+כל CTA ראשי (hero, CTA סופי, כפתור Pricing) חייב שורת אמון מתחתיו:
+
+**גרסה ארוכה** (hero, כפתור ראשי):
+```
+🛡 30-day money-back guarantee — no risk to try it
+```
+אייקון: שילד SVG `<path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6l8-4z"/>` + `<path d="M9 12l2 2 4-4"/>` (stroke, לא fill).
+צבע: --text-3 לטקסט, --accent לאייקון.
+
+**גרסה קצרה** (CTA סופי, Pricing):
+```
+🛡 30-day money-back guarantee
+```
+
+לא לפצל, לא לנסח מחדש, לא לשנות את המספר.
+
+## 58. מפרט דף הנחיתה (Landing Page)
+**רפרנס חי:** `Docs/nextadsgen-landing-cinematic-v2.html`
+**קומפוננטה:** `src/pages/Landing.tsx` (נתיב `/`)
+
+### מבנה
+1. **Nav דביק** — שקוף→blur+border בגלילה (scrollY > 40). CTA: "Get started" בלבד.
+2. **Hero** — badge + H1 Fraunces italic accent + תת-כותרת + 2 כפתורים + שורת trust (§57 גרסה ארוכה) + dashboard מרחף עם count-up.
+3. **Stats band** — 4 מספרים עם count-up on scroll (IntersectionObserver). **⚠️ הערה: −38% CPL ו-×3 faster = PLACEHOLDER — דורשים אישור לפני שהדף עולה לאוויר.**
+4. **Features grid** — 6 כרטיסים, hover lift (-6px).
+5. **How it works** — 4 שלבים scrollytelling, reveal on scroll.
+6. **CTA סופי** — זוהר + trust line (§57 גרסה קצרה).
+7. **Footer** — לוגו + copyright.
+
+### Slot לוידאו רקע (עתידי)
+הקוד מכיל בלוק `.hero-media` עם `<video>` מוסר בהערה (comment). **לא לממש עכשיו.**
+לאפשור בעתיד: בטל הערה מהבלוק, הוסף mp4 מ-Higgsfield, ה-overlay כבר קיים ב-CSS.
+
+### טיפוגרפיה ופונטים
+- **Fraunces** (display) — כותרות hero, section titles, feat h3
+- **Inter** (UI) — כל שאר הטקסט
+- **JetBrains Mono** (mono) — מספרי dashboard, count-up, stats
+
+### אנימציות (transform/opacity בלבד)
+- `lp-breathe` — גוהר hero נושם (9s ease-in-out infinite)
+- `lp-twinkle` — נצנוצי אור (6s ease-in-out infinite)
+- `lp-rise` — כניסת אלמנטים Hero (delay מדורג: .1s, .25s, .45s, .65s, .78s, .85s, 1.3s)
+- count-up — easeOut cubic (1400ms, קוד בתוך Landing.tsx)
+- reveal on scroll — `opacity + translateY(40px)` via IntersectionObserver
+
+## 59. צ'קליסט מודל עסקי (לבדוק בכל מסך ציבורי)
+- [ ] אין "free" / "trial" / "Start free" בשום מקום?
+- [ ] CTA ראשי = "Get started" בדיוק?
+- [ ] שורת trust ליד כל CTA ראשי (§57)?
+- [ ] ערבות = "30-day money-back guarantee" — לא 60, לא "30-60"?
+- [ ] Slot לוידאו מוכן אך כבוי (comment)?
+- [ ] מספרי stats שסומנו PLACEHOLDER — אושרו לפני פרסום?
+- [ ] Pricing / Onboarding / Billing — נבדקו מול צ'קליסט זה?
