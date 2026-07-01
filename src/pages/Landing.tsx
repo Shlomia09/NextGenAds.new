@@ -1,1087 +1,657 @@
-import React, { useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  ArrowRight, BarChart3, Zap, Target, Shield, Globe, Users, Menu, X,
-} from 'lucide-react';
-import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '../lib/supabase';
 
-/* ────────────────────────────────────────────
-   HERO TILE — dark panel campaign result card
-──────────────────────────────────────────── */
-const HeroTile: React.FC<{
-  brand: string; roas: string; revenue: string; spend: string; badge?: string;
-}> = ({ brand, roas, revenue, spend, badge }) => (
-  <div className="ht-tile">
-    {badge && <div className="ht-badge">{badge}</div>}
-    <div className="ht-roas">{roas}</div>
-    <div className="ht-row">
-      <div>
-        <div className="ht-val">{revenue}</div>
-        <div className="ht-lbl">Revenue</div>
-      </div>
-      <div>
-        <div className="ht-val dim">{spend}</div>
-        <div className="ht-lbl">Spend</div>
-      </div>
-    </div>
-    <div className="ht-brand">{brand}</div>
-  </div>
-);
+/* ─────────────────────────────────────────────────────────────
+   NextAdsGen — Cinematic Landing Page
+   Design-system: §56-58 (business model), reference: nextadsgen-landing-cinematic-v2.html
+   Rules:
+   • No "free" / "trial" anywhere — only "Get started"
+   • 30-day money-back guarantee (exact, not 60 days)
+   • Performance numbers (−38%, ×3) = placeholder, marked [PLACEHOLDER]
+   ───────────────────────────────────────────────────────────── */
 
-/* ────────────────────────────────────────────
-   CAMPAIGN CARD — showcase section
-──────────────────────────────────────────── */
-const CampaignCard: React.FC<{
-  flag: string; brand: string; category: string; roas: string;
-  revenue: string; spend: string; spend_label?: string; tag: string;
-}> = ({ flag, brand, category, roas, revenue, spend, tag }) => (
-  <div className="cc-card">
-    <div className="cc-image">
-      <div className="cc-image-inner" />
-      <div className="cc-tag">{tag}</div>
-    </div>
-    <div className="cc-body">
-      <div className="cc-flag-row"><span>{flag}</span> <span className="cc-cat">{category}</span></div>
-      <div className="cc-brand">{brand}</div>
-      <div className="cc-metrics">
-        <div><div className="cc-mval">{roas}</div><div className="cc-mlbl">ROAS</div></div>
-        <div><div className="cc-mval">{revenue}</div><div className="cc-mlbl">Revenue</div></div>
-        <div><div className="cc-mval dim">{spend}</div><div className="cc-mlbl">Spend</div></div>
-      </div>
-      <div className="cc-cta-row">
-        <span className="cc-benchmark-tag">↑ above benchmark</span>
-      </div>
-    </div>
-  </div>
-);
-
-/* ────────────────────────────────────────────
-   DIFFERENTIATOR CARD — dark section
-──────────────────────────────────────────── */
-const DiffCard: React.FC<{ icon: React.ReactNode; title: string; desc: string }> = ({ icon, title, desc }) => (
-  <div className="dc-card">
-    <div className="dc-icon">{icon}</div>
-    <div className="dc-title">{title}</div>
-    <p className="dc-desc">{desc}</p>
-  </div>
-);
-
-/* ────────────────────────────────────────────
-   TESTIMONIAL
-──────────────────────────────────────────── */
-const Testimonial: React.FC<{
-  initials: string; name: string; role: string; quote: string; roas: string;
-}> = ({ initials, name, role, quote, roas }) => (
-  <div className="tt-card">
-    <div className="tt-header">
-      <div className="tt-avatar">{initials}</div>
-      <div className="tt-meta">
-        <div className="tt-name">{name}</div>
-        <div className="tt-role">{role}</div>
-      </div>
-      <div className="tt-roas">{roas}</div>
-    </div>
-    <p className="tt-quote">"{quote}"</p>
-  </div>
-);
-
-/* ════════════════════════════════════════════
-   LANDING PAGE
-════════════════════════════════════════════ */
-const Landing: React.FC = () => {
-  const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  /* Auth form state */
-  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [authLoading, setAuthLoading] = useState(false);
-  const [authError, setAuthError] = useState('');
-
-  const handleEmailAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(''); setAuthLoading(true);
-    try {
-      const { error } = authMode === 'signin'
-        ? await signInWithEmail(email, password)
-        : await signUpWithEmail(email, password);
-      if (error) throw error;
-      navigate('/dashboard');
-    } catch (err: unknown) {
-      setAuthError(err instanceof Error ? err.message : 'Authentication failed');
-    } finally { setAuthLoading(false); }
+// ── Count-up animation ────────────────────────────────────────
+function countUp(el: HTMLElement) {
+  if (el.dataset.done) return;
+  el.dataset.done = '1';
+  const end  = parseFloat(el.dataset.count ?? '0');
+  const dec  = +(el.dataset.dec  ?? '0');
+  const pre  = el.dataset.prefix  ?? '';
+  const suf  = el.dataset.suffix  ?? '';
+  const dur  = 1400;
+  const t0   = performance.now();
+  const tick = (t: number) => {
+    const p   = Math.min((t - t0) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const val  = (end * ease).toFixed(dec);
+    el.textContent = pre + (dec ? val : Math.round(+val).toLocaleString()) + suf;
+    if (p < 1) requestAnimationFrame(tick);
   };
+  requestAnimationFrame(tick);
+}
 
-  const handleGoogle = async () => {
-    setAuthError('');
-    try {
-      const { error } = await signInWithGoogle();
-      if (error) throw error;
-    } catch (err: unknown) {
-      setAuthError(err instanceof Error ? err.message : 'Google sign-in failed');
-    }
+export default function Landing() {
+  const navigate   = useNavigate();
+  const navRef     = useRef<HTMLElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  /* Nav scroll effect */
+  useEffect(() => {
+    const onScroll = () => {
+      if (navRef.current)
+        navRef.current.classList.toggle('scrolled', window.scrollY > 40);
+    };
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  /* Scroll-reveal via IntersectionObserver */
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          (e.target as HTMLElement).querySelectorAll<HTMLElement>('[data-count]')
+            .forEach(countUp);
+        }
+      }),
+      { threshold: 0.2 },
+    );
+    document.querySelectorAll<HTMLElement>('.reveal')
+      .forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  /* Hero count-up fires 900 ms after page load */
+  useEffect(() => {
+    const t = setTimeout(() => {
+      previewRef.current?.querySelectorAll<HTMLElement>('[data-count]')
+        .forEach(countUp);
+    }, 900);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleGetStarted = () => navigate('/login');
+  const handleHowItWorks = () => {
+    document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div className="lp">
-
-      {/* ════ NAV ════ */}
-      <nav className="lp-nav">
-        <div className="lp-nav-logo">Next<em>Gen</em>Ads</div>
-
-        <div className={`lp-nav-center ${menuOpen ? 'open' : ''}`}>
-          <a href="#platform" onClick={() => setMenuOpen(false)}>Platform</a>
-          <a href="#benchmarks" onClick={() => setMenuOpen(false)}>Benchmark Data</a>
-          <a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
-          <button className="btn btn-primary" onClick={() => { navigate('/login'); setMenuOpen(false); }}>
-            Get Access
-          </button>
-        </div>
-
-        <button className="lp-hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
-          {menuOpen ? <X size={18} strokeWidth={1.5} /> : <Menu size={18} strokeWidth={1.5} />}
-        </button>
-      </nav>
-
-      {/* ════ HERO ════ */}
-      <section className="lp-hero" id="platform">
-        {/* Left */}
-        <div className="lp-hero-left">
-          <div className="lp-eyebrow">Beauty & Cosmetics Intelligence</div>
-          <h1 className="lp-hero-h1">
-            Launch like you've<br />
-            run ads for<br />
-            <em>nine years</em>
-          </h1>
-          <p className="lp-hero-sub">
-            NextGenAds layers 9 years of proprietary Beauty & Cosmetics benchmark data on your campaigns — so you know what works before you spend a single euro.
-          </p>
-          <div className="lp-hero-ctas">
-            <button className="btn btn-primary btn-lg" onClick={() => navigate('/login')}>
-              Request Early Access
-              <ArrowRight size={14} strokeWidth={1.5} />
-            </button>
-            <button className="btn btn-outline btn-lg" onClick={() => navigate('/demo')}>
-              View Live Demo
-            </button>
-          </div>
-          <p className="lp-hero-note">No credit card required · Setup in 5 minutes</p>
-        </div>
-
-        {/* Right — dark tiles */}
-        <div className="lp-hero-right">
-          <div className="lp-hero-tiles">
-            <HeroTile brand="Skincare Launch · ES" roas="5.2x" revenue="€7,500" spend="€1.4K" badge="AOV €140" />
-            <HeroTile brand="Milano Collection · IT" roas="€7,300" revenue="€7,300" spend="€1.9K" />
-            <HeroTile brand="Market Entry · DE" roas="€280" revenue="€280" spend="€1.1K" badge="New Account" />
-            <HeroTile brand="Scaling Phase · NL" roas="-0.2x" revenue="vs bench" spend="€2.1K" />
-          </div>
-        </div>
-      </section>
-
-      {/* ════ STATS BAR ════ */}
-      <section className="lp-stats">
-        {[
-          { num: '9yr',   lbl: 'Benchmark Dataset' },
-          { num: '500%',  lbl: 'Avg ROAS Improvement' },
-          { num: '€100+', lbl: 'Average AOV' },
-          { num: '3',     lbl: 'AI Models Active' },
-        ].map(({ num, lbl }) => (
-          <div key={lbl} className="lp-stat">
-            <div className="lp-stat-num">{num}</div>
-            <div className="lp-stat-lbl">{lbl}</div>
-          </div>
-        ))}
-      </section>
-
-      {/* ════ CAMPAIGN SHOWCASE ════ */}
-      <section className="lp-section" id="benchmarks">
-        <div className="lp-sh-header">
-          <div className="lp-eyebrow-light">Real Results</div>
-          <h2 className="lp-sh-title">
-            Campaigns built on<br /><em>benchmark intelligence</em>
-          </h2>
-          <p className="lp-sh-sub">
-            Real campaigns powered by 9 years of Beauty & Cosmetics data — not guesswork, not generic advice.
-          </p>
-        </div>
-        <div className="lp-cc-grid">
-          <CampaignCard flag="🇪🇸" brand="Luxury Skincare Launch" category="Skincare · Spain" roas="5.8x" revenue="€7.5K" spend="€1.3K" tag="AOV-FIRST FUNNEL" />
-          <CampaignCard flag="🇮🇹" brand="Cosmetic Collection" category="Cosmetics · Italy" roas="3.8x" revenue="€4.2K" spend="€1.1K" tag="BRAND FIRST" />
-          <CampaignCard flag="🇩🇪" brand="DE Market Entry" category="Anti-aging · Germany" roas="4.4x" revenue="€3.4K" spend="€800" tag="BENCHMARK TO LAUNCH" />
-        </div>
-      </section>
-
-      {/* ════ DIFFERENTIATORS (dark) ════ */}
-      <section className="lp-diff" id="platform-features">
-        <div className="lp-diff-inner">
-          <div className="lp-eyebrow-dark" style={{ justifyContent: 'center' }}>What sets us apart</div>
-          <h2 className="lp-diff-title">
-            Not just your data.<br /><em>Nine years of ours.</em>
-          </h2>
-          <div className="lp-diff-grid">
-            <DiffCard icon={<BarChart3 size={16} strokeWidth={1.5} />} title="Benchmark Intelligence" desc="Compare your ROAS, CAC, and CPM against 847 Beauty brands in real-time — not just your own history." />
-            <DiffCard icon={<Zap size={16} strokeWidth={1.5} />} title="Cold-Start Solved" desc="New account? Get recommendations immediately as if you had 9 years of data. No learning phase wasted." />
-            <DiffCard icon={<Target size={16} strokeWidth={1.5} />} title="Full Funnel Stack" desc="Meta → Google → Klaviyo. The complete multi-channel strategy for your exact AOV bracket." />
-            <DiffCard icon={<Shield size={16} strokeWidth={1.5} />} title="Human Approved" desc="AI recommendations, human execution. Every action requires your approval before anything runs." />
-            <DiffCard icon={<Globe size={16} strokeWidth={1.5} />} title="Market Intelligence" desc="Spain, Germany, Italy, Netherlands — market-specific insights built from real performance data." />
-            <DiffCard icon={<Users size={16} strokeWidth={1.5} />} title="AOV-First Logic" desc="€80 vs €300 AOV need completely different funnel strategies. We prescribe the right one automatically." />
-          </div>
-        </div>
-        <div className="lp-diff-separator">NextGenAds · Benchmark · your data</div>
-      </section>
-
-      {/* ════ TESTIMONIALS ════ */}
-      <section className="lp-testi-section">
-        <div className="lp-eyebrow-light" style={{ marginBottom: 10 }}>What beauty brands are saying</div>
-        <h2 className="lp-testi-title">
-          What beauty brands<br /><em>are saying</em>
-        </h2>
-        <div className="lp-testi-grid">
-          <Testimonial
-            initials="SM" name="Sofia M." role="CMO, Skincare Brand · Spain"
-            quote="I launched knowing NextGenAds had benchmark data from similar skincare brands in the ES market. The funnel they prescribed worked from day one — no wasted spend."
-            roas="5.8x" />
-          <Testimonial
-            initials="CR" name="Chiara R." role="Founder, Cosmetics Italia"
-            quote="I was running Trademark campaigns on a €200 AOV product. NextGenAds told me exactly why it wasn't working and fixed it in 24 hours."
-            roas="3.8x" />
-          <Testimonial
-            initials="AK" name="Anna K." role="Media Buyer, Anti-aging · DE"
-            quote="The market-specific benchmarks for Germany completely recalibrated our EU expansion. For every single euro for the market."
-            roas="4.4x" />
-        </div>
-      </section>
-
-      {/* ════ CTA + AUTH ════ */}
-      <section className="lp-bottom">
-        {/* Left — dark editorial */}
-        <div className="lp-bottom-left">
-          <div className="lp-eyebrow-dark" style={{ marginBottom: 16 }}>Early Access</div>
-          <h2 className="lp-bottom-title">
-            Intelligence built for brands<br />that build <em>iconic beauty</em>
-          </h2>
-          <p className="lp-bottom-sub">
-            Connect your Meta, Google and Klaviyo accounts. Get brand-level results and recommendations in minutes.
-          </p>
-          <div className="lp-bottom-stats">
-            {[
-              { n: '9yr',  l: 'Data' },
-              { n: '500%', l: 'ROI' },
-              { n: '5',    l: 'Min setup' },
-              { n: 'EU',   l: 'Focused' },
-            ].map(({ n, l }) => (
-              <div key={l} className="lp-bs">
-                <div className="lp-bs-num">{n}</div>
-                <div className="lp-bs-lbl">{l}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right — cream auth panel */}
-        <div className="lp-bottom-right">
-          <div className="lp-auth-box">
-            <div className="lp-auth-eyebrow">Early Access</div>
-            <h3 className="lp-auth-title">Sign in</h3>
-            <p className="lp-auth-sub">Connect your intelligence dashboard</p>
-
-            <button className="lp-google-btn" onClick={handleGoogle}>
-              <Globe size={14} strokeWidth={1.5} />
-              Continue with Google
-            </button>
-
-            <div className="lp-auth-or"><span>or</span></div>
-
-            <form onSubmit={handleEmailAuth} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div className="form-group">
-                <label className="form-label">Email</label>
-                <input className="form-input" type="email" placeholder="you@yourbrand.com"
-                  value={email} onChange={e => setEmail(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Password</label>
-                <input className="form-input" type="password" placeholder="••••••••"
-                  value={password} onChange={e => setPassword(e.target.value)} required />
-              </div>
-              {authError && (
-                <div className="lp-auth-error">{authError}</div>
-              )}
-              <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }} disabled={authLoading}>
-                {authLoading ? 'Please wait…' : authMode === 'signin' ? 'Sign In' : 'Create Account'}
-              </button>
-            </form>
-
-            <button className="lp-auth-toggle" onClick={() => setAuthMode(m => m === 'signin' ? 'signup' : 'signin')}>
-              {authMode === 'signin' ? "Don't have an account? Get started" : "Already have an account? Sign in"}
-            </button>
-            <p className="lp-auth-legal">By continuing you agree to our Terms of Service and Privacy Policy.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ════ FOOTER ════ */}
-      <footer className="lp-footer">
-        <div className="lp-footer-logo">Next<em>Gen</em>Ads</div>
-        <p className="lp-footer-copy">AI-powered campaign intelligence for Beauty & Cosmetics brands with high AOV.</p>
-        <div className="lp-footer-links">
-          <span>Privacy Policy</span>
-          <span>Terms of Service</span>
-          <span>Contact</span>
-        </div>
-        <p className="lp-footer-copy" style={{ marginTop: 8, fontFamily: 'var(--font-mono)', fontSize: 9, opacity: 0.5 }}>
-          © 2024 NextGenAds · 9-year Beauty benchmark dataset
-        </p>
-      </footer>
-
-      {/* ════ STYLES ════ */}
+    <>
+      {/* ── Inline CSS (matches reference exactly) ──────────── */}
       <style>{`
-        /* ─── Root ─── */
-        .lp {
-          font-family: var(--font-sans);
-          background: var(--bg-primary);
-          min-height: 100vh;
-          overflow-x: hidden;
+        :root {
+          --bg:#0B0A09;--bg2:#120F0D;--surface:#1A1614;--border:#2A2420;
+          --text:#F4EEE8;--text-2:#A39A91;--text-3:#6B635B;
+          --accent:#E3A88E;--accent-deep:#C97B5E;--accent-soft:rgba(227,168,142,0.12);
+          --green:#6BBF8A;
+          --font-display:'Fraunces',serif;
+          --font-ui:'Inter',sans-serif;
+          --font-mono:'JetBrains Mono',monospace;
         }
+        .lp-root { background:var(--bg); color:var(--text); font-family:var(--font-ui);
+                   -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+        .lp-root *{ box-sizing:border-box; margin:0; padding:0; }
+        .lp-root ::selection{ background:var(--accent); color:#2A1A12; }
 
-        /* ─── Nav ─── */
+        /* ── NAV ─────────────────────────────────────────────── */
         .lp-nav {
-          position: sticky; top: 0; z-index: 200;
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 0 48px; height: 54px;
-          background: rgba(253,246,240,0.94);
-          backdrop-filter: blur(14px);
-          border-bottom: 0.5px solid var(--border-light);
+          position:fixed;top:0;left:0;right:0;z-index:100;
+          display:flex;align-items:center;justify-content:space-between;
+          padding:20px 48px;transition:.4s;backdrop-filter:blur(0px);
         }
+        .lp-nav.scrolled {
+          background:rgba(11,10,9,0.72);backdrop-filter:blur(16px);
+          border-bottom:1px solid var(--border);padding:14px 48px;
+        }
+        .lp-logo { display:flex;align-items:center;gap:11px;text-decoration:none; }
+        .lp-logo-mark {
+          width:36px;height:36px;border-radius:10px;
+          background:linear-gradient(135deg,#E3A88E,#C97B5E);
+          display:flex;align-items:center;justify-content:center;
+          color:#2A1A12;font-family:var(--font-display);font-weight:600;font-size:19px;
+          box-shadow:0 4px 16px rgba(201,123,94,0.4);flex-shrink:0;
+        }
+        .lp-logo-name { font-size:18px;font-weight:500;letter-spacing:.2px;color:var(--text); }
+        .lp-logo-name em { color:var(--accent);font-style:normal; }
+        .lp-nav-links { display:flex;align-items:center;gap:34px; }
+        .lp-nav-links a { color:var(--text-2);text-decoration:none;font-size:14px;transition:.2s; }
+        .lp-nav-links a:hover { color:var(--text); }
+        .lp-nav-cta {
+          background:var(--accent);color:#2A1A12;padding:10px 20px;
+          border-radius:30px;font-size:14px;font-weight:500;text-decoration:none;
+          transition:.2s;cursor:pointer;border:none;
+        }
+        .lp-nav-cta:hover { background:var(--accent-deep);transform:translateY(-1px); }
 
-        .lp-nav-logo {
-          font-family: 'Playfair Display', serif;
-          font-size: 18px; font-weight: 400;
-          color: var(--text-primary);
-          letter-spacing: 0.02em;
-          flex-shrink: 0;
-        }
-        .lp-nav-logo em { font-style: italic; color: var(--rose-gold); }
-
-        .lp-nav-center {
-          display: flex; align-items: center; gap: 32px;
-        }
-        .lp-nav-center a {
-          font-family: 'Outfit', sans-serif;
-          font-size: 12px; font-weight: 300;
-          letter-spacing: 0.06em;
-          color: var(--text-secondary);
-          text-decoration: none;
-          transition: color var(--transition);
-        }
-        .lp-nav-center a:hover { color: var(--text-primary); }
-
-        .lp-hamburger {
-          display: none;
-          background: none; border: none;
-          color: var(--text-primary);
-          cursor: pointer; padding: 4px;
-        }
-
-        /* ─── Hero ─── */
+        /* ── HERO ─────────────────────────────────────────────── */
         .lp-hero {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          min-height: calc(100vh - 54px);
+          min-height:100vh;display:flex;flex-direction:column;
+          align-items:center;justify-content:center;
+          text-align:center;position:relative;
+          padding:120px 24px 80px;overflow:hidden;
         }
 
-        .lp-hero-left {
-          padding: 72px 64px 72px 64px;
-          display: flex; flex-direction: column;
-          justify-content: center; gap: 0;
-          background: var(--bg-primary);
+        /* ── VIDEO SLOT (commented out — uncomment to enable) ──
+           .lp-hero-media { position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none; }
+           .lp-hero-media video { width:100%;height:100%;object-fit:cover;opacity:.55; }
+           .lp-hero-media::after { content:"";position:absolute;inset:0;
+             background:radial-gradient(circle at 50% 38%,transparent,rgba(11,10,9,0.55) 70%),
+                        linear-gradient(180deg,rgba(11,10,9,0.4),rgba(11,10,9,0.85)); }
+        ─────────────────────────────────────────────────────── */
+
+        /* Default: animated golden glow */
+        .lp-hero-glow {
+          position:absolute;width:1200px;height:1200px;border-radius:50%;
+          background:radial-gradient(circle,rgba(227,168,142,0.20),rgba(201,123,94,0.08) 40%,transparent 64%);
+          top:-46%;left:50%;transform:translateX(-50%);pointer-events:none;
+          animation:lp-breathe 9s ease-in-out infinite;z-index:1;
+        }
+        .lp-hero-glow::after {
+          content:"";position:absolute;inset:0;border-radius:50%;
+          background:radial-gradient(circle at 60% 60%,rgba(214,170,120,0.12),transparent 55%);
+        }
+        .lp-hero-grain {
+          position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.5;
+          background-image:
+            radial-gradient(1px 1px at 20% 30%,rgba(227,168,142,.5),transparent),
+            radial-gradient(1px 1px at 70% 20%,rgba(227,168,142,.4),transparent),
+            radial-gradient(1px 1px at 40% 70%,rgba(214,170,120,.5),transparent),
+            radial-gradient(1px 1px at 85% 60%,rgba(227,168,142,.35),transparent),
+            radial-gradient(1px 1px at 55% 45%,rgba(227,168,142,.45),transparent);
+          animation:lp-twinkle 6s ease-in-out infinite;
+        }
+        @keyframes lp-twinkle { 0%,100%{opacity:.35;} 50%{opacity:.7;} }
+        @keyframes lp-breathe {
+          0%,100%{opacity:.7;transform:translateX(-50%) scale(1);}
+          50%{opacity:1;transform:translateX(-50%) scale(1.08);}
         }
 
-        .lp-eyebrow {
-          font-family: 'Outfit', sans-serif;
-          font-size: 10px; font-weight: 400;
-          letter-spacing: 0.28em; text-transform: uppercase;
-          color: var(--rose-gold);
-          display: flex; align-items: center; gap: 10px;
-          margin-bottom: 20px;
+        .lp-badge {
+          display:inline-flex;align-items:center;gap:8px;
+          border:1px solid var(--border);background:rgba(26,22,20,0.6);
+          padding:8px 16px;border-radius:30px;font-size:12.5px;color:var(--text-2);
+          margin-bottom:30px;opacity:0;animation:lp-rise .9s .1s forwards;
+          position:relative;z-index:2;
         }
-        .lp-eyebrow::before {
-          content: ''; display: block;
-          width: 24px; height: 0.5px;
-          background: var(--rose-gold); flex-shrink: 0;
+        .lp-badge .pulse-dot {
+          width:7px;height:7px;border-radius:50%;background:var(--green);
+          box-shadow:0 0 0 3px rgba(107,191,138,0.2);flex-shrink:0;
         }
 
-        .lp-hero-h1 {
-          font-family: 'Playfair Display', serif;
-          font-size: clamp(36px, 4.5vw, 58px);
-          font-weight: 400; line-height: 1.1;
-          color: var(--text-primary);
-          letter-spacing: -0.02em;
-          margin: 0 0 22px;
+        .lp-hero h1 {
+          font-family:var(--font-display);font-weight:500;
+          font-size:clamp(42px,7vw,86px);line-height:1.02;letter-spacing:-2px;
+          max-width:14ch;opacity:0;animation:lp-rise 1s .25s forwards;
+          position:relative;z-index:2;
         }
-        .lp-hero-h1 em { font-style: italic; color: var(--rose-gold); }
+        .lp-hero h1 em { font-style:italic;color:var(--accent); }
+        .lp-hero p {
+          font-size:clamp(16px,2vw,20px);color:var(--text-2);max-width:52ch;
+          margin:28px auto 0;line-height:1.6;
+          opacity:0;animation:lp-rise 1s .45s forwards;
+          position:relative;z-index:2;
+        }
+        .lp-actions {
+          display:flex;gap:14px;margin-top:40px;
+          opacity:0;animation:lp-rise 1s .65s forwards;
+          flex-wrap:wrap;justify-content:center;position:relative;z-index:2;
+        }
+        .btn-primary {
+          background:var(--accent);color:#2A1A12;padding:15px 30px;
+          border-radius:30px;font-size:15px;font-weight:500;
+          text-decoration:none;transition:.2s;
+          display:inline-flex;align-items:center;gap:8px;
+          border:none;cursor:pointer;
+        }
+        .btn-primary:hover {
+          background:var(--accent-deep);transform:translateY(-2px);
+          box-shadow:0 12px 30px rgba(201,123,94,0.35);
+        }
+        .btn-ghost {
+          border:1px solid var(--border);color:var(--text);padding:15px 30px;
+          border-radius:30px;font-size:15px;font-weight:500;
+          text-decoration:none;transition:.2s;
+          display:inline-flex;align-items:center;gap:8px;
+          background:none;cursor:pointer;
+        }
+        .btn-ghost:hover { background:var(--surface);border-color:var(--accent); }
 
-        .lp-hero-sub {
-          font-family: 'Outfit', sans-serif;
-          font-size: 14px; font-weight: 300;
-          color: var(--text-secondary); line-height: 1.7;
-          max-width: 420px; margin-bottom: 32px;
-        }
+        @keyframes lp-rise { to{opacity:1;transform:translateY(0);} }
+        .lp-badge,.lp-hero h1,.lp-hero p,.lp-actions { transform:translateY(24px); }
 
-        .lp-hero-ctas {
-          display: flex; gap: 10px; flex-wrap: wrap;
-          margin-bottom: 14px;
+        .lp-guarantee {
+          display:flex;align-items:center;gap:8px;justify-content:center;
+          color:var(--text-3);font-size:12.5px;margin-top:20px;
+          opacity:0;animation:lp-rise 1s .78s forwards;
+          transform:translateY(16px);position:relative;z-index:2;
         }
+        .lp-guarantee svg { color:var(--accent);flex-shrink:0; }
 
-        .lp-hero-note {
-          font-family: 'Outfit', sans-serif;
-          font-size: 11px; font-weight: 300;
-          color: var(--text-hint); letter-spacing: 0.04em;
+        /* ── FLOATING DASHBOARD PREVIEW ──────────────────────── */
+        .lp-preview {
+          margin-top:64px;width:min(1000px,92vw);border-radius:18px;
+          border:1px solid var(--border);
+          background:linear-gradient(180deg,var(--surface),var(--bg2));
+          box-shadow:0 40px 100px rgba(0,0,0,0.6);overflow:hidden;
+          opacity:0;animation:lp-rise 1.2s .85s forwards;
+          position:relative;z-index:2;
         }
+        .lp-hp-bar { display:flex;gap:7px;padding:14px 18px;border-bottom:1px solid var(--border); }
+        .lp-hp-bar i { width:11px;height:11px;border-radius:50%;background:var(--border); }
+        .lp-hp-body { padding:26px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px; }
+        .lp-kpi { background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:left; }
+        .lp-kpi .l { font-size:9px;letter-spacing:1px;color:var(--text-3); }
+        .lp-kpi .v { font-family:var(--font-mono);font-size:22px;font-weight:500;margin-top:7px; }
+        .lp-kpi .v.a { color:var(--accent); }
+        .lp-kpi .v.g { color:var(--green); }
+        .lp-hp-chart {
+          grid-column:1/-1;height:120px;background:var(--bg2);
+          border:1px solid var(--border);border-radius:12px;
+          position:relative;overflow:hidden;
+        }
+        .lp-hp-chart svg { position:absolute;inset:0;width:100%;height:100%; }
 
-        /* Hero right */
-        .lp-hero-right {
-          background: #2C1810;
-          padding: 48px 40px;
-          display: flex; align-items: center; justify-content: center;
-          position: relative; overflow: hidden;
+        .lp-scroll-hint {
+          position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+          color:var(--text-3);font-size:11px;letter-spacing:2px;
+          display:flex;flex-direction:column;align-items:center;gap:9px;
+          opacity:0;animation:lp-rise 1s 1.3s forwards;z-index:2;
         }
-        .lp-hero-right::before {
-          content: '';
-          position: absolute; top: -80px; right: -80px;
-          width: 320px; height: 320px;
-          background: radial-gradient(circle, rgba(196,131,106,0.1) 0%, transparent 70%);
-          pointer-events: none;
+        .lp-mouse {
+          width:22px;height:34px;border:1.5px solid var(--text-3);border-radius:12px;position:relative;
         }
-
-        .lp-hero-tiles {
-          display: grid; grid-template-columns: 1fr 1fr;
-          gap: 10px; width: 100%; max-width: 460px;
-          position: relative; z-index: 1;
+        .lp-mouse::after {
+          content:"";position:absolute;top:6px;left:50%;transform:translateX(-50%);
+          width:3px;height:6px;border-radius:3px;background:var(--accent);
+          animation:lp-scroll 1.6s infinite;
         }
-
-        /* Hero tile */
-        .ht-tile {
-          background: linear-gradient(135deg, #3d2a1e 0%, #2C1810 100%);
-          border: 0.5px solid rgba(196,131,106,0.12);
-          border-radius: 6px; padding: 18px 16px;
-          display: flex; flex-direction: column; gap: 10px;
-          position: relative;
-          transition: border-color 0.2s;
-        }
-        .ht-tile:nth-child(2n) { background: linear-gradient(135deg, #2C1810 0%, #1a0e08 100%); }
-        .ht-tile:hover { border-color: rgba(196,131,106,0.3); }
-
-        .ht-badge {
-          position: absolute; top: 10px; right: 10px;
-          font-family: 'DM Mono', monospace;
-          font-size: 8px; font-weight: 500;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: #C4836A; background: rgba(196,131,106,0.12);
-          border: 0.5px solid rgba(196,131,106,0.25);
-          padding: 2px 6px; border-radius: 2px;
-        }
-
-        .ht-roas {
-          font-family: 'DM Mono', monospace;
-          font-size: 26px; font-weight: 500;
-          color: #C4836A; line-height: 1;
-        }
-
-        .ht-row { display: flex; gap: 16px; }
-        .ht-val {
-          font-family: 'DM Mono', monospace;
-          font-size: 13px; font-weight: 500;
-          color: #F5E6D8; line-height: 1;
-        }
-        .ht-val.dim { color: rgba(245,230,216,0.4); }
-
-        .ht-lbl {
-          font-family: 'Outfit', sans-serif;
-          font-size: 8px; font-weight: 300;
-          letter-spacing: 0.14em; text-transform: uppercase;
-          color: rgba(196,160,144,0.45); margin-top: 3px;
-        }
-
-        .ht-brand {
-          font-family: 'Outfit', sans-serif;
-          font-size: 10px; font-weight: 300;
-          color: rgba(196,160,144,0.4);
-          letter-spacing: 0.04em;
+        @keyframes lp-scroll {
+          0%{opacity:0;top:6px;} 40%{opacity:1;} 80%{opacity:0;top:16px;} 100%{opacity:0;}
         }
 
-        /* ─── Stats bar ─── */
+        /* ── REVEAL ──────────────────────────────────────────── */
+        .reveal {
+          opacity:0;transform:translateY(40px);
+          transition:opacity .9s cubic-bezier(.2,.7,.3,1),transform .9s cubic-bezier(.2,.7,.3,1);
+        }
+        .reveal.in { opacity:1;transform:none; }
+        .reveal.d1 { transition-delay:.1s; }
+        .reveal.d2 { transition-delay:.2s; }
+        .reveal.d3 { transition-delay:.3s; }
+
+        /* ── SECTIONS ─────────────────────────────────────────── */
+        .lp-section { padding:120px 48px;max-width:1200px;margin:0 auto; }
+        .eyebrow {
+          font-size:12px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;
+          margin-bottom:18px;display:flex;align-items:center;gap:10px;justify-content:center;
+        }
+        .eyebrow::before,.eyebrow::after { content:"";width:30px;height:1px;background:var(--border); }
+        .section-title {
+          font-family:var(--font-display);font-weight:500;
+          font-size:clamp(32px,5vw,56px);line-height:1.08;letter-spacing:-1px;
+          text-align:center;max-width:18ch;margin:0 auto;
+        }
+        .section-sub {
+          color:var(--text-2);font-size:17px;text-align:center;
+          max-width:54ch;margin:22px auto 0;line-height:1.6;
+        }
+
+        /* ── STATS ───────────────────────────────────────────── */
         .lp-stats {
-          background: #1a0e08;
-          display: flex; align-items: stretch;
+          background:var(--bg2);border-top:1px solid var(--border);
+          border-bottom:1px solid var(--border);padding:80px 48px;
+        }
+        .lp-stats-inner {
+          max-width:1100px;margin:0 auto;
+          display:grid;grid-template-columns:repeat(4,1fr);gap:30px;text-align:center;
+        }
+        .lp-stat .num {
+          font-family:var(--font-display);font-weight:500;
+          font-size:clamp(38px,5vw,60px);color:var(--accent);letter-spacing:-1.5px;line-height:1;
+        }
+        .lp-stat .lbl { color:var(--text-2);font-size:13.5px;margin-top:12px;letter-spacing:.3px; }
+
+        /* ── FEATURES ────────────────────────────────────────── */
+        .feat-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:64px; }
+        .feat {
+          background:var(--surface);border:1px solid var(--border);border-radius:18px;
+          padding:30px;transition:.3s;position:relative;overflow:hidden;
+        }
+        .feat:hover { transform:translateY(-6px);border-color:var(--accent);box-shadow:0 24px 50px rgba(0,0,0,0.4); }
+        .feat-ic {
+          width:50px;height:50px;border-radius:13px;background:var(--accent-soft);
+          display:flex;align-items:center;justify-content:center;
+          color:var(--accent);font-size:24px;margin-bottom:20px;
+        }
+        .feat h3 { font-family:var(--font-display);font-size:21px;font-weight:500;margin-bottom:11px; }
+        .feat p { color:var(--text-2);font-size:14.5px;line-height:1.65; }
+
+        /* ── STEPS / SCROLLYTELLING ──────────────────────────── */
+        .lp-steps { display:flex;flex-direction:column;gap:0;margin-top:60px; }
+        .step-row {
+          display:grid;grid-template-columns:1fr 1fr;gap:60px;
+          align-items:center;padding:60px 0;border-top:1px solid var(--border);
+        }
+        .step-row:nth-child(even) .step-visual { order:-1; }
+        .step-n { font-family:var(--font-mono);font-size:13px;color:var(--accent);margin-bottom:16px; }
+        .step-row h3 {
+          font-family:var(--font-display);font-size:clamp(26px,3.5vw,38px);
+          font-weight:500;line-height:1.15;letter-spacing:-.5px;
+        }
+        .step-row p { color:var(--text-2);font-size:16px;line-height:1.65;margin-top:16px;max-width:42ch; }
+        .step-visual {
+          height:280px;border-radius:18px;border:1px solid var(--border);
+          background:linear-gradient(160deg,var(--surface),var(--bg2));
+          display:flex;align-items:center;justify-content:center;
+          color:var(--accent);font-size:54px;position:relative;overflow:hidden;
+          box-shadow:0 24px 60px rgba(0,0,0,0.35);
+        }
+        .step-visual::after {
+          content:"";position:absolute;width:300px;height:300px;border-radius:50%;
+          background:radial-gradient(circle,var(--accent-soft),transparent 65%);
+          top:-30%;right:-20%;
         }
 
-        .lp-stat {
-          flex: 1; padding: 30px 20px;
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center; gap: 7px;
-          border-right: 0.5px solid #2C1810;
+        /* ── FINAL CTA ───────────────────────────────────────── */
+        .lp-cta-final { text-align:center;padding:140px 48px;position:relative;overflow:hidden; }
+        .lp-cta-final .glow {
+          position:absolute;width:900px;height:900px;border-radius:50%;
+          background:radial-gradient(circle,rgba(227,168,142,0.13),transparent 60%);
+          top:50%;left:50%;transform:translate(-50%,-50%);
         }
-        .lp-stat:last-child { border-right: none; }
-
-        .lp-stat-num {
-          font-family: 'DM Mono', monospace;
-          font-size: 30px; font-weight: 500;
-          color: #C4836A; line-height: 1;
+        .lp-cta-final h2 {
+          font-family:var(--font-display);font-weight:500;
+          font-size:clamp(34px,5.5vw,64px);letter-spacing:-1.5px;line-height:1.05;
+          max-width:16ch;margin:0 auto;position:relative;
         }
-        .lp-stat-lbl {
-          font-family: 'Outfit', sans-serif;
-          font-size: 9px; font-weight: 300;
-          letter-spacing: 0.16em; text-transform: uppercase;
-          color: #6B4A38; text-align: center;
+        .lp-cta-final h2 em { font-style:italic;color:var(--accent); }
+        .lp-cta-final p {
+          color:var(--text-2);font-size:18px;margin:24px auto 36px;
+          max-width:48ch;position:relative;
         }
 
-        /* ─── Section common ─── */
-        .lp-section {
-          padding: 80px 80px;
-          background: var(--bg-primary);
-        }
-
-        .lp-sh-header { margin-bottom: 44px; }
-
-        .lp-eyebrow-light {
-          font-family: 'Outfit', sans-serif;
-          font-size: 10px; font-weight: 400;
-          letter-spacing: 0.28em; text-transform: uppercase;
-          color: var(--text-muted);
-          display: flex; align-items: center; gap: 8px;
-          margin-bottom: 10px;
-        }
-        .lp-eyebrow-light::before {
-          content: ''; width: 20px; height: 0.5px;
-          background: var(--text-hint); flex-shrink: 0;
-        }
-
-        .lp-sh-title {
-          font-family: 'Playfair Display', serif;
-          font-size: clamp(28px, 3.5vw, 44px);
-          font-weight: 400; line-height: 1.15;
-          color: var(--text-primary); margin-bottom: 14px;
-        }
-        .lp-sh-title em { font-style: italic; color: var(--rose-gold); }
-
-        .lp-sh-sub {
-          font-family: 'Outfit', sans-serif;
-          font-size: 14px; font-weight: 300;
-          color: var(--text-secondary); line-height: 1.65;
-          max-width: 500px;
-        }
-
-        /* ─── Campaign cards grid ─── */
-        .lp-cc-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 14px;
-        }
-
-        .cc-card {
-          background: var(--bg-card);
-          border: 0.5px solid var(--border-light);
-          border-radius: 8px; overflow: hidden;
-          display: flex; flex-direction: column;
-          transition: box-shadow 0.2s, border-color 0.2s;
-        }
-        .cc-card:hover { box-shadow: var(--shadow); border-color: var(--rose-gold-pale); }
-
-        .cc-image {
-          height: 140px;
-          background: linear-gradient(135deg, #C4836A 0%, #8B5A42 40%, #2C1810 100%);
-          position: relative; overflow: hidden;
-        }
-        .cc-card:nth-child(2) .cc-image {
-          background: linear-gradient(135deg, #8B5A42 0%, #5d3520 40%, #2C1810 100%);
-        }
-        .cc-card:nth-child(3) .cc-image {
-          background: linear-gradient(135deg, #6B4030 0%, #3d2a1e 40%, #1a0e08 100%);
-        }
-        .cc-image-inner {
-          position: absolute; inset: 0;
-          background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.3) 100%);
-        }
-        .cc-tag {
-          position: absolute; bottom: 10px; right: 10px;
-          font-family: 'DM Mono', monospace;
-          font-size: 8px; font-weight: 500;
-          letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(245,230,216,0.8);
-          background: rgba(0,0,0,0.35);
-          border: 0.5px solid rgba(255,255,255,0.1);
-          backdrop-filter: blur(4px);
-          padding: 3px 7px; border-radius: 2px;
-        }
-
-        .cc-body { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
-
-        .cc-flag-row {
-          display: flex; align-items: center; gap: 6px;
-          font-size: 16px;
-        }
-        .cc-cat {
-          font-family: 'Outfit', sans-serif;
-          font-size: 11px; font-weight: 300; color: var(--text-muted);
-        }
-
-        .cc-brand {
-          font-family: 'Playfair Display', serif;
-          font-size: 16px; font-weight: 400; color: var(--text-primary);
-        }
-
-        .cc-metrics {
-          display: flex; gap: 18px;
-          padding: 10px 0;
-          border-top: 0.5px solid var(--border-light);
-          border-bottom: 0.5px solid var(--border-light);
-        }
-
-        .cc-mval {
-          font-family: 'DM Mono', monospace;
-          font-size: 14px; font-weight: 500; color: var(--text-primary);
-        }
-        .cc-mval.dim { color: var(--text-muted); }
-
-        .cc-mlbl {
-          font-family: 'Outfit', sans-serif;
-          font-size: 9px; font-weight: 300;
-          letter-spacing: 0.12em; text-transform: uppercase;
-          color: var(--text-hint); margin-top: 3px;
-        }
-
-        .cc-cta-row { display: flex; align-items: center; }
-        .cc-benchmark-tag {
-          font-family: 'DM Mono', monospace;
-          font-size: 10px; font-weight: 500;
-          color: var(--success);
-          display: flex; align-items: center; gap: 4px;
-        }
-
-        /* ─── Differentiators ─── */
-        .lp-diff {
-          background: #2C1810;
-          padding: 80px 80px 0;
-        }
-        .lp-diff-inner {
-          display: flex; flex-direction: column; align-items: center;
-          gap: 0;
-        }
-
-        .lp-eyebrow-dark {
-          font-family: 'Outfit', sans-serif;
-          font-size: 10px; font-weight: 400;
-          letter-spacing: 0.28em; text-transform: uppercase;
-          color: var(--rose-gold);
-          display: flex; align-items: center; gap: 10px;
-          margin-bottom: 16px;
-        }
-        .lp-eyebrow-dark::before {
-          content: ''; width: 20px; height: 0.5px;
-          background: var(--rose-gold); flex-shrink: 0;
-        }
-
-        .lp-diff-title {
-          font-family: 'Playfair Display', serif;
-          font-size: clamp(28px, 3.5vw, 44px);
-          font-weight: 400; line-height: 1.15;
-          color: #F5E6D8; text-align: center;
-          margin-bottom: 52px;
-        }
-        .lp-diff-title em { font-style: italic; color: var(--rose-gold); }
-
-        .lp-diff-grid {
-          display: grid; grid-template-columns: repeat(3, 1fr);
-          gap: 0; width: 100%;
-          border: 0.5px solid #3d2a1e;
-        }
-
-        .dc-card {
-          padding: 32px 28px;
-          border-right: 0.5px solid #3d2a1e;
-          border-bottom: 0.5px solid #3d2a1e;
-          display: flex; flex-direction: column; gap: 12px;
-          transition: background 0.2s;
-        }
-        .dc-card:hover { background: rgba(196,131,106,0.04); }
-        .dc-card:nth-child(3),
-        .dc-card:nth-child(6) { border-right: none; }
-        .dc-card:nth-child(4),
-        .dc-card:nth-child(5),
-        .dc-card:nth-child(6) { border-bottom: none; }
-
-        .dc-icon {
-          width: 34px; height: 34px;
-          background: rgba(196,131,106,0.1);
-          border-radius: 4px;
-          display: flex; align-items: center; justify-content: center;
-          color: #C4836A;
-        }
-        .dc-title {
-          font-family: 'Outfit', sans-serif;
-          font-size: 14px; font-weight: 500; color: #F5E6D8;
-        }
-        .dc-desc {
-          font-family: 'Outfit', sans-serif;
-          font-size: 12px; font-weight: 300;
-          color: #8B6050; line-height: 1.65;
-        }
-
-        .lp-diff-separator {
-          font-family: 'DM Mono', monospace;
-          font-size: 10px; font-weight: 400;
-          letter-spacing: 0.2em; text-transform: uppercase;
-          color: #4d3a2e;
-          text-align: center;
-          padding: 20px;
-          border-top: 0.5px solid #3d2a1e;
-          width: 100%; margin-top: 40px;
-        }
-
-        /* ─── Testimonials ─── */
-        .lp-testi-section {
-          padding: 80px 80px;
-          background: var(--bg-primary);
-        }
-
-        .lp-testi-title {
-          font-family: 'Playfair Display', serif;
-          font-size: clamp(28px, 3.5vw, 40px);
-          font-weight: 400; line-height: 1.2;
-          color: var(--text-primary); margin-bottom: 44px;
-        }
-        .lp-testi-title em { font-style: italic; color: var(--rose-gold); }
-
-        .lp-testi-grid {
-          display: grid; grid-template-columns: repeat(3, 1fr);
-          gap: 14px;
-        }
-
-        .tt-card {
-          background: var(--bg-card);
-          border: 0.5px solid var(--border-light);
-          border-radius: 8px; padding: 24px;
-          display: flex; flex-direction: column; gap: 16px;
-          transition: box-shadow 0.2s;
-        }
-        .tt-card:hover { box-shadow: var(--shadow-sm); }
-
-        .tt-header { display: flex; align-items: center; gap: 12px; }
-
-        .tt-avatar {
-          width: 38px; height: 38px; border-radius: 50%;
-          background: #2C1810;
-          display: flex; align-items: center; justify-content: center;
-          font-family: 'Playfair Display', serif;
-          font-size: 14px; font-weight: 400; color: #C4836A;
-          flex-shrink: 0;
-        }
-
-        .tt-name {
-          font-family: 'Outfit', sans-serif;
-          font-size: 13px; font-weight: 500; color: var(--text-primary);
-        }
-        .tt-role {
-          font-family: 'Outfit', sans-serif;
-          font-size: 11px; font-weight: 300; color: var(--text-muted);
-          margin-top: 1px;
-        }
-
-        .tt-roas {
-          margin-left: auto;
-          font-family: 'DM Mono', monospace;
-          font-size: 13px; font-weight: 500;
-          color: var(--rose-gold-dark);
-          background: var(--rose-gold-light);
-          border: 0.5px solid var(--border-rose);
-          padding: 3px 9px; border-radius: 2px;
-          flex-shrink: 0;
-        }
-
-        .tt-quote {
-          font-family: 'Playfair Display', serif;
-          font-style: italic; font-size: 14px; font-weight: 400;
-          color: var(--text-secondary); line-height: 1.65;
-        }
-
-        /* ─── Bottom CTA + Auth ─── */
-        .lp-bottom {
-          display: grid; grid-template-columns: 1.1fr 0.9fr;
-          min-height: 520px;
-        }
-
-        .lp-bottom-left {
-          background: #2C1810;
-          padding: 72px 64px;
-          display: flex; flex-direction: column;
-          justify-content: center; gap: 0;
-          position: relative; overflow: hidden;
-        }
-        .lp-bottom-left::before {
-          content: '';
-          position: absolute; bottom: -80px; left: -80px;
-          width: 280px; height: 280px;
-          background: radial-gradient(circle, rgba(196,131,106,0.07) 0%, transparent 70%);
-          pointer-events: none;
-        }
-
-        .lp-bottom-title {
-          font-family: 'Playfair Display', serif;
-          font-size: clamp(24px, 3vw, 38px);
-          font-weight: 400; line-height: 1.2; color: #F5E6D8;
-          margin-bottom: 16px;
-          position: relative; z-index: 1;
-        }
-        .lp-bottom-title em { font-style: italic; color: #C4836A; }
-
-        .lp-bottom-sub {
-          font-family: 'Outfit', sans-serif;
-          font-size: 13px; font-weight: 300; color: #8B6050;
-          line-height: 1.65; max-width: 380px;
-          margin-bottom: 36px; position: relative; z-index: 1;
-        }
-
-        .lp-bottom-stats {
-          display: flex; gap: 32px; flex-wrap: wrap;
-          position: relative; z-index: 1;
-        }
-
-        .lp-bs { display: flex; flex-direction: column; gap: 4px; }
-        .lp-bs-num {
-          font-family: 'DM Mono', monospace;
-          font-size: 22px; font-weight: 500; color: #F5E6D8; line-height: 1;
-        }
-        .lp-bs-lbl {
-          font-family: 'Outfit', sans-serif;
-          font-size: 9px; font-weight: 300;
-          letter-spacing: 0.14em; text-transform: uppercase; color: #7A5A48;
-        }
-
-        .lp-bottom-right {
-          background: var(--bg-primary);
-          display: flex; align-items: center; justify-content: center;
-          padding: 60px 40px;
-        }
-
-        .lp-auth-box {
-          width: 100%; max-width: 360px;
-          display: flex; flex-direction: column; gap: 16px;
-        }
-
-        .lp-auth-eyebrow {
-          font-family: 'Outfit', sans-serif;
-          font-size: 9px; font-weight: 400;
-          letter-spacing: 0.24em; text-transform: uppercase;
-          color: var(--rose-gold);
-          display: flex; align-items: center; gap: 8px;
-        }
-        .lp-auth-eyebrow::before {
-          content: ''; width: 16px; height: 0.5px;
-          background: var(--rose-gold);
-        }
-
-        .lp-auth-title {
-          font-family: 'Playfair Display', serif;
-          font-size: 22px; font-weight: 400; color: var(--text-primary);
-        }
-
-        .lp-auth-sub {
-          font-family: 'Outfit', sans-serif;
-          font-size: 12px; font-weight: 300; color: var(--text-muted);
-          margin-top: -8px;
-        }
-
-        .lp-google-btn {
-          display: flex; align-items: center; justify-content: center;
-          gap: 9px; width: 100%; padding: 11px 16px;
-          background: var(--bg-card);
-          border: 0.5px solid var(--border-light);
-          border-radius: var(--radius);
-          font-family: 'Outfit', sans-serif;
-          font-size: 12px; font-weight: 400; letter-spacing: 0.04em;
-          color: var(--text-primary); cursor: pointer;
-          transition: all var(--transition);
-        }
-        .lp-google-btn:hover {
-          border-color: var(--rose-gold-pale);
-          background: var(--bg-secondary);
-        }
-
-        .lp-auth-or {
-          display: flex; align-items: center; gap: 12px;
-          font-family: 'Outfit', sans-serif;
-          font-size: 11px; color: var(--text-hint);
-        }
-        .lp-auth-or::before, .lp-auth-or::after {
-          content: ''; flex: 1;
-          height: 0.5px; background: var(--border-light);
-        }
-
-        .lp-auth-error {
-          background: #FEE2E2;
-          border: 0.5px solid rgba(239,68,68,0.2);
-          border-radius: var(--radius);
-          padding: 9px 12px;
-          font-family: 'Outfit', sans-serif;
-          font-size: 12px; font-weight: 300; color: #991B1B;
-        }
-
-        .lp-auth-toggle {
-          background: none; border: none;
-          font-family: 'Outfit', sans-serif;
-          font-size: 12px; font-weight: 300;
-          color: var(--rose-gold); cursor: pointer;
-          text-align: center; text-decoration: underline;
-          text-underline-offset: 2px;
-          transition: color var(--transition);
-        }
-        .lp-auth-toggle:hover { color: var(--rose-gold-dark); }
-
-        .lp-auth-legal {
-          font-family: 'Outfit', sans-serif;
-          font-size: 10px; font-weight: 300;
-          color: var(--text-hint); text-align: center;
-          line-height: 1.5; letter-spacing: 0.02em;
-        }
-
-        /* ─── Footer ─── */
+        /* ── FOOTER ──────────────────────────────────────────── */
         .lp-footer {
-          background: #1a0e08;
-          padding: 40px 80px;
-          display: flex; flex-direction: column;
-          align-items: center; gap: 8px; text-align: center;
+          border-top:1px solid var(--border);padding:50px 48px;
+          display:flex;justify-content:space-between;align-items:center;
+          color:var(--text-3);font-size:13px;flex-wrap:wrap;gap:20px;
         }
 
-        .lp-footer-logo {
-          font-family: 'Playfair Display', serif;
-          font-size: 16px; font-weight: 400;
-          color: #C4A090; letter-spacing: 0.06em;
+        /* ── RESPONSIVE ──────────────────────────────────────── */
+        @media(max-width:860px){
+          .lp-nav,.lp-nav.scrolled{padding:14px 22px;}
+          .lp-nav-links{display:none;}
+          .lp-section{padding:80px 22px;}
+          .lp-stats{padding:60px 22px;}
+          .lp-stats-inner{grid-template-columns:repeat(2,1fr);gap:40px 20px;}
+          .feat-grid{grid-template-columns:1fr;}
+          .step-row{grid-template-columns:1fr;gap:30px;}
+          .step-row:nth-child(even) .step-visual{order:0;}
+          .lp-hp-body{grid-template-columns:repeat(2,1fr);}
+          .lp-cta-final{padding:80px 22px;}
+          .lp-footer{padding:36px 22px;flex-direction:column;text-align:center;}
         }
-        .lp-footer-logo em { font-style: italic; color: #C4836A; }
-
-        .lp-footer-copy {
-          font-family: 'Outfit', sans-serif;
-          font-size: 11px; font-weight: 300; color: #7A5A48;
-          letter-spacing: 0.04em; max-width: 400px; line-height: 1.5;
-        }
-
-        .lp-footer-links {
-          display: flex; gap: 24px; margin-top: 6px;
-        }
-        .lp-footer-links span {
-          font-family: 'Outfit', sans-serif;
-          font-size: 10px; font-weight: 300;
-          letter-spacing: 0.12em; text-transform: uppercase;
-          color: #7A5A48; cursor: pointer;
-          transition: color var(--transition);
-        }
-        .lp-footer-links span:hover { color: #C4A090; }
-
-        /* ════════════════════════════════════════
-           RESPONSIVE — Tablet (≤ 1100px)
-        ════════════════════════════════════════ */
-        @media (max-width: 1100px) {
-          .lp-nav { padding: 0 28px; }
-          .lp-nav-center { display: none; flex-direction: column; position: fixed;
-            top: 54px; left: 0; right: 0; background: var(--bg-primary);
-            border-bottom: 0.5px solid var(--border-light);
-            padding: 20px 28px; gap: 16px; z-index: 190;
-            box-shadow: var(--shadow-lg);
-          }
-          .lp-nav-center.open { display: flex; }
-          .lp-nav-center a { font-size: 14px; }
-          .lp-hamburger { display: flex; }
-
-          .lp-hero { grid-template-columns: 1fr; }
-          .lp-hero-left { padding: 60px 40px; }
-          .lp-hero-right {
-            display: grid; grid-template-columns: 1fr;
-            padding: 40px 40px;
-          }
-          .lp-hero-tiles { max-width: 100%; }
-
-          .lp-stats { flex-wrap: wrap; }
-          .lp-stat { flex: 0 0 50%; border-right: none; border-bottom: 0.5px solid #2C1810; padding: 24px; }
-          .lp-stat:nth-child(odd) { border-right: 0.5px solid #2C1810; }
-          .lp-stat:last-child, .lp-stat:nth-last-child(2):nth-child(odd) { border-bottom: none; }
-
-          .lp-section { padding: 60px 40px; }
-          .lp-cc-grid { grid-template-columns: repeat(2, 1fr); }
-          .lp-cc-grid .cc-card:last-child { grid-column: 1 / -1; }
-
-          .lp-diff { padding: 60px 40px 0; }
-          .lp-diff-grid { grid-template-columns: repeat(2, 1fr); }
-          .dc-card:nth-child(2n) { border-right: none; }
-          .dc-card:nth-child(3),
-          .dc-card:nth-child(4),
-          .dc-card:nth-child(6) { border-right: none; }
-          .dc-card:nth-child(3) { border-right: 0.5px solid #3d2a1e; }
-          .dc-card:nth-child(4),
-          .dc-card:nth-child(5) { border-bottom: 0.5px solid #3d2a1e; }
-          .dc-card:nth-child(5) { border-right: 0.5px solid #3d2a1e; }
-
-          .lp-testi-section { padding: 60px 40px; }
-          .lp-testi-grid { grid-template-columns: repeat(2, 1fr); }
-          .lp-testi-grid .tt-card:last-child { grid-column: 1 / -1; }
-
-          .lp-bottom { grid-template-columns: 1fr; }
-          .lp-bottom-left { padding: 60px 40px; }
-          .lp-bottom-right { padding: 48px 40px; }
-
-          .lp-footer { padding: 40px 40px; }
-        }
-
-        /* ════════════════════════════════════════
-           RESPONSIVE — Mobile (≤ 768px)
-        ════════════════════════════════════════ */
-        @media (max-width: 768px) {
-          .lp-nav { padding: 0 20px; }
-
-          .lp-hero-left { padding: 48px 20px; }
-          .lp-hero-h1 { font-size: 34px; }
-          .lp-hero-sub { font-size: 13px; }
-          .lp-hero-ctas { flex-direction: column; }
-          .lp-hero-ctas .btn { width: 100%; justify-content: center; }
-
-          .lp-hero-right { padding: 32px 20px; }
-          .lp-hero-tiles { grid-template-columns: 1fr 1fr; gap: 8px; }
-
-          .lp-stat { flex: 0 0 100%; border-right: none !important; }
-
-          .lp-section { padding: 48px 20px; }
-          .lp-cc-grid { grid-template-columns: 1fr; }
-          .lp-cc-grid .cc-card:last-child { grid-column: auto; }
-
-          .lp-diff { padding: 48px 20px 0; }
-          .lp-diff-grid { grid-template-columns: 1fr; }
-          .dc-card { border-right: none !important; }
-          .dc-card:not(:last-child) { border-bottom: 0.5px solid #3d2a1e !important; }
-
-          .lp-testi-section { padding: 48px 20px; }
-          .lp-testi-grid { grid-template-columns: 1fr; }
-          .lp-testi-grid .tt-card:last-child { grid-column: auto; }
-
-          .lp-bottom-left { padding: 48px 20px; }
-          .lp-bottom-right { padding: 40px 20px; }
-          .lp-bottom-stats { gap: 20px; }
-
-          .lp-footer { padding: 32px 20px; }
-          .lp-footer-links { flex-direction: column; gap: 12px; align-items: center; }
-        }
-
-        /* ════════════════════════════════════════
-           RESPONSIVE — Small mobile (≤ 390px)
-        ════════════════════════════════════════ */
-        @media (max-width: 390px) {
-          .lp-hero-tiles { grid-template-columns: 1fr; }
-          .ht-tile { padding: 14px 12px; }
-          .lp-hero-h1 { font-size: 30px; }
+        @media(max-width:480px){
+          .lp-actions{flex-direction:column;align-items:center;}
+          .btn-primary,.btn-ghost{width:100%;justify-content:center;}
         }
       `}</style>
-    </div>
-  );
-};
 
-export default Landing;
+      <div className="lp-root">
+        {/* ── GOOGLE FONTS ──────────────────────────────────── */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,400;9..144,0,500;9..144,1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+          rel="stylesheet"
+        />
+
+        {/* ── NAV ───────────────────────────────────────────── */}
+        <nav ref={navRef} className="lp-nav">
+          <a href="/" className="lp-logo">
+            <div className="lp-logo-mark">N</div>
+            <div className="lp-logo-name">NextAds<em>Gen</em></div>
+          </a>
+          <div className="lp-nav-links">
+            <a href="#how">How it works</a>
+            <a href="#features">Features</a>
+            <button className="lp-nav-cta" onClick={handleGetStarted}>Get started</button>
+          </div>
+        </nav>
+
+        {/* ── HERO ──────────────────────────────────────────── */}
+        <header className="lp-hero">
+          {/*
+            ── VIDEO HERO SLOT (disabled — uncomment to activate) ──────────
+            To go cinematic: uncomment the block below and point src to your
+            beauty b-roll. Keep muted + loop + playsinline. Overlay is in CSS.
+            <div className="lp-hero-media">
+              <video autoPlay muted loop playsInline poster="hero-poster.jpg">
+                <source src="hero.mp4" type="video/mp4" />
+              </video>
+            </div>
+            ── END VIDEO SLOT ───────────────────────────────────────────────
+          */}
+          <div className="lp-hero-glow" />
+          <div className="lp-hero-grain" />
+
+          <div className="lp-badge">
+            <span className="pulse-dot" />
+            Trained on 9 years of beauty campaign data
+          </div>
+
+          <h1>Campaign intelligence for <em>beauty</em> brands</h1>
+
+          <p>
+            Upload a creative. AI writes the copy, launches to Meta &amp; Google,
+            and optimizes your budget — around the clock.
+          </p>
+
+          <div className="lp-actions">
+            <button className="btn-primary" onClick={handleGetStarted}>
+              Get started <span style={{ fontSize: 17 }}>→</span>
+            </button>
+            <button className="btn-ghost" onClick={handleHowItWorks}>
+              See how it works
+            </button>
+          </div>
+
+          {/* §56-58: 30-day money-back guarantee — exact wording, no alterations */}
+          <div className="lp-guarantee">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6l8-4z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+            30-day money-back guarantee — no risk to try it
+          </div>
+
+          {/* Floating dashboard preview */}
+          <div className="lp-preview" ref={previewRef}>
+            <div className="lp-hp-bar">
+              <i /><i /><i />
+            </div>
+            <div className="lp-hp-body">
+              <div className="lp-kpi">
+                <div className="l">TOTAL SPEND</div>
+                <div className="v a" data-count="7080" data-prefix="€">€0</div>
+              </div>
+              <div className="lp-kpi">
+                <div className="l">LEADS</div>
+                <div className="v g" data-count="745">0</div>
+              </div>
+              <div className="lp-kpi">
+                <div className="l">AVG CPL</div>
+                <div className="v" data-count="9.5" data-prefix="€" data-dec="2">€0</div>
+              </div>
+              <div className="lp-kpi">
+                <div className="l">CTR</div>
+                <div className="v" data-count="2.53" data-suffix="%" data-dec="2">0%</div>
+              </div>
+              <div className="lp-hp-chart">
+                <svg viewBox="0 0 1000 120" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="lpg" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stopColor="#E3A88E" stopOpacity="0.4"/>
+                      <stop offset="1" stopColor="#E3A88E" stopOpacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,95 C120,90 180,70 280,72 C400,74 460,40 580,45 C700,50 760,25 880,20 L1000,15 L1000,120 L0,120 Z" fill="url(#lpg)"/>
+                  <path d="M0,95 C120,90 180,70 280,72 C400,74 460,40 580,45 C700,50 760,25 880,20 L1000,15" fill="none" stroke="#E3A88E" strokeWidth="2"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="lp-scroll-hint">
+            <div className="lp-mouse" />
+            SCROLL
+          </div>
+        </header>
+
+        {/* ── STATS BAND ────────────────────────────────────────
+            [PLACEHOLDER NUMBERS — need sign-off before going live]
+            9 years = confirmed real
+            38% / 24/7 / ×3 = placeholder, to be replaced with verified data
+        ───────────────────────────────────────────────────────── */}
+        <div className="lp-stats">
+          <div className="lp-stats-inner">
+            <div className="lp-stat reveal">
+              <div className="num" data-count="9">0</div>
+              <div className="lbl">Years of beauty benchmark data</div>
+            </div>
+            <div className="lp-stat reveal d1">
+              {/* [PLACEHOLDER] −38% CPL — verify before launch */}
+              <div className="num" data-count="38" data-suffix="%">0%</div>
+              <div className="lbl">Average drop in cost-per-lead*</div>
+            </div>
+            <div className="lp-stat reveal d2">
+              <div className="num" data-count="24" data-suffix="/7">0</div>
+              <div className="lbl">Always-on budget optimization</div>
+            </div>
+            <div className="lp-stat reveal d3">
+              {/* [PLACEHOLDER] ×3 faster — verify before launch */}
+              <div className="num" data-count="3" data-prefix="×">×0</div>
+              <div className="lbl">Faster campaign launches*</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── FEATURES ──────────────────────────────────────── */}
+        <section className="lp-section" id="features">
+          <div className="eyebrow reveal">What it does</div>
+          <h2 className="section-title reveal d1">An entire ads team, in one platform</h2>
+          <p className="section-sub reveal d2">
+            From creative to copy to optimization — NextAdsGen runs the parts
+            that used to take a team of specialists.
+          </p>
+          <div className="feat-grid">
+            <div className="feat reveal">
+              <div className="feat-ic">✦</div>
+              <h3>AI copy that converts</h3>
+              <p>Upload your creative and the engine writes headlines and copy tuned to your beauty audience, drawing on what actually converted.</p>
+            </div>
+            <div className="feat reveal d1">
+              <div className="feat-ic">◎</div>
+              <h3>Launch to Meta &amp; Google</h3>
+              <p>Build once and publish directly to your connected ad accounts. No more juggling Ads Manager tabs.</p>
+            </div>
+            <div className="feat reveal d2">
+              <div className="feat-ic">⟳</div>
+              <h3>Always-on optimization</h3>
+              <p>The engine watches your campaigns around the clock, shifting budget to winners and flagging fatigue before it costs you.</p>
+            </div>
+            <div className="feat reveal">
+              <div className="feat-ic">◈</div>
+              <h3>9-year benchmark</h3>
+              <p>Every metric is judged against nearly a decade of real beauty &amp; clinic campaign data — so you always know what "good" is.</p>
+            </div>
+            <div className="feat reveal d1">
+              <div className="feat-ic">◇</div>
+              <h3>Intelligence chat</h3>
+              <p>Ask anything — "why is my CPM rising?" — and get a real answer grounded in your data, not a generic tip.</p>
+            </div>
+            <div className="feat reveal d2">
+              <div className="feat-ic">◊</div>
+              <h3>Built for beauty</h3>
+              <p>Not a generic dashboard. Every benchmark, audience and recommendation is calibrated for beauty &amp; aesthetics brands.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── HOW IT WORKS / SCROLLYTELLING ─────────────────── */}
+        <section className="lp-section" id="how">
+          <div className="eyebrow reveal">How it works</div>
+          <h2 className="section-title reveal d1">Four steps from creative to conversions</h2>
+          <div className="lp-steps">
+            <div className="step-row">
+              <div className="reveal">
+                <div className="step-n">01</div>
+                <h3>Upload your creative</h3>
+                <p>Drop in an image or video. The engine reads it and understands what it's looking at.</p>
+              </div>
+              <div className="step-visual reveal d1">✦</div>
+            </div>
+            <div className="step-row">
+              <div className="reveal">
+                <div className="step-n">02</div>
+                <h3>AI writes the campaign</h3>
+                <p>Headlines, primary text, audience, budget — drafted for you, tuned to beauty buyers, ready to edit.</p>
+              </div>
+              <div className="step-visual reveal d1">✎</div>
+            </div>
+            <div className="step-row">
+              <div className="reveal">
+                <div className="step-n">03</div>
+                <h3>Publish to your platform</h3>
+                <p>One click pushes the campaign live to your connected Meta or Google account, in a safe paused state for final review.</p>
+              </div>
+              <div className="step-visual reveal d1">◎</div>
+            </div>
+            <div className="step-row">
+              <div className="reveal">
+                <div className="step-n">04</div>
+                <h3>The engine optimizes</h3>
+                <p>From there it runs itself — reallocating budget, catching fatigue, and reporting what it did while you slept.</p>
+              </div>
+              <div className="step-visual reveal d1">⟳</div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── FINAL CTA ─────────────────────────────────────── */}
+        <section className="lp-cta-final" id="results">
+          <div className="glow" />
+          <h2 className="reveal">Your campaigns deserve an <em>intelligence engine</em></h2>
+          <p className="reveal d1">Join the beauty brands running smarter campaigns with less effort.</p>
+          <div className="reveal d2">
+            <button
+              className="btn-primary"
+              style={{ display: 'inline-flex' }}
+              onClick={handleGetStarted}
+            >
+              Get started <span style={{ fontSize: 17 }}>→</span>
+            </button>
+            {/* §56-58: Short form guarantee for final CTA */}
+            <div className="lp-guarantee" style={{ opacity: 1, transform: 'none', animation: 'none', marginTop: 20 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6l8-4z"/>
+                <path d="M9 12l2 2 4-4"/>
+              </svg>
+              30-day money-back guarantee
+            </div>
+          </div>
+        </section>
+
+        {/* ── FOOTER ────────────────────────────────────────── */}
+        <footer className="lp-footer">
+          <a href="/" className="lp-logo" style={{ textDecoration: 'none' }}>
+            <div className="lp-logo-mark" style={{ width: 30, height: 30, fontSize: 16 }}>N</div>
+            <div className="lp-logo-name" style={{ fontSize: 15 }}>NextAds<em>Gen</em></div>
+          </a>
+          <div>© 2026 NextAdsGen · Campaign Intelligence for Beauty</div>
+        </footer>
+      </div>
+    </>
+  );
+}
