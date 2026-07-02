@@ -48,7 +48,7 @@ export default function Landing() {
   const navigate        = useNavigate();
   const navRef          = useRef<HTMLElement>(null);
   const previewRef      = useRef<HTMLDivElement>(null);
-  const heroWrapperRef  = useRef<HTMLDivElement>(null);
+  const heroStageRef    = useRef<HTMLDivElement>(null);
   const wallRef         = useRef<HTMLDivElement>(null);
   const spotlightRef    = useRef<HTMLDivElement>(null);
   const vignetteRef     = useRef<HTMLDivElement>(null);
@@ -91,12 +91,9 @@ export default function Landing() {
 
   /* ── Spotlight: cursor-following lantern with lerp (§60) ──── */
   useEffect(() => {
-    const wrapper  = heroWrapperRef.current;
+    const stage = heroStageRef.current;
     const spotlight = spotlightRef.current;
-    if (!wrapper || !spotlight) return;
-
-    const stage = wrapper.querySelector<HTMLElement>('.lp-hero-stage');
-    if (!stage) return;
+    if (!stage || !spotlight) return;
 
     const hasHover     = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -170,16 +167,17 @@ export default function Landing() {
 
   /* ── Scroll parallax: wall zoom + vignette fade (§60) ────── */
   useEffect(() => {
-    const wrapper = heroWrapperRef.current;
-    if (!wrapper) return;
+    const stage = heroStageRef.current;
+    if (!stage) return;
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reducedMotion) return; // skip parallax for reduced-motion
 
     const onScroll = () => {
-      const rect      = wrapper.getBoundingClientRect();
-      const scrollable = wrapper.offsetHeight - window.innerHeight; // 200vh
-      const progress  = Math.max(0, Math.min(1, -rect.top / scrollable));
+      const rect     = stage.getBoundingClientRect();
+      const h        = stage.offsetHeight; 
+      // progress: 0 when hero top is at viewport top, 1 when hero is fully above viewport
+      const progress = Math.max(0, Math.min(1, -rect.top / h));
 
       // Wall: scale 1.06 → 1.16 (§60)
       if (wallRef.current)
@@ -247,11 +245,10 @@ export default function Landing() {
         }
         .lp-nav-cta:hover { background:var(--accent-deep);transform:translateY(-1px); }
 
-        /* ── HERO: Wall of Creatives + Spotlight (§60) ──────── */
-        /* 300vh wrapper enables scroll parallax without scroll-jacking */
-        .lp-hero-wrapper { position:relative; height:300vh; }
+        /* ── HERO wrapper: normal flow, no gap (§60) ──────── */
+        .lp-hero-wrapper { position:relative; }
         .lp-hero-stage {
-          position:sticky; top:0; height:100vh; min-height:640px;
+          min-height:100vh;
           display:flex; flex-direction:column; align-items:center;
           justify-content:center; text-align:center;
           padding:120px 24px 80px; overflow:hidden; isolation:isolate;
@@ -604,8 +601,8 @@ export default function Landing() {
             300vh wrapper = sticky stage scrolls without scroll-jacking.
             Image: public/assets/hero-wall.png (~9 MB PNG — compress to WebP before prod!)
         ────────────────────────────────────────────────────── */}
-        <div className="lp-hero-wrapper" ref={heroWrapperRef}>
-          <div className="lp-hero-stage">
+        <div className="lp-hero-wrapper" >
+          <div className="lp-hero-stage" ref={heroStageRef}>
 
             {/* Layer 1: wall image — very dark at rest, brightened by spotlight */}
             <div className="wall" ref={wallRef} />
