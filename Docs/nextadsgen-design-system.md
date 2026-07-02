@@ -805,6 +805,7 @@ your-repo/
 - count-up — easeOut cubic (1400ms, קוד בתוך Landing.tsx)
 - reveal on scroll — `opacity + translateY(40px)` via IntersectionObserver
 
+
 ## 59. צ'קליסט מודל עסקי (לבדוק בכל מסך ציבורי)
 - [ ] אין "free" / "trial" / "Start free" בשום מקום?
 - [ ] CTA ראשי = "Get started" בדיוק?
@@ -813,3 +814,61 @@ your-repo/
 - [ ] Slot לוידאו מוכן אך כבוי (comment)?
 - [ ] מספרי stats שסומנו PLACEHOLDER — אושרו לפני פרסום?
 - [ ] Pricing / Onboarding / Billing — נבדקו מול צ'קליסט זה?
+
+## 60. Landing Hero — Wall of Creatives + Cursor Spotlight
+
+**רפרנס חי:** `Docs/nextadsgen-landing-home-v3.html`
+**מימוש:** `src/pages/Landing.tsx` (החל מ-commit שכולל "hero wall")
+**תמונה:** `public/assets/hero-wall.png` (~9 MB PNG — יש לדחוס ל-WebP לפני production)
+
+### הרעיון
+קיר mood-board צפוף של קריאטיבים (בקבוקי סרום, קלוז-אפים, קלטת פולארויד),
+כהה מאוד במנוחה, שהעכבר "מאיר" עליו כמו פנס. לא לייזר, לא beam — spotlight רך.
+
+### מבנה שכבות (מהתחתונה לעליונה)
+
+| שכבה | Class | תפקיד |
+|---|---|---|
+| 1 | `.wall` | תמונת הרקע — `brightness(0.46) saturate(0.9)`, `scale(1.06)` |
+| 2 | `.grain` | film grain (SVG data-URI feTurbulence), `opacity:.05`, `mix-blend-mode:overlay` |
+| 3 | `.vignette` | radial + linear gradients — מכהה מרכז ומסגרת, שומר על קריאות כותרת |
+| 4 | `.spotlight` | עוקב אחרי העכבר עם lerp=0.14, קוטר 460px, `blur(22px)`, `mix-blend-mode:screen`, opacity max~0.36 |
+| 5 | `.lp-hotspot` | 6 נקודות דאטה קבועות — מופעלות כשה-spotlight בטווח 95px |
+| 6 | `.hero-inner` | כל תוכן הטקסט (`z-index:5`) |
+
+### גלילה (300vh wrapper + sticky stage)
+- Wrapper: `height:300vh; position:relative`
+- Stage: `position:sticky; top:0; height:100vh`
+- בגלילה: `.wall` עושה zoom איטי (`scale 1.06→1.16`); `.vignette` נחלשת (`×(1-progress×0.4)`)
+- **לא scroll-jacking** — המשתמש שולט בגלילה
+
+### Spotlight — פרמטרים קריטיים
+- `lerp factor: 0.14` (עדכון `requestAnimationFrame`)
+- `blur: 22px` — חובה! בלי blur זה "בלוב" ולא אור
+- `mix-blend-mode: screen`
+- opacity max: **0.36** — פנס קלאסי עמום, לא זרקור
+- עוזב את ה-hero → opacity 0 (transition .5s)
+
+### Hotspots — [PLACEHOLDER]
+**כל 6 הנקודות מסומנות `[PLACEHOLDER]`** — אסור להשאיר ערכים בדויים.
+לפני launch: לחבר ל-Meta API / Supabase per-creative data, או להסתיר נקודה שאין לה דאטה.
+
+מיקומים (% מתוך stage): `(11%,20%)`, `(89%,17%)`, `(7%,78%)`, `(93%,76%)`, `(17%,50%)`, `(83%,48%)`
+
+### Fallbacks (חובה)
+- **מובייל/מגע** (`hover:none`): spotlight קבוע במרכז עם נשימה עדינה (`lp-ambient-breathe 6s`); hotspots לחיצים (tap toggles `.active`)
+- **`prefers-reduced-motion`**: אנימציית הנשימה מבוטלת; spotlight סטטי; parallax מדולג
+
+### טוקנים בשימוש
+`--accent`, `--accent-soft`, `--border`, `--bg`, `--text-2`, `--font-mono`
+**אסור hex חדש בקוד** — רק CSS variables.
+
+### צ'קליסט מימוש
+- [ ] טקסט קריא לאורך כל הגלילה (vignette מספיקה גם עם zoom)
+- [ ] spotlight לא "שוטף" מסך — פנס ממוקד, לא זרקור
+- [ ] hotspots לא חופפים ל-hero-preview הרחב
+- [ ] מובייל: ambient glow + tap עובד
+- [ ] `prefers-reduced-motion` נבדק
+- [ ] כל hotspot מסומן `[PLACEHOLDER]` בקוד
+- [ ] hero-wall.png → WebP לפני production (~9MB כבד מדי)
+- [ ] אין hex חדש — רק var(--accent) וכו'

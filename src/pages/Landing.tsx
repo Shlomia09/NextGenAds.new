@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 
 /* ─────────────────────────────────────────────────────────────
    NextAdsGen — Cinematic Landing Page
-   Design-system: §56-58 (business model), reference: nextadsgen-landing-cinematic-v2.html
+   Design-system: §56-58 (business model), §60 (hero wall + spotlight)
+   Reference: nextadsgen-landing-home-v3.html
    Rules:
    • No "free" / "trial" anywhere — only "Get started"
    • 30-day money-back guarantee (exact, not 60 days)
-   • Performance numbers (−38%, ×3) = placeholder, marked [PLACEHOLDER]
+   • All hotspot values marked [PLACEHOLDER] — §56, connect real data before launch
    ───────────────────────────────────────────────────────────── */
 
 // ── Count-up animation ────────────────────────────────────────
@@ -30,10 +31,27 @@ function countUp(el: HTMLElement) {
   requestAnimationFrame(tick);
 }
 
+// ── Fixed hotspot definitions ─────────────────────────────────
+// [PLACEHOLDER] — §56: connect to real per-creative data before launch.
+// Never show fabricated numbers — remove hotspot if no real data available.
+const HOTSPOTS = [
+  { xPct: 11, yPct: 20, label: 'CTR',  val: '—'   },
+  { xPct: 89, yPct: 17, label: 'CPC',  val: '—'   },
+  { xPct:  7, yPct: 78, label: 'ROAS', val: '—'   },
+  { xPct: 93, yPct: 76, label: 'CPM',  val: '—'   },
+  { xPct: 17, yPct: 50, label: 'CVR',  val: '—'   },
+  { xPct: 83, yPct: 48, label: 'CTR',  val: '—'   },
+] as const;
+// TODO: replace all '—' values with real data from Meta API / Supabase — see design-system §56
+
 export default function Landing() {
-  const navigate   = useNavigate();
-  const navRef     = useRef<HTMLElement>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
+  const navigate        = useNavigate();
+  const navRef          = useRef<HTMLElement>(null);
+  const previewRef      = useRef<HTMLDivElement>(null);
+  const heroWrapperRef  = useRef<HTMLDivElement>(null);
+  const wallRef         = useRef<HTMLDivElement>(null);
+  const spotlightRef    = useRef<HTMLDivElement>(null);
+  const vignetteRef     = useRef<HTMLDivElement>(null);
 
   /* Nav scroll effect */
   useEffect(() => {
@@ -71,6 +89,111 @@ export default function Landing() {
     return () => clearTimeout(t);
   }, []);
 
+  /* ── Spotlight: cursor-following lantern with lerp (§60) ──── */
+  useEffect(() => {
+    const wrapper  = heroWrapperRef.current;
+    const spotlight = spotlightRef.current;
+    if (!wrapper || !spotlight) return;
+
+    const stage = wrapper.querySelector<HTMLElement>('.lp-hero-stage');
+    if (!stage) return;
+
+    const hasHover     = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Touch / mobile fallback: ambient breathing glow centred on stage
+    if (!hasHover) {
+      spotlight.classList.add('ambient');
+      if (reducedMotion) spotlight.style.animation = 'none';
+      // Tap on hotspot toggles active class
+      stage.querySelectorAll<HTMLElement>('.lp-hotspot').forEach((hs) => {
+        hs.style.pointerEvents = 'auto';
+        hs.addEventListener('click', () => hs.classList.toggle('active'));
+      });
+      return;
+    }
+
+    // prefers-reduced-motion: keep spotlight static, skip lerp
+    if (reducedMotion) {
+      spotlight.style.left = '50%';
+      spotlight.style.top  = '42%';
+      spotlight.style.transition = 'none';
+      return;
+    }
+
+    let curX = window.innerWidth  * 0.5;
+    let curY = window.innerHeight * 0.42;
+    let tgtX = curX, tgtY = curY;
+    let rafId: number;
+    const LERP      = 0.14;
+    const PROXIMITY = 95; // px — hotspot activation radius
+
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    const tick = () => {
+      curX = lerp(curX, tgtX, LERP);
+      curY = lerp(curY, tgtY, LERP);
+      spotlight.style.left = `${curX}px`;
+      spotlight.style.top  = `${curY}px`;
+
+      // Check proximity to each hotspot
+      const rect = stage.getBoundingClientRect();
+      HOTSPOTS.forEach((hs, i) => {
+        const hx   = (hs.xPct / 100) * rect.width;
+        const hy   = (hs.yPct / 100) * rect.height;
+        const dist = Math.hypot(curX - hx, curY - hy);
+        const el   = stage.querySelector<HTMLElement>(`.lp-hotspot[data-idx="${i}"]`);
+        if (el) el.classList.toggle('active', dist < PROXIMITY);
+      });
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const onMove = (e: MouseEvent) => {
+      const rect = stage.getBoundingClientRect();
+      tgtX = e.clientX - rect.left;
+      tgtY = e.clientY - rect.top;
+      spotlight.style.opacity = '1';
+    };
+    const onLeave = () => { spotlight.style.opacity = '0'; };
+
+    rafId = requestAnimationFrame(tick);
+    stage.addEventListener('mousemove', onMove);
+    stage.addEventListener('mouseleave', onLeave);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      stage.removeEventListener('mousemove', onMove);
+      stage.removeEventListener('mouseleave', onLeave);
+    };
+  }, []);
+
+  /* ── Scroll parallax: wall zoom + vignette fade (§60) ────── */
+  useEffect(() => {
+    const wrapper = heroWrapperRef.current;
+    if (!wrapper) return;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) return; // skip parallax for reduced-motion
+
+    const onScroll = () => {
+      const rect      = wrapper.getBoundingClientRect();
+      const scrollable = wrapper.offsetHeight - window.innerHeight; // 200vh
+      const progress  = Math.max(0, Math.min(1, -rect.top / scrollable));
+
+      // Wall: scale 1.06 → 1.16 (§60)
+      if (wallRef.current)
+        wallRef.current.style.transform = `scale(${1.06 + 0.10 * progress})`;
+
+      // Vignette: weakens gently as page scrolls (§60)
+      if (vignetteRef.current)
+        vignetteRef.current.style.opacity = String(1 - progress * 0.4);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const handleGetStarted = () => navigate('/login');
   const handleHowItWorks = () => {
     document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' });
@@ -78,7 +201,7 @@ export default function Landing() {
 
   return (
     <>
-      {/* ── Inline CSS (matches reference exactly) ──────────── */}
+      {/* ── Inline CSS ──────────────────────────────────────── */}
       <style>{`
         :root {
           --bg:#0B0A09;--bg2:#120F0D;--surface:#1A1614;--border:#2A2420;
@@ -124,78 +247,135 @@ export default function Landing() {
         }
         .lp-nav-cta:hover { background:var(--accent-deep);transform:translateY(-1px); }
 
-        /* ── HERO ─────────────────────────────────────────────── */
-        .lp-hero {
-          min-height:100vh;display:flex;flex-direction:column;
-          align-items:center;justify-content:center;
-          text-align:center;position:relative;
-          padding:120px 24px 80px;overflow:hidden;
+        /* ── HERO: Wall of Creatives + Spotlight (§60) ──────── */
+        /* 300vh wrapper enables scroll parallax without scroll-jacking */
+        .lp-hero-wrapper { position:relative; height:300vh; }
+        .lp-hero-stage {
+          position:sticky; top:0; height:100vh; min-height:640px;
+          display:flex; flex-direction:column; align-items:center;
+          justify-content:center; text-align:center;
+          padding:120px 24px 80px; overflow:hidden; isolation:isolate;
+          cursor:none;
+        }
+        @media (hover:none),(pointer:coarse){ .lp-hero-stage{ cursor:auto; } }
+
+        /* Layer 1 — wall image: very dark by default (§60) */
+        .wall {
+          position:absolute; inset:0;
+          background:url('/assets/hero-wall.png') center/cover no-repeat;
+          filter:brightness(0.46) saturate(0.9);
+          transform:scale(1.06); transform-origin:center;
+          will-change:transform;
         }
 
-        /* ── VIDEO SLOT (commented out — uncomment to enable) ──
-           .lp-hero-media { position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none; }
-           .lp-hero-media video { width:100%;height:100%;object-fit:cover;opacity:.55; }
-           .lp-hero-media::after { content:"";position:absolute;inset:0;
-             background:radial-gradient(circle at 50% 38%,transparent,rgba(11,10,9,0.55) 70%),
-                        linear-gradient(180deg,rgba(11,10,9,0.4),rgba(11,10,9,0.85)); }
-        ─────────────────────────────────────────────────────── */
-
-        /* Default: animated golden glow */
-        .lp-hero-glow {
-          position:absolute;width:1200px;height:1200px;border-radius:50%;
-          background:radial-gradient(circle,rgba(227,168,142,0.20),rgba(201,123,94,0.08) 40%,transparent 64%);
-          top:-46%;left:50%;transform:translateX(-50%);pointer-events:none;
-          animation:lp-breathe 9s ease-in-out infinite;z-index:1;
-        }
-        .lp-hero-glow::after {
-          content:"";position:absolute;inset:0;border-radius:50%;
-          background:radial-gradient(circle at 60% 60%,rgba(214,170,120,0.12),transparent 55%);
-        }
-        .lp-hero-grain {
-          position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.5;
-          background-image:
-            radial-gradient(1px 1px at 20% 30%,rgba(227,168,142,.5),transparent),
-            radial-gradient(1px 1px at 70% 20%,rgba(227,168,142,.4),transparent),
-            radial-gradient(1px 1px at 40% 70%,rgba(214,170,120,.5),transparent),
-            radial-gradient(1px 1px at 85% 60%,rgba(227,168,142,.35),transparent),
-            radial-gradient(1px 1px at 55% 45%,rgba(227,168,142,.45),transparent);
-          animation:lp-twinkle 6s ease-in-out infinite;
-        }
-        @keyframes lp-twinkle { 0%,100%{opacity:.35;} 50%{opacity:.7;} }
-        @keyframes lp-breathe {
-          0%,100%{opacity:.7;transform:translateX(-50%) scale(1);}
-          50%{opacity:1;transform:translateX(-50%) scale(1.08);}
+        /* Layer 2 — film grain texture (SVG data-URI, §60) */
+        .grain {
+          position:absolute; inset:0; z-index:1; pointer-events:none;
+          opacity:.05; mix-blend-mode:overlay;
+          background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
 
+        /* Layer 3 — multi-layer vignette (§60 reference): keeps headline readable */
+        .vignette {
+          position:absolute; inset:0; z-index:2; pointer-events:none;
+          background:
+            radial-gradient(ellipse at 50% 44%, rgba(14,12,11,0.45) 0%, rgba(14,12,11,0.82) 62%, rgba(14,12,11,0.9) 100%),
+            linear-gradient(to top, var(--bg) 0%, rgba(14,12,11,0.35) 26%, transparent 50%),
+            linear-gradient(to bottom, rgba(14,12,11,0.7) 0%, transparent 22%);
+          will-change:opacity;
+        }
+
+        /* Layer 4 — cursor spotlight: soft lantern, not a laser (§60) */
+        .spotlight {
+          position:absolute; z-index:3; pointer-events:none;
+          width:460px; height:460px; border-radius:50%;
+          background:radial-gradient(circle, rgba(227,168,142,0.36) 0%, transparent 65%);
+          mix-blend-mode:screen; filter:blur(22px);
+          transform:translate(-50%,-50%);
+          left:50%; top:42%;
+          opacity:0; transition:opacity .5s;
+          will-change:left, top, opacity;
+        }
+        @keyframes lp-ambient-breathe {
+          0%,100%{ opacity:.4; transform:translate(-50%,-50%) scale(1); }
+          50%    { opacity:.6; transform:translate(-50%,-50%) scale(1.12); }
+        }
+        /* Mobile fallback: ambient breathing glow centred (§60) */
+        .spotlight.ambient {
+          animation:lp-ambient-breathe 6s ease-in-out infinite;
+          opacity:.4;
+        }
+        @media (prefers-reduced-motion:reduce){
+          .spotlight.ambient{ animation:none; opacity:.4; }
+        }
+
+        /* Layer 5 — hotspots (§60) */
+        /* [PLACEHOLDER] — connect all values to real data before launch (§56) */
+        .lp-hotspot {
+          position:absolute; z-index:4;
+          width:10px; height:10px; border-radius:50%;
+          background:var(--accent); opacity:.45;
+          pointer-events:none; cursor:default;
+          transition:opacity .3s, box-shadow .3s;
+        }
+        .lp-hotspot.active {
+          opacity:1;
+          box-shadow:0 0 0 4px rgba(227,168,142,0.2), 0 0 12px rgba(227,168,142,0.4);
+        }
+        .lp-hotspot-bubble {
+          position:absolute; bottom:calc(100% + 12px); left:50%;
+          transform:translateX(-50%) translateY(8px);
+          background:rgba(18,15,13,0.88); border:1px solid var(--border);
+          backdrop-filter:blur(8px); border-radius:8px;
+          padding:8px 12px; white-space:nowrap;
+          opacity:0; transition:opacity .25s, transform .25s;
+          pointer-events:none; box-shadow:0 8px 24px rgba(0,0,0,0.5);
+        }
+        .lp-hotspot-bubble .hs-label {
+          color:var(--text-3); font-size:9px; letter-spacing:1.5px;
+          font-family:var(--font-ui); text-transform:uppercase; display:block;
+        }
+        .lp-hotspot-bubble .hs-val {
+          color:var(--accent); font-size:15px; font-weight:500;
+          font-family:var(--font-mono);
+        }
+        .lp-hotspot.active .lp-hotspot-bubble {
+          opacity:1; transform:translateX(-50%) translateY(0);
+        }
+
+        /* Layer 6 — hero content sits above all layers */
+        .hero-inner {
+          position:relative; z-index:5;
+          display:flex; flex-direction:column; align-items:center; width:100%;
+        }
+
+        /* ── HERO CONTENT ───────────────────────────────────── */
         .lp-badge {
           display:inline-flex;align-items:center;gap:8px;
           border:1px solid var(--border);background:rgba(26,22,20,0.6);
           padding:8px 16px;border-radius:30px;font-size:12.5px;color:var(--text-2);
           margin-bottom:30px;opacity:0;animation:lp-rise .9s .1s forwards;
-          position:relative;z-index:2;
         }
         .lp-badge .pulse-dot {
           width:7px;height:7px;border-radius:50%;background:var(--green);
           box-shadow:0 0 0 3px rgba(107,191,138,0.2);flex-shrink:0;
         }
 
-        .lp-hero h1 {
+        .lp-hero-stage h1 {
           font-family:var(--font-display);font-weight:500;
           font-size:clamp(42px,7vw,86px);line-height:1.02;letter-spacing:-2px;
           max-width:14ch;opacity:0;animation:lp-rise 1s .25s forwards;
-          position:relative;z-index:2;
         }
-        .lp-hero h1 em { font-style:italic;color:var(--accent); }
-        .lp-hero p {
+        .lp-hero-stage h1 em { font-style:italic;color:var(--accent); }
+        .lp-hero-stage p {
           font-size:clamp(16px,2vw,20px);color:var(--text-2);max-width:52ch;
           margin:28px auto 0;line-height:1.6;
           opacity:0;animation:lp-rise 1s .45s forwards;
-          position:relative;z-index:2;
         }
         .lp-actions {
           display:flex;gap:14px;margin-top:40px;
           opacity:0;animation:lp-rise 1s .65s forwards;
-          flex-wrap:wrap;justify-content:center;position:relative;z-index:2;
+          flex-wrap:wrap;justify-content:center;
         }
         .btn-primary {
           background:var(--accent);color:#2A1A12;padding:15px 30px;
@@ -218,13 +398,13 @@ export default function Landing() {
         .btn-ghost:hover { background:var(--surface);border-color:var(--accent); }
 
         @keyframes lp-rise { to{opacity:1;transform:translateY(0);} }
-        .lp-badge,.lp-hero h1,.lp-hero p,.lp-actions { transform:translateY(24px); }
+        .lp-badge,.lp-hero-stage h1,.lp-hero-stage p,.lp-actions { transform:translateY(24px); }
 
         .lp-guarantee {
           display:flex;align-items:center;gap:8px;justify-content:center;
           color:var(--text-3);font-size:12.5px;margin-top:20px;
           opacity:0;animation:lp-rise 1s .78s forwards;
-          transform:translateY(16px);position:relative;z-index:2;
+          transform:translateY(16px);
         }
         .lp-guarantee svg { color:var(--accent);flex-shrink:0; }
 
@@ -235,7 +415,6 @@ export default function Landing() {
           background:linear-gradient(180deg,var(--surface),var(--bg2));
           box-shadow:0 40px 100px rgba(0,0,0,0.6);overflow:hidden;
           opacity:0;animation:lp-rise 1.2s .85s forwards;
-          position:relative;z-index:2;
         }
         .lp-hp-bar { display:flex;gap:7px;padding:14px 18px;border-bottom:1px solid var(--border); }
         .lp-hp-bar i { width:11px;height:11px;border-radius:50%;background:var(--border); }
@@ -256,7 +435,7 @@ export default function Landing() {
           position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
           color:var(--text-3);font-size:11px;letter-spacing:2px;
           display:flex;flex-direction:column;align-items:center;gap:9px;
-          opacity:0;animation:lp-rise 1s 1.3s forwards;z-index:2;
+          opacity:0;animation:lp-rise 1s 1.3s forwards;z-index:6;
         }
         .lp-mouse {
           width:22px;height:34px;border:1.5px solid var(--text-3);border-radius:12px;position:relative;
@@ -421,94 +600,120 @@ export default function Landing() {
           </div>
         </nav>
 
-        {/* ── HERO ──────────────────────────────────────────── */}
-        <header className="lp-hero">
-          {/*
-            ── VIDEO HERO SLOT (disabled — uncomment to activate) ──────────
-            To go cinematic: uncomment the block below and point src to your
-            beauty b-roll. Keep muted + loop + playsinline. Overlay is in CSS.
-            <div className="lp-hero-media">
-              <video autoPlay muted loop playsInline poster="hero-poster.jpg">
-                <source src="hero.mp4" type="video/mp4" />
-              </video>
-            </div>
-            ── END VIDEO SLOT ───────────────────────────────────────────────
-          */}
-          <div className="lp-hero-glow" />
-          <div className="lp-hero-grain" />
+        {/* ── HERO: Wall of Creatives + Cursor Spotlight (§60) ─
+            300vh wrapper = sticky stage scrolls without scroll-jacking.
+            Image: public/assets/hero-wall.png (~9 MB PNG — compress to WebP before prod!)
+        ────────────────────────────────────────────────────── */}
+        <div className="lp-hero-wrapper" ref={heroWrapperRef}>
+          <div className="lp-hero-stage">
 
-          <div className="lp-badge">
-            <span className="pulse-dot" />
-            Trained on 9 years of beauty campaign data
-          </div>
+            {/* Layer 1: wall image — very dark at rest, brightened by spotlight */}
+            <div className="wall" ref={wallRef} />
 
-          <h1>Campaign intelligence for <em>beauty</em> brands</h1>
+            {/* Layer 2: film grain — background-image data-URI, mix-blend-mode:overlay */}
+            <div className="grain" aria-hidden="true" />
 
-          <p>
-            Upload a creative. AI writes the copy, launches to Meta &amp; Google,
-            and optimizes your budget, around the clock.
-          </p>
+            {/* Layer 3: vignette — keeps headline readable over busy wall */}
+            <div className="vignette" ref={vignetteRef} />
 
-          <div className="lp-actions">
-            <button className="btn-primary" onClick={handleGetStarted}>
-              Get started <span style={{ fontSize: 17 }}>→</span>
-            </button>
-            <button className="btn-ghost" onClick={handleHowItWorks}>
-              See how it works
-            </button>
-          </div>
+            {/* Layer 4: spotlight — follows cursor with lag (lerp 0.14), blur:22px, mix:screen */}
+            <div className="spotlight" ref={spotlightRef} aria-hidden="true" />
 
-          {/* §56-58: 30-day money-back guarantee — exact wording, no alterations */}
-          <div className="lp-guarantee">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6l8-4z"/>
-              <path d="M9 12l2 2 4-4"/>
-            </svg>
-            30-day money-back guarantee — no risk to try it
-          </div>
-
-          {/* Floating dashboard preview */}
-          <div className="lp-preview" ref={previewRef}>
-            <div className="lp-hp-bar">
-              <i /><i /><i />
-            </div>
-            <div className="lp-hp-body">
-              <div className="lp-kpi">
-                <div className="l">TOTAL SPEND</div>
-                <div className="v a" data-count="7080" data-prefix="€">€0</div>
+            {/* Layer 5: hotspots — 6 fixed data points, activate on spotlight proximity
+                [PLACEHOLDER] ALL values are '—' until connected to real Meta/Supabase data.
+                TODO: restore real per-creative stats once available — see design-system §56
+                NOTE: on mobile/touch, tap on dot toggles the bubble. */}
+            {HOTSPOTS.map((hs, i) => (
+              <div
+                key={i}
+                className="lp-hotspot"
+                data-idx={i}
+                style={{ left: `${hs.xPct}%`, top: `${hs.yPct}%` }}
+                aria-label={`${hs.label}: ${hs.val}`}
+              >
+                <div className="lp-hotspot-bubble">
+                  <span className="hs-label">{hs.label}</span>
+                  <span className="hs-val">{hs.val}</span>
+                </div>
               </div>
-              <div className="lp-kpi">
-                <div className="l">LEADS</div>
-                <div className="v g" data-count="745">0</div>
+            ))}
+
+            {/* Layer 6: hero content — badge → h1 → p → actions → guarantee → preview */}
+            <div className="hero-inner">
+              <div className="lp-badge">
+                <span className="pulse-dot" />
+                Trained on 9 years of beauty campaign data
               </div>
-              <div className="lp-kpi">
-                <div className="l">AVG CPL</div>
-                <div className="v" data-count="9.5" data-prefix="€" data-dec="2">€0</div>
+
+              <h1>Campaign intelligence for <em>beauty</em> brands</h1>
+
+              <p>
+                Upload a creative. AI writes the copy, launches to Meta &amp; Google,
+                and optimizes your budget, around the clock.
+              </p>
+
+              <div className="lp-actions">
+                <button className="btn-primary" onClick={handleGetStarted}>
+                  Get started <span style={{ fontSize: 17 }}>→</span>
+                </button>
+                <button className="btn-ghost" onClick={handleHowItWorks}>
+                  See how it works
+                </button>
               </div>
-              <div className="lp-kpi">
-                <div className="l">CTR</div>
-                <div className="v" data-count="2.53" data-suffix="%" data-dec="2">0%</div>
-              </div>
-              <div className="lp-hp-chart">
-                <svg viewBox="0 0 1000 120" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="lpg" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stopColor="#E3A88E" stopOpacity="0.4"/>
-                      <stop offset="1" stopColor="#E3A88E" stopOpacity="0"/>
-                    </linearGradient>
-                  </defs>
-                  <path d="M0,95 C120,90 180,70 280,72 C400,74 460,40 580,45 C700,50 760,25 880,20 L1000,15 L1000,120 L0,120 Z" fill="url(#lpg)"/>
-                  <path d="M0,95 C120,90 180,70 280,72 C400,74 460,40 580,45 C700,50 760,25 880,20 L1000,15" fill="none" stroke="#E3A88E" strokeWidth="2"/>
+
+              {/* §56-57: 30-day money-back guarantee — exact wording, no alterations */}
+              <div className="lp-guarantee">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6l8-4z"/>
+                  <path d="M9 12l2 2 4-4"/>
                 </svg>
+                30-day money-back guarantee — no risk to try it
               </div>
-            </div>
-          </div>
 
-          <div className="lp-scroll-hint">
-            <div className="lp-mouse" />
-            SCROLL
-          </div>
-        </header>
+              {/* Floating dashboard preview */}
+              <div className="lp-preview" ref={previewRef}>
+                <div className="lp-hp-bar">
+                  <i /><i /><i />
+                </div>
+                <div className="lp-hp-body">
+                  <div className="lp-kpi">
+                    <div className="l">TOTAL SPEND</div>
+                    <div className="v a" data-count="7080" data-prefix="€">€0</div>
+                  </div>
+                  <div className="lp-kpi">
+                    <div className="l">LEADS</div>
+                    <div className="v g" data-count="745">0</div>
+                  </div>
+                  <div className="lp-kpi">
+                    <div className="l">AVG CPL</div>
+                    <div className="v" data-count="9.5" data-prefix="€" data-dec="2">€0</div>
+                  </div>
+                  <div className="lp-kpi">
+                    <div className="l">CTR</div>
+                    <div className="v" data-count="2.53" data-suffix="%" data-dec="2">0%</div>
+                  </div>
+                  <div className="lp-hp-chart">
+                    <svg viewBox="0 0 1000 120" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="lpg" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stopColor="#E3A88E" stopOpacity="0.4"/>
+                          <stop offset="1" stopColor="#E3A88E" stopOpacity="0"/>
+                        </linearGradient>
+                      </defs>
+                      <path d="M0,95 C120,90 180,70 280,72 C400,74 460,40 580,45 C700,50 760,25 880,20 L1000,15 L1000,120 L0,120 Z" fill="url(#lpg)"/>
+                      <path d="M0,95 C120,90 180,70 280,72 C400,74 460,40 580,45 C700,50 760,25 880,20 L1000,15" fill="none" stroke="#E3A88E" strokeWidth="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>{/* /hero-inner */}
+
+            <div className="lp-scroll-hint">
+              <div className="lp-mouse" />
+              SCROLL
+            </div>
+          </div>{/* /lp-hero-stage */}
+        </div>{/* /lp-hero-wrapper */}
 
         {/* ── STATS BAND ────────────────────────────────────────
             Two factual stats only. Performance stats (CPL improvement, launch speed)
@@ -630,7 +835,7 @@ export default function Landing() {
             >
               Get started <span style={{ fontSize: 17 }}>→</span>
             </button>
-            {/* §56-58: Short form guarantee for final CTA */}
+            {/* §56-57: Short-form guarantee for final CTA */}
             <div className="lp-guarantee" style={{ opacity: 1, transform: 'none', animation: 'none', marginTop: 20 }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6l8-4z"/>
