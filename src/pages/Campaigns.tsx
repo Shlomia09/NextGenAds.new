@@ -501,7 +501,7 @@ const DonutPanel: React.FC<DonutPanelProps> = ({ campaigns }) => {
         {campaigns.filter(c => c.spend === 0).length > 0 && (
           <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11.5, color: 'var(--text-3)', fontFamily: 'var(--font-ui)' }}>
             <span style={{ width: 9, height: 9, borderRadius: 3, background: 'var(--text-3)', display: 'inline-block', flexShrink: 0 }} />
-            {campaigns.filter(c => c.spend === 0).length} draft / inactive — €0
+            {campaigns.filter(c => c.spend === 0).length} draft / inactive · €0
           </span>
         )}
       </div>

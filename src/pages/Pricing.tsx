@@ -14,7 +14,7 @@ const plans = [
       '1 brand · 1 ad account',
       'Full benchmark comparison',
       'AI recommendations (read-only)',
-      'Intelligence Chat — 20 queries/mo',
+      'Intelligence Chat (20 queries/mo)',
       'Monthly benchmark audit report',
       'Meta Ads sync',
       'Email support',
@@ -33,7 +33,7 @@ const plans = [
       'Everything in Starter',
       'Campaign execution (human-approved)',
       'Klaviyo intelligence layer',
-      'Intelligence Chat — unlimited',
+      'Intelligence Chat (unlimited)',
       'Google Ads sync',
       'Priority support + onboarding call',
     ],
@@ -535,7 +535,7 @@ export default function Pricing() {
               className={`toggle-btn ${billingCycle === 'yearly' ? 'active' : 'inactive'}`}
               onClick={() => setBillingCycle('yearly')}
             >
-              Annually — Save 17%
+              Annually · Save 17%
             </button>
           </div>
 

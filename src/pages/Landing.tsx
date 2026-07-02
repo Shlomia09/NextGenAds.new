@@ -446,7 +446,7 @@ export default function Landing() {
 
           <p>
             Upload a creative. AI writes the copy, launches to Meta &amp; Google,
-            and optimizes your budget — around the clock.
+            and optimizes your budget, around the clock.
           </p>
 
           <div className="lp-actions">
@@ -540,7 +540,7 @@ export default function Landing() {
           <div className="eyebrow reveal">What it does</div>
           <h2 className="section-title reveal d1">An entire ads team, in one platform</h2>
           <p className="section-sub reveal d2">
-            From creative to copy to optimization — NextAdsGen runs the parts
+            From creative to copy to optimization. NextAdsGen runs the parts
             that used to take a team of specialists.
           </p>
           <div className="feat-grid">
@@ -562,12 +562,12 @@ export default function Landing() {
             <div className="feat reveal">
               <div className="feat-ic">◈</div>
               <h3>9-year benchmark</h3>
-              <p>Every metric is judged against nearly a decade of real beauty &amp; clinic campaign data — so you always know what "good" is.</p>
+              <p>Every metric is judged against nearly a decade of real beauty &amp; clinic campaign data, so you always know what "good" is.</p>
             </div>
             <div className="feat reveal d1">
               <div className="feat-ic">◇</div>
               <h3>Intelligence chat</h3>
-              <p>Ask anything — "why is my CPM rising?" — and get a real answer grounded in your data, not a generic tip.</p>
+              <p>Ask anything: "why is my CPM rising?" Get a real answer grounded in your data, not a generic tip.</p>
             </div>
             <div className="feat reveal d2">
               <div className="feat-ic">◊</div>
@@ -594,7 +594,7 @@ export default function Landing() {
               <div className="reveal">
                 <div className="step-n">02</div>
                 <h3>AI writes the campaign</h3>
-                <p>Headlines, primary text, audience, budget — drafted for you, tuned to beauty buyers, ready to edit.</p>
+                <p>Headlines, primary text, audience, budget. All drafted for you, tuned to beauty buyers, ready to edit.</p>
               </div>
               <div className="step-visual reveal d1">✎</div>
             </div>
@@ -610,7 +610,7 @@ export default function Landing() {
               <div className="reveal">
                 <div className="step-n">04</div>
                 <h3>The engine optimizes</h3>
-                <p>From there it runs itself — reallocating budget, catching fatigue, and reporting what it did while you slept.</p>
+                <p>From there it runs itself: reallocating budget, catching fatigue, and reporting what it did while you slept.</p>
               </div>
               <div className="step-visual reveal d1">⟳</div>
             </div>

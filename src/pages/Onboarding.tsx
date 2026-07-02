@@ -218,7 +218,7 @@ const Onboarding: React.FC = () => {
           <div className="ob-progress-bar">
             <div className="ob-progress-fill" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
           </div>
-          <div className="ob-step-label-top">Step {step + 1} of {STEPS.length} — {STEPS[step]}</div>
+          <div className="ob-step-label-top">Step {step + 1} of {STEPS.length}: {STEPS[step]}</div>
 
           {/* ── Step 0 — Brand Basics ── */}
           {step === 0 && (

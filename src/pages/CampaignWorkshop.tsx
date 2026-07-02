@@ -429,7 +429,7 @@ const CampaignWorkshop: React.FC = () => {
     const brand = brands.find(b => b.id === form.brandId);
     if (!brand) return;
     const goalLabel = GOALS.find(g => g.value === form.goal)?.label.split('/')[0].trim() ?? form.goal;
-    const name = `${brand.name} — ${goalLabel} — ${thisMonth} ${thisYear}`;
+    const name = `${brand.name}, ${goalLabel}, ${thisMonth} ${thisYear}`;
     upd('campaignName', name);
   }, [form.brandId, form.goal, form.platform, brands]);
 
@@ -753,7 +753,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
           </span>
         </div>
         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-2)' }}>
-          Build your campaign step by step — AI writes the copy, you publish to your connected ad platform.
+          Build your campaign step by step. AI writes the copy, you publish to your connected ad platform.
         </div>
       </div>
 
@@ -846,7 +846,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
 
                     <MB>
                       <FL>HEADLINE</FL>
-                      <Field placeholder="e.g. Reveal your glow — non-invasive results in one session" value={form.headline} onChange={e => upd('headline', e.target.value)} maxLength={40} />
+                      <Field placeholder="e.g. Reveal your glow, non-invasive results in one session" value={form.headline} onChange={e => upd('headline', e.target.value)} maxLength={40} />
                       <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginTop: 4, textAlign: 'right' }}>{form.headline.length}/40</div>
                     </MB>
 
@@ -914,7 +914,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                       <FL>KEYWORDS (comma-separated)</FL>
                       <Textarea rows={2} placeholder="e.g. aesthetic clinic milan, botox consultation, non-invasive treatment" value={form.keywords} onChange={e => upd('keywords', e.target.value)} />
                     </MB>
-                    <PNote>Google Search ads are text-only — no creative needed. Your headlines and descriptions will rotate automatically.</PNote>
+                    <PNote>Google Search ads are text-only. No creative needed. Your headlines and descriptions will rotate automatically.</PNote>
                   </>
                 )}
               </>
@@ -1011,7 +1011,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
 
                 <MB>
                   <FL>CAMPAIGN NAME</FL>
-                  <Field value={form.campaignName} onChange={e => upd('campaignName', e.target.value)} placeholder="e.g. Brand — Lead gen — June 2026" />
+                  <Field value={form.campaignName} onChange={e => upd('campaignName', e.target.value)} placeholder="e.g. Brand, Lead gen, June 2026" />
                 </MB>
 
                 <MB>
