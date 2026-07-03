@@ -108,6 +108,23 @@ serve(async (req) => {
       let roas = 0;
       let leads = 0;
       let cpl = 0;
+      // Extracted for ALL objectives (available regardless of campaign type)
+      let page_views = 0; // landing_page_view — primary KPI for Traffic
+      let atc = 0;        // add_to_cart — funnel metric for Sales
+
+      // ── Extract page views (landing_page_view) — all campaigns ──────────
+      const pageViewAction = (insight.actions || []).find(
+        (a: { action_type: string }) => a.action_type === 'landing_page_view'
+      );
+      page_views = parseInt(pageViewAction?.value || '0');
+
+      // ── Extract ATC (add_to_cart) — all campaigns ────────────────────────
+      const atcAction = (insight.actions || []).find(
+        (a: { action_type: string }) =>
+          a.action_type === 'offsite_conversion.fb_pixel_add_to_cart' ||
+          a.action_type === 'add_to_cart'
+      );
+      atc = parseInt(atcAction?.value || '0');
 
       if (goal === 'sales') {
         // Sales: extract purchases and ROAS
@@ -141,10 +158,9 @@ serve(async (req) => {
         );
         leads = parseInt(leadAction?.value || '0');
         cpl = leads > 0 ? spend / leads : 0;
-
       }
-      // For traffic: clicks already captured above from API insights
-      // For awareness: reach/frequency captured via separate fields below
+      // Traffic: page_views already extracted above (primary KPI)
+      // Awareness: reach/frequency captured below
 
       // Parse reach and frequency (available for all objectives)
       const reach = parseInt(insight.reach || '0');
@@ -166,9 +182,11 @@ serve(async (req) => {
           spend,
           impressions,
           clicks,
+          page_views,   // landing_page_view from Meta actions
           purchases,
           revenue,
           roas,
+          atc,          // add_to_cart from Meta actions
           leads,
           cpl,
           reach,

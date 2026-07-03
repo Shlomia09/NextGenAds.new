@@ -435,7 +435,7 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
   useEffect(() => {
-    if (initialMsg) sendMessage(`[System] ${initialMsg}`);
+    if (initialMsg) sendMessage(initialMsg);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialMsg]);
 
@@ -445,7 +445,7 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
         <Sparkles size={12} style={{ color: 'var(--accent)' }} />
         <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)' }}>
-          Campaign Intelligence Chat
+          Heinrick · Campaign Analysis
         </span>
       </div>
 

@@ -80,8 +80,17 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
     camps.forEach((c) => {
       const parts: string[] = [`• ${c.name} [${c.status}] | Objective: ${c.objective}`];
       parts.push(`  Spend: €${(c.spend ?? 0).toFixed(2)} | Impressions: ${(c.impressions ?? 0).toLocaleString()} | Clicks: ${(c.clicks ?? 0).toLocaleString()}`);
+      // Traffic: Landing Page Views is the primary conversion (more accurate than clicks)
+      if ((c.page_views ?? 0) > 0) {
+        parts.push(`  Landing Page Views: ${(c.page_views ?? 0).toLocaleString()} (primary conversion for Traffic objective)`);
+      }
       if ((c.roas ?? 0) > 0 || (c.purchases ?? 0) > 0) {
         parts.push(`  Purchases: ${c.purchases ?? 0} | Revenue: €${(c.revenue ?? 0).toFixed(2)} | ROAS: ${(c.roas ?? 0).toFixed(2)}x`);
+      }
+      // Sales: Add to Cart is a key funnel metric
+      if ((c.atc ?? 0) > 0) {
+        const atcToP = (c.purchases ?? 0) > 0 ? ((c.purchases / c.atc) * 100).toFixed(0) + '%' : 'n/a';
+        parts.push(`  Add to Cart (ATC): ${(c.atc ?? 0).toLocaleString()} | ATC-to-Purchase rate: ${atcToP}`);
       }
       if ((c.leads ?? 0) > 0) {
         const cpl = c.cpl ?? ((c.leads > 0 && c.spend > 0) ? c.spend / c.leads : 0);

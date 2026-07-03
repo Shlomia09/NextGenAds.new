@@ -65,7 +65,7 @@ const StatusPill: React.FC<{ status: string }> = ({ status }) => {
   );
 };
 
-// ─── Conversion cell (goal-adaptive) ─────────────────────────
+// ─── Conversion cell (goal-adaptive, Meta-accurate) ──────────
 const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, goal }) => {
   const ctr = campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100 : 0;
   const cellStyle = { padding: '16px 22px', borderBottom: '1px solid var(--border-soft)', textAlign: 'right' as const };
@@ -79,7 +79,14 @@ const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, 
           <div style={{ ...numStyle, color: campaign.roas >= 3 ? 'var(--green)' : campaign.roas >= 1.5 ? 'var(--champagne)' : 'var(--red)' }}>
             {campaign.roas > 0 ? `${campaign.roas.toFixed(2)}x` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
           </div>
-          <div style={subStyle}>{campaign.purchases > 0 ? `${campaign.purchases} purch.` : 'no sales'}</div>
+          {/* ATC takes priority over purchases as the funnel metric */}
+          <div style={subStyle}>
+            {campaign.atc > 0
+              ? `${formatNumber(campaign.atc)} ATC`
+              : campaign.purchases > 0
+              ? `${campaign.purchases} purch.`
+              : 'no sales'}
+          </div>
         </td>
       );
     case 'leads':
@@ -94,8 +101,13 @@ const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, 
     case 'traffic':
       return (
         <td style={cellStyle}>
+          {/* Landing Page Views = the real Meta conversion for Traffic (more accurate than clicks) */}
           <div style={{ ...numStyle, color: 'var(--blue)' }}>
-            {campaign.clicks > 0 ? `${formatNumber(campaign.clicks)} clicks` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
+            {campaign.page_views > 0
+              ? `${formatNumber(campaign.page_views)} page views`
+              : campaign.clicks > 0
+              ? `${formatNumber(campaign.clicks)} clicks`
+              : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
           </div>
           <div style={subStyle}>{ctr > 0 ? `CTR ${ctr.toFixed(2)}%` : 'no clicks'}</div>
         </td>

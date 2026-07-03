@@ -78,10 +78,13 @@ export interface Campaign {
   spend: number;
   impressions: number;
   clicks: number;
+  // Traffic-specific
+  page_views: number;        // landing_page_view action from Meta
   // Ecommerce
   purchases: number;
   revenue: number;
   roas: number;
+  atc: number;               // add_to_cart action from Meta
   // Lead gen (clinic/spa/salon/wholesale)
   leads: number;
   cpl: number;
