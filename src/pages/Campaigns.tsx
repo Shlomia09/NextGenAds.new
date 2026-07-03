@@ -65,13 +65,37 @@ const StatusPill: React.FC<{ status: string }> = ({ status }) => {
   );
 };
 
-// ─── Conversion cell (goal-adaptive, Meta-accurate) ──────────
+// ─── Conversion cell — shows the event the client actually configured in Meta ─
 const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, goal }) => {
   const ctr = campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100 : 0;
   const cellStyle = { padding: '16px 22px', borderBottom: '1px solid var(--border-soft)', textAlign: 'right' as const };
   const numStyle  = { fontFamily: 'var(--font-mono)', fontSize: 13.5, fontWeight: 500 };
   const subStyle  = { fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--text-3)', marginTop: 3 };
 
+  // ── Primary: use the actual Meta conversion event if synced ──────────────────
+  if (campaign.conversion_event) {
+    // Color: green if good, default accent otherwise
+    const isRevenue = ['Purchases', 'ROAS'].includes(campaign.conversion_event);
+    const color = isRevenue
+      ? (campaign.roas >= 3 ? 'var(--green)' : campaign.roas >= 1.5 ? 'var(--champagne)' : 'var(--accent)')
+      : 'var(--accent)';
+
+    return (
+      <td style={cellStyle}>
+        <div style={{ ...numStyle, color }}>
+          {campaign.conversion_value > 0
+            ? formatNumber(campaign.conversion_value)
+            : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
+        </div>
+        <div style={subStyle}>
+          {campaign.conversion_event}
+          {ctr > 0 && ` · CTR ${ctr.toFixed(1)}%`}
+        </div>
+      </td>
+    );
+  }
+
+  // ── Fallback: data not yet synced with promoted_object — use goal logic ──────
   switch (goal) {
     case 'sales':
       return (
@@ -79,14 +103,7 @@ const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, 
           <div style={{ ...numStyle, color: campaign.roas >= 3 ? 'var(--green)' : campaign.roas >= 1.5 ? 'var(--champagne)' : 'var(--red)' }}>
             {campaign.roas > 0 ? `${campaign.roas.toFixed(2)}x` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
           </div>
-          {/* ATC takes priority over purchases as the funnel metric */}
-          <div style={subStyle}>
-            {campaign.atc > 0
-              ? `${formatNumber(campaign.atc)} ATC`
-              : campaign.purchases > 0
-              ? `${campaign.purchases} purch.`
-              : 'no sales'}
-          </div>
+          <div style={subStyle}>{campaign.atc > 0 ? `${formatNumber(campaign.atc)} ATC` : campaign.purchases > 0 ? `${campaign.purchases} purch.` : 'no sales'}</div>
         </td>
       );
     case 'leads':
@@ -101,13 +118,8 @@ const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, 
     case 'traffic':
       return (
         <td style={cellStyle}>
-          {/* Landing Page Views = the real Meta conversion for Traffic (more accurate than clicks) */}
           <div style={{ ...numStyle, color: 'var(--blue)' }}>
-            {campaign.page_views > 0
-              ? `${formatNumber(campaign.page_views)} page views`
-              : campaign.clicks > 0
-              ? `${formatNumber(campaign.clicks)} clicks`
-              : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
+            {campaign.page_views > 0 ? `${formatNumber(campaign.page_views)} page views` : campaign.clicks > 0 ? `${formatNumber(campaign.clicks)} clicks` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
           </div>
           <div style={subStyle}>{ctr > 0 ? `CTR ${ctr.toFixed(2)}%` : 'no clicks'}</div>
         </td>

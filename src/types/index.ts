@@ -94,6 +94,9 @@ export interface Campaign {
   // Local (salon)
   reach: number;
   frequency: number;
+  // The actual conversion event configured in this Meta campaign
+  conversion_event: string | null;   // friendly label, e.g. 'ATC', 'Purchases', 'Page Views'
+  conversion_value: number;           // count of that event from Meta insights
   date_start: string;
   date_end?: string;
   synced_at: string;

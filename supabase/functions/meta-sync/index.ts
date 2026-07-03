@@ -21,6 +21,55 @@ const classifyObj = (o: string): string => {
   return 'unknown';
 };
 
+// ── Meta custom_event_type → { action_type, label } ─────────────────────────
+// Maps what Meta stores in promoted_object.custom_event_type
+// to the action_type key in the insights actions array and a friendly label.
+const META_CONVERSION_MAP: Record<string, { actionType: string; label: string }> = {
+  PURCHASE:               { actionType: 'offsite_conversion.fb_pixel_purchase',            label: 'Purchases'       },
+  ADD_TO_CART:            { actionType: 'offsite_conversion.fb_pixel_add_to_cart',         label: 'ATC'             },
+  INITIATE_CHECKOUT:      { actionType: 'offsite_conversion.fb_pixel_initiate_checkout',   label: 'Checkout'        },
+  ADD_PAYMENT_INFO:       { actionType: 'offsite_conversion.fb_pixel_add_payment_info',    label: 'Add Payment Info' },
+  VIEW_CONTENT:           { actionType: 'offsite_conversion.fb_pixel_view_content',        label: 'View Content'    },
+  LEAD:                   { actionType: 'offsite_conversion.fb_pixel_lead',                label: 'Leads'           },
+  COMPLETE_REGISTRATION:  { actionType: 'offsite_conversion.fb_pixel_complete_registration', label: 'Registrations' },
+  SUBSCRIBE:              { actionType: 'offsite_conversion.fb_pixel_subscribe',           label: 'Subscriptions'   },
+  SEARCH:                 { actionType: 'offsite_conversion.fb_pixel_search',              label: 'Searches'        },
+  ADD_TO_WISHLIST:        { actionType: 'offsite_conversion.fb_pixel_add_to_wishlist',     label: 'Wishlist Adds'   },
+  // Traffic fallbacks
+  LANDING_PAGE_VIEW:      { actionType: 'landing_page_view',                              label: 'Page Views'      },
+  LINK_CLICK:             { actionType: 'link_click',                                     label: 'Clicks'          },
+  // Awareness fallback
+  REACH:                  { actionType: 'reach',                                          label: 'Reach'           },
+};
+
+/** Given a campaign's promoted_object and objective, return the conversion key to use */
+const resolveConversionKey = (promotedObject: Record<string, string> | null, objective: string): string => {
+  // 1. Use custom_event_type from promoted_object if available
+  if (promotedObject?.custom_event_type) {
+    return promotedObject.custom_event_type.toUpperCase();
+  }
+  // 2. Fall back to objective-based defaults
+  const goal = classifyObj(objective);
+  if (goal === 'traffic')   return 'LANDING_PAGE_VIEW';
+  if (goal === 'awareness') return 'REACH';
+  if (goal === 'leads')     return 'LEAD';
+  if (goal === 'sales')     return 'PURCHASE';
+  return 'LINK_CLICK';
+};
+
+/** Extract the conversion count from the insights actions array */
+const extractConversionValue = (
+  actions: Array<{ action_type: string; value: string }> | undefined,
+  conversionKey: string,
+): number => {
+  if (!actions || !conversionKey) return 0;
+  const mapping = META_CONVERSION_MAP[conversionKey];
+  if (!mapping) return 0;
+  const action = actions.find((a) => a.action_type === mapping.actionType);
+  return parseInt(action?.value || '0');
+};
+
+
 // ── Helper: extract lead count from a Meta actions array ──
 const extractLeads = (actions: Array<{ action_type: string; value: string }> | undefined): number => {
   if (!actions) return 0;
@@ -74,7 +123,7 @@ serve(async (req) => {
     // 1. Get campaigns from Meta API
     const campaignsUrl = new URL(`${META_API_BASE}/act_${adAccount.account_id}/campaigns`);
     campaignsUrl.searchParams.set('access_token', accessToken);
-    campaignsUrl.searchParams.set('fields', 'id,name,status,objective,daily_budget,lifetime_budget,start_time,stop_time');
+    campaignsUrl.searchParams.set('fields', 'id,name,status,objective,daily_budget,lifetime_budget,start_time,stop_time,promoted_object');
     campaignsUrl.searchParams.set('limit', '50');
 
     const campaignsRes = await fetch(campaignsUrl.toString());
@@ -166,6 +215,12 @@ serve(async (req) => {
       const reach = parseInt(insight.reach || '0');
       const frequency = parseFloat(insight.frequency || '0');
 
+      // ── Resolve the actual conversion event configured in this campaign ──
+      // Uses promoted_object.custom_event_type from Meta — the event the client actually set.
+      const conversionKey   = resolveConversionKey(campaign.promoted_object || null, campaign.objective || '');
+      const conversion_event = META_CONVERSION_MAP[conversionKey]?.label ?? conversionKey;
+      const conversion_value = extractConversionValue(insight.actions, conversionKey);
+
       // Upsert to DB
       const { error: upsertError } = await supabase
         .from('campaigns')
@@ -191,6 +246,8 @@ serve(async (req) => {
           cpl,
           reach,
           frequency,
+          conversion_event,  // friendly label of the campaign's configured conversion event
+          conversion_value,  // count of that event from Meta insights
           date_start: campaign.start_time,
           date_end: campaign.stop_time || null,
           synced_at: new Date().toISOString(),
