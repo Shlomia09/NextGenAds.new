@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Sparkles, BarChart3, Wrench, Store, Plug, Settings, Menu, X,
+  LayoutDashboard, Sparkles, BarChart3, Wrench, Store, Plug, Settings, Menu, X, Palette,
 } from 'lucide-react';
 import BrandSwitcher from './BrandSwitcher';
 import ThemeToggle from './ThemeToggle';
@@ -14,6 +14,7 @@ const navItems = [
   { path: '/intelligence',      icon: Sparkles,        label: 'Intelligence' },
   { path: '/campaigns',         icon: BarChart3,       label: 'Campaigns' },
   { path: '/campaign-workshop', icon: Wrench,          label: 'Campaign Workshop' },
+  { path: '/creative-studio',   icon: Palette,         label: 'Creative Studio' },
   { path: '/brands',            icon: Store,           label: 'Brands' },
   { path: '/connect',           icon: Plug,            label: 'Connect' },
   { path: '/settings',          icon: Settings,        label: 'Settings' },

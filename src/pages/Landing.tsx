@@ -259,7 +259,7 @@ export default function Landing() {
         /* Layer 1 — wall image: very dark by default (§60) */
         .wall {
           position:absolute; inset:0;
-          background:url('/assets/hero-wall.png') center/cover no-repeat;
+          background:url('/assets/hero-wall.webp') center/cover no-repeat;
           filter:brightness(0.46) saturate(0.9);
           transform:scale(1.06); transform-origin:center;
           will-change:transform;

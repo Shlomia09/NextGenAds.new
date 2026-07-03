@@ -11,6 +11,7 @@ interface IntelligenceChatProps {
   sessionId?: string;
   initialMessages?: ChatMessage[];
   compact?: boolean;
+  onMessagesChange?: (messages: ChatMessage[]) => void;
 }
 
 const QUICK_QUESTIONS = [
@@ -41,6 +42,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
   campaigns,
   initialMessages = [],
   compact = false,
+  onMessagesChange,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [input, setInput] = useState('');
@@ -50,11 +52,23 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
   const [inputFocused, setInputFocused] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { activeAccount } = useActiveAccount();
 
+  // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Persist messages to DB via parent callback (debounced 1.5 s)
+  useEffect(() => {
+    if (!onMessagesChange || messages.length === 0) return;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      onMessagesChange(messages);
+    }, 1500);
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
+  }, [messages, onMessagesChange]);
 
   /** Build a rich human-readable context summary from campaigns */
   const buildCampaignContextSummary = (camps: Campaign[]): string => {
