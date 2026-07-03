@@ -349,3 +349,64 @@ export const deleteDraft = async (draftId: string): Promise<void> => {
   if (error) throw error;
 };
 
+// ── Account ↔ Brand Linking ───────────────────────────────────────────────────
+
+/**
+ * Reassign an ad_account to a different brand (or null to unlink).
+ * Call this when the user connected to the wrong brand and needs to correct it.
+ */
+export const relinkAdAccount = async (
+  adAccountId: string,
+  newBrandId: string | null,
+): Promise<void> => {
+  const { error } = await supabase
+    .from('ad_accounts')
+    .update({ brand_id: newBrandId })
+    .eq('id', adAccountId);
+  if (error) throw error;
+};
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+
+export interface UserNotification {
+  id: string;
+  type: string;
+  label: string;
+  metadata: Record<string, unknown> | null;
+  brand_id: string | null;
+  created_at: string;
+}
+
+/**
+ * Returns the most recent system events across ALL of a user's brands.
+ * Used to populate the Topbar notifications panel.
+ */
+export const getUserNotifications = async (
+  userId: string,
+  limit = 20,
+): Promise<UserNotification[]> => {
+  // 1. Get all brand IDs for this user
+  const { data: brands, error: brandErr } = await supabase
+    .from('brands')
+    .select('id')
+    .eq('user_id', userId);
+
+  if (brandErr || !brands || brands.length === 0) return [];
+
+  const brandIds = brands.map((b) => b.id);
+
+  // 2. Get system events for those brands
+  const { data, error } = await supabase
+    .from('system_events')
+    .select('id, type, label, metadata, brand_id, created_at')
+    .in('brand_id', brandIds)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.warn('getUserNotifications error:', error.message);
+    return [];
+  }
+
+  return (data ?? []) as UserNotification[];
+};

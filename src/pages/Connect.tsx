@@ -55,7 +55,7 @@ const KlaviyoLogo = () => (
 
 
 
-import { getAdAccounts, supabase } from '../lib/supabase';
+import { getAdAccounts, supabase, relinkAdAccount } from '../lib/supabase';
 import { initiateMetaOAuth, syncMetaCampaigns } from '../lib/meta-api';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -84,6 +84,11 @@ const Connect: React.FC = () => {
   const [syncingId,  setSyncingId]  = useState<string | null>(null);
   const [syncResults, setSyncResults] = useState<Record<string, { synced: number; total: number }>>({});
   const [syncErrors,  setSyncErrors]  = useState<Record<string, string>>({});
+
+  // Brand-account relink state
+  const [relinkingId,   setRelinkingId]   = useState<string | null>(null);
+  const [relinkSaving,  setRelinkSaving]  = useState(false);
+  const [relinkSuccess, setRelinkSuccess] = useState<string | null>(null);
 
   // Disconnect modal
   const [disconnectTarget, setDisconnectTarget] = useState<{ id: string; name: string } | null>(null);
@@ -146,26 +151,49 @@ const Connect: React.FC = () => {
     }
   };
 
+  // ── Relink account to a different brand ─────────────────────
+  const handleRelink = async (adAccountId: string, newBrandId: string) => {
+    if (!newBrandId || relinkSaving) return;
+    setRelinkSaving(true);
+    try {
+      await relinkAdAccount(adAccountId, newBrandId || null);
+      setRelinkSuccess(adAccountId);
+      setTimeout(() => setRelinkSuccess(null), 3000);
+      setRelinkingId(null);
+      refetchAccounts();
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+    } catch (err) {
+      setSyncErrors(prev => ({ ...prev, [adAccountId]: 'Could not relink: ' + (err instanceof Error ? err.message : 'Unknown error') }));
+    } finally {
+      setRelinkSaving(false);
+    }
+  };
+
   // ── Sync a specific account ──────────────────────────────────
-  const handleSync = async (accountId: string) => {
+  const handleSync = async (accountId: string, accountBrandId?: string | null) => {
     setSyncingId(accountId);
     setSyncResults(prev => { const n = { ...prev }; delete n[accountId]; return n; });
     setSyncErrors(prev  => { const n = { ...prev }; delete n[accountId]; return n; });
 
     try {
-      const { data: brands } = await supabase
-        .from('brands')
-        .select('id')
-        .eq('user_id', user!.id)
-        .limit(1)
-        .single();
+      // Use the account's own brand_id if set; otherwise fall back to first brand
+      let brandId = accountBrandId ?? null;
+      if (!brandId) {
+        const { data: firstBrand } = await supabase
+          .from('brands')
+          .select('id')
+          .eq('user_id', user!.id)
+          .limit(1)
+          .single();
+        brandId = firstBrand?.id ?? null;
+      }
 
-      if (!brands?.id) {
-        setSyncErrors(prev => ({ ...prev, [accountId]: 'No brand found. Complete onboarding first.' }));
+      if (!brandId) {
+        setSyncErrors(prev => ({ ...prev, [accountId]: 'No brand linked. Use "Change brand" to assign this account first.' }));
         return;
       }
 
-      const result = await syncMetaCampaigns(brands.id, accountId);
+      const result = await syncMetaCampaigns(brandId, accountId);
       setSyncResults(prev => ({ ...prev, [accountId]: { synced: result.synced, total: result.total } }));
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
     } catch (err) {
@@ -406,6 +434,79 @@ const Connect: React.FC = () => {
                       </button>
                     </div>
 
+                    {/* ── Brand assignment row ── */}
+                    <div style={{
+                      background: 'rgba(196,131,106,0.04)',
+                      border: '0.5px solid rgba(196,131,106,0.15)',
+                      borderRadius: 4, padding: '8px 10px',
+                      display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+                    }}>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-hint)', letterSpacing: '0.12em', textTransform: 'uppercase', flexShrink: 0 }}>
+                        Brand
+                      </span>
+
+                      {relinkingId === account.id ? (
+                        /* ── Relink dropdown ── */
+                        <>
+                          <select
+                            autoFocus
+                            defaultValue={(account as any).brand_id ?? ''}
+                            onChange={e => handleRelink(account.id, e.target.value)}
+                            disabled={relinkSaving}
+                            style={{
+                              flex: 1, minWidth: 120,
+                              background: 'var(--bg-secondary)',
+                              border: '0.5px solid var(--accent)',
+                              borderRadius: 3, padding: '4px 8px',
+                              fontFamily: 'var(--font-sans)', fontSize: 12,
+                              color: 'var(--text-primary)', cursor: 'pointer',
+                            }}
+                          >
+                            <option value="">— Unlinked —</option>
+                            {brands.map(b => (
+                              <option key={b.id} value={b.id}>{b.name}</option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => setRelinkingId(null)}
+                            style={{ background: 'none', border: 'none', color: 'var(--text-hint)', cursor: 'pointer', fontSize: 12, padding: '2px 4px' }}
+                          >
+                            ✕
+                          </button>
+                        </>
+                      ) : (
+                        /* ── Static display ── */
+                        <>
+                          {(account as any).brand_id ? (
+                            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', flex: 1 }}>
+                              {brands.find(b => b.id === (account as any).brand_id)?.name ?? 'Unknown brand'}
+                            </span>
+                          ) : (
+                            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: '#F59E0B', flex: 1, display: 'flex', alignItems: 'center', gap: 5 }}>
+                              ⚠ Not linked to a brand
+                            </span>
+                          )}
+                          <button
+                            onClick={() => setRelinkingId(account.id)}
+                            style={{
+                              background: 'rgba(196,131,106,0.1)',
+                              border: '0.5px solid rgba(196,131,106,0.3)',
+                              borderRadius: 3, padding: '3px 8px',
+                              fontFamily: 'var(--font-sans)', fontSize: 10,
+                              color: 'var(--accent)', cursor: 'pointer', flexShrink: 0,
+                            }}
+                          >
+                            Change brand
+                          </button>
+                        </>
+                      )}
+
+                      {/* Success flash */}
+                      {relinkSuccess === account.id && (
+                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: '#10B981', marginLeft: 4 }}>✓ Saved</span>
+                      )}
+                    </div>
+
                     {/* Sync result / error for this account */}
                     {syncResults[account.id] && (
                       <div style={{ background: 'rgba(16,185,129,0.06)', border: '0.5px solid rgba(16,185,129,0.2)', borderRadius: 4, padding: '7px 11px', fontFamily: "'Outfit', sans-serif", fontSize: 11, color: '#10B981', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -422,7 +523,7 @@ const Connect: React.FC = () => {
                     {/* Sync button */}
                     <button
                       className="btn btn-primary"
-                      onClick={() => handleSync(account.id)}
+                      onClick={() => handleSync(account.id, (account as any).brand_id)}
                       disabled={syncingId === account.id}
                     >
                       {syncingId === account.id
