@@ -274,17 +274,6 @@ const MetaCallback: React.FC = () => {
         }
       }
 
-        if (token) minPayload.access_token = token;
-
-        const { error: minErr } = await supabase
-          .from('ad_accounts')
-          .insert(minPayload);
-
-        if (minErr) {
-          console.error('Minimal insert also failed:', minErr.message);
-          errors.push(`${cfg.account_name}: ${minErr.message}`);
-        }
-      }
     }
 
     if (errors.length > 0) {
