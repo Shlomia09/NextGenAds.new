@@ -705,9 +705,25 @@ const Campaigns: React.FC = () => {
     try {
       const brand = selectedBrand === 'all' ? brands[0] : brands.find(b => b.id === selectedBrand);
       if (!brand) { setSyncMsg('Select a brand first'); return; }
-      await syncMetaCampaigns(brand.id, metaAccounts[0].id);
+
+      // ── Find the ad account that is actually linked to this brand ──
+      // Bug fix: previously always used metaAccounts[0], causing ALL brands
+      // to sync from the same first account regardless of which was selected.
+      const accountForBrand = adAccounts.find(
+        (a) => (a as any).brand_id === brand.id && a.platform === 'meta'
+      );
+      const accountToSync = accountForBrand ?? metaAccounts[0];
+
+      if (!accountToSync) { setSyncMsg('No Meta account linked. Go to Connect → Change brand.'); return; }
+
+      // Warn in UI if falling back to unlinked account
+      if (!accountForBrand) {
+        setSyncMsg(`⚠ No account linked to "${brand.name}" — syncing from default account. Go to Connect to link.`);
+      }
+
+      await syncMetaCampaigns(brand.id, accountToSync.id);
       await queryClient.invalidateQueries({ queryKey: ['campaigns'] });
-      setSyncMsg('Synced ✓');
+      setSyncMsg(accountForBrand ? 'Synced ✓' : `Synced ✓ (from default account)`);
     } catch (err) {
       setSyncMsg(err instanceof Error ? err.message : 'Sync failed');
     } finally { setSyncing(false); }
