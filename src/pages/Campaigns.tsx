@@ -83,8 +83,8 @@ const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, 
     return (
       <td style={cellStyle}>
         <div style={{ ...numStyle, color }}>
-          {campaign.conversion_value > 0
-            ? formatNumber(campaign.conversion_value)
+          {(campaign.conversion_value ?? 0) > 0
+            ? formatNumber(campaign.conversion_value ?? 0)
             : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
         </div>
         <div style={subStyle}>
@@ -103,7 +103,7 @@ const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, 
           <div style={{ ...numStyle, color: campaign.roas >= 3 ? 'var(--green)' : campaign.roas >= 1.5 ? 'var(--champagne)' : 'var(--red)' }}>
             {campaign.roas > 0 ? `${campaign.roas.toFixed(2)}x` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
           </div>
-          <div style={subStyle}>{campaign.atc > 0 ? `${formatNumber(campaign.atc)} ATC` : campaign.purchases > 0 ? `${campaign.purchases} purch.` : 'no sales'}</div>
+          <div style={subStyle}>{(campaign.atc ?? 0) > 0 ? `${formatNumber(campaign.atc ?? 0)} ATC` : (campaign.purchases ?? 0) > 0 ? `${campaign.purchases} purch.` : 'no sales'}</div>
         </td>
       );
     case 'leads':
@@ -119,7 +119,7 @@ const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, 
       return (
         <td style={cellStyle}>
           <div style={{ ...numStyle, color: 'var(--blue)' }}>
-            {campaign.page_views > 0 ? `${formatNumber(campaign.page_views)} page views` : campaign.clicks > 0 ? `${formatNumber(campaign.clicks)} clicks` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
+            {(campaign.page_views ?? 0) > 0 ? `${formatNumber(campaign.page_views ?? 0)} page views` : (campaign.clicks ?? 0) > 0 ? `${formatNumber(campaign.clicks ?? 0)} clicks` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
           </div>
           <div style={subStyle}>{ctr > 0 ? `CTR ${ctr.toFixed(2)}%` : 'no clicks'}</div>
         </td>

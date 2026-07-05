@@ -73,7 +73,7 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, linkedAccounts, allAccount
         </div>
         <div className="brand-metric">
           <div className="brand-metric-label"><Globe size={9} strokeWidth={1.5} />Mkts</div>
-          <div className="brand-metric-value">{brand.markets.length || '—'}</div>
+          <div className="brand-metric-value">{brand.markets?.length || '—'}</div>
         </div>
       </div>
 
@@ -217,9 +217,9 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, linkedAccounts, allAccount
         )}
       </div>
 
-      {brand.markets.length > 0 && (
+      {(brand.markets?.length ?? 0) > 0 && (
         <div className="brand-flags">
-          {brand.markets.slice(0, 5).map((m) => (
+          {brand.markets!.slice(0, 5).map((m) => (
             <span key={m} style={{ fontSize: 16 }}>{MARKETS[m]?.split(' ')[0]}</span>
           ))}
         </div>
