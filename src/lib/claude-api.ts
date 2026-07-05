@@ -40,6 +40,21 @@ export interface ClaudeChatRequest {
   conversion_type?: string;
 }
 
+export interface ChatResponse {
+  content: string;
+  action_proposal: ActionProposal | null;
+}
+
+export interface ActionProposal {
+  type: 'create_campaign' | 'duplicate_ad' | 'duplicate_adset' | 'pause_campaign' | 'activate_campaign' | 'scale_budget';
+  label: string;
+  description: string;
+  params?: Record<string, unknown>;
+  ad_account_id?: string;
+  campaign_id_external?: string;
+  ad_id_external?: string;
+}
+
 // Custom error for chat limit reached
 export class ChatLimitError extends Error {
   code = 'CHAT_LIMIT_REACHED';
@@ -56,14 +71,12 @@ export class ChatLimitError extends Error {
   }
 }
 
-export const sendChatMessage = async (request: ClaudeChatRequest): Promise<string> => {
+export const sendChatMessage = async (request: ClaudeChatRequest): Promise<ChatResponse> => {
   const { data, error } = await supabase.functions.invoke('claude-chat', {
     body: request,
   });
 
   if (error) {
-    // Supabase wraps non-2xx responses as FunctionsHttpError.
-    // Try to extract the JSON body to detect CHAT_LIMIT_REACHED (429).
     if (error.context) {
       try {
         const body = await (error.context as Response).json();
@@ -77,13 +90,15 @@ export const sendChatMessage = async (request: ClaudeChatRequest): Promise<strin
         }
       } catch (parseErr) {
         if (parseErr instanceof ChatLimitError) throw parseErr;
-        // JSON parse failed — fall through to generic throw
       }
     }
     throw error;
   }
 
-  return data.content as string;
+  return {
+    content:         data.content as string,
+    action_proposal: (data.action_proposal as ActionProposal | null) ?? null,
+  };
 };
 
 

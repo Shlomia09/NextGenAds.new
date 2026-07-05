@@ -26,7 +26,7 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
     if (authError || !user) throw new Error('Unauthorized');
 
-    const { action, campaign_id_external, ad_account_id, value } = await req.json();
+    const { action, campaign_id_external, ad_account_id, ad_id_external, value, params } = await req.json();
 
     // ── Verify user owns the ad account & fetch token ──────────────────
     const { data: adAccount, error: accErr } = await supabase
@@ -110,6 +110,147 @@ serve(async (req) => {
         const adsData = await adsRes.json();
         if (adsData.error) throw new Error(`Meta API: ${adsData.error.message}`);
         result = { success: true, ads: adsData.data || [] };
+        break;
+      }
+
+      case 'duplicate_ad': {
+        // POST /{ad_id}/copies — duplicates ad into same campaign, starts PAUSED
+        const adId = ad_id_external || params?.ad_id_external;
+        if (!adId) throw new Error('ad_id_external is required for duplicate_ad');
+        const res = await fetch(
+          `${META_API}/${adId}/copies`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              campaign_id:    campaign_id_external,
+              access_token:   token,
+              status_option:  'PAUSED',
+              rename_options: JSON.stringify({ rename_strategy: 'DEEP_RENAME', rename_prefix: '[Copy] ' }),
+            }),
+          }
+        );
+        const data = await res.json();
+        if (data.error) throw new Error(`Meta API: ${data.error.message}`);
+        result = {
+          success:    true,
+          message:    `✅ Ad duplicated successfully (PAUSED). New ad ID: ${data.copied_adset_id || data.id || 'see Ads Manager'}. Review and activate in Meta Ads Manager.`,
+          new_ad_id:  data.copied_adset_id || data.id,
+        };
+        break;
+      }
+
+      case 'create_campaign': {
+        // Full flow: Campaign → AdSet → Ad (copies creative from source_ad_id)
+        if (!params) throw new Error('params is required for create_campaign');
+        const META_V = 'https://graph.facebook.com/v19.0';
+        const actId   = adAccount.account_id;
+
+        // A: Create Campaign
+        const campRes = await fetch(
+          `${META_V}/act_${actId}/campaigns`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name:                  params.campaign_name,
+              objective:             params.objective || 'LEAD_GENERATION',
+              status:                'PAUSED',
+              special_ad_categories: [],
+              access_token:          token,
+            }),
+          }
+        );
+        const campData = await campRes.json();
+        if (campData.error) throw new Error(`Create campaign: ${campData.error.message}`);
+        const newCampaignId = campData.id;
+
+        // B: Create AdSet
+        const adsetBody: Record<string, unknown> = {
+          name:              `${params.campaign_name} — AdSet`,
+          campaign_id:       newCampaignId,
+          daily_budget:      params.daily_budget_cents || 3000,
+          billing_event:     'IMPRESSIONS',
+          optimization_goal: params.objective === 'LEAD_GENERATION' ? 'LEAD_GENERATION' : 'REACH',
+          targeting: {
+            geo_locations: { countries: params.adset?.countries || ['IL'] },
+            age_min:       params.adset?.age_min || 25,
+            age_max:       params.adset?.age_max || 44,
+          },
+          status:            'PAUSED',
+          access_token:      token,
+        };
+        const adsetRes  = await fetch(`${META_V}/act_${actId}/adsets`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(adsetBody),
+        });
+        const adsetData = await adsetRes.json();
+        if (adsetData.error) throw new Error(`Create adset: ${adsetData.error.message}`);
+        const newAdsetId = adsetData.id;
+
+        // C: Duplicate source ad into the new campaign/adset
+        let newAdId: string | null = null;
+        if (params.source_ad_id) {
+          const copyRes  = await fetch(`${META_V}/${params.source_ad_id}/copies`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              campaign_id:    newCampaignId,
+              adset_id:       newAdsetId,
+              access_token:   token,
+              status_option:  'PAUSED',
+              rename_options: JSON.stringify({ rename_strategy: 'DEEP_RENAME', rename_prefix: '[Scale] ' }),
+            }),
+          });
+          const copyData = await copyRes.json();
+          if (!copyData.error) newAdId = copyData.copied_adset_id || copyData.id;
+          else console.warn('Ad copy warning:', copyData.error.message);
+        }
+
+        result = {
+          success:         true,
+          message:         `✅ Campaign "${params.campaign_name}" created (PAUSED) with 1 AdSet${newAdId ? ' and 1 Ad' : ''}. Review and activate in Meta Ads Manager when ready.`,
+          new_campaign_id: newCampaignId,
+          new_adset_id:    newAdsetId,
+          new_ad_id:       newAdId,
+        };
+        break;
+      }
+
+      case 'duplicate_adset': {
+        const adsetId = params?.adset_id_external;
+        if (!adsetId) throw new Error('params.adset_id_external required for duplicate_adset');
+        const res = await fetch(`${META_API}/${adsetId}/copies`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            campaign_id:   campaign_id_external,
+            access_token:  token,
+            status_option: 'PAUSED',
+          }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(`Meta API: ${data.error.message}`);
+        result = { success: true, message: `✅ AdSet duplicated (PAUSED). ID: ${data.id}`, new_adset_id: data.id };
+        break;
+      }
+
+      case 'log_action': {
+        // Log a proposed action to action_logs table
+        const { data: logRow, error: logErr } = await supabase
+          .from('action_logs')
+          .insert({
+            brand_id:    params?.brand_id,
+            user_id:     user.id,
+            action_type: params?.action_type,
+            params:      params?.params || {},
+            status:      'pending',
+          })
+          .select('id')
+          .single();
+        if (logErr) throw new Error(`Log error: ${logErr.message}`);
+        result = { success: true, log_id: logRow?.id };
         break;
       }
 

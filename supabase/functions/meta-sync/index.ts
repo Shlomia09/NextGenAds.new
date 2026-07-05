@@ -317,7 +317,7 @@ serve(async (req) => {
       }
     }
 
-    // ── Step 4: Ad-level insights ──
+    // ── Step 4: Ad-level insights (with status, adset_id, purchases, roas) ──
     let adsCount = 0;
 
     try {
@@ -325,7 +325,7 @@ serve(async (req) => {
       adsUrl.searchParams.set('access_token', accessToken);
       adsUrl.searchParams.set(
         'fields',
-        'id,name,campaign_id,insights.date_preset(last_30d){spend,impressions,clicks,ctr,actions}'
+        'id,name,status,effective_status,adset_id,campaign_id,insights.date_preset(last_30d){spend,impressions,clicks,ctr,actions,action_values,purchase_roas}'
       );
       adsUrl.searchParams.set('limit', '100');
 
@@ -337,6 +337,9 @@ serve(async (req) => {
         .map((ad: {
           id: string;
           name: string;
+          status: string;
+          effective_status: string;
+          adset_id?: string;
           campaign_id: string;
           insights?: { data?: Array<{
             spend?: string;
@@ -344,31 +347,52 @@ serve(async (req) => {
             clicks?: string;
             ctr?: string;
             actions?: Array<{ action_type: string; value: string }>;
+            action_values?: Array<{ action_type: string; value: string }>;
+            purchase_roas?: Array<{ action_type: string; value: string }>;
           }> };
         }) => {
           const campaignUuid = externalToUuid.get(ad.campaign_id);
           if (!campaignUuid) return null;
 
           const insight = ad.insights?.data?.[0] || {};
-          const adSpend = parseFloat(insight.spend || '0');
+          const adSpend       = parseFloat(insight.spend || '0');
           const adImpressions = parseInt(insight.impressions || '0');
-          const adClicks = parseInt(insight.clicks || '0');
-          const adCtr = parseFloat(insight.ctr || '0');
-          const adLeads = extractLeads(insight.actions);
-          const adCpl = adLeads > 0 ? adSpend / adLeads : 0;
+          const adClicks      = parseInt(insight.clicks || '0');
+          const adCtr         = parseFloat(insight.ctr || '0');
+          const adLeads       = extractLeads(insight.actions);
+          const adCpl         = adLeads > 0 ? adSpend / adLeads : 0;
+
+          // Purchases
+          const purchaseAction = (insight.actions || []).find(
+            (a: { action_type: string }) =>
+              a.action_type === 'offsite_conversion.fb_pixel_purchase' ||
+              a.action_type === 'purchase'
+          );
+          const adPurchases = parseInt(purchaseAction?.value || '0');
+
+          // ROAS
+          const roasData = (insight.purchase_roas || []).find(
+            (a: { action_type: string }) =>
+              a.action_type === 'offsite_conversion.fb_pixel_purchase'
+          );
+          const adRoas = parseFloat(roasData?.value || '0');
 
           return {
-            campaign_id: campaignUuid,
+            campaign_id:        campaignUuid,
             brand_id,
-            ad_id_external: ad.id,
-            ad_name: ad.name,
-            spend: adSpend,
-            impressions: adImpressions,
-            clicks: adClicks,
-            leads: adLeads,
-            ctr: adCtr,
-            cpl: adCpl,
-            synced_at: new Date().toISOString(),
+            ad_id_external:     ad.id,
+            ad_name:            ad.name,
+            status:             ad.effective_status || ad.status || 'UNKNOWN',
+            adset_id_external:  ad.adset_id || null,
+            spend:              adSpend,
+            impressions:        adImpressions,
+            clicks:             adClicks,
+            leads:              adLeads,
+            purchases:          adPurchases,
+            roas:               adRoas,
+            ctr:                adCtr,
+            cpl:                adCpl,
+            synced_at:          new Date().toISOString(),
           };
         })
         .filter(Boolean);
@@ -379,18 +403,66 @@ serve(async (req) => {
           .upsert(adRows, { onConflict: 'campaign_id,ad_id_external' });
 
         if (!adsError) adsCount = adRows.length;
+        else console.error('Ad creatives upsert error:', adsError);
       }
     } catch (adsErr) {
       console.error('Ad-level insights fetch failed:', adsErr);
     }
 
-    // ── Step 5: Log system event ──
+    // ── Step 5: Sync Ad Sets (targeting, budget per adset) ──────────────────
+    let adSetsCount = 0;
+    try {
+      for (const campaign of campaigns) {
+        const adsetsUrl = new URL(`${META_API_BASE}/${campaign.id}/adsets`);
+        adsetsUrl.searchParams.set('access_token', accessToken);
+        adsetsUrl.searchParams.set('fields', 'id,name,status,daily_budget,lifetime_budget,targeting');
+        adsetsUrl.searchParams.set('limit', '50');
+
+        const adsetsRes  = await fetch(adsetsUrl.toString());
+        const adsetsData = await adsetsRes.json();
+        const adsets     = adsetsData.data || [];
+
+        const campaignUuid = externalToUuid.get(campaign.id);
+        if (!campaignUuid) continue;
+
+        const adsetRows = adsets.map((adset: {
+          id: string;
+          name: string;
+          status: string;
+          daily_budget?: string;
+          lifetime_budget?: string;
+          targeting?: Record<string, unknown>;
+        }) => ({
+          campaign_id:       campaignUuid,
+          brand_id,
+          adset_id_external: adset.id,
+          adset_name:        adset.name,
+          status:            adset.status,
+          daily_budget:      adset.daily_budget    ? parseInt(adset.daily_budget)    / 100 : null,
+          lifetime_budget:   adset.lifetime_budget ? parseInt(adset.lifetime_budget) / 100 : null,
+          targeting:         adset.targeting || null,
+          synced_at:         new Date().toISOString(),
+        }));
+
+        if (adsetRows.length > 0) {
+          const { error: adsetErr } = await supabase
+            .from('ad_sets')
+            .upsert(adsetRows, { onConflict: 'campaign_id,adset_id_external' });
+          if (!adsetErr) adSetsCount += adsetRows.length;
+          else console.error('Adset upsert error:', adsetErr);
+        }
+      }
+    } catch (adSetsErr) {
+      console.error('Ad sets sync failed:', adSetsErr);
+    }
+
+    // ── Step 6: Log system event ─────────────────────────────────────────────
     try {
       await supabase.from('system_events').insert({
         brand_id,
-        type: 'sync',
-        label: `${synced} campaigns synced with Meta`,
-        metadata: { synced, total: campaigns.length },
+        type:     'sync',
+        label:    `${synced} campaigns synced with Meta`,
+        metadata: { synced, total: campaigns.length, ads: adsCount, ad_sets: adSetsCount },
       });
     } catch (eventErr) {
       console.error('System event logging failed:', eventErr);
@@ -398,11 +470,12 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        success: true,
+        success:    true,
         synced,
-        total: campaigns.length,
+        total:      campaigns.length,
         daily_days: dailyCount,
-        ads: adsCount,
+        ads:        adsCount,
+        ad_sets:    adSetsCount,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -414,3 +487,5 @@ serve(async (req) => {
     );
   }
 });
+
+

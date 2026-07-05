@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, User, MessageSquare, Plus, Database } from 'lucide-react';
+import { Send, Sparkles, User, MessageSquare, Plus, Database, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 import type { ChatMessage, Brand, Campaign } from '../../types';
-import { sendChatMessage, ChatLimitError, type CampaignContext } from '../../lib/claude-api';
+import { sendChatMessage, ChatLimitError, type CampaignContext, type ActionProposal } from '../../lib/claude-api';
 import { useActiveAccount } from '../../contexts/ActiveAccountContext';
+import { supabase } from '../../lib/supabase';
 
 interface IntelligenceChatProps {
   brand: Brand;
@@ -50,6 +51,8 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
   const [hoveredQuick, setHoveredQuick] = useState<string | null>(null);
   const [sendHovered, setSendHovered] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
+  const [pendingAction, setPendingAction] = useState<ActionProposal | null>(null);
+  const [executingAction, setExecutingAction] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -150,7 +153,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
         budget_daily: c.budget_daily,
       }));
 
-      const response = await sendChatMessage({
+      const { content, action_proposal } = await sendChatMessage({
         brand_id: brand.id,
         messages: apiMessages,
         campaigns: richCampaigns,
@@ -158,9 +161,12 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
         conversion_type: activeAccount?.conversion_type ?? 'ecommerce',
       });
 
+      // Store action proposal for confirmation UI
+      if (action_proposal) setPendingAction(action_proposal);
+
       const assistantMsg: ChatMessage = {
         role: 'assistant',
-        content: response,
+        content,
         timestamp: new Date().toISOString(),
       };
 
@@ -191,6 +197,52 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage(input);
+    }
+  };
+
+  // ── Execute a Heinrick-proposed action via meta-action edge function ──────
+  const executeAction = async (proposal: ActionProposal, confirmed: boolean) => {
+    setPendingAction(null);
+    if (!confirmed) {
+      const dismissMsg: ChatMessage = {
+        role: 'assistant',
+        content: 'Understood — action cancelled. Let me know if you change your mind.',
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, dismissMsg]);
+      return;
+    }
+
+    setExecutingAction(true);
+    try {
+      const body: Record<string, unknown> = {
+        action:                 proposal.type,
+        ad_account_id:          proposal.ad_account_id,
+        campaign_id_external:   proposal.campaign_id_external,
+        ad_id_external:         proposal.ad_id_external,
+        params:                 proposal.params,
+        value:                  (proposal.params as Record<string, unknown> | undefined)?.value,
+      };
+
+      const { data, error } = await supabase.functions.invoke('meta-action', { body });
+
+      const resultMsg: ChatMessage = {
+        role: 'assistant',
+        content: error
+          ? `❌ Action failed: ${error.message}`
+          : (data?.message as string) ?? '✅ Action completed successfully.',
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, resultMsg]);
+    } catch (err) {
+      const errMsg: ChatMessage = {
+        role: 'assistant',
+        content: `❌ Unexpected error: ${err instanceof Error ? err.message : String(err)}`,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, errMsg]);
+    } finally {
+      setExecutingAction(false);
     }
   };
 
@@ -654,6 +706,64 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
 
         <div ref={bottomRef} />
       </div>
+
+      {/* ── Heinrick Action Proposal Card ── */}
+      {pendingAction && (
+        <div style={{
+          margin: '0 14px 8px',
+          padding: '12px 16px',
+          background: 'linear-gradient(135deg, rgba(196,131,106,0.12) 0%, rgba(196,131,106,0.06) 100%)',
+          border: '1px solid rgba(196,131,106,0.35)',
+          borderRadius: 10,
+          backdropFilter: 'blur(8px)',
+          flexShrink: 0,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <Sparkles size={16} style={{ color: T.accent, marginTop: 2, flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.accent, marginBottom: 2, letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                Heinrick Proposes an Action
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: T.textPrimary, marginBottom: 4 }}>
+                {pendingAction.label}
+              </div>
+              <div style={{ fontSize: 12, color: T.textBody, lineHeight: 1.5 }}>
+                {pendingAction.description}
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+            <button
+              onClick={() => executeAction(pendingAction, true)}
+              disabled={executingAction}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '7px 16px', borderRadius: 6, border: 'none',
+                background: T.accent, color: '#fff', fontSize: 12,
+                fontWeight: 600, cursor: executingAction ? 'wait' : 'pointer',
+                opacity: executingAction ? 0.7 : 1, transition: T.transition,
+              }}
+            >
+              {executingAction
+                ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> Executing…</>
+                : <><CheckCircle size={13} /> Yes, execute</>}
+            </button>
+            <button
+              onClick={() => executeAction(pendingAction, false)}
+              disabled={executingAction}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '7px 16px', borderRadius: 6,
+                border: `1px solid ${T.borderColor}`,
+                background: 'transparent', color: T.textMuted, fontSize: 12,
+                fontWeight: 600, cursor: 'pointer', transition: T.transition,
+              }}
+            >
+              <XCircle size={13} /> No, cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Input area ── */}
       <div

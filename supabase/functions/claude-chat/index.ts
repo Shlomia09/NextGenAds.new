@@ -436,11 +436,25 @@ serve(async (req) => {
     // Fetch campaigns context from DB
     const { data: dbCampaigns } = await supabase
       .from('campaigns')
-      .select('name, status, objective, spend, roas, impressions, clicks, purchases, revenue, leads, cpl, lead_quality_rate, qualified_leads, bookings, reach, frequency, budget_daily')
+      .select('name, status, objective, spend, roas, impressions, clicks, purchases, revenue, leads, cpl, lead_quality_rate, qualified_leads, bookings, reach, frequency, budget_daily, campaign_id_external')
       .eq('brand_id', brand_id)
       .order('spend', { ascending: false })
       .limit(10);
 
+    // Fetch top performing ads for Heinrick context
+    const { data: dbAds } = await supabase
+      .from('ad_creatives')
+      .select('ad_name, status, spend, impressions, clicks, leads, purchases, ctr, cpl, roas, ad_id_external, adset_id_external')
+      .eq('brand_id', brand_id)
+      .order('leads', { ascending: false })
+      .limit(15);
+
+    // Fetch ad sets for Heinrick context
+    const { data: dbAdSets } = await supabase
+      .from('ad_sets')
+      .select('adset_name, adset_id_external, status, daily_budget, targeting')
+      .eq('brand_id', brand_id)
+      .limit(10);
 
     // Build context-enriched system prompt
     const conversionBenchmark = BENCHMARK_CONTEXT[conversion_type || 'ecommerce'] || BENCHMARK_CONTEXT.ecommerce;
@@ -455,6 +469,41 @@ serve(async (req) => {
       richCampaignBlock = `The user has ${campaigns.length} campaign(s):\n` +
         campaigns.map((c: CampaignPayload) => `- ${c.name} [${c.status ?? 'UNKNOWN'}] | Spend: €${(c.spend ?? 0).toFixed(2)} | Objective: ${c.objective}`).join('\n');
     }
+
+    // Build ad-level context block for Heinrick
+    const adsBlock = dbAds && dbAds.length > 0
+      ? `\n## Top Performing Ads (last 30 days)\n` +
+        dbAds.map((ad: Record<string, unknown>, i: number) => {
+          const cpl       = (ad.cpl       as number) ?? 0;
+          const ctr       = (ad.ctr       as number) ?? 0;
+          const leads     = (ad.leads     as number) ?? 0;
+          const spend     = (ad.spend     as number) ?? 0;
+          const purchases = (ad.purchases as number) ?? 0;
+          const roas      = (ad.roas      as number) ?? 0;
+          const parts = [
+            `${i + 1}. "${ad.ad_name}"`,
+            `Spend: €${spend.toFixed(0)}`,
+            leads     > 0 ? `Leads: ${leads} | CPL: €${cpl.toFixed(1)}`          : '',
+            purchases > 0 ? `Purchases: ${purchases} | ROAS: ${roas.toFixed(2)}x` : '',
+            `CTR: ${ctr.toFixed(2)}%`,
+            `[${ad.status}]`,
+            `ad_id: ${ad.ad_id_external}`,
+          ].filter(Boolean);
+          return parts.join(' | ');
+        }).join('\n')
+      : '';
+
+    // Build ad-sets context block for Heinrick
+    const adSetsBlock = dbAdSets && dbAdSets.length > 0
+      ? `\n## Active Ad Sets\n` +
+        dbAdSets.map((s: Record<string, unknown>, i: number) => {
+          const budget    = s.daily_budget ? `€${s.daily_budget}/day` : 'lifetime budget';
+          const targeting = s.targeting as Record<string, unknown> | null;
+          const countries = (targeting?.geo_locations as Record<string, unknown>)?.countries;
+          const geo       = Array.isArray(countries) ? (countries as string[]).join(', ') : 'broad';
+          return `${i + 1}. "${s.adset_name}" | ${budget} | Geo: ${geo} | [${s.status}] | adset_id: ${s.adset_id_external}`;
+        }).join('\n')
+      : '';
 
     // Merge DB campaigns (may have more/updated data)
     const dbBlock = dbCampaigns && dbCampaigns.length > 0
@@ -486,8 +535,30 @@ ${richCampaignBlock || dbBlock || 'No campaigns synced yet. Ask user to sync the
 
 ${dbBlock && richCampaignBlock ? `### DB Snapshot (for cross-reference)\n${dbBlock}` : ''}
 ${buildObjContext(campaigns)}
+${adsBlock}
+${adSetsBlock}
 
-Analyze the above data in context of the benchmark knowledge when answering.`;
+## Your Action Capabilities
+
+You are not just an advisor — you are an executor. When you and the user reach a decision that requires a Meta Ads action:
+1. Summarize clearly what you are about to do and why
+2. Ask the user: "Would you like me to execute this now?"
+3. ONLY after they confirm — include an action_proposal in your response using this EXACT format:
+
+<action_proposal>
+{"type":"create_campaign|duplicate_ad|duplicate_adset|pause_campaign|activate_campaign|scale_budget","label":"Short label shown to user","description":"Detailed description of what will happen","params":{},"ad_account_id":"","campaign_id_external":"","ad_id_external":""}
+</action_proposal>
+
+Param shapes by action type:
+- create_campaign: {campaign_name, objective, daily_budget_cents, source_ad_id (optional), adset: {countries: [], age_min, age_max}}
+- duplicate_ad: use ad_id_external field
+- duplicate_adset: {adset_id_external}
+- scale_budget: use value field (e.g. 1.2 for +20%)
+- pause_campaign / activate_campaign: use campaign_id_external field
+
+NEVER include action_proposal without explicit user confirmation. Always explain your reasoning first.
+
+Analyze all data above in context of the benchmark knowledge when answering.`;
 
     // Call Claude
     const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') });
@@ -499,7 +570,16 @@ Analyze the above data in context of the benchmark knowledge when answering.`;
       messages: messages,
     });
 
-    const content = response.content[0].type === 'text' ? response.content[0].text : '';
+    const rawContent = response.content[0].type === 'text' ? response.content[0].text : '';
+
+    // Extract action_proposal if Heinrick included one
+    let actionProposal: Record<string, unknown> | null = null;
+    const apMatch = rawContent.match(/<action_proposal>([\s\S]*?)<\/action_proposal>/);
+    if (apMatch) {
+      try { actionProposal = JSON.parse(apMatch[1].trim()); } catch { /* ignore parse errors */ }
+    }
+    // Strip the XML block from the visible message
+    const content = rawContent.replace(/<action_proposal>[\s\S]*?<\/action_proposal>/g, '').trim();
 
     // ── Increment chat usage atomically ──────────────────────
     await supabaseService.rpc('increment_chat_usage', {
@@ -508,7 +588,7 @@ Analyze the above data in context of the benchmark knowledge when answering.`;
     });
 
     return new Response(
-      JSON.stringify({ content }),
+      JSON.stringify({ content, action_proposal: actionProposal }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
