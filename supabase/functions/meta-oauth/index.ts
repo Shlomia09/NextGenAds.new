@@ -87,54 +87,69 @@ serve(async (req) => {
       );
     }
 
-    // ── Store in Supabase (service role bypasses RLS) ────────────
+    // ── Safe UPSERT strategy ──────────────────────────────────────────────────────────
+    // Rule: NEVER delete active rows. Active rows carry brand_id and
+    // conversion_type set by the user. Deleting them loses that data.
+    //
+    // For each account returned by Meta:
+    //   - active   → UPDATE access_token only (preserve brand_id, status)
+    //   - pending  → UPDATE access_token (not yet confirmed by user)
+    //   - missing  → INSERT as 'pending' (user will confirm in picker)
+    const stored: string[] = [];
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
-
-    // ── First delete ALL stale accounts for this user (pending and active) ──
-    // so we can INSERT fresh rows without constraint issues
-    await supabase
-      .from('ad_accounts')
-      .delete()
-      .eq('user_id', userId)
-      .eq('platform', 'meta')
-      .eq('status', 'pending');
-
-    // ── Store all accounts as 'pending' — user picks in the UI ────
-    const stored = [];
     for (const account of adAccounts) {
-      // Delete existing row first (avoids unique constraint issues)
-      await supabase
+      // Check if this account_id already exists for this user+platform
+      const { data: existing } = await supabase
         .from('ad_accounts')
-        .delete()
+        .select('id, status')
         .eq('user_id', userId)
         .eq('platform', 'meta')
-        .eq('account_id', account.account_id);
+        .eq('account_id', account.account_id)
+        .maybeSingle();
 
-      const { error: insertError } = await supabase
-        .from('ad_accounts')
-        .insert({
-          user_id:      userId,
-          platform:     'meta',
-          account_id:   account.account_id,
-          account_name: account.name,
-          access_token: longLivedToken,
-          status:       'pending',
-          connected_at: new Date().toISOString(),
-        });
-
-      if (!insertError) stored.push(account.account_id);
-      else console.error('Insert error:', insertError);
+      if (existing) {
+        if (existing.status === 'active') {
+          // ── Already connected: refresh token only, preserve brand_id etc. ──
+          const { error: updErr } = await supabase
+            .from('ad_accounts')
+            .update({ access_token: longLivedToken, account_name: account.name })
+            .eq('id', existing.id);
+          if (!updErr) stored.push(account.account_id);
+          else console.error('Token refresh error (active):', updErr);
+        } else {
+          // ── Pending: update token + name, keep as pending ──
+          const { error: updErr } = await supabase
+            .from('ad_accounts')
+            .update({ access_token: longLivedToken, account_name: account.name })
+            .eq('id', existing.id);
+          if (!updErr) stored.push(account.account_id);
+          else console.error('Token refresh error (pending):', updErr);
+        }
+      } else {
+        // ── New account: insert as pending ──
+        const { error: insertError } = await supabase
+          .from('ad_accounts')
+          .insert({
+            user_id:      userId,
+            platform:     'meta',
+            account_id:   account.account_id,
+            account_name: account.name,
+            access_token: longLivedToken,
+            status:       'pending',
+            connected_at: new Date().toISOString(),
+          });
+        if (!insertError) stored.push(account.account_id);
+        else console.error('Insert error:', insertError);
+      }
     }
 
     return new Response(
       JSON.stringify({
         success:         true,
         accounts_stored: stored.length,
-        // Return the token so the frontend can save it directly
-        // (fallback if DB insert failed for any account)
         access_token:    longLivedToken,
         accounts:        adAccounts.map((a: { account_id: string; name: string }) => ({
           account_id: a.account_id,
@@ -143,6 +158,8 @@ serve(async (req) => {
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+
+
 
   } catch (error) {
     console.error('meta-oauth error:', error);
