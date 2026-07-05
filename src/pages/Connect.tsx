@@ -90,10 +90,24 @@ const Connect: React.FC = () => {
   const [relinkSaving,  setRelinkSaving]  = useState(false);
   const [relinkSuccess, setRelinkSuccess] = useState<string | null>(null);
 
-  // Disconnect modal
-  const [disconnectTarget, setDisconnectTarget] = useState<{ id: string; name: string } | null>(null);
+  // Disconnect modal — includes brand-orphan warning
+  const [disconnectTarget, setDisconnectTarget] = useState<{
+    id: string;
+    name: string;
+    brandName?: string;     // name of linked brand, if any
+    isLastForBrand?: boolean; // true if this is the only account for that brand
+  } | null>(null);
   const [disconnecting, setDisconnecting] = useState(false);
 
+  /** Build disconnect target with brand-orphan check */
+  const buildDisconnectTarget = (account: typeof metaAccounts[0]) => {
+    const brandId = (account as any).brand_id;
+    const brandName = brandId ? brands.find(b => b.id === brandId)?.name : undefined;
+    const isLastForBrand = brandId
+      ? metaAccounts.filter(a => (a as any).brand_id === brandId && a.id !== account.id).length === 0
+      : false;
+    setDisconnectTarget({ id: account.id, name: account.account_name, brandName, isLastForBrand });
+  };
 
   const successParam = searchParams.get('success');
   const errorParam   = searchParams.get('error');
@@ -266,6 +280,21 @@ const Connect: React.FC = () => {
               </div>
             </div>
 
+            {/* Brand orphan warning */}
+            {disconnectTarget.isLastForBrand && (
+              <div style={{
+                background: 'rgba(245,158,11,0.08)', border: '0.5px solid rgba(245,158,11,0.3)',
+                borderRadius: 6, padding: '10px 14px',
+                display: 'flex', alignItems: 'flex-start', gap: 10,
+              }}>
+                <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
+                <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#F59E0B', lineHeight: 1.6, margin: 0 }}>
+                  <strong style={{ fontWeight: 600 }}>{disconnectTarget.brandName}</strong> will be left with no
+                  ad account after this. You can re-link an account later from the Brands page.
+                </p>
+              </div>
+            )}
+
             <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: '#8B6050', lineHeight: 1.65, margin: 0 }}>
               Do you want to keep the campaign data already synced to NextAdsGen, or delete everything?
             </p>
@@ -420,7 +449,7 @@ const Connect: React.FC = () => {
                       </div>
                       {/* Disconnect */}
                       <button
-                        onClick={() => setDisconnectTarget({ id: account.id, name: account.account_name })}
+                        onClick={() => buildDisconnectTarget(account)}
                         title="Disconnect this account"
                         style={{
                           background: 'none', border: '0.5px solid #2a1a0e',

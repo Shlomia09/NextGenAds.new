@@ -57,6 +57,8 @@ const MetaCallback: React.FC = () => {
   const [userId,   setUserId]   = useState('');
   // Map of account_id → access_token (read from DB after OAuth)
   const [tokenMap, setTokenMap] = useState<Record<string, string>>({});
+  // Set of account_ids that are ALREADY CONNECTED (active) in the DB
+  const [existingConnected, setExistingConnected] = useState<Record<string, { id: string; brand_id: string | null }>>({});
 
   useEffect(() => {
     const run = async () => {
@@ -112,6 +114,19 @@ const MetaCallback: React.FC = () => {
 
         setAccounts(pickerAccounts);
         setSelected(new Set());
+
+        // ── Fetch already-connected (active) accounts from DB ───────────
+        // Used to: (a) show "Already connected" badge in picker,
+        //          (b) preserve brand_id in handleConfirm UPSERT
+        const { data: activeRows } = await supabase
+          .from('ad_accounts')
+          .select('id, account_id, brand_id')
+          .eq('user_id', user.id)
+          .eq('platform', 'meta')
+          .eq('status', 'active');
+        const connectedMap: Record<string, { id: string; brand_id: string | null }> = {};
+        (activeRows || []).forEach(r => { connectedMap[r.account_id] = { id: r.id, brand_id: r.brand_id }; });
+        setExistingConnected(connectedMap);
 
         // ── Build token map: prefer DB pending rows, fallback to response body ──
         // The updated edge function returns access_token in response body
@@ -202,48 +217,63 @@ const MetaCallback: React.FC = () => {
     for (const cfg of configs) {
       const token = tokenMap[cfg.id] || null;
 
-      // Step A: delete any existing row(s) for this account
-      await supabase
-        .from('ad_accounts')
-        .delete()
-        .eq('user_id', userId)
-        .eq('platform', 'meta')
-        .eq('account_id', cfg.id);
+      const existing = existingConnected[cfg.id];
 
-      // Step B: insert fresh row WITH the token (if we have it)
-      const payload: Record<string, unknown> = {
-        user_id:     userId,
-        platform:    'meta',
-        account_id:  cfg.id,
-        account_name: cfg.account_name,
-        status:      'active',
-        connected_at: new Date().toISOString(),
-      };
-
-      // Only add new columns if they exist (try/catch per column not possible,
-      // so we include them all — they were added via migration)
-      payload.display_name    = cfg.display_name;
-      payload.brand_id        = cfg.brand_id || null;
-      payload.conversion_type = cfg.conversion_type;
-
-      // Always include the token (null is allowed now)
-      if (token) payload.access_token = token;
-
-      const { error: insertErr } = await supabase
-        .from('ad_accounts')
-        .insert(payload);
-
-      if (insertErr) {
-        console.error('Insert failed:', insertErr.message);
-        // Fallback: try minimal insert without new columns
-        const minPayload: Record<string, unknown> = {
-          user_id:     userId,
-          platform:    'meta',
-          account_id:  cfg.id,
-          account_name: cfg.account_name,
-          status:      'active',
-          connected_at: new Date().toISOString(),
+      if (existing) {
+        // ── Account already connected: UPDATE token + settings, PRESERVE brand_id ──
+        // Only override brand_id if user actively chose one (non-empty)
+        const updatePayload: Record<string, unknown> = {
+          account_name:    cfg.account_name,
+          display_name:    cfg.display_name,
+          status:          'active',
+          conversion_type: cfg.conversion_type,
         };
+        if (token) updatePayload.access_token = token;
+        // Use the new brand_id if user set one; otherwise keep the existing one
+        updatePayload.brand_id = cfg.brand_id || existing.brand_id || null;
+
+        const { error: updateErr } = await supabase
+          .from('ad_accounts')
+          .update(updatePayload)
+          .eq('id', existing.id);
+
+        if (updateErr) {
+          console.error('Update failed:', updateErr.message);
+          errors.push(`${cfg.account_name}: ${updateErr.message}`);
+        }
+      } else {
+        // ── New account: INSERT fresh row ───────────────────────────────
+        const payload: Record<string, unknown> = {
+          user_id:         userId,
+          platform:        'meta',
+          account_id:      cfg.id,
+          account_name:    cfg.account_name,
+          display_name:    cfg.display_name,
+          brand_id:        cfg.brand_id || null,
+          conversion_type: cfg.conversion_type,
+          status:          'active',
+          connected_at:    new Date().toISOString(),
+        };
+        if (token) payload.access_token = token;
+
+        const { error: insertErr } = await supabase
+          .from('ad_accounts')
+          .insert(payload);
+
+        if (insertErr) {
+          console.error('Insert failed:', insertErr.message);
+          // Fallback: minimal insert
+          const minPayload: Record<string, unknown> = {
+            user_id: userId, platform: 'meta', account_id: cfg.id,
+            account_name: cfg.account_name, status: 'active',
+            connected_at: new Date().toISOString(),
+          };
+          if (token) minPayload.access_token = token;
+          const { error: minErr } = await supabase.from('ad_accounts').insert(minPayload);
+          if (minErr) errors.push(`${cfg.account_name}: ${minErr.message}`);
+        }
+      }
+
         if (token) minPayload.access_token = token;
 
         const { error: minErr } = await supabase
@@ -319,7 +349,9 @@ const MetaCallback: React.FC = () => {
             Select accounts to connect
           </div>
           <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.55, margin: 0 }}>
-            Choose which ad accounts NextAdsGen should monitor. You can change this later.
+            Choose which ad accounts to add. Accounts marked{' '}
+            <span style={{ color: '#10B981', fontWeight: 500 }}>Already connected</span>{' '}
+            will have their token refreshed without losing brand settings.
           </p>
         </div>
 
@@ -338,15 +370,20 @@ const MetaCallback: React.FC = () => {
         {/* Account list */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 320, overflowY: 'auto', marginBottom: 20 }}>
           {accounts.map(account => {
-            const isSelected = selected.has(account.id);
+            const isSelected   = selected.has(account.id);
+            const isConnected  = !!existingConnected[account.id];
             return (
               <div
                 key={account.id}
                 onClick={() => toggleAccount(account.id)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  background: isSelected ? 'rgba(196,131,106,0.07)' : T.bg,
-                  border: isSelected ? `0.5px solid rgba(196,131,106,0.4)` : T.border,
+                  background: isSelected ? 'rgba(196,131,106,0.07)' : isConnected ? 'rgba(16,185,129,0.04)' : T.bg,
+                  border: isSelected
+                    ? `0.5px solid rgba(196,131,106,0.4)`
+                    : isConnected
+                    ? '0.5px solid rgba(16,185,129,0.25)'
+                    : T.border,
                   borderRadius: 6, padding: '12px 14px',
                   cursor: 'pointer', transition: 'all 0.15s',
                 }}
@@ -363,8 +400,19 @@ const MetaCallback: React.FC = () => {
 
                 {/* Account info */}
                 <div style={{ flex: 1, textAlign: 'left' }}>
-                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 13, fontWeight: 400, color: T.text }}>
-                    {account.account_name}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                    <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: 13, fontWeight: 400, color: T.text }}>
+                      {account.account_name}
+                    </span>
+                    {isConnected && (
+                      <span style={{
+                        fontFamily: "'DM Mono', monospace", fontSize: 8,
+                        letterSpacing: '0.1em', textTransform: 'uppercase',
+                        color: '#10B981', background: 'rgba(16,185,129,0.1)',
+                        border: '0.5px solid rgba(16,185,129,0.3)',
+                        borderRadius: 3, padding: '1px 5px', flexShrink: 0,
+                      }}>Already connected</span>
+                    )}
                   </div>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: T.hint, marginTop: 2 }}>
                     ID: {account.account_id}
@@ -372,7 +420,7 @@ const MetaCallback: React.FC = () => {
                 </div>
 
                 {/* Status dot */}
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: account.status === 'active' ? '#10B981' : '#F59E0B', flexShrink: 0 }} />
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: isConnected ? '#10B981' : '#F59E0B', flexShrink: 0 }} />
               </div>
             );
           })}
