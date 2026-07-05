@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { RefreshCw, ChevronDown } from 'lucide-react';
+import { RefreshCw, ChevronDown, CalendarDays } from 'lucide-react';
 import {
   Chart,
   registerables,
@@ -8,7 +8,8 @@ import {
   type Chart as ChartType,
 } from 'chart.js';
 
-import { getCampaigns, getBrands, getAdAccounts } from '../lib/supabase';
+import { getCampaigns, getBrands, getAdAccounts, getDailyKpis } from '../lib/supabase';
+import type { DailyKpiResult } from '../lib/supabase';
 import { syncMetaCampaigns } from '../lib/meta-api';
 import { useAuth } from '../hooks/useAuth';
 import { useBrand } from '../contexts/BrandContext';
@@ -24,8 +25,113 @@ Chart.register(...registerables);
 const cssv = (n: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
+// ─── Date range helpers ──────────────────────────────────────
+export type DatePreset = 'today' | 'yesterday' | '7d' | '30d' | 'month' | 'last_month' | 'custom';
+
+const isoDate = (d: Date) => d.toISOString().split('T')[0];
+
+export function resolvePreset(preset: DatePreset, customFrom: string, customTo: string): { from: string; to: string; label: string } {
+  const now  = new Date();
+  const zero = (d: Date) => { d.setHours(0, 0, 0, 0); return d; };
+  switch (preset) {
+    case 'today': {
+      const d = isoDate(zero(now));
+      return { from: d, to: d, label: 'Today' };
+    }
+    case 'yesterday': {
+      const y = new Date(now); y.setDate(y.getDate() - 1); zero(y);
+      const d = isoDate(y);
+      return { from: d, to: d, label: 'Yesterday' };
+    }
+    case '7d': {
+      const f = new Date(now); f.setDate(f.getDate() - 6); zero(f);
+      return { from: isoDate(f), to: isoDate(zero(new Date(now))), label: 'Last 7 days' };
+    }
+    case '30d': {
+      const f = new Date(now); f.setDate(f.getDate() - 29); zero(f);
+      return { from: isoDate(f), to: isoDate(zero(new Date(now))), label: 'Last 30 days' };
+    }
+    case 'month': {
+      const f = new Date(now.getFullYear(), now.getMonth(), 1);
+      return { from: isoDate(f), to: isoDate(zero(new Date(now))), label: 'This month' };
+    }
+    case 'last_month': {
+      const f = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const t = new Date(now.getFullYear(), now.getMonth(), 0);
+      return { from: isoDate(f), to: isoDate(t), label: 'Last month' };
+    }
+    case 'custom':
+      return { from: customFrom || isoDate(new Date(now.setDate(now.getDate() - 29))), to: customTo || isoDate(new Date()), label: `${customFrom} → ${customTo}` };
+  }
+}
+
+// ─── DateRangeBar component ───────────────────────────────────
+interface DateRangeBarProps {
+  preset: DatePreset;
+  customFrom: string;
+  customTo: string;
+  onPreset: (p: DatePreset) => void;
+  onCustomFrom: (v: string) => void;
+  onCustomTo: (v: string) => void;
+}
+const PRESETS: { id: DatePreset; label: string }[] = [
+  { id: 'today',      label: 'Today'      },
+  { id: 'yesterday',  label: 'Yesterday'  },
+  { id: '7d',         label: '7 days'     },
+  { id: '30d',        label: '30 days'    },
+  { id: 'month',      label: 'This month' },
+  { id: 'last_month', label: 'Last month' },
+  { id: 'custom',     label: 'Custom'     },
+];
+const DateRangeBar: React.FC<DateRangeBarProps> = ({ preset, customFrom, customTo, onPreset, onCustomFrom, onCustomTo }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+    <CalendarDays size={14} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+    {PRESETS.map(({ id, label }) => (
+      <button
+        key={id}
+        onClick={() => onPreset(id)}
+        style={{
+          padding: '5px 11px', borderRadius: 20, fontSize: 11.5,
+          fontFamily: 'var(--font-ui)', fontWeight: 500, cursor: 'pointer',
+          border: '1px solid', transition: 'all 0.13s',
+          background: preset === id ? 'var(--accent)'      : 'var(--surface)',
+          color:      preset === id ? '#fff'               : 'var(--text-2)',
+          borderColor: preset === id ? 'var(--accent)'     : 'var(--border)',
+        }}
+      >
+        {label}
+      </button>
+    ))}
+    {preset === 'custom' && (
+      <>
+        <input
+          type="date"
+          value={customFrom}
+          onChange={e => onCustomFrom(e.target.value)}
+          style={{
+            fontFamily: 'var(--font-mono)', fontSize: 11.5, padding: '4px 8px',
+            border: '1px solid var(--border)', borderRadius: 6,
+            background: 'var(--surface)', color: 'var(--text-2)', outline: 'none',
+          }}
+        />
+        <span style={{ color: 'var(--text-3)', fontSize: 11 }}>→</span>
+        <input
+          type="date"
+          value={customTo}
+          onChange={e => onCustomTo(e.target.value)}
+          style={{
+            fontFamily: 'var(--font-mono)', fontSize: 11.5, padding: '4px 8px',
+            border: '1px solid var(--border)', borderRadius: 6,
+            background: 'var(--surface)', color: 'var(--text-2)', outline: 'none',
+          }}
+        />
+      </>
+    )}
+  </div>
+);
+
 // ─── Simulate 30-day daily series from a total ───────────────
-// Uses a realistic ad-spend ramp-up curve (actual daily data unavailable)
+// Kept as fallback when campaign_daily_stats has no data for selected range
 function simulateDailySeries(total: number): number[] {
   const weights = [
     1, 1.2, 1.5, 2, 2.5, 3, 3.5, 4, 3.8, 4.2,
@@ -223,13 +329,21 @@ const KpiCard: React.FC<KpiCardProps> = ({ label, value, icon, kcVar, barPct, tr
 
 // ─── Chart panel (§29) ───────────────────────────────────────
 interface TrendPanelProps {
+  dailyRows: { date: string; spend: number; leads: number }[];
   totalSpend: number;
   totalLeads: number;
   totalImpressions: number;
+  dateLabel: string;
 }
-const TrendPanel: React.FC<TrendPanelProps> = ({ totalSpend, totalLeads, totalImpressions }) => {
+const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalLeads, totalImpressions, dateLabel }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef  = useRef<ChartType | null>(null);
+
+  // Use real daily data if available, fall back to simulated curve
+  const hasRealData = dailyRows.length > 0;
+  const chartLabels  = hasRealData ? dailyRows.map(r => r.date.slice(5)) : DAYS_LABELS;
+  const spendData    = hasRealData ? dailyRows.map(r => r.spend) : simulateDailySeries(totalSpend);
+  const leadsData    = hasRealData ? dailyRows.map(r => r.leads) : simulateDailySeries(totalLeads);
 
   const buildChart = useCallback(() => {
     if (!canvasRef.current) return;
@@ -252,13 +366,10 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ totalSpend, totalLeads, totalIm
     g2.addColorStop(0, green + '40');
     g2.addColorStop(1, green + '03');
 
-    const spendData = simulateDailySeries(totalSpend);
-    const leadsData = simulateDailySeries(totalLeads);
-
     const config: ChartConfiguration = {
       type: 'line',
       data: {
-        labels: DAYS_LABELS,
+        labels: chartLabels,
         datasets: [
           {
             label: 'Spend',
@@ -329,7 +440,7 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ totalSpend, totalLeads, totalIm
     Chart.defaults.color       = text2;
 
     chartRef.current = new Chart(ctx, config);
-  }, [totalSpend, totalLeads]);
+  }, [spendData, leadsData, chartLabels]);
 
   useEffect(() => {
     buildChart();
@@ -348,7 +459,7 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ totalSpend, totalLeads, totalIm
       {/* Panel header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 500, letterSpacing: -0.2 }}>
-          Performance · last 30 days
+          Performance · <span style={{ color: 'var(--accent)' }}>{dateLabel}</span>
         </div>
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
           {[
@@ -381,9 +492,11 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ totalSpend, totalLeads, totalIm
       <div style={{ position: 'relative', height: 240, marginTop: 6 }}>
         <canvas ref={canvasRef} />
       </div>
-      <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 8, fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>
-        * Daily distribution estimated from campaign totals. Live daily data coming soon.
-      </div>
+      {!hasRealData && (
+        <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 8, fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>
+          * Daily distribution estimated — run Sync Meta to load real daily data.
+        </div>
+      )}
     </div>
   );
 };
@@ -636,6 +749,15 @@ const Campaigns: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
   const [goalFilter,    setGoalFilter]    = useState<GoalType | 'all'>('all');
 
+  // ── Date range state ──────────────────────────────────────
+  const [datePreset,  setDatePreset]  = useState<DatePreset>('30d');
+  const [customFrom,  setCustomFrom]  = useState('');
+  const [customTo,    setCustomTo]    = useState('');
+  const { from, to, label: dateLabel } = useMemo(
+    () => resolvePreset(datePreset, customFrom, customTo),
+    [datePreset, customFrom, customTo]
+  );
+
   const { data: brands = [] } = useQuery({
     queryKey: ['brands', user?.id],
     queryFn:  () => getBrands(user!.id),
@@ -666,6 +788,15 @@ const Campaigns: React.FC = () => {
     enabled: brands.length > 0,
   });
 
+  // ── Daily KPIs for the selected date range ────────────────
+  const activeBrandId = selectedBrand !== 'all' ? selectedBrand : (brands[0]?.id ?? '');
+  const { data: dailyKpis } = useQuery<DailyKpiResult>({
+    queryKey: ['daily-kpis', activeBrandId, from, to],
+    queryFn:  () => getDailyKpis(activeBrandId, from, to),
+    enabled:  !!activeBrandId,
+    staleTime: 60_000,
+  });
+
   const brandCampaigns = useMemo(() =>
     selectedBrand === 'all' ? allCampaigns : allCampaigns.filter(c => c.brand_id === selectedBrand),
     [allCampaigns, selectedBrand]
@@ -684,19 +815,24 @@ const Campaigns: React.FC = () => {
   const metaAccounts  = adAccounts.filter(a => a.platform === 'meta');
   const getBrandName  = (id: string) => brands.find(b => b.id === id)?.name || '';
 
-  // ─── KPI aggregations ─────────────────────────────────────
-  const totalSpend  = useMemo(() => campaigns.reduce((s, c) => s + c.spend,       0), [campaigns]);
-  const totalLeads  = useMemo(() => campaigns.reduce((s, c) => s + c.leads,       0), [campaigns]);
-  const totalImpr   = useMemo(() => campaigns.reduce((s, c) => s + c.impressions, 0), [campaigns]);
-  const totalQual   = useMemo(() => campaigns.reduce((s, c) => s + c.qualified_leads, 0), [campaigns]);
-  const activeCnt   = useMemo(() => campaigns.filter(c => c.status === 'ACTIVE').length, [campaigns]);
-  const avgCpl      = totalLeads > 0 ? totalSpend / totalLeads : 0;
+  // ─── KPI aggregations — prefer daily stats, fall back to campaign aggregate ─
+  const aggSpend  = useMemo(() => campaigns.reduce((s, c) => s + c.spend,       0), [campaigns]);
+  const aggLeads  = useMemo(() => campaigns.reduce((s, c) => s + c.leads,       0), [campaigns]);
+  const aggImpr   = useMemo(() => campaigns.reduce((s, c) => s + c.impressions, 0), [campaigns]);
+  const aggQual   = useMemo(() => campaigns.reduce((s, c) => s + c.qualified_leads, 0), [campaigns]);
+
+  const totalSpend = dailyKpis?.hasData ? dailyKpis.spend       : aggSpend;
+  const totalLeads = dailyKpis?.hasData ? dailyKpis.leads       : aggLeads;
+  const totalImpr  = dailyKpis?.hasData ? dailyKpis.impressions : aggImpr;
+  const totalQual  = aggQual; // qualified_leads not in daily stats, use aggregate
+  const activeCnt  = useMemo(() => campaigns.filter(c => c.status === 'ACTIVE').length, [campaigns]);
+  const avgCpl     = totalLeads > 0 ? totalSpend / totalLeads : 0;
 
   // Bar percentages (relative to campaign max, or reference values)
   const spendPct  = Math.min(100, totalSpend  > 0 ? 75 : 0);   // 75% → "in budget"
   const leadsPct  = Math.min(100, totalLeads  > 0 ? (totalLeads / Math.max(totalLeads, 1000)) * 100 : 0);
   const cplPct    = avgCpl > 0 ? Math.max(10, 100 - (avgCpl / 50) * 100) : 0; // inverse: lower CPL = taller bar
-  const qualPct   = totalLeads > 0 ? (totalQual / totalLeads) * 100 : 0;
+  const qualPct   = aggLeads > 0 ? (totalQual / aggLeads) * 100 : 0;
 
   // ─── Sync ─────────────────────────────────────────────────
   const handleSync = async () => {
@@ -854,6 +990,34 @@ const Campaigns: React.FC = () => {
         </div>
       </div>
 
+      {/* ── Date Range Bar ─────────────────────────────────── */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        marginBottom: 16, padding: '10px 14px',
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        borderRadius: 12, flexWrap: 'wrap',
+      }}>
+        <DateRangeBar
+          preset={datePreset}
+          customFrom={customFrom}
+          customTo={customTo}
+          onPreset={setDatePreset}
+          onCustomFrom={setCustomFrom}
+          onCustomTo={setCustomTo}
+        />
+        {dailyKpis?.hasData && (
+          <span style={{ marginLeft: 'auto', fontSize: 10.5, color: 'var(--green)', fontFamily: 'var(--font-ui)', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--green)', display: 'inline-block' }} />
+            Real data
+          </span>
+        )}
+        {!dailyKpis?.hasData && activeBrandId && (
+          <span style={{ marginLeft: 'auto', fontSize: 10.5, color: 'var(--text-3)', fontFamily: 'var(--font-ui)' }}>
+            Sync Meta to load data for this range
+          </span>
+        )}
+      </div>
+
       {/* ── KPI Row (§28) — 4 colored cards ─────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 16 }}>
         <KpiCard
@@ -898,9 +1062,11 @@ const Campaigns: React.FC = () => {
       {campaigns.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: '1.7fr 1fr', gap: 14, marginBottom: 16 }}>
           <TrendPanel
+            dailyRows={dailyKpis?.dailyRows ?? []}
             totalSpend={totalSpend}
             totalLeads={totalLeads}
             totalImpressions={totalImpr}
+            dateLabel={dateLabel}
           />
           <DonutPanel campaigns={campaigns} />
         </div>
