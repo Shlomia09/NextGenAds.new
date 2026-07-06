@@ -42,13 +42,18 @@ const META_CONVERSION_MAP: Record<string, { actionType: string; label: string }>
   REACH:                  { actionType: 'reach',                                          label: 'Reach'           },
 };
 
-/** Given a campaign's promoted_object and objective, return the conversion key to use */
+/** Given a campaign's promoted_object and objective/optimization_goal, return the conversion key to use */
 const resolveConversionKey = (promotedObject: Record<string, string> | null, objective: string): string => {
   // 1. Use custom_event_type from promoted_object if available
   if (promotedObject?.custom_event_type) {
     return promotedObject.custom_event_type.toUpperCase();
   }
-  // 2. Fall back to objective-based defaults
+  // 2. Direct optimization_goal mapping (adset-level goals)
+  const u = (objective || '').toUpperCase();
+  if (u === 'LANDING_PAGE_VIEWS') return 'LANDING_PAGE_VIEW';
+  if (u === 'LINK_CLICKS')        return 'LINK_CLICK';
+  if (u === 'REACH')              return 'REACH';
+  // 3. Fall back to campaign-objective-based defaults
   const goal = classifyObj(objective);
   if (goal === 'traffic')   return 'LANDING_PAGE_VIEW';
   if (goal === 'awareness') return 'REACH';
@@ -409,13 +414,21 @@ serve(async (req) => {
       console.error('Ad-level insights fetch failed:', adsErr);
     }
 
-    // ── Step 5: Sync Ad Sets (targeting, budget per adset) ──────────────────
+    // ── Step 5: Ad Sets with optimization_goal + insights ─────────────────────────
+    // Fetches per-adset goal, results count, cost-per-result.
+    // Builds campaignConvEvents map to determine campaign-level conversion_event.
     let adSetsCount = 0;
+    // Map: external campaign id → Set of unique conversion event labels
+    const campaignConvEvents = new Map<string, Set<string>>();
     try {
       for (const campaign of campaigns) {
         const adsetsUrl = new URL(`${META_API_BASE}/${campaign.id}/adsets`);
         adsetsUrl.searchParams.set('access_token', accessToken);
-        adsetsUrl.searchParams.set('fields', 'id,name,status,daily_budget,lifetime_budget,targeting');
+        adsetsUrl.searchParams.set(
+          'fields',
+          'id,name,status,daily_budget,lifetime_budget,targeting,optimization_goal,promoted_object,' +
+          `insights.date_preset(last_30d){spend,impressions,clicks,actions,cost_per_action_type}`
+        );
         adsetsUrl.searchParams.set('limit', '50');
 
         const adsetsRes  = await fetch(adsetsUrl.toString());
@@ -425,6 +438,8 @@ serve(async (req) => {
         const campaignUuid = externalToUuid.get(campaign.id);
         if (!campaignUuid) continue;
 
+        const convEventsForCampaign = new Set<string>();
+
         const adsetRows = adsets.map((adset: {
           id: string;
           name: string;
@@ -432,17 +447,57 @@ serve(async (req) => {
           daily_budget?: string;
           lifetime_budget?: string;
           targeting?: Record<string, unknown>;
-        }) => ({
-          campaign_id:       campaignUuid,
-          brand_id,
-          adset_id_external: adset.id,
-          adset_name:        adset.name,
-          status:            adset.status,
-          daily_budget:      adset.daily_budget    ? parseInt(adset.daily_budget)    / 100 : null,
-          lifetime_budget:   adset.lifetime_budget ? parseInt(adset.lifetime_budget) / 100 : null,
-          targeting:         adset.targeting || null,
-          synced_at:         new Date().toISOString(),
-        }));
+          optimization_goal?: string;
+          promoted_object?: Record<string, string>;
+          insights?: { data?: Array<{
+            spend?: string;
+            impressions?: string;
+            clicks?: string;
+            actions?: Array<{ action_type: string; value: string }>;
+            cost_per_action_type?: Array<{ action_type: string; value: string }>;
+          }> };
+        }) => {
+          const insight = adset.insights?.data?.[0] || {};
+
+          // Resolve the conversion event for this adset from promoted_object + optimization_goal
+          const adsetConvKey   = resolveConversionKey(adset.promoted_object || null, adset.optimization_goal || '');
+          const adsetConvEvent = META_CONVERSION_MAP[adsetConvKey]?.label ?? adsetConvKey;
+          convEventsForCampaign.add(adsetConvEvent);
+
+          // Extract results count: find the matching action_type in insights.actions
+          const mapping = META_CONVERSION_MAP[adsetConvKey];
+          const resultAction = mapping
+            ? (insight.actions || []).find((a: { action_type: string }) => a.action_type === mapping.actionType)
+            : null;
+          const results = parseInt(resultAction?.value || '0');
+
+          // Cost per result from cost_per_action_type
+          const costAction = mapping
+            ? (insight.cost_per_action_type || []).find((a: { action_type: string }) => a.action_type === mapping.actionType)
+            : null;
+          const costPerResult = parseFloat(costAction?.value || '0');
+
+          return {
+            campaign_id:        campaignUuid,
+            brand_id,
+            adset_id_external:  adset.id,
+            adset_name:         adset.name,
+            status:             adset.status,
+            optimization_goal:  adset.optimization_goal  || null,
+            conversion_event:   adsetConvEvent,
+            spend:              parseFloat(insight.spend || '0'),
+            impressions:        parseInt(insight.impressions || '0'),
+            clicks:             parseInt(insight.clicks || '0'),
+            results,
+            cost_per_result:    costPerResult,
+            daily_budget:       adset.daily_budget    ? parseInt(adset.daily_budget)    / 100 : null,
+            lifetime_budget:    adset.lifetime_budget ? parseInt(adset.lifetime_budget) / 100 : null,
+            targeting:          adset.targeting || null,
+            synced_at:          new Date().toISOString(),
+          };
+        });
+
+        campaignConvEvents.set(campaign.id, convEventsForCampaign);
 
         if (adsetRows.length > 0) {
           const { error: adsetErr } = await supabase
@@ -454,6 +509,26 @@ serve(async (req) => {
       }
     } catch (adSetsErr) {
       console.error('Ad sets sync failed:', adSetsErr);
+    }
+
+    // ── Step 5.5: Update campaign conversion_event from adset analysis ────────────
+    // If all adsets share one goal  → campaign.conversion_event = that label
+    // If multiple different goals   → campaign.conversion_event = 'Multiple'
+    // (mirrors Meta Ads Manager "Multiple conversions" display)
+    for (const campaign of campaigns) {
+      const campaignUuid = externalToUuid.get(campaign.id);
+      if (!campaignUuid) continue;
+
+      const convEvents = campaignConvEvents.get(campaign.id);
+      if (!convEvents || convEvents.size === 0) continue;
+
+      const uniqueEvents       = Array.from(convEvents);
+      const campaignConvEvent  = uniqueEvents.length === 1 ? uniqueEvents[0] : 'Multiple';
+
+      await supabase
+        .from('campaigns')
+        .update({ conversion_event: campaignConvEvent })
+        .eq('id', campaignUuid);
     }
 
     // ── Step 6: Log system event ─────────────────────────────────────────────

@@ -173,6 +173,7 @@ const StatusPill: React.FC<{ status: string }> = ({ status }) => {
 
 // ─── Results cell — shows the event the campaign is OPTIMIZING for ────────────────────────
 // Primary: campaign.conversion_event (from Meta's promoted_object.custom_event_type)
+// 'Multiple' = campaign has adsets with different conversion goals (mirrors Meta behavior)
 // Fallback: inferred from objective + per-field DB columns (atc, page_views, leads, reach)
 const ResultsCell: React.FC<{ campaign: Campaign; goal: GoalType; isLast: boolean }> = ({ campaign, goal, isLast }) => {
   const ctr = campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100 : 0;
@@ -185,6 +186,16 @@ const ResultsCell: React.FC<{ campaign: Campaign; goal: GoalType; isLast: boolea
   const subStyle = { fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--text-3)', marginTop: 3 };
   const dash     = <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>;
 
+  // ── Special case: Multiple conversions (different adsets have different goals) ──
+  if (campaign.conversion_event === 'Multiple') {
+    return (
+      <td style={cellStyle}>
+        <div style={{ ...numStyle, color: 'var(--accent)', fontSize: 12 }}>Multiple</div>
+        <div style={subStyle}>conv. goals · open for details</div>
+      </td>
+    );
+  }
+
   // ── Primary: use the actual Meta conversion_event label synced from promoted_object ──
   if (campaign.conversion_event) {
     const evt = campaign.conversion_event;
@@ -195,8 +206,11 @@ const ResultsCell: React.FC<{ campaign: Campaign; goal: GoalType; isLast: boolea
     if (evt === 'ATC' || evt === 'Checkout' || evt === 'Add Payment Info') {
       value = campaign.atc ?? campaign.conversion_value ?? 0;
       color = 'var(--champagne)';
-    } else if (evt === 'Page Views' || evt === 'Clicks') {
-      value = evt === 'Page Views' ? (campaign.page_views ?? 0) : campaign.clicks;
+    } else if (evt === 'View Content' || evt === 'Page Views' || evt === 'Clicks') {
+      // View Content uses conversion_value (fb_pixel_view_content), Page Views uses page_views
+      value = evt === 'Page Views' ? (campaign.page_views ?? 0)
+             : evt === 'Clicks'    ? campaign.clicks
+             : (campaign.conversion_value ?? 0); // View Content
       color = 'var(--blue)';
     } else if (evt === 'Leads' || evt === 'Registrations' || evt === 'Subscriptions') {
       value = campaign.leads > 0 ? campaign.leads : (campaign.conversion_value ?? 0);

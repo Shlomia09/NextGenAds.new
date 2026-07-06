@@ -242,6 +242,135 @@ const MetricVsBenchmark: React.FC<{
   );
 };
 
+// ─── Ad Sets breakdown section ─────────────────────────────────
+// Fetched from ad_sets table (populated by meta-sync Step 5)
+// Shows per-adset: goal, results, cost/result, spend — like Meta Ads Manager
+interface AdSetRow {
+  id: string;
+  adset_id_external: string;
+  adset_name: string;
+  status: string;
+  optimization_goal: string | null;
+  conversion_event: string | null;
+  spend: number;
+  impressions: number;
+  results: number;
+  cost_per_result: number;
+}
+const GOAL_COLORS: Record<string, string> = {
+  'ATC':          'var(--champagne)',
+  'Checkout':     'var(--champagne)',
+  'View Content': 'var(--blue)',
+  'Page Views':   'var(--blue)',
+  'Clicks':       'var(--blue)',
+  'Purchases':    'var(--green)',
+  'Leads':        'var(--green)',
+  'Reach':        'var(--blue)',
+};
+
+const AdSetsSection: React.FC<{ campaignId: string }> = ({ campaignId }) => {
+  const [adsets,  setAdsets]  = useState<AdSetRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    supabase
+      .from('ad_sets')
+      .select('id,adset_id_external,adset_name,status,optimization_goal,conversion_event,spend,impressions,results,cost_per_result')
+      .eq('campaign_id', campaignId)
+      .order('spend', { ascending: false })
+      .then(({ data }) => { setAdsets((data as AdSetRow[]) ?? []); setLoading(false); });
+  }, [campaignId]);
+
+  if (loading) return (
+    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)', padding: '6px 0' }}>Loading ad sets…</div>
+  );
+
+  if (adsets.length === 0) return (
+    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)', padding: '6px 0' }}>
+      No ad sets synced — run Sync Meta to load.
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+      {adsets.map(adset => {
+        const isActive = adset.status === 'ACTIVE';
+        const isPaused = adset.status === 'PAUSED';
+        const dotColor  = isActive ? 'var(--green)' : isPaused ? 'var(--champagne)' : 'var(--text-3)';
+        const dotBg     = isActive ? 'var(--green-soft)' : isPaused ? 'var(--champagne-soft)' : 'var(--surface)';
+        const statusLabel = isActive ? 'Active' : isPaused ? 'Paused'
+          : adset.status.charAt(0) + adset.status.slice(1).toLowerCase();
+        const goalColor = adset.conversion_event ? (GOAL_COLORS[adset.conversion_event] ?? 'var(--accent)') : 'var(--text-3)';
+
+        return (
+          <div key={adset.id} style={{
+            background: 'var(--surface-2)', border: '1px solid var(--border-soft)',
+            borderRadius: 9, padding: '10px 13px',
+          }}>
+            {/* Name row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '2px 7px', borderRadius: 20,
+                background: dotBg, color: dotColor,
+                fontSize: 10, fontFamily: 'var(--font-ui)', fontWeight: 500, whiteSpace: 'nowrap', flexShrink: 0,
+              }}>
+                <span style={{
+                  width: 4, height: 4, borderRadius: '50%',
+                  background: dotColor, display: 'inline-block',
+                  ...(isActive ? { boxShadow: '0 0 0 2px var(--green-soft)' } : {}),
+                }} />
+                {statusLabel}
+              </span>
+              <span style={{
+                fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>{adset.adset_name}</span>
+            </div>
+
+            {/* Metrics row */}
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              {/* Goal */}
+              <div>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 2 }}>Goal</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5, color: goalColor, fontWeight: 500 }}>
+                  {adset.conversion_event ?? adset.optimization_goal ?? '—'}
+                </div>
+              </div>
+              {/* Results */}
+              <div>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 2 }}>Results</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5, color: adset.results > 0 ? goalColor : 'var(--text-3)', fontWeight: 500 }}>
+                  {adset.results > 0 ? adset.results.toLocaleString() : '—'}
+                </div>
+              </div>
+              {/* Cost/Result */}
+              {adset.cost_per_result > 0 && (
+                <div>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 2 }}>Cost/Result</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5, color: 'var(--text-2)', fontWeight: 500 }}>
+                    {formatCurrency(adset.cost_per_result)}
+                  </div>
+                </div>
+              )}
+              {/* Spend */}
+              {adset.spend > 0 && (
+                <div>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 2 }}>Spend</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5, color: 'var(--text-2)', fontWeight: 500 }}>
+                    {formatCurrency(adset.spend)}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 // ─── Signal alert (§35.4 + §14) — CSS vars ────────────────────
 const SignalAlert: React.FC<{ type: 'good' | 'warning' | 'error'; children: React.ReactNode }> = ({ type, children }) => {
   const bg    = type === 'good'    ? 'var(--green-soft)'     : type === 'warning' ? 'var(--champagne-soft)' : 'var(--red-soft)';
@@ -771,6 +900,14 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* ── Ad Sets breakdown */}
+            <div>
+              <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>
+                Ad Sets
+              </div>
+              <AdSetsSection campaignId={campaign.id} />
             </div>
 
             {/* vs Industry Benchmark */}
