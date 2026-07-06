@@ -171,72 +171,105 @@ const StatusPill: React.FC<{ status: string }> = ({ status }) => {
   );
 };
 
-// ─── Conversion cell — shows the event the client actually configured in Meta ─
-const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, goal }) => {
+// ─── Results cell — shows the event the campaign is OPTIMIZING for ────────────────────────
+// Primary: campaign.conversion_event (from Meta's promoted_object.custom_event_type)
+// Fallback: inferred from objective + per-field DB columns (atc, page_views, leads, reach)
+const ResultsCell: React.FC<{ campaign: Campaign; goal: GoalType; isLast: boolean }> = ({ campaign, goal, isLast }) => {
   const ctr = campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100 : 0;
-  const cellStyle = { padding: '16px 22px', borderBottom: '1px solid var(--border-soft)', textAlign: 'right' as const };
-  const numStyle  = { fontFamily: 'var(--font-mono)', fontSize: 13.5, fontWeight: 500 };
-  const subStyle  = { fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--text-3)', marginTop: 3 };
+  const cellStyle = {
+    padding: '16px 22px',
+    borderBottom: isLast ? 'none' : '1px solid var(--border-soft)',
+    textAlign: 'right' as const,
+  };
+  const numStyle = { fontFamily: 'var(--font-mono)', fontSize: 13.5, fontWeight: 500 };
+  const subStyle = { fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--text-3)', marginTop: 3 };
+  const dash     = <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>;
 
-  // ── Primary: use the actual Meta conversion event if synced ──────────────────
+  // ── Primary: use the actual Meta conversion_event label synced from promoted_object ──
   if (campaign.conversion_event) {
-    // Color: green if good, default accent otherwise
-    const isRevenue = ['Purchases', 'ROAS'].includes(campaign.conversion_event);
-    const color = isRevenue
-      ? (campaign.roas >= 3 ? 'var(--green)' : campaign.roas >= 1.5 ? 'var(--champagne)' : 'var(--accent)')
-      : 'var(--accent)';
+    const evt = campaign.conversion_event;
+    let value: number = 0;
+    let color = 'var(--accent)';
+
+    // Map event label → the correct per-field column in DB
+    if (evt === 'ATC' || evt === 'Checkout' || evt === 'Add Payment Info') {
+      value = campaign.atc ?? campaign.conversion_value ?? 0;
+      color = 'var(--champagne)';
+    } else if (evt === 'Page Views' || evt === 'Clicks') {
+      value = evt === 'Page Views' ? (campaign.page_views ?? 0) : campaign.clicks;
+      color = 'var(--blue)';
+    } else if (evt === 'Leads' || evt === 'Registrations' || evt === 'Subscriptions') {
+      value = campaign.leads > 0 ? campaign.leads : (campaign.conversion_value ?? 0);
+      color = 'var(--green)';
+    } else if (evt === 'Reach') {
+      value = campaign.reach ?? 0;
+      color = 'var(--blue)';
+    } else if (evt === 'Purchases') {
+      // Purchases as results: show count (Sales column shows revenue)
+      value = campaign.purchases ?? campaign.conversion_value ?? 0;
+      color = campaign.roas >= 3 ? 'var(--green)' : campaign.roas >= 1.5 ? 'var(--champagne)' : 'var(--accent)';
+    } else {
+      value = campaign.conversion_value ?? 0;
+    }
 
     return (
       <td style={cellStyle}>
         <div style={{ ...numStyle, color }}>
-          {(campaign.conversion_value ?? 0) > 0
-            ? formatNumber(campaign.conversion_value ?? 0)
-            : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
+          {value > 0 ? formatNumber(value) : dash}
         </div>
         <div style={subStyle}>
-          {campaign.conversion_event}
-          {ctr > 0 && ` · CTR ${ctr.toFixed(1)}%`}
+          {evt}{ctr > 0 && ` · CTR ${ctr.toFixed(1)}%`}
         </div>
       </td>
     );
   }
 
-  // ── Fallback: data not yet synced with promoted_object — use goal logic ──────
+  // ── Fallback: data not yet synced with promoted_object — infer from objective ──
   switch (goal) {
     case 'sales':
       return (
         <td style={cellStyle}>
-          <div style={{ ...numStyle, color: campaign.roas >= 3 ? 'var(--green)' : campaign.roas >= 1.5 ? 'var(--champagne)' : 'var(--red)' }}>
-            {campaign.roas > 0 ? `${campaign.roas.toFixed(2)}x` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
+          <div style={{ ...numStyle, color: (campaign.atc ?? 0) > 0 ? 'var(--champagne)' : 'var(--text-3)' }}>
+            {(campaign.atc ?? 0) > 0 ? formatNumber(campaign.atc!) : dash}
           </div>
-          <div style={subStyle}>{(campaign.atc ?? 0) > 0 ? `${formatNumber(campaign.atc ?? 0)} ATC` : (campaign.purchases ?? 0) > 0 ? `${campaign.purchases} purch.` : 'no sales'}</div>
+          <div style={subStyle}>
+            {(campaign.atc ?? 0) > 0 ? `ATC · CTR ${ctr.toFixed(1)}%` : 'Sync for goal data'}
+          </div>
         </td>
       );
     case 'leads':
       return (
         <td style={cellStyle}>
-          <div style={{ ...numStyle, color: 'var(--accent)' }}>
-            {campaign.leads > 0 ? `${formatNumber(campaign.leads)} leads` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
+          <div style={{ ...numStyle, color: campaign.leads > 0 ? 'var(--green)' : 'var(--text-3)' }}>
+            {campaign.leads > 0 ? formatNumber(campaign.leads) : dash}
           </div>
-          <div style={subStyle}>{campaign.cpl > 0 ? `CPL ${formatCurrency(campaign.cpl)}` : 'no leads'}</div>
+          <div style={subStyle}>
+            {campaign.leads > 0 ? `Leads · CPL ${formatCurrency(campaign.cpl)}` : '—'}
+          </div>
         </td>
       );
     case 'traffic':
       return (
         <td style={cellStyle}>
           <div style={{ ...numStyle, color: 'var(--blue)' }}>
-            {(campaign.page_views ?? 0) > 0 ? `${formatNumber(campaign.page_views ?? 0)} page views` : (campaign.clicks ?? 0) > 0 ? `${formatNumber(campaign.clicks ?? 0)} clicks` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
+            {(campaign.page_views ?? 0) > 0
+              ? formatNumber(campaign.page_views!)
+              : campaign.clicks > 0 ? formatNumber(campaign.clicks) : dash}
           </div>
-          <div style={subStyle}>{ctr > 0 ? `CTR ${ctr.toFixed(2)}%` : 'no clicks'}</div>
+          <div style={subStyle}>
+            {(campaign.page_views ?? 0) > 0 ? 'Page Views' : 'Clicks'}{ctr > 0 && ` · CTR ${ctr.toFixed(1)}%`}
+          </div>
         </td>
       );
     case 'awareness':
       return (
         <td style={cellStyle}>
           <div style={{ ...numStyle, color: 'var(--blue)' }}>
-            {campaign.reach > 0 ? `${formatNumber(campaign.reach)} reach` : <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>—</span>}
+            {campaign.reach > 0 ? formatNumber(campaign.reach) : dash}
           </div>
-          <div style={subStyle}>{campaign.frequency > 0 ? `${campaign.frequency.toFixed(1)}x freq.` : ''}</div>
+          <div style={subStyle}>
+            {campaign.reach > 0 ? `Reach · ${campaign.frequency.toFixed(1)}x freq.` : '—'}
+          </div>
         </td>
       );
     default:
@@ -248,6 +281,41 @@ const ConvCell: React.FC<{ campaign: Campaign; goal: GoalType }> = ({ campaign, 
         </td>
       );
   }
+};
+
+// ─── Sales cell — always shows purchase/revenue regardless of campaign objective ─
+const SalesCell: React.FC<{ campaign: Campaign; isLast: boolean }> = ({ campaign, isLast }) => {
+  const cellStyle = {
+    padding: '16px 22px',
+    borderBottom: isLast ? 'none' : '1px solid var(--border-soft)',
+    textAlign: 'right' as const,
+  };
+  const numStyle = { fontFamily: 'var(--font-mono)', fontSize: 13.5, fontWeight: 500 };
+  const subStyle = { fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--text-3)', marginTop: 3 };
+
+  const purchases = campaign.purchases ?? 0;
+  const revenue   = campaign.revenue   ?? 0;
+  const roas      = campaign.roas      ?? 0;
+
+  if (purchases > 0 || revenue > 0) {
+    const color = roas >= 3 ? 'var(--green)' : roas >= 1.5 ? 'var(--champagne)' : 'var(--accent)';
+    return (
+      <td style={cellStyle}>
+        <div style={{ ...numStyle, color }}>
+          {revenue > 0 ? formatCurrency(revenue) : `${purchases}`}
+        </div>
+        <div style={subStyle}>
+          {[purchases > 0 && `${purchases} purch.`, roas > 0 && `${roas.toFixed(1)}x ROAS`].filter(Boolean).join(' · ')}
+        </div>
+      </td>
+    );
+  }
+
+  return (
+    <td style={cellStyle}>
+      <span style={{ ...numStyle, color: 'var(--text-3)', fontWeight: 400 }}>—</span>
+    </td>
+  );
 };
 
 // ─── Colored KPI card (design system §28) ────────────────────
@@ -734,7 +802,10 @@ const CampaignRow: React.FC<{ campaign: Campaign; showBrand?: string; onClick: (
       </td>
 
       {/* Conversion (goal-adaptive) */}
-      <ConvCell campaign={campaign} goal={goal} />
+      <ResultsCell campaign={campaign} goal={goal} isLast={isLast} />
+
+      {/* Sales — always shows purchases/revenue regardless of objective */}
+      <SalesCell campaign={campaign} isLast={isLast} />
     </tr>
   );
 };
@@ -1091,7 +1162,7 @@ const Campaigns: React.FC = () => {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
-                {['CAMPAIGN', 'STATUS', 'SPEND', 'CPM', 'CONVERSION'].map((h, i) => (
+                {['CAMPAIGN', 'STATUS', 'SPEND', 'CPM', 'RESULTS', 'SALES'].map((h, i) => (
                   <th key={h} style={{
                     padding: '13px 22px', textAlign: i >= 2 ? 'right' : 'left',
                     fontSize: 10, letterSpacing: 1.2, color: 'var(--text-3)',
