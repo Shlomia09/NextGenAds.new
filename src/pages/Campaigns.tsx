@@ -8,8 +8,8 @@ import {
   type Chart as ChartType,
 } from 'chart.js';
 
-import { getCampaigns, getBrands, getAdAccounts, getDailyKpis } from '../lib/supabase';
-import type { DailyKpiResult } from '../lib/supabase';
+import { getCampaigns, getBrands, getAdAccounts, getDailyKpis, getDailyCampaignStats } from '../lib/supabase';
+import type { DailyKpiResult, CampaignRangeStats } from '../lib/supabase';
 import { syncMetaCampaigns } from '../lib/meta-api';
 import { useAuth } from '../hooks/useAuth';
 import { useBrand } from '../contexts/BrandContext';
@@ -882,6 +882,16 @@ const Campaigns: React.FC = () => {
     staleTime: 60_000,
   });
 
+  // ── Per-campaign date-range stats — drives campaign table + donut chart ──
+  // Queries campaign_daily_stats grouped by campaign_id for the selected range.
+  // Returns empty {} when no daily data exists for this period (meta-sync hasn't run).
+  const { data: campaignDailyStats } = useQuery<Record<string, CampaignRangeStats>>({
+    queryKey: ['campaign-range-stats', activeBrandId, from, to],
+    queryFn:  () => getDailyCampaignStats(activeBrandId, from, to),
+    enabled:  !!activeBrandId,
+    staleTime: 60_000,
+  });
+
   const brandCampaigns = useMemo(() =>
     selectedBrand === 'all' ? allCampaigns : allCampaigns.filter(c => c.brand_id === selectedBrand),
     [allCampaigns, selectedBrand]
@@ -890,6 +900,28 @@ const Campaigns: React.FC = () => {
     goalFilter === 'all' ? brandCampaigns : brandCampaigns.filter(c => classifyObjective(c.objective) === goalFilter),
     [brandCampaigns, goalFilter]
   );
+
+  // ── Merge campaigns with date-filtered stats ──────────────────────────────────────
+  // When campaignDailyStats is populated, override the all-time campaign fields
+  // with date-filtered values. This makes the campaign table, donut chart, and
+  // aggregations all respond correctly when the user changes the date range.
+  // Campaigns with no data in the range keep their all-time values (data gap, not zero spend).
+  const mergedCampaigns = useMemo(() => {
+    if (!campaignDailyStats || Object.keys(campaignDailyStats).length === 0) return campaigns;
+    return campaigns.map(c => {
+      const ds = campaignDailyStats[c.id];
+      if (!ds) return c; // No daily data for this campaign in range — keep aggregate values
+      return {
+        ...c,
+        spend:       ds.spend,
+        impressions: ds.impressions,
+        clicks:      ds.clicks,
+        leads:       ds.leads,
+        cpl:         ds.leads > 0      ? ds.spend / ds.leads      : 0,
+        cpm:         ds.impressions > 0 ? (ds.spend / ds.impressions) * 1000 : 0,
+      };
+    });
+  }, [campaigns, campaignDailyStats]);
 
   const goalCounts = useMemo(() => {
     const counts: Record<GoalType, number> = { sales: 0, leads: 0, traffic: 0, awareness: 0, engagement: 0, unknown: 0 };
@@ -901,10 +933,11 @@ const Campaigns: React.FC = () => {
   const getBrandName  = (id: string) => brands.find(b => b.id === id)?.name || '';
 
   // ─── KPI aggregations — prefer daily stats, fall back to campaign aggregate ─
-  const aggSpend  = useMemo(() => campaigns.reduce((s, c) => s + c.spend,       0), [campaigns]);
-  const aggLeads  = useMemo(() => campaigns.reduce((s, c) => s + c.leads,       0), [campaigns]);
-  const aggImpr   = useMemo(() => campaigns.reduce((s, c) => s + c.impressions, 0), [campaigns]);
-  const aggQual   = useMemo(() => campaigns.reduce((s, c) => s + c.qualified_leads, 0), [campaigns]);
+  // KPI aggregations — use mergedCampaigns (date-filtered when campaignDailyStats is available)
+  const aggSpend  = useMemo(() => mergedCampaigns.reduce((s, c) => s + c.spend,       0), [mergedCampaigns]);
+  const aggLeads  = useMemo(() => mergedCampaigns.reduce((s, c) => s + c.leads,       0), [mergedCampaigns]);
+  const aggImpr   = useMemo(() => mergedCampaigns.reduce((s, c) => s + c.impressions, 0), [mergedCampaigns]);
+  const aggQual   = useMemo(() => campaigns.reduce((s, c) => s + c.qualified_leads,  0), [campaigns]); // not in daily stats
 
   const totalSpend = dailyKpis?.hasData ? dailyKpis.spend       : aggSpend;
   const totalLeads = dailyKpis?.hasData ? dailyKpis.leads       : aggLeads;
@@ -1153,7 +1186,7 @@ const Campaigns: React.FC = () => {
             totalImpressions={totalImpr}
             dateLabel={dateLabel}
           />
-          <DonutPanel campaigns={campaigns} />
+          <DonutPanel campaigns={mergedCampaigns} />
         </div>
       )}
 
@@ -1189,13 +1222,13 @@ const Campaigns: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {campaigns.map((c, idx) => (
+              {mergedCampaigns.map((c, idx) => (
                 <CampaignRow
                   key={c.id}
                   campaign={c}
                   showBrand={brands.length > 1 ? getBrandName(c.brand_id) : undefined}
                   onClick={() => setSelectedCampaign(c)}
-                  isLast={idx === campaigns.length - 1}
+                  isLast={idx === mergedCampaigns.length - 1}
                 />
               ))}
             </tbody>

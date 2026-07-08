@@ -270,6 +270,44 @@ export const getDailyKpis = async (
   return { spend, leads, impressions, purchases, revenue, dailyRows, hasData: true };
 };
 
+// ── Per-campaign date-range aggregates (campaign table / donut filtering) ─────
+// Returns a map: campaign internal UUID → aggregated metrics for the selected date range.
+// Used to override the all-time campaign.spend/impressions/clicks/leads fields when a
+// date range is selected, so the campaign table and donut chart react to date changes.
+export interface CampaignRangeStats {
+  spend: number;
+  impressions: number;
+  clicks: number;
+  leads: number;
+}
+
+export const getDailyCampaignStats = async (
+  brandId:  string,
+  from:     string,
+  to:       string,
+): Promise<Record<string, CampaignRangeStats>> => {
+  const { data, error } = await supabase
+    .from('campaign_daily_stats')
+    .select('campaign_id, spend, impressions, clicks, leads')
+    .eq('brand_id', brandId)
+    .gte('date', from)
+    .lte('date', to);
+
+  if (error || !data || data.length === 0) return {};
+
+  const result: Record<string, CampaignRangeStats> = {};
+  data.forEach(row => {
+    const ex = result[row.campaign_id] ?? { spend: 0, impressions: 0, clicks: 0, leads: 0 };
+    result[row.campaign_id] = {
+      spend:       ex.spend       + (row.spend       ?? 0),
+      impressions: ex.impressions + (row.impressions ?? 0),
+      clicks:      ex.clicks      + (row.clicks      ?? 0),
+      leads:       ex.leads       + (row.leads       ?? 0),
+    };
+  });
+  return result;
+};
+
 
 // ── Top creatives (for Top Creative card) ────────────────────────────────
 export const getTopCreatives = async (brandId: string, limit = 3) => {
