@@ -279,6 +279,12 @@ export interface CampaignRangeStats {
   impressions: number;
   clicks: number;
   leads: number;
+  purchases: number;
+  revenue: number;
+  atc: number;
+  page_views: number;
+  reach: number;
+  conversion_value: number;
 }
 
 export const getDailyCampaignStats = async (
@@ -288,7 +294,7 @@ export const getDailyCampaignStats = async (
 ): Promise<Record<string, CampaignRangeStats>> => {
   const { data, error } = await supabase
     .from('campaign_daily_stats')
-    .select('campaign_id, spend, impressions, clicks, leads')
+    .select('campaign_id, spend, impressions, clicks, leads, purchases, revenue, atc, page_views, reach, conversion_value')
     .eq('brand_id', brandId)
     .gte('date', from)
     .lte('date', to);
@@ -297,12 +303,29 @@ export const getDailyCampaignStats = async (
 
   const result: Record<string, CampaignRangeStats> = {};
   data.forEach(row => {
-    const ex = result[row.campaign_id] ?? { spend: 0, impressions: 0, clicks: 0, leads: 0 };
+    const ex = result[row.campaign_id] ?? {
+      spend: 0,
+      impressions: 0,
+      clicks: 0,
+      leads: 0,
+      purchases: 0,
+      revenue: 0,
+      atc: 0,
+      page_views: 0,
+      reach: 0,
+      conversion_value: 0,
+    };
     result[row.campaign_id] = {
-      spend:       ex.spend       + (row.spend       ?? 0),
-      impressions: ex.impressions + (row.impressions ?? 0),
-      clicks:      ex.clicks      + (row.clicks      ?? 0),
-      leads:       ex.leads       + (row.leads       ?? 0),
+      spend:            ex.spend            + (row.spend            ?? 0),
+      impressions:      ex.impressions      + (row.impressions      ?? 0),
+      clicks:           ex.clicks           + (row.clicks           ?? 0),
+      leads:            ex.leads            + (row.leads            ?? 0),
+      purchases:        ex.purchases        + (row.purchases        ?? 0),
+      revenue:          ex.revenue          + (row.revenue          ?? 0),
+      atc:              ex.atc              + (row.atc              ?? 0),
+      page_views:       ex.page_views       + (row.page_views       ?? 0),
+      reach:            ex.reach            + (row.reach            ?? 0),
+      conversion_value: ex.conversion_value + (row.conversion_value ?? 0),
     };
   });
   return result;

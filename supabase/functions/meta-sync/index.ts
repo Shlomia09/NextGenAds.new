@@ -285,7 +285,7 @@ serve(async (req) => {
         dailyUrl.searchParams.set('access_token', accessToken);
         dailyUrl.searchParams.set('date_preset', 'last_30d');
         dailyUrl.searchParams.set('time_increment', '1');
-        dailyUrl.searchParams.set('fields', 'date_start,spend,impressions,clicks,actions');
+        dailyUrl.searchParams.set('fields', 'date_start,spend,impressions,clicks,reach,actions,action_values');
 
         const dailyRes = await fetch(dailyUrl.toString());
         const dailyData = await dailyRes.json();
@@ -294,21 +294,63 @@ serve(async (req) => {
         const campaignUuid = externalToUuid.get(campaign.id);
         if (!campaignUuid) continue;
 
+        const conversionKey = resolveConversionKey(campaign.promoted_object || null, campaign.objective || '');
+
         const rows = dailyRows.map((row: {
           date_start: string;
           spend?: string;
           impressions?: string;
           clicks?: string;
+          reach?: string;
           actions?: Array<{ action_type: string; value: string }>;
-        }) => ({
-          campaign_id: campaignUuid,
-          brand_id,
-          date: row.date_start,
-          spend: parseFloat(row.spend || '0'),
-          impressions: parseInt(row.impressions || '0'),
-          clicks: parseInt(row.clicks || '0'),
-          leads: extractLeads(row.actions),
-        }));
+          action_values?: Array<{ action_type: string; value: string }>;
+        }) => {
+          // Extract purchases
+          const purchaseAction = (row.actions || []).find(
+            (a: { action_type: string }) =>
+              a.action_type === 'offsite_conversion.fb_pixel_purchase' ||
+              a.action_type === 'purchase'
+          );
+          const purchases = parseInt(purchaseAction?.value || '0');
+
+          // Extract revenue
+          const revenueAction = (row.action_values || []).find(
+            (a: { action_type: string }) =>
+              a.action_type === 'offsite_conversion.fb_pixel_purchase' ||
+              a.action_type === 'purchase'
+          );
+          const revenue = parseFloat(revenueAction?.value || '0');
+
+          // Extract ATC
+          const atcAction = (row.actions || []).find(
+            (a: { action_type: string }) =>
+              a.action_type === 'offsite_conversion.fb_pixel_add_to_cart' ||
+              a.action_type === 'add_to_cart'
+          );
+          const atc = parseInt(atcAction?.value || '0');
+
+          // Extract Page Views
+          const pageViewAction = (row.actions || []).find(
+            (a: { action_type: string }) => a.action_type === 'landing_page_view'
+          );
+          const page_views = parseInt(pageViewAction?.value || '0');
+
+          return {
+            campaign_id: campaignUuid,
+            brand_id,
+            date: row.date_start,
+            spend: parseFloat(row.spend || '0'),
+            impressions: parseInt(row.impressions || '0'),
+            clicks: parseInt(row.clicks || '0'),
+            leads: extractLeads(row.actions),
+            purchases,
+            revenue,
+            atc,
+            page_views,
+            reach: parseInt(row.reach || '0'),
+            conversion_value: extractConversionValue(row.actions, conversionKey),
+          };
+        });
 
         if (rows.length > 0) {
           const { error: dailyError } = await supabase

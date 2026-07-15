@@ -905,23 +905,53 @@ const Campaigns: React.FC = () => {
   // When campaignDailyStats is populated, override the all-time campaign fields
   // with date-filtered values. This makes the campaign table, donut chart, and
   // aggregations all respond correctly when the user changes the date range.
-  // Campaigns with no data in the range keep their all-time values (data gap, not zero spend).
   const mergedCampaigns = useMemo(() => {
-    if (!campaignDailyStats || Object.keys(campaignDailyStats).length === 0) return campaigns;
+    const hasDailyHistory = dailyKpis?.hasData;
+    if (!hasDailyHistory) return campaigns;
+
     return campaigns.map(c => {
-      const ds = campaignDailyStats[c.id];
-      if (!ds) return c; // No daily data for this campaign in range — keep aggregate values
+      const ds = campaignDailyStats?.[c.id];
+      if (!ds) {
+        // No daily data for this campaign in the range means it had zero spend/actions in this range
+        return {
+          ...c,
+          spend:            0,
+          impressions:      0,
+          clicks:           0,
+          leads:            0,
+          purchases:        0,
+          revenue:          0,
+          roas:             0,
+          atc:              0,
+          page_views:       0,
+          reach:            0,
+          frequency:        0,
+          conversion_value: 0,
+          cpl:              0,
+          cpm:              0,
+        };
+      }
+      const frequency = ds.reach > 0 ? ds.impressions / ds.reach : 0;
+      const roas = ds.spend > 0 ? ds.revenue / ds.spend : 0;
       return {
         ...c,
-        spend:       ds.spend,
-        impressions: ds.impressions,
-        clicks:      ds.clicks,
-        leads:       ds.leads,
-        cpl:         ds.leads > 0      ? ds.spend / ds.leads      : 0,
-        cpm:         ds.impressions > 0 ? (ds.spend / ds.impressions) * 1000 : 0,
+        spend:            ds.spend,
+        impressions:      ds.impressions,
+        clicks:           ds.clicks,
+        leads:            ds.leads,
+        purchases:        ds.purchases,
+        revenue:          ds.revenue,
+        atc:              ds.atc,
+        page_views:       ds.page_views,
+        reach:            ds.reach,
+        conversion_value: ds.conversion_value,
+        frequency,
+        roas,
+        cpl:              ds.leads > 0       ? ds.spend / ds.leads : 0,
+        cpm:              ds.impressions > 0 ? (ds.spend / ds.impressions) * 1000 : 0,
       };
     });
-  }, [campaigns, campaignDailyStats]);
+  }, [campaigns, campaignDailyStats, dailyKpis]);
 
   const goalCounts = useMemo(() => {
     const counts: Record<GoalType, number> = { sales: 0, leads: 0, traffic: 0, awareness: 0, engagement: 0, unknown: 0 };
