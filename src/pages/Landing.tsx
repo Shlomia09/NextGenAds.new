@@ -201,15 +201,6 @@ export default function Landing() {
     <>
       {/* ── Inline CSS ──────────────────────────────────────── */}
       <style>{`
-        :root {
-          --bg:#0B0A09;--bg2:#120F0D;--surface:#1A1614;--border:#2A2420;
-          --text:#F4EEE8;--text-2:#A39A91;--text-3:#6B635B;
-          --accent:#E3A88E;--accent-deep:#C97B5E;--accent-soft:rgba(227,168,142,0.12);
-          --green:#6BBF8A;
-          --font-display:'Fraunces',serif;
-          --font-ui:'Inter',sans-serif;
-          --font-mono:'JetBrains Mono',monospace;
-        }
         .lp-root { background:var(--bg); color:var(--text); font-family:var(--font-ui);
                    -webkit-font-smoothing:antialiased; overflow-x:hidden; }
         .lp-root *{ box-sizing:border-box; margin:0; padding:0; }
@@ -519,15 +510,22 @@ export default function Landing() {
         .step-row p { color:var(--text-2);font-size:16px;line-height:1.65;margin-top:16px;max-width:42ch; }
         .step-visual {
           height:280px;border-radius:18px;border:1px solid var(--border);
-          background:linear-gradient(160deg,var(--surface),var(--bg2));
+          background:linear-gradient(160deg,var(--surface),var(--bg));
+          background-size:cover;background-position:center;
           display:flex;align-items:center;justify-content:center;
           color:var(--accent);font-size:54px;position:relative;overflow:hidden;
           box-shadow:0 24px 60px rgba(0,0,0,0.35);
         }
+        /* image overlay: darkens bottom so text above remains readable */
+        .step-visual.has-image::before {
+          content:"";position:absolute;inset:0;border-radius:18px;
+          background:linear-gradient(180deg,rgba(11,11,13,.05) 0%,rgba(11,11,13,.55) 100%);
+          z-index:1;
+        }
         .step-visual::after {
           content:"";position:absolute;width:300px;height:300px;border-radius:50%;
           background:radial-gradient(circle,var(--accent-soft),transparent 65%);
-          top:-30%;right:-20%;
+          top:-30%;right:-20%;mix-blend-mode:screen;z-index:2;
         }
 
         /* ── FINAL CTA ───────────────────────────────────────── */
@@ -790,7 +788,10 @@ export default function Landing() {
                 <h3>Upload your creative</h3>
                 <p>Drop in an image or video. The engine reads it and understands what it's looking at.</p>
               </div>
-              <div className="step-visual reveal d1">✦</div>
+              <div
+                className="step-visual has-image reveal d1"
+                style={{ backgroundImage: 'url(/assets/how-it-works-01-upload.jpg)' }}
+              />
             </div>
             <div className="step-row">
               <div className="reveal">
@@ -798,7 +799,10 @@ export default function Landing() {
                 <h3>AI writes the campaign</h3>
                 <p>Headlines, primary text, audience, budget. All drafted for you, tuned to beauty buyers, ready to edit.</p>
               </div>
-              <div className="step-visual reveal d1">✎</div>
+              <div
+                className="step-visual has-image reveal d1"
+                style={{ backgroundImage: 'url(/assets/how-it-works-02-ai-writes.jpg)' }}
+              />
             </div>
             <div className="step-row">
               <div className="reveal">
@@ -806,7 +810,10 @@ export default function Landing() {
                 <h3>Publish to your platform</h3>
                 <p>One click pushes the campaign live to your connected Meta or Google account, in a safe paused state for final review.</p>
               </div>
-              <div className="step-visual reveal d1">◎</div>
+              <div
+                className="step-visual has-image reveal d1"
+                style={{ backgroundImage: 'url(/assets/how-it-works-03-publish.jpg)' }}
+              />
             </div>
             <div className="step-row">
               <div className="reveal">
@@ -814,7 +821,10 @@ export default function Landing() {
                 <h3>The engine optimizes</h3>
                 <p>From there it runs itself: reallocating budget, catching fatigue, and reporting what it did while you slept.</p>
               </div>
-              <div className="step-visual reveal d1">⟳</div>
+              <div
+                className="step-visual has-image reveal d1"
+                style={{ backgroundImage: 'url(/assets/how-it-works-04-publish.png)' }}
+              />
             </div>
           </div>
         </section>

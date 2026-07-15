@@ -8,7 +8,7 @@ import {
   type Chart as ChartType,
 } from 'chart.js';
 
-import { getCampaigns, getBrands, getAdAccounts, getDailyKpis, getDailyCampaignStats } from '../lib/supabase';
+import { getCampaigns, getBrands, getAdAccounts, getDailyKpis, getDailyCampaignStats, checkHasDailyStats } from '../lib/supabase';
 import type { DailyKpiResult, CampaignRangeStats } from '../lib/supabase';
 import { syncMetaCampaigns } from '../lib/meta-api';
 import { useAuth } from '../hooks/useAuth';
@@ -833,6 +833,11 @@ const Campaigns: React.FC = () => {
   const [syncMsg,       setSyncMsg]       = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
   const [goalFilter,    setGoalFilter]    = useState<GoalType | 'all'>('all');
+  const [statusFilter,  setStatusFilter]  = useState<'all' | 'ACTIVE' | 'PAUSED'>('all');
+
+  // Sorting state
+  const [sortField, setSortField] = useState<'name' | 'spend' | 'cpm' | 'results' | 'sales'>('spend');
+  const [sortAsc,   setSortAsc]   = useState<boolean>(false);
 
   // ── Date range state ──────────────────────────────────────
   const [datePreset,  setDatePreset]  = useState<DatePreset>('30d');
@@ -882,6 +887,17 @@ const Campaigns: React.FC = () => {
     staleTime: 60_000,
   });
 
+  // ── Global daily stats check for the brand ────────────────
+  // Checks if the brand has ANY daily breakdown history stored in the database.
+  // If it does, we can safely zero-out campaigns that had no activity in the selected range.
+  // If it does not, we fall back to displaying all-time totals so we don't show empty zeros.
+  const { data: hasDailyHistory = false } = useQuery<boolean>({
+    queryKey: ['has-daily-stats', activeBrandId],
+    queryFn:  () => checkHasDailyStats(activeBrandId),
+    enabled:  !!activeBrandId,
+    staleTime: 60_000,
+  });
+
   // ── Per-campaign date-range stats — drives campaign table + donut chart ──
   // Queries campaign_daily_stats grouped by campaign_id for the selected range.
   // Returns empty {} when no daily data exists for this period (meta-sync hasn't run).
@@ -896,17 +912,21 @@ const Campaigns: React.FC = () => {
     selectedBrand === 'all' ? allCampaigns : allCampaigns.filter(c => c.brand_id === selectedBrand),
     [allCampaigns, selectedBrand]
   );
-  const campaigns = useMemo(() =>
-    goalFilter === 'all' ? brandCampaigns : brandCampaigns.filter(c => classifyObjective(c.objective) === goalFilter),
-    [brandCampaigns, goalFilter]
-  );
+
+  // Filter campaigns by objective and active status
+  const campaigns = useMemo(() => {
+    let list = goalFilter === 'all' ? brandCampaigns : brandCampaigns.filter(c => classifyObjective(c.objective) === goalFilter);
+    if (statusFilter !== 'all') {
+      list = list.filter(c => c.status === statusFilter);
+    }
+    return list;
+  }, [brandCampaigns, goalFilter, statusFilter]);
 
   // ── Merge campaigns with date-filtered stats ──────────────────────────────────────
   // When campaignDailyStats is populated, override the all-time campaign fields
   // with date-filtered values. This makes the campaign table, donut chart, and
   // aggregations all respond correctly when the user changes the date range.
   const mergedCampaigns = useMemo(() => {
-    const hasDailyHistory = dailyKpis?.hasData;
     if (!hasDailyHistory) return campaigns;
 
     return campaigns.map(c => {
@@ -951,7 +971,46 @@ const Campaigns: React.FC = () => {
         cpm:              ds.impressions > 0 ? (ds.spend / ds.impressions) * 1000 : 0,
       };
     });
-  }, [campaigns, campaignDailyStats, dailyKpis]);
+  }, [campaigns, campaignDailyStats, hasDailyHistory]);
+
+  // ── Sort campaigns ──────────────────────────────────────────
+  const sortedCampaigns = useMemo(() => {
+    return [...mergedCampaigns].sort((a, b) => {
+      let valA: any = 0;
+      let valB: any = 0;
+
+      if (sortField === 'name') {
+        return sortAsc
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      }
+
+      if (sortField === 'spend') {
+        valA = a.spend;
+        valB = b.spend;
+      } else if (sortField === 'cpm') {
+        valA = a.impressions > 0 ? (a.spend / a.impressions) * 1000 : 0;
+        valB = b.impressions > 0 ? (b.spend / b.impressions) * 1000 : 0;
+      } else if (sortField === 'results') {
+        valA = a.conversion_value ?? 0;
+        valB = b.conversion_value ?? 0;
+      } else if (sortField === 'sales') {
+        valA = a.revenue > 0 ? a.revenue : (a.purchases ?? 0);
+        valB = b.revenue > 0 ? b.revenue : (b.purchases ?? 0);
+      }
+
+      return sortAsc ? valA - valB : valB - valA;
+    });
+  }, [mergedCampaigns, sortField, sortAsc]);
+
+  const handleSort = (field: typeof sortField) => {
+    if (sortField === field) {
+      setSortAsc(prev => !prev);
+    } else {
+      setSortField(field);
+      setSortAsc(field === 'name' ? true : false);
+    }
+  };
 
   const goalCounts = useMemo(() => {
     const counts: Record<GoalType, number> = { sales: 0, leads: 0, traffic: 0, awareness: 0, engagement: 0, unknown: 0 };
@@ -1136,6 +1195,35 @@ const Campaigns: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Divider */}
+        <span style={{ width: 1, height: 22, background: 'var(--border)', display: 'inline-block', margin: '0 2px' }} />
+
+        {/* Status filter pills */}
+        <div style={{ display: 'flex', gap: 5 }}>
+          {(['all', 'ACTIVE', 'PAUSED'] as const).map(s => {
+            const label = s === 'all' ? 'All Status' : s === 'ACTIVE' ? '🟢 Active' : '⏸ Paused';
+            const isActive = statusFilter === s;
+            return (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s)}
+                style={{
+                  padding: '6px 13px',
+                  borderRadius: 30,
+                  fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500,
+                  cursor: 'pointer', border: '1px solid',
+                  transition: 'all 0.15s',
+                  background: isActive ? 'var(--accent-soft)' : 'var(--surface)',
+                  color: isActive ? 'var(--accent)' : 'var(--text-2)',
+                  borderColor: isActive ? 'var(--accent)' : 'var(--border)',
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* ── Date Range Bar ─────────────────────────────────── */}
@@ -1239,26 +1327,48 @@ const Campaigns: React.FC = () => {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
-                {['CAMPAIGN', 'STATUS', 'SPEND', 'CPM', 'RESULTS', 'SALES'].map((h, i) => (
-                  <th key={h} style={{
-                    padding: '13px 22px', textAlign: i >= 2 ? 'right' : 'left',
-                    fontSize: 10, letterSpacing: 1.2, color: 'var(--text-3)',
-                    fontFamily: 'var(--font-ui)', fontWeight: 500,
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {h}
+                {([
+                  { key: 'name',    label: 'CAMPAIGN',  align: 'left'  },
+                  { key: null,      label: 'STATUS',    align: 'left'  },
+                  { key: 'spend',   label: 'SPEND',     align: 'right' },
+                  { key: 'cpm',     label: 'CPM',       align: 'right' },
+                  { key: 'results', label: 'RESULTS',   align: 'right' },
+                  { key: 'sales',   label: 'SALES',     align: 'right' },
+                ] as const).map(({ key, label, align }) => (
+                  <th
+                    key={label}
+                    onClick={key ? () => handleSort(key as 'name' | 'spend' | 'cpm' | 'results' | 'sales') : undefined}
+                    style={{
+                      padding: '13px 22px', textAlign: align as 'left' | 'right',
+                      fontSize: 10, letterSpacing: 1.2, color: key ? 'var(--text-2)' : 'var(--text-3)',
+                      fontFamily: 'var(--font-ui)', fontWeight: 500,
+                      whiteSpace: 'nowrap',
+                      cursor: key ? 'pointer' : 'default',
+                      userSelect: 'none',
+                      transition: 'color 0.15s',
+                    }}
+                  >
+                    {label}
+                    {key && sortField === key && (
+                      <span style={{ marginLeft: 4, fontSize: 9, opacity: 0.7 }}>
+                        {sortAsc ? '▲' : '▼'}
+                      </span>
+                    )}
+                    {key && sortField !== key && (
+                      <span style={{ marginLeft: 4, fontSize: 9, opacity: 0.25 }}>▼</span>
+                    )}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {mergedCampaigns.map((c, idx) => (
+              {sortedCampaigns.map((c, idx) => (
                 <CampaignRow
                   key={c.id}
                   campaign={c}
                   showBrand={brands.length > 1 ? getBrandName(c.brand_id) : undefined}
                   onClick={() => setSelectedCampaign(c)}
-                  isLast={idx === mergedCampaigns.length - 1}
+                  isLast={idx === sortedCampaigns.length - 1}
                 />
               ))}
             </tbody>

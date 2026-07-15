@@ -331,6 +331,20 @@ export const getDailyCampaignStats = async (
   return result;
 };
 
+// ── Check if brand has any daily stats history in DB ─────────────────────────
+export const checkHasDailyStats = async (brandId: string): Promise<boolean> => {
+  const { data, error } = await supabase
+    .from('campaign_daily_stats')
+    .select('id')
+    .eq('brand_id', brandId)
+    .limit(1);
+  if (error) {
+    console.warn('checkHasDailyStats error:', error.message);
+    return false;
+  }
+  return (data?.length ?? 0) > 0;
+};
+
 
 // ── Top creatives (for Top Creative card) ────────────────────────────────
 export const getTopCreatives = async (brandId: string, limit = 3) => {

@@ -31,16 +31,16 @@
 
 | Token | Hex | שימוש |
 |---|---|---|
-| --bg | #0E0C0B | רקע ראשי |
-| --bg-sidebar | #0A0908 | סיידבר (כהה יותר מהמסך) |
-| --surface | #161312 | כרטיסים, טבלאות, מודלים |
-| --surface-2 | #1B1716 | כרטיס מורם / hover רך |
-| --surface-hover | #201B19 | hover על שורה/כפתור |
-| --border | #262120 | גבול ראשי |
-| --border-soft | #1C1918 | גבול עדין בין שורות |
-| --text | #F1EBE4 | טקסט ראשי (לבן-חמים) |
-| --text-2 | #8A817A | טקסט משני |
-| --text-3 | #675F58 | הינטים, placeholder |
+| --bg | #0B0B0D | רקע ראשי |
+| --bg-sidebar | #08080A | סיידבר (כהה יותר מהמסך) |
+| --surface | #141416 | כרטיסים, טבלאות, מודלים |
+| --surface-2 | #1A1A1D | כרטיס מורם / hover רך |
+| --surface-hover | #202024 | hover על שורה/כפתור |
+| --border | #27272B | גבול ראשי |
+| --border-soft | #1D1D20 | גבול עדין בין שורות |
+| --text | #EEEEF0 | טקסט ראשי (אפור-לבן ניטרלי) |
+| --text-2 | #8B8B93 | טקסט משני |
+| --text-3 | #626268 | הינטים, placeholder |
 | --accent | #E3A88E | **רוז-גולד — צבע המותג** |
 | --accent-deep | #C97B5E | רוז-גולד עמוק (אגורות, hover) |
 | --accent-soft | rgba(227,168,142,0.10) | רקע מבטא רוז-גולד |
@@ -815,7 +815,47 @@ your-repo/
 - [ ] מספרי stats שסומנו PLACEHOLDER — אושרו לפני פרסום?
 - [ ] Pricing / Onboarding / Billing — נבדקו מול צ'קליסט זה?
 
-## 60. Landing Hero — Wall of Creatives + Cursor Spotlight
+## 60. פלטת ניטרלים — Neutral Gray-Black (§60)
+
+הניטרלים הוחלפו מ-"חם" (כחום-ארגמן עדין) ל-"ניטרלי" (אפור-שחור). הרציונל:
+ה-accent רוז-גולד בולט חד יותר על רקע ניטרלי מאשר על רקע עם נטייה חמה. גם צבעי
+דאטה (ירוק/אדום) קוראים נכון יותר. שאר הטוקנים (accent/green/red/blue/champagne)
+לא זזים.
+
+| Token | ערך חדש (§60) |
+|---|---|
+| --bg | #0B0B0D |
+| --bg-sidebar | #08080A |
+| --surface | #141416 |
+| --surface-2 | #1A1A1D |
+| --surface-hover | #202024 |
+| --border | #27272B |
+| --border-soft | #1D1D20 |
+| --text | #EEEEF0 |
+| --text-2 | #8B8B93 |
+| --text-3 | #626268 |
+
+**מיושם ב:** `src/styles/theme.css` — כל שאר הקבצים משתמשים ב-`var()`, אז השינוי זורם לכל המסכים.
+**TODO:** `BillingTab.tsx` + `UpgradeModal.tsx` עדיין מכילים hex ישן מחורז ידנית (לפני מערכת הטוקנים). לתקן בסשן נפרד.
+
+---
+
+## 61. How it Works — תמונות lifestyle (§61)
+
+בסקשן ה-`.steps` ב-`Landing.tsx` — כל 4 השלבים מקבלים background-image אמיתי:
+
+| שלב | קובץ |
+|---|---|
+| 01 Upload your creative | `public/assets/how-it-works-01-upload.jpg` |
+| 02 AI writes the campaign | `public/assets/how-it-works-02-ai-writes.jpg` |
+| 03 Publish to your platform | `public/assets/how-it-works-03-publish.jpg` |
+| 04 The engine optimizes | `public/assets/how-it-works-04-publish.png` |
+
+**עיצוב `.step-visual.has-image`:**
+- `background-size:cover; background-position:center`
+- Overlay עדינה מעל: `linear-gradient(180deg, rgba(11,11,13,.05) 0%, rgba(11,11,13,.55) 100%)` דרך `::before`
+- Radial glow (`::after`) מעל הכל עם `mix-blend-mode:screen` — מתערבב עם התמונה
+
 
 **רפרנס חי:** `Docs/nextadsgen-landing-home-v3.html`
 **מימוש:** `src/pages/Landing.tsx` (החל מ-commit שכולל "hero wall")

@@ -28,21 +28,21 @@
    ============================================================ */
 :root,
 [data-theme="dark"] {
-  /* Surfaces */
-  --bg:             #0E0C0B;
-  --bg-sidebar:     #0A0908;
-  --surface:        #1A1614;
-  --surface-2:      #221B18;
-  --surface-hover:  #241D1A;
+  /* Surfaces — §60 neutral gray-black palette */
+  --bg:             #0B0B0D;
+  --bg-sidebar:     #08080A; /* proportionally darker than --bg; adjust if needed */
+  --surface:        #141416;
+  --surface-2:      #1A1A1D;
+  --surface-hover:  #202024;
 
   /* Borders */
-  --border:         #2E2724;
-  --border-soft:    #231D1B;
+  --border:         #27272B;
+  --border-soft:    #1D1D20;
 
   /* Text */
-  --text:           #F4EEE8;
-  --text-2:         #9A9089;
-  --text-3:         #6B635B;
+  --text:           #EEEEF0;
+  --text-2:         #8B8B93;
+  --text-3:         #626268;
 
   /* Accent — Rose Gold (brand color) */
   --accent:         #E3A88E;
