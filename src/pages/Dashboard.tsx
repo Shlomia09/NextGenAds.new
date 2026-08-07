@@ -24,6 +24,7 @@ import {
   getIntelligenceSessions, updateRecommendationStatus, executeRecommendation,
   getDailyStats, getTopCreatives, getSystemEvents,
 } from '../lib/supabase';
+import { generateRecommendations } from '../lib/claude-api';
 import { resolvePrimaryConversion } from '../lib/conversions';
 import { useAuth } from '../hooks/useAuth';
 import { useBrand } from '../contexts/BrandContext';
@@ -296,6 +297,14 @@ const Dashboard: React.FC = () => {
     mutationFn: (id: string) => executeRecommendation(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['recommendations'] }),
     onError: (err: Error) => alert(`Execution failed: ${err.message}`),
+  });
+ 
+  // Analyzes all campaigns for the active brand against the 9-year benchmark
+  // and (re)generates the pending recommendations list.
+  const generateRecsMutation = useMutation({
+    mutationFn: () => generateRecommendations(activeBrand!.id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['recommendations'] }),
+    onError: (err: Error) => alert(`Failed to generate recommendations: ${err.message}`),
   });
  
   // ── Derived data ─────────────────────────────────────────────
@@ -622,7 +631,22 @@ const Dashboard: React.FC = () => {
  
             {/* ── 5. Needs Your Attention ── */}
             <Card>
-              <SectionLabel>Needs your attention</SectionLabel>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <SectionLabel>Needs your attention</SectionLabel>
+                <button
+                  onClick={() => activeBrand && generateRecsMutation.mutate()}
+                  disabled={!activeBrand || generateRecsMutation.isPending}
+                  style={{
+                    padding: '3px 10px', background: 'transparent', color: 'var(--text-2)',
+                    border: '1px solid var(--border-soft)', borderRadius: 7,
+                    fontFamily: 'var(--font-ui)', fontSize: 10.5,
+                    cursor: generateRecsMutation.isPending ? 'default' : 'pointer',
+                    opacity: generateRecsMutation.isPending ? 0.6 : 1,
+                  }}
+                >
+                  {generateRecsMutation.isPending ? 'Analyzing…' : 'Generate recommendations'}
+                </button>
+              </div>
               {isLoading ? (
                 <div style={{ height: 60, background: 'var(--surface-2)', borderRadius: 10, animation: 'pulse 1.5s ease-in-out infinite' }} />
               ) : pendingRecs.length === 0 ? (
@@ -630,7 +654,7 @@ const Dashboard: React.FC = () => {
                   <CheckCircle2 size={18} style={{ color: 'var(--green)', flexShrink: 0 }} />
                   <div>
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)' }}>All clear</div>
-                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>No pending actions right now.</div>
+                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>No pending actions — click "Generate recommendations" to analyze.</div>
                   </div>
                 </div>
               ) : pendingRecs.map(rec => {
@@ -800,3 +824,4 @@ const Dashboard: React.FC = () => {
 };
  
 export default Dashboard;
+ 
