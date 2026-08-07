@@ -24,6 +24,7 @@ import {
   getIntelligenceSessions, updateRecommendationStatus,
   getDailyStats, getTopCreatives, getSystemEvents,
 } from '../lib/supabase';
+import { resolvePrimaryConversion } from '../lib/conversions';
 import { useAuth } from '../hooks/useAuth';
 import { useBrand } from '../contexts/BrandContext';
 import {
@@ -68,25 +69,28 @@ interface HealthComponent { name: string; score: number; label: string; color: s
 
 const computeHealth = (campaigns: Campaign[], benchmarks: BenchmarkMetric[]): { score: number; grade: string; components: HealthComponent[] } => {
   if (!campaigns.length) return { score: 0, grade: 'No data', components: [] };
-  const totalLeads      = campaigns.reduce((s, c) => s + (c.leads ?? 0), 0);
-  const totalSpend      = campaigns.reduce((s, c) => s + (c.spend ?? 0), 0);
-  const totalClicks     = campaigns.reduce((s, c) => s + (c.clicks ?? 0), 0);
+  // Use resolvePrimaryConversion so health score reflects the actual conversion type
+  const convSummary    = resolvePrimaryConversion(campaigns);
+  const totalResults   = convSummary.totalValue;   // Purchases, Leads, or mixed
+  const totalSpend     = campaigns.reduce((s, c) => s + (c.spend ?? 0), 0);
+  const totalClicks    = campaigns.reduce((s, c) => s + (c.clicks ?? 0), 0);
   const totalImpressions = campaigns.reduce((s, c) => s + (c.impressions ?? 0), 0);
-  const avgCPL = totalLeads > 0 ? totalSpend / totalLeads : 0;
+  const avgCPA = totalResults > 0 ? totalSpend / totalResults : 0;
   const avgCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
-  const cplBench = benchmarks.find(b => b.label.toLowerCase().includes('cpl'));
+  const cpaBench = benchmarks.find(b => b.label.toLowerCase().includes('cpl') || b.label.toLowerCase().includes('cpa'));
   const ctrBench = benchmarks.find(b => b.label.toLowerCase().includes('ctr'));
   const components: HealthComponent[] = [];
   let totalScore = 0; let totalWeight = 0;
-  if (avgCPL > 0 && cplBench?.benchmark_value) {
-    const ratio = avgCPL / cplBench.benchmark_value;
+  if (avgCPA > 0 && cpaBench?.benchmark_value) {
+    const ratio = avgCPA / cpaBench.benchmark_value;
     const s = ratio < 0.8 ? 95 : ratio < 1.0 ? 78 : ratio < 1.3 ? 52 : 22;
     components.push({ name: 'Cost efficiency', score: s, label: ratio < 0.8 ? 'Excellent' : ratio < 1.0 ? 'Good' : ratio < 1.3 ? 'Watch' : 'Poor', color: s >= 70 ? 'var(--green)' : s >= 45 ? 'var(--champagne)' : 'var(--red)' });
     totalScore += s * 40; totalWeight += 40;
   }
-  if (totalLeads > 0) {
-    const s = totalLeads > 200 ? 92 : totalLeads > 100 ? 80 : totalLeads > 30 ? 62 : 40;
-    components.push({ name: 'Lead volume', score: s, label: s >= 80 ? 'Strong' : s >= 60 ? 'Good' : 'Building', color: s >= 70 ? 'var(--green)' : s >= 50 ? 'var(--champagne)' : 'var(--red)' });
+  if (totalResults > 0) {
+    const s = totalResults > 200 ? 92 : totalResults > 100 ? 80 : totalResults > 30 ? 62 : 40;
+    const label = convSummary.eventLabel || 'Results';
+    components.push({ name: `${label} volume`, score: s, label: s >= 80 ? 'Strong' : s >= 60 ? 'Good' : 'Building', color: s >= 70 ? 'var(--green)' : s >= 50 ? 'var(--champagne)' : 'var(--red)' });
     totalScore += s * 30; totalWeight += 30;
   }
   if (avgCTR > 0 && ctrBench?.benchmark_value) {
@@ -120,9 +124,9 @@ const SectionLabel: React.FC<{ children: React.ReactNode; style?: React.CSSPrope
 );
 
 // ─── 30-Day Trend Chart ─────────────────────────────────────────
-interface DailyStat { date: string; spend: number; leads: number; }
+interface DailyStat { date: string; spend: number; leads: number; purchases: number; conversion_value: number; }
 
-const TrendChart: React.FC<{ data: DailyStat[] }> = ({ data }) => {
+const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ data, conversionLabel }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef  = useRef<Chart | null>(null);
 
@@ -165,8 +169,11 @@ const TrendChart: React.FC<{ data: DailyStat[] }> = ({ data }) => {
             yAxisID: 'y',
           },
           {
-            label: 'Leads',
-            data: data.map(d => d.leads),
+            label: conversionLabel,
+            data: data.map(d =>
+              conversionLabel === 'Leads'     ? d.leads
+            : conversionLabel === 'Purchases' ? d.purchases
+            : d.conversion_value),
             borderColor: green, backgroundColor: g2,
             fill: true, tension: 0.4, borderWidth: 2,
             pointRadius: 0, pointHoverRadius: 4,
@@ -192,7 +199,7 @@ const TrendChart: React.FC<{ data: DailyStat[] }> = ({ data }) => {
             callbacks: {
               label: ctx => ctx.datasetIndex === 0
                 ? ` Spend: €${ctx.raw?.toLocaleString()}`
-                : ` Leads: ${ctx.raw}`,
+                : ` ${conversionLabel}: ${ctx.raw}`,
             },
           },
         },
@@ -288,11 +295,14 @@ const Dashboard: React.FC = () => {
   const benchmarks    = useMemo(() => activeBrand ? getBenchmarkMetricsByType(businessType, aov, campaigns) : [], [activeBrand, campaigns, businessType, aov]);
 
   const totalSpend       = campaigns.reduce((s, c) => s + (c.spend ?? 0), 0);
-  const totalLeads       = campaigns.reduce((s, c) => s + (c.leads ?? 0), 0);
   const totalImpressions = campaigns.reduce((s, c) => s + (c.impressions ?? 0), 0);
   const totalClicks      = campaigns.reduce((s, c) => s + (c.clicks ?? 0), 0);
-  const avgCPL           = totalLeads > 0 ? totalSpend / totalLeads : 0;
   const avgCTR           = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+  // Dynamic conversion summary — replaces hardcoded totalLeads/avgCPL
+  const dashConvSummary  = useMemo(() => resolvePrimaryConversion(campaigns), [campaigns]);
+  const totalResults     = dashConvSummary.totalValue;
+  const convLabel        = dashConvSummary.eventLabel || 'Results';
+  const avgCPA           = totalResults > 0 ? totalSpend / totalResults : 0;
 
   // Today pulse — real timestamps
   const syncedToday   = campaigns.filter(c => isToday(c.synced_at)).length;
@@ -305,13 +315,13 @@ const Dashboard: React.FC = () => {
   // Pending recs (top 3)
   const pendingRecs = recommendations.filter(r => r.status === 'pending').slice(0, 3);
 
-  // Per-account stats
+  // Per-account stats — results is dynamic (Purchases, Leads, etc.)
   const accountStats = useMemo(() => adAccounts.map(acc => ({
-    account: acc,
+    account:   acc,
     campaigns: campaigns.filter(c => c.ad_account_id === acc.id).length,
     active:    campaigns.filter(c => c.ad_account_id === acc.id && c.status === 'ACTIVE').length,
     spend:     campaigns.filter(c => c.ad_account_id === acc.id).reduce((s, c) => s + (c.spend ?? 0), 0),
-    leads:     campaigns.filter(c => c.ad_account_id === acc.id).reduce((s, c) => s + (c.leads ?? 0), 0),
+    results:   resolvePrimaryConversion(campaigns.filter(c => c.ad_account_id === acc.id)).totalValue,
   })), [adAccounts, campaigns]);
 
   // Live activity: prefer system_events, fallback to timestamp-based
@@ -414,7 +424,7 @@ const Dashboard: React.FC = () => {
                   No Meta accounts connected.{' '}
                   <a href="/settings" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Connect now →</a>
                 </div>
-              ) : accountStats.map(({ account, campaigns: numC, active, spend, leads }) => {
+              ) : accountStats.map(({ account, campaigns: numC, active, spend, results }) => {
                 const initials = (account.display_name || account.account_name).split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
                 return (
                   <div key={account.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '11px 14px', background: 'var(--surface-2)', borderRadius: 12, marginBottom: 8, border: '1px solid var(--border-soft)' }}>
@@ -434,10 +444,10 @@ const Dashboard: React.FC = () => {
                         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(spend)}</div>
                         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)' }}>spend</div>
                       </div>
-                      {leads > 0 && (
+                      {results > 0 && (
                         <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(leads)}</div>
-                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)' }}>leads</div>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(results)}</div>
+                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)' }}>{convLabel.toLowerCase()}</div>
                         </div>
                       )}
                     </div>
@@ -457,17 +467,17 @@ const Dashboard: React.FC = () => {
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(totalSpend)}</span>
                       <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginLeft: 6 }}>spend</span>
                     </div>
-                    {totalLeads > 0 && (
+                    {totalResults > 0 && (
                       <div>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(totalLeads)}</span>
-                        <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginLeft: 6 }}>leads</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(totalResults)}</span>
+                        <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginLeft: 6 }}>{convLabel.toLowerCase()}</span>
                       </div>
                     )}
                   </div>
                 </div>
                 {/* Legend */}
                 <div style={{ display: 'flex', gap: 14, flexShrink: 0 }}>
-                  {[{ label: 'Spend', color: 'var(--accent)' }, { label: 'Leads', color: 'var(--green)' }].map(l => (
+                  {[{ label: 'Spend', color: 'var(--accent)' }, { label: convLabel, color: 'var(--green)' }].map(l => (
                     <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-2)' }}>
                       <div style={{ width: 8, height: 8, borderRadius: 2, background: l.color }} />
                       {l.label}
@@ -490,7 +500,7 @@ const Dashboard: React.FC = () => {
               ) : (
                 /* Real Chart.js chart */
                 <div style={{ height: 220 }}>
-                  <TrendChart data={dailyStats} />
+                  <TrendChart data={dailyStats} conversionLabel={convLabel} />
                 </div>
               )}
 
@@ -498,10 +508,10 @@ const Dashboard: React.FC = () => {
               {!isLoading && campaigns.length > 0 && (
                 <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
                   {[
-                    { label: 'Total Spend', value: formatCurrency(totalSpend), color: 'var(--accent)' },
-                    { label: 'Total Leads', value: totalLeads > 0 ? formatNumber(totalLeads) : '—', color: 'var(--green)', hide: totalLeads === 0 },
-                    { label: 'Avg CPL', value: avgCPL > 0 ? formatCurrency(avgCPL) : '—', color: 'var(--text)' },
-                    { label: 'Avg CTR', value: avgCTR > 0 ? `${avgCTR.toFixed(2)}%` : '—', color: 'var(--blue)' },
+                    { label: 'Total Spend',          value: formatCurrency(totalSpend),      color: 'var(--accent)' },
+                    { label: `Total ${convLabel}`,    value: totalResults > 0 ? formatNumber(totalResults) : '—', color: 'var(--green)', hide: totalResults === 0 },
+                    { label: dashConvSummary.cpaLabel, value: avgCPA > 0 ? formatCurrency(avgCPA) : '—', color: 'var(--text)' },
+                    { label: 'Avg CTR',               value: avgCTR > 0 ? `${avgCTR.toFixed(2)}%` : '—', color: 'var(--blue)' },
                   ].filter(m => !m.hide).map(m => (
                     <div key={m.label} style={{ background: 'var(--surface-2)', borderRadius: 10, padding: '10px 12px', border: '1px solid var(--border-soft)' }}>
                       <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>{m.label}</div>

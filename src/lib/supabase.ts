@@ -197,12 +197,12 @@ export const getRecentSessionContext = async (
 
 // ── Daily stats (for 30-day trend chart) ─────────────────────────────────
 // Aggregates spend + leads per day across ALL campaigns for a brand
-export const getDailyStats = async (brandId: string, days = 30): Promise<{ date: string; spend: number; leads: number }[]> => {
+export const getDailyStats = async (brandId: string, days = 30): Promise<{ date: string; spend: number; leads: number; purchases: number; conversion_value: number }[]> => {
   const since = new Date();
   since.setDate(since.getDate() - days);
   const { data, error } = await supabase
     .from('campaign_daily_stats')
-    .select('date, spend, leads')
+    .select('date, spend, leads, purchases, conversion_value')
     .eq('brand_id', brandId)
     .gte('date', since.toISOString().split('T')[0])
     .order('date', { ascending: true });
@@ -211,10 +211,15 @@ export const getDailyStats = async (brandId: string, days = 30): Promise<{ date:
     return [];
   }
   // Aggregate multiple campaigns per day
-  const map = new Map<string, { spend: number; leads: number }>();
+  const map = new Map<string, { spend: number; leads: number; purchases: number; conversion_value: number }>();
   (data ?? []).forEach(row => {
-    const existing = map.get(row.date) ?? { spend: 0, leads: 0 };
-    map.set(row.date, { spend: existing.spend + (row.spend ?? 0), leads: existing.leads + (row.leads ?? 0) });
+    const existing = map.get(row.date) ?? { spend: 0, leads: 0, purchases: 0, conversion_value: 0 };
+    map.set(row.date, {
+      spend:            existing.spend            + (row.spend            ?? 0),
+      leads:            existing.leads            + (row.leads            ?? 0),
+      purchases:        existing.purchases        + (row.purchases        ?? 0),
+      conversion_value: existing.conversion_value + (row.conversion_value ?? 0),
+    });
   });
   return Array.from(map.entries()).map(([date, v]) => ({ date, ...v })).sort((a, b) => a.date.localeCompare(b.date));
 };
@@ -227,7 +232,8 @@ export interface DailyKpiResult {
   impressions: number;
   purchases: number;
   revenue: number;
-  dailyRows: { date: string; spend: number; leads: number }[];
+  conversion_value: number;
+  dailyRows: { date: string; spend: number; leads: number; purchases: number; conversion_value: number }[];
   hasData: boolean;
 }
 
@@ -236,11 +242,11 @@ export const getDailyKpis = async (
   from: string,
   to: string,
 ): Promise<DailyKpiResult> => {
-  const empty: DailyKpiResult = { spend: 0, leads: 0, impressions: 0, purchases: 0, revenue: 0, dailyRows: [], hasData: false };
+  const empty: DailyKpiResult = { spend: 0, leads: 0, impressions: 0, purchases: 0, revenue: 0, conversion_value: 0, dailyRows: [], hasData: false };
 
   const { data, error } = await supabase
     .from('campaign_daily_stats')
-    .select('date, spend, leads, impressions, purchases, revenue')
+    .select('date, spend, leads, impressions, purchases, revenue, conversion_value')
     .eq('brand_id', brandId)
     .gte('date', from)
     .lte('date', to)
@@ -250,24 +256,30 @@ export const getDailyKpis = async (
   if (!data || data.length === 0) return empty;
 
   // Aggregate totals
-  let spend = 0, leads = 0, impressions = 0, purchases = 0, revenue = 0;
-  const byDate = new Map<string, { spend: number; leads: number }>();
+  let spend = 0, leads = 0, impressions = 0, purchases = 0, revenue = 0, conversion_value = 0;
+  const byDate = new Map<string, { spend: number; leads: number; purchases: number; conversion_value: number }>();
 
   data.forEach(row => {
-    spend       += row.spend       ?? 0;
-    leads       += row.leads       ?? 0;
-    impressions += row.impressions ?? 0;
-    purchases   += row.purchases   ?? 0;
-    revenue     += row.revenue     ?? 0;
-    const d = byDate.get(row.date) ?? { spend: 0, leads: 0 };
-    byDate.set(row.date, { spend: d.spend + (row.spend ?? 0), leads: d.leads + (row.leads ?? 0) });
+    spend            += row.spend            ?? 0;
+    leads            += row.leads            ?? 0;
+    impressions      += row.impressions      ?? 0;
+    purchases        += row.purchases        ?? 0;
+    revenue          += row.revenue          ?? 0;
+    conversion_value += row.conversion_value ?? 0;
+    const d = byDate.get(row.date) ?? { spend: 0, leads: 0, purchases: 0, conversion_value: 0 };
+    byDate.set(row.date, {
+      spend:            d.spend            + (row.spend            ?? 0),
+      leads:            d.leads            + (row.leads            ?? 0),
+      purchases:        d.purchases        + (row.purchases        ?? 0),
+      conversion_value: d.conversion_value + (row.conversion_value ?? 0),
+    });
   });
 
   const dailyRows = Array.from(byDate.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([date, v]) => ({ date, ...v }));
 
-  return { spend, leads, impressions, purchases, revenue, dailyRows, hasData: true };
+  return { spend, leads, impressions, purchases, revenue, conversion_value, dailyRows, hasData: true };
 };
 
 // ── Per-campaign date-range aggregates (campaign table / donut filtering) ─────

@@ -15,6 +15,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useBrand } from '../contexts/BrandContext';
 import { formatCurrency, formatNumber } from '../lib/benchmarks';
 import { classifyObjective, GOAL_META } from '../lib/objective';
+import { resolvePrimaryConversion } from '../lib/conversions';
 import CampaignDetailPanel from '../components/campaigns/CampaignDetailPanel';
 import type { GoalType } from '../lib/objective';
 import type { Campaign } from '../types';
@@ -411,21 +412,27 @@ const KpiCard: React.FC<KpiCardProps> = ({ label, value, icon, kcVar, barPct, tr
 
 // ─── Chart panel (§29) ───────────────────────────────────────
 interface TrendPanelProps {
-  dailyRows: { date: string; spend: number; leads: number }[];
+  dailyRows: { date: string; spend: number; leads: number; purchases: number; conversion_value: number }[];
   totalSpend: number;
-  totalLeads: number;
+  totalConversions: number;
+  conversionLabel: string;  // e.g. "Leads", "Purchases", "Results"
   totalImpressions: number;
   dateLabel: string;
 }
-const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalLeads, totalImpressions, dateLabel }) => {
+const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalConversions, conversionLabel, totalImpressions, dateLabel }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef  = useRef<ChartType | null>(null);
 
-  // Use real daily data if available, fall back to simulated curve
   const hasRealData = dailyRows.length > 0;
-  const chartLabels  = hasRealData ? dailyRows.map(r => r.date.slice(5)) : DAYS_LABELS;
-  const spendData    = hasRealData ? dailyRows.map(r => r.spend) : simulateDailySeries(totalSpend);
-  const leadsData    = hasRealData ? dailyRows.map(r => r.leads) : simulateDailySeries(totalLeads);
+  const chartLabels = hasRealData ? dailyRows.map(r => r.date.slice(5)) : DAYS_LABELS;
+  const spendData   = hasRealData ? dailyRows.map(r => r.spend) : simulateDailySeries(totalSpend);
+  // Pick the right daily series based on what conversion type is active
+  const convData = hasRealData
+    ? dailyRows.map(r =>
+        conversionLabel === 'Leads'     ? r.leads
+      : conversionLabel === 'Purchases' ? r.purchases
+      : r.conversion_value)
+    : simulateDailySeries(totalConversions);
 
   const buildChart = useCallback(() => {
     if (!canvasRef.current) return;
@@ -467,8 +474,8 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalLea
             yAxisID: 'y',
           },
           {
-            label: 'Leads',
-            data: leadsData,
+            label: conversionLabel,
+            data: convData,
             borderColor: green,
             backgroundColor: g2,
             fill: true,
@@ -522,7 +529,7 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalLea
     Chart.defaults.color       = text2;
 
     chartRef.current = new Chart(ctx, config);
-  }, [spendData, leadsData, chartLabels]);
+  }, [spendData, convData, chartLabels]);
 
   useEffect(() => {
     buildChart();
@@ -546,7 +553,7 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalLea
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
           {[
             { color: 'var(--accent)', label: 'Spend' },
-            { color: 'var(--green)', label: 'Leads' },
+            { color: 'var(--green)', label: conversionLabel },
           ].map(({ color, label }) => (
             <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: 'var(--text-2)', fontFamily: 'var(--font-ui)' }}>
               <span style={{ width: 9, height: 9, borderRadius: 3, background: color, display: 'inline-block' }} />
@@ -559,9 +566,9 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalLea
       {/* Stat row */}
       <div style={{ display: 'flex', gap: 30, marginBottom: 8 }}>
         {[
-          { label: 'TOTAL SPEND',   value: formatCurrency(totalSpend),   color: 'var(--accent)' },
-          { label: 'TOTAL LEADS',   value: String(totalLeads),           color: 'var(--green)'  },
-          { label: 'IMPRESSIONS',   value: fmt(totalImpressions),        color: 'var(--blue)'   },
+          { label: 'TOTAL SPEND',              value: formatCurrency(totalSpend),   color: 'var(--accent)' },
+          { label: `TOTAL ${conversionLabel.toUpperCase()}`, value: String(totalConversions), color: 'var(--green)'  },
+          { label: 'IMPRESSIONS',               value: fmt(totalImpressions),        color: 'var(--blue)'   },
         ].map(({ label, value, color }) => (
           <div key={label}>
             <div style={{ fontSize: 10.5, letterSpacing: 1, color: 'var(--text-2)', marginBottom: 5, fontFamily: 'var(--font-ui)', fontWeight: 500 }}>{label}</div>
@@ -1021,25 +1028,24 @@ const Campaigns: React.FC = () => {
   const metaAccounts  = adAccounts.filter(a => a.platform === 'meta');
   const getBrandName  = (id: string) => brands.find(b => b.id === id)?.name || '';
 
-  // ─── KPI aggregations — prefer daily stats, fall back to campaign aggregate ─
-  // KPI aggregations — use mergedCampaigns (date-filtered when campaignDailyStats is available)
-  const aggSpend  = useMemo(() => mergedCampaigns.reduce((s, c) => s + c.spend,       0), [mergedCampaigns]);
-  const aggLeads  = useMemo(() => mergedCampaigns.reduce((s, c) => s + c.leads,       0), [mergedCampaigns]);
-  const aggImpr   = useMemo(() => mergedCampaigns.reduce((s, c) => s + c.impressions, 0), [mergedCampaigns]);
-  const aggQual   = useMemo(() => campaigns.reduce((s, c) => s + c.qualified_leads,  0), [campaigns]); // not in daily stats
+  // ─── KPI aggregations — dynamic conversion type ───────────────────────────
+  // resolvePrimaryConversion inspects campaign.conversion_event across all visible
+  // campaigns and returns the dominant type (or "mixed" if multiple types exist).
+  const convSummary = useMemo(() => resolvePrimaryConversion(mergedCampaigns), [mergedCampaigns]);
 
-  const totalSpend = dailyKpis?.hasData ? dailyKpis.spend       : aggSpend;
-  const totalLeads = dailyKpis?.hasData ? dailyKpis.leads       : aggLeads;
-  const totalImpr  = dailyKpis?.hasData ? dailyKpis.impressions : aggImpr;
-  const totalQual  = aggQual; // qualified_leads not in daily stats, use aggregate
-  const activeCnt  = useMemo(() => campaigns.filter(c => c.status === 'ACTIVE').length, [campaigns]);
-  const avgCpl     = totalLeads > 0 ? totalSpend / totalLeads : 0;
+  const aggSpend = useMemo(() => mergedCampaigns.reduce((s, c) => s + c.spend,       0), [mergedCampaigns]);
+  const aggImpr  = useMemo(() => mergedCampaigns.reduce((s, c) => s + c.impressions, 0), [mergedCampaigns]);
 
-  // Bar percentages (relative to campaign max, or reference values)
-  const spendPct  = Math.min(100, totalSpend  > 0 ? 75 : 0);   // 75% → "in budget"
-  const leadsPct  = Math.min(100, totalLeads  > 0 ? (totalLeads / Math.max(totalLeads, 1000)) * 100 : 0);
-  const cplPct    = avgCpl > 0 ? Math.max(10, 100 - (avgCpl / 50) * 100) : 0; // inverse: lower CPL = taller bar
-  const qualPct   = aggLeads > 0 ? (totalQual / aggLeads) * 100 : 0;
+  const totalSpend       = dailyKpis?.hasData ? dailyKpis.spend       : aggSpend;
+  const totalConversions = convSummary.totalValue;  // already computed from mergedCampaigns
+  const totalImpr        = dailyKpis?.hasData ? dailyKpis.impressions : aggImpr;
+  const activeCnt        = useMemo(() => campaigns.filter(c => c.status === 'ACTIVE').length, [campaigns]);
+  const avgCpa           = totalConversions > 0 ? totalSpend / totalConversions : 0;
+
+  // Bar percentages
+  const spendPct  = Math.min(100, totalSpend        > 0 ? 75 : 0);
+  const convPct   = Math.min(100, totalConversions  > 0 ? (totalConversions / Math.max(totalConversions, 1000)) * 100 : 0);
+  const cpaPct    = avgCpa > 0 ? Math.max(10, 100 - (avgCpa / 50) * 100) : 0;
 
   // ─── Sync ─────────────────────────────────────────────────
   const handleSync = async () => {
@@ -1263,34 +1269,42 @@ const Campaigns: React.FC = () => {
           kcVar="--accent"
           barPct={spendPct}
           trendUp={true}
-          trendPct={totalSpend > 0 ? undefined : undefined}
           subText={`${activeCnt} active campaign${activeCnt !== 1 ? 's' : ''}`}
         />
         <KpiCard
-          label="TOTAL LEADS"
-          value={formatNumber(totalLeads)}
+          label={convSummary.cardLabel}
+          value={totalConversions > 0 ? formatNumber(totalConversions) : '—'}
           icon="◎"
           kcVar="--green"
-          barPct={leadsPct}
+          barPct={convPct}
           trendUp={true}
-          trendPct={totalLeads > 0 ? undefined : undefined}
-          subText={totalLeads > 0 ? `avg CPL ${formatCurrency(avgCpl)}` : 'no leads yet'}
+          subText={
+            totalConversions > 0
+              ? convSummary.mixed
+                ? convSummary.breakdown.slice(0, 2).map(b => `${formatNumber(b.value)} ${b.label}`).join(' · ')
+                : `avg ${convSummary.cpaLabel.replace('AVG ', '')} ${formatCurrency(avgCpa)}`
+              : 'No conversion data yet'
+          }
         />
         <KpiCard
-          label="AVG CPL"
-          value={avgCpl > 0 ? formatCurrency(avgCpl) : '—'}
+          label={convSummary.cpaLabel}
+          value={avgCpa > 0 ? formatCurrency(avgCpa) : '—'}
           icon="◈"
           kcVar="--blue"
-          barPct={cplPct}
-          subText={avgCpl > 0 ? `${totalLeads} total leads` : 'awaiting leads data'}
+          barPct={cpaPct}
+          subText={
+            avgCpa > 0
+              ? `${formatNumber(totalConversions)} ${convSummary.eventLabel || 'results'}`
+              : convSummary.totalValue === 0 ? 'No conversion data yet' : 'awaiting data'
+          }
         />
         <KpiCard
-          label="QUALIFIED"
-          value={formatNumber(totalQual)}
+          label="ACTIVE CAMPAIGNS"
+          value={String(activeCnt)}
           icon="✦"
           kcVar="--amber"
-          barPct={qualPct}
-          subText={totalQual > 0 ? `${qualPct.toFixed(0)}% of leads` : 'awaiting qualification'}
+          barPct={campaigns.length > 0 ? (activeCnt / campaigns.length) * 100 : 0}
+          subText={campaigns.length > 0 ? `${campaigns.length} total` : 'no campaigns yet'}
         />
       </div>
 
@@ -1300,7 +1314,8 @@ const Campaigns: React.FC = () => {
           <TrendPanel
             dailyRows={dailyKpis?.dailyRows ?? []}
             totalSpend={totalSpend}
-            totalLeads={totalLeads}
+            totalConversions={totalConversions}
+            conversionLabel={convSummary.eventLabel || 'Results'}
             totalImpressions={totalImpr}
             dateLabel={dateLabel}
           />
