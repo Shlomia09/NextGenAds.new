@@ -1,14 +1,14 @@
 // ============================================================
 // NextGenAds — Type Definitions
 // ============================================================
-
+ 
 export type Platform = 'meta' | 'google';
 export type BrandStage = 'new' | 'scaling' | 'mature';
 export type BusinessType = 'ecommerce' | 'clinic' | 'spa' | 'salon' | 'wholesale';
 export type BusinessGoal = 'purchases' | 'leads' | 'bookings' | 'inquiries';
 export type BenchmarkAvailability = 'full' | 'partial';
 export type ConversionType = 'ecommerce' | 'leads' | 'bookings' | 'app' | 'awareness';
-
+ 
 export type RecommendationPriority = 'critical' | 'high' | 'medium';
 export type RecommendationStatus = 'pending' | 'approved' | 'executed' | 'dismissed';
 export type RecommendationType =
@@ -17,7 +17,7 @@ export type RecommendationType =
   | 'budget'
   | 'creative'
   | 'scaling';
-
+ 
 export interface Brand {
   id: string;
   user_id: string;
@@ -48,7 +48,7 @@ export interface Brand {
   ecom_platform?: string;
   created_at: string;
 }
-
+ 
 export interface AdAccount {
   id: string;
   user_id: string;
@@ -63,7 +63,7 @@ export interface AdAccount {
   conversion_type: ConversionType;
   display_name?: string;
 }
-
+ 
 export interface Campaign {
   id: string;
   brand_id: string;
@@ -101,22 +101,25 @@ export interface Campaign {
   date_end?: string;
   synced_at: string;
 }
-
+ 
 export interface Recommendation {
   id: string;
   brand_id: string;
+  campaign_id?: string | null;
   type: RecommendationType;
   priority: RecommendationPriority;
   title: string;
   description: string;
   action: string;
+  action_type?: string | null;
+  auto_executable?: boolean;
   reasoning: string;
   benchmark_reference: string;
   status: RecommendationStatus;
   created_at: string;
   executed_at?: string;
 }
-
+ 
 export interface IntelligenceSession {
   id: string;
   brand_id: string;
@@ -124,13 +127,13 @@ export interface IntelligenceSession {
   messages: ChatMessage[];
   created_at: string;
 }
-
+ 
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
 }
-
+ 
 // Benchmark data types
 export interface BenchmarkMetric {
   label: string;
@@ -139,7 +142,7 @@ export interface BenchmarkMetric {
   unit: string;
   higher_is_better: boolean;
 }
-
+ 
 export interface AovBracket {
   label: string;
   min: number;
@@ -149,7 +152,7 @@ export interface AovBracket {
   recommended_funnel: string;
   timeline_days: number;
 }
-
+ 
 // Meta API types
 export interface MetaCampaignInsight {
   campaign_id: string;
