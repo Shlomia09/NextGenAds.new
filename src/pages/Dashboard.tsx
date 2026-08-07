@@ -8,7 +8,7 @@
  * Top creative: requires ad_creatives table + meta-sync update.
  * Live activity: requires system_events table + meta-sync update.
  */
-
+ 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -18,10 +18,10 @@ import {
   CheckCircle2, AlertTriangle, ChevronRight,
   Layers, Image as ImageIcon, TrendingUp,
 } from 'lucide-react';
-
+ 
 import {
   getCampaigns, getRecommendations, getAdAccounts,
-  getIntelligenceSessions, updateRecommendationStatus,
+  getIntelligenceSessions, updateRecommendationStatus, executeRecommendation,
   getDailyStats, getTopCreatives, getSystemEvents,
 } from '../lib/supabase';
 import { resolvePrimaryConversion } from '../lib/conversions';
@@ -32,23 +32,23 @@ import {
   formatCurrency, formatNumber,
 } from '../lib/benchmarks';
 import type { Campaign, Recommendation, BusinessType, AdAccount, BenchmarkMetric } from '../types';
-
+ 
 // ─── Helpers ───────────────────────────────────────────────────
-
+ 
 const greeting = () => {
   const h = new Date().getHours();
   if (h < 12) return 'Good morning';
   if (h < 17) return 'Good afternoon';
   return 'Good evening';
 };
-
+ 
 const displayName = (email?: string) => {
   if (!email) return '';
   const local = email.split('@')[0];
   return local.replace(/[._-]/g, ' ').split(' ')
     .map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 };
-
+ 
 const relTime = (iso: string) => {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
@@ -58,15 +58,15 @@ const relTime = (iso: string) => {
   if (h < 24) return `${h}h ago`;
   return `${Math.floor(h / 24)}d ago`;
 };
-
+ 
 const isToday = (iso: string) => {
   const d = new Date(iso); const now = new Date();
   return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
 };
-
+ 
 // ─── Account Health Score ──────────────────────────────────────
 interface HealthComponent { name: string; score: number; label: string; color: string; }
-
+ 
 const computeHealth = (campaigns: Campaign[], benchmarks: BenchmarkMetric[]): { score: number; grade: string; components: HealthComponent[] } => {
   if (!campaigns.length) return { score: 0, grade: 'No data', components: [] };
   // Use resolvePrimaryConversion so health score reflects the actual conversion type
@@ -109,33 +109,33 @@ const computeHealth = (campaigns: Campaign[], benchmarks: BenchmarkMetric[]): { 
   const score = totalWeight > 0 ? Math.round(totalScore / totalWeight) : 0;
   return { score, grade: score >= 80 ? 'Excellent' : score >= 65 ? 'Good' : score >= 45 ? 'Watch' : 'Needs work', components };
 };
-
+ 
 // ─── Card wrapper ───────────────────────────────────────────────
 const Card: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
   <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, boxShadow: 'var(--shadow)', padding: '18px 20px', ...style }}>
     {children}
   </div>
 );
-
+ 
 const SectionLabel: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 14, ...style }}>
     {children}
   </div>
 );
-
+ 
 // ─── 30-Day Trend Chart ─────────────────────────────────────────
 interface DailyStat { date: string; spend: number; leads: number; purchases: number; conversion_value: number; }
-
+ 
 const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ data, conversionLabel }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef  = useRef<Chart | null>(null);
-
+ 
   useEffect(() => {
     if (!canvasRef.current || !data.length) return;
-
+ 
     // Destroy existing chart
     if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
-
+ 
     const root   = document.documentElement;
     const get    = (v: string) => getComputedStyle(root).getPropertyValue(v).trim();
     const accent = get('--accent');
@@ -144,13 +144,13 @@ const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ 
     const grid   = get('--grid') || 'rgba(255,255,255,0.05)';
     const surface = get('--surface');
     const border  = get('--border');
-
+ 
     const ctx = canvasRef.current.getContext('2d')!;
     const g1 = ctx.createLinearGradient(0, 0, 0, 220);
     g1.addColorStop(0, accent + '44'); g1.addColorStop(1, accent + '04');
     const g2 = ctx.createLinearGradient(0, 0, 0, 220);
     g2.addColorStop(0, green + '33'); g2.addColorStop(1, green + '03');
-
+ 
     chartRef.current = new Chart(ctx, {
       type: 'line',
       data: {
@@ -221,79 +221,88 @@ const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ 
         },
       },
     });
-
+ 
     return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
   }, [data]);
-
+ 
   return <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />;
 };
-
+ 
 // ─── Main Dashboard ────────────────────────────────────────────
 const Dashboard: React.FC = () => {
   const { user }       = useAuth();
   const navigate       = useNavigate();
   const queryClient    = useQueryClient();
   const [learnMoreRec, setLearnMoreRec] = useState<Recommendation | null>(null);
-
+ 
   // ── Core queries ──────────────────────────────────────
   // activeBrand comes from global BrandContext (brand switcher in sidebar)
   const { activeBrand, loading: brandsLoading } = useBrand();
-
+ 
   const { data: campaigns = [], isLoading: campaignsLoading } = useQuery({
     queryKey: ['campaigns', activeBrand?.id],
     queryFn:  () => getCampaigns(activeBrand!.id),
     enabled:  !!activeBrand,
   });
-
+ 
   const { data: recommendations = [], isLoading: recsLoading } = useQuery({
     queryKey: ['recommendations', activeBrand?.id],
     queryFn:  () => getRecommendations(activeBrand!.id),
     enabled:  !!activeBrand,
   });
-
+ 
   const { data: adAccounts = [] } = useQuery<AdAccount[]>({
     queryKey: ['adAccounts', user?.id],
     queryFn:  () => getAdAccounts(user!.id) as Promise<AdAccount[]>,
     enabled:  !!user,
   });
-
+ 
   const { data: sessions = [] } = useQuery({
     queryKey: ['sessions', activeBrand?.id],
     queryFn:  () => getIntelligenceSessions(activeBrand!.id),
     enabled:  !!activeBrand,
   });
-
+ 
   // ── NEW: Daily stats, top creatives, system events ───────────
   const { data: dailyStats = [] } = useQuery({
     queryKey: ['dailyStats', activeBrand?.id],
     queryFn:  () => getDailyStats(activeBrand!.id, 30),
     enabled:  !!activeBrand,
   });
-
+ 
   const { data: topCreatives = [] } = useQuery({
     queryKey: ['topCreatives', activeBrand?.id],
     queryFn:  () => getTopCreatives(activeBrand!.id, 3),
     enabled:  !!activeBrand,
   });
-
+ 
   const { data: systemEvents = [] } = useQuery({
     queryKey: ['systemEvents', activeBrand?.id],
     queryFn:  () => getSystemEvents(activeBrand!.id, 10),
     enabled:  !!activeBrand,
   });
-
+ 
   // ── Mutations ─────────────────────────────────────────────────
   const updateRecMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: 'approved' | 'dismissed' }) =>
       updateRecommendationStatus(id, status),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['recommendations'] }),
   });
-
+ 
+  // Auto-executable recommendations (pause_campaign / scale_budget / activate_campaign
+  // with a linked campaign) go through execute-recommendation: baseline snapshot →
+  // meta-action call → 48h monitoring scheduled. Everything else stays manual.
+  const executeRecMutation = useMutation({
+    mutationFn: (id: string) => executeRecommendation(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['recommendations'] }),
+    onError: (err: Error) => alert(`Execution failed: ${err.message}`),
+  });
+ 
   // ── Derived data ─────────────────────────────────────────────
   const businessType  = (activeBrand?.business_type as BusinessType) ?? 'ecommerce';
   const aov           = activeBrand ? ((activeBrand.aov_min ?? 0) + (activeBrand.aov_max ?? 0)) / 2 : 0;
   const benchmarks    = useMemo(() => activeBrand ? getBenchmarkMetricsByType(businessType, aov, campaigns) : [], [activeBrand, campaigns, businessType, aov]);
-
+ 
   const totalSpend       = campaigns.reduce((s, c) => s + (c.spend ?? 0), 0);
   const totalImpressions = campaigns.reduce((s, c) => s + (c.impressions ?? 0), 0);
   const totalClicks      = campaigns.reduce((s, c) => s + (c.clicks ?? 0), 0);
@@ -303,18 +312,18 @@ const Dashboard: React.FC = () => {
   const totalResults     = dashConvSummary.totalValue;
   const convLabel        = dashConvSummary.eventLabel || 'Results';
   const avgCPA           = totalResults > 0 ? totalSpend / totalResults : 0;
-
+ 
   // Today pulse — real timestamps
   const syncedToday   = campaigns.filter(c => isToday(c.synced_at)).length;
   const sessionsToday = sessions.filter((s: { created_at: string }) => isToday(s.created_at)).length;
   const syncsToday    = systemEvents.filter((e: { type: string; created_at: string }) => e.type === 'sync' && isToday(e.created_at)).length;
-
+ 
   // Account health
   const health = useMemo(() => computeHealth(campaigns, benchmarks), [campaigns, benchmarks]);
-
+ 
   // Pending recs (top 3)
   const pendingRecs = recommendations.filter(r => r.status === 'pending').slice(0, 3);
-
+ 
   // Per-account stats — results is dynamic (Purchases, Leads, etc.)
   const accountStats = useMemo(() => adAccounts.map(acc => ({
     account:   acc,
@@ -323,7 +332,7 @@ const Dashboard: React.FC = () => {
     spend:     campaigns.filter(c => c.ad_account_id === acc.id).reduce((s, c) => s + (c.spend ?? 0), 0),
     results:   resolvePrimaryConversion(campaigns.filter(c => c.ad_account_id === acc.id)).totalValue,
   })), [adAccounts, campaigns]);
-
+ 
   // Live activity: prefer system_events, fallback to timestamp-based
   const activityFeed = useMemo(() => {
     if (systemEvents.length > 0) {
@@ -351,14 +360,14 @@ const Dashboard: React.FC = () => {
     });
     return events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 7);
   }, [systemEvents, campaigns, sessions, recommendations]);
-
+ 
   // ── Loading state ─────────────────────────────────────────────
   if (brandsLoading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 44px)' }}>
       <RefreshCw size={18} style={{ color: 'var(--text-3)', animation: 'spin 1s linear infinite' }} />
     </div>
   );
-
+ 
   if (!activeBrand) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 44px)' }}>
       <div style={{ textAlign: 'center', padding: '60px 40px' }}>
@@ -369,13 +378,13 @@ const Dashboard: React.FC = () => {
       </div>
     </div>
   );
-
+ 
   const isLoading = campaignsLoading || recsLoading;
-
+ 
   return (
     <>
       <div style={{ height: 'calc(100vh - 44px)', overflowY: 'auto', background: 'var(--bg)', padding: '20px 24px 32px' }}>
-
+ 
         {/* ════════ WELCOME STRIP (full width) ════════ */}
         <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', gap: 20, marginBottom: 20 }}>
           {/* Greeting */}
@@ -387,7 +396,7 @@ const Dashboard: React.FC = () => {
               {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </div>
           </div>
-
+ 
           {/* Today pulse card */}
           <Card style={{ padding: '14px 20px', minWidth: 300, display: 'flex', alignItems: 'center', gap: 14, position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'var(--accent)', opacity: 0.08, filter: 'blur(20px)' }} />
@@ -409,13 +418,13 @@ const Dashboard: React.FC = () => {
             </div>
           </Card>
         </div>
-
+ 
         {/* ════════ BENTO GRID — 1.6fr / 1fr ════════ */}
         <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 20, alignItems: 'start' }}>
-
+ 
           {/* ══ LEFT COLUMN ══════════════════════════════════════ */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-
+ 
             {/* ── 1. Your Accounts ── */}
             <Card>
               <SectionLabel>Your accounts</SectionLabel>
@@ -455,7 +464,7 @@ const Dashboard: React.FC = () => {
                 );
               })}
             </Card>
-
+ 
             {/* ── 2. Performance · 30 days ── */}
             <Card style={{ padding: '18px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
@@ -485,7 +494,7 @@ const Dashboard: React.FC = () => {
                   ))}
                 </div>
               </div>
-
+ 
               {isLoading ? (
                 <div style={{ height: 220, background: 'var(--surface-2)', borderRadius: 10, animation: 'pulse 1.5s ease-in-out infinite' }} />
               ) : dailyStats.length === 0 ? (
@@ -503,7 +512,7 @@ const Dashboard: React.FC = () => {
                   <TrendChart data={dailyStats} conversionLabel={convLabel} />
                 </div>
               )}
-
+ 
               {/* Totals row below chart */}
               {!isLoading && campaigns.length > 0 && (
                 <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
@@ -521,7 +530,7 @@ const Dashboard: React.FC = () => {
                 </div>
               )}
             </Card>
-
+ 
             {/* ── 3. Recent Intelligence ── */}
             <Card>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -572,10 +581,10 @@ const Dashboard: React.FC = () => {
               )}
             </Card>
           </div>
-
+ 
           {/* ══ RIGHT COLUMN ═════════════════════════════════════ */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-
+ 
             {/* ── 4. Account Health ── */}
             <Card>
               <SectionLabel>Account health</SectionLabel>
@@ -610,7 +619,7 @@ const Dashboard: React.FC = () => {
                 </>
               )}
             </Card>
-
+ 
             {/* ── 5. Needs Your Attention ── */}
             <Card>
               <SectionLabel>Needs your attention</SectionLabel>
@@ -635,14 +644,27 @@ const Dashboard: React.FC = () => {
                         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-2)', lineHeight: 1.4, marginBottom: 8 }}>
                           {rec.description.slice(0, 90)}{rec.description.length > 90 ? '…' : ''}
                         </div>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <button onClick={() => updateRecMutation.mutate({ id: rec.id, status: 'approved' })}
-                            style={{ padding: '4px 11px', background: 'var(--accent)', color: '#2A1A12', border: 'none', borderRadius: 7, fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500, cursor: 'pointer' }}>
-                            Apply
-                          </button>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          {rec.auto_executable ? (
+                            <button
+                              onClick={() => executeRecMutation.mutate(rec.id)}
+                              disabled={executeRecMutation.isPending}
+                              style={{ padding: '4px 11px', background: 'var(--accent)', color: '#2A1A12', border: 'none', borderRadius: 7, fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500, cursor: executeRecMutation.isPending ? 'default' : 'pointer', opacity: executeRecMutation.isPending ? 0.6 : 1 }}>
+                              {executeRecMutation.isPending ? 'Executing…' : 'Approve & Execute'}
+                            </button>
+                          ) : (
+                            <span style={{ padding: '4px 11px', background: 'var(--surface)', border: '1px solid var(--border-soft)', borderRadius: 7, fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)' }}
+                              title={rec.action}>
+                              Manual action needed{rec.action_type ? ` (${rec.action_type})` : ''}
+                            </span>
+                          )}
                           <button onClick={() => setLearnMoreRec(rec)}
                             style={{ padding: '4px 11px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 7, fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-2)', cursor: 'pointer' }}>
                             Review
+                          </button>
+                          <button onClick={() => updateRecMutation.mutate({ id: rec.id, status: 'dismissed' })}
+                            style={{ padding: '4px 8px', background: 'transparent', border: 'none', borderRadius: 7, fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)', cursor: 'pointer' }}>
+                            Dismiss
                           </button>
                         </div>
                       </div>
@@ -651,7 +673,7 @@ const Dashboard: React.FC = () => {
                 );
               })}
             </Card>
-
+ 
             {/* ── 6. Top Creative ── */}
             <Card>
               <SectionLabel>Top creative · {new Date().toLocaleString('en', { month: 'long' })}</SectionLabel>
@@ -679,7 +701,7 @@ const Dashboard: React.FC = () => {
                       </div>
                       <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)' }}>top by leads</div>
                     </div>
-
+ 
                     {/* Thumbnail + name */}
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
                       <div style={{ width: 56, height: 56, borderRadius: 10, flexShrink: 0, overflow: 'hidden', background: 'var(--surface-2)', border: '1px solid var(--border-soft)' }}>
@@ -695,7 +717,7 @@ const Dashboard: React.FC = () => {
                         {campName && <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)' }}>{campName}</div>}
                       </div>
                     </div>
-
+ 
                     {/* Metrics */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                       {[
@@ -709,7 +731,7 @@ const Dashboard: React.FC = () => {
                         </div>
                       ))}
                     </div>
-
+ 
                     {/* Outperforming because */}
                     {topCreatives.length > 1 && (
                       <div style={{ marginTop: 12, padding: '8px 11px', background: 'var(--green-soft, rgba(107,191,138,0.1))', borderRadius: 9, border: '1px solid var(--green)', fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--green)' }}>
@@ -720,7 +742,7 @@ const Dashboard: React.FC = () => {
                 );
               })}
             </Card>
-
+ 
             {/* ── 7. Live Activity ── */}
             <Card>
               <SectionLabel>Live activity</SectionLabel>
@@ -746,11 +768,11 @@ const Dashboard: React.FC = () => {
                 </div>
               ))}
             </Card>
-
+ 
           </div>{/* /RIGHT column */}
         </div>{/* /Bento grid */}
       </div>
-
+ 
       {/* ── Learn More Modal ── */}
       {learnMoreRec && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setLearnMoreRec(null)}>
@@ -768,7 +790,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       )}
-
+ 
       <style>{`
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         @keyframes spin  { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -776,5 +798,5 @@ const Dashboard: React.FC = () => {
     </>
   );
 };
-
+ 
 export default Dashboard;
