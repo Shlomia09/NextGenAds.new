@@ -1,17 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
-
+ 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
+ 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase credentials not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env');
 }
-
+ 
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
   supabaseAnonKey || 'placeholder-key'
 );
-
+ 
 // Auth helpers
 export const signInWithGoogle = () =>
   supabase.auth.signInWithOAuth({
@@ -20,17 +20,17 @@ export const signInWithGoogle = () =>
       redirectTo: `${window.location.origin}/dashboard`,
     },
   });
-
+ 
 export const signInWithEmail = (email: string, password: string) =>
   supabase.auth.signInWithPassword({ email, password });
-
+ 
 export const signUpWithEmail = (email: string, password: string) =>
   supabase.auth.signUp({ email, password });
-
+ 
 export const signOut = () => supabase.auth.signOut();
-
+ 
 export const getUser = () => supabase.auth.getUser();
-
+ 
 // Brand queries
 export const getBrands = async (userId: string) => {
   const { data, error } = await supabase
@@ -41,7 +41,7 @@ export const getBrands = async (userId: string) => {
   if (error) throw error;
   return data;
 };
-
+ 
 export const createBrand = async (brand: {
   user_id: string;
   name: string;
@@ -56,7 +56,7 @@ export const createBrand = async (brand: {
   if (error) throw error;
   return data;
 };
-
+ 
 // Campaign queries
 export const getCampaigns = async (brandId: string) => {
   const { data, error } = await supabase
@@ -67,7 +67,7 @@ export const getCampaigns = async (brandId: string) => {
   if (error) throw error;
   return data;
 };
-
+ 
 // Recommendation queries
 export const getRecommendations = async (brandId: string) => {
   const { data, error } = await supabase
@@ -79,7 +79,7 @@ export const getRecommendations = async (brandId: string) => {
   if (error) throw error;
   return data;
 };
-
+ 
 export const updateRecommendationStatus = async (
   id: string,
   status: 'approved' | 'executed' | 'dismissed'
@@ -93,7 +93,30 @@ export const updateRecommendationStatus = async (
   if (error) throw error;
   return data;
 };
-
+ 
+// Calls the execute-recommendation Edge Function: captures a baseline snapshot,
+// performs the action on Meta via meta-action, and schedules a 48h outcome check.
+// Only works for recommendations where auto_executable = true (pause_campaign,
+// scale_budget, activate_campaign — with a linked campaign_id). Anything else
+// (creative refresh, audience audit, structural fixes) still needs manual work.
+export const executeRecommendation = async (id: string) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Not authenticated');
+ 
+  const res = await fetch(`${supabaseUrl}/functions/v1/execute-recommendation`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+      apikey: supabaseAnonKey,
+    },
+    body: JSON.stringify({ recommendation_id: id }),
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error || 'Execution failed');
+  return data;
+};
+ 
 // Ad accounts — only returns accounts the user actively selected (status=active)
 export const getAdAccounts = async (userId: string) => {
   const { data, error } = await supabase
@@ -104,10 +127,10 @@ export const getAdAccounts = async (userId: string) => {
   if (error) throw error;
   return data;
 };
-
-
+ 
+ 
 // ── Intelligence sessions ────────────────────────────────────────
-
+ 
 export const getIntelligenceSessions = async (brandId: string) => {
   const { data, error } = await supabase
     .from('intelligence_sessions')
@@ -117,7 +140,7 @@ export const getIntelligenceSessions = async (brandId: string) => {
   if (error) throw error;
   return data ?? [];
 };
-
+ 
 export const createIntelligenceSession = async (session: {
   brand_id: string;
   user_id: string;
@@ -137,7 +160,7 @@ export const createIntelligenceSession = async (session: {
   if (error) throw error;
   return data;
 };
-
+ 
 export const updateIntelligenceSession = async (
   id: string,
   messages: unknown[],
@@ -151,7 +174,7 @@ export const updateIntelligenceSession = async (
   if (error) throw error;
   return data;
 };
-
+ 
 export const updateSessionTitle = async (id: string, title: string) => {
   const { error } = await supabase
     .from('intelligence_sessions')
@@ -159,7 +182,7 @@ export const updateSessionTitle = async (id: string, title: string) => {
     .eq('id', id);
   if (error) console.warn('Could not update session title:', error.message);
 };
-
+ 
 /**
  * Returns up to `limit` recent sessions for a brand (excluding current session),
  * each with just the first user message (used as memory context for the AI).
@@ -175,12 +198,12 @@ export const getRecentSessionContext = async (
     .eq('brand_id', brandId)
     .order('updated_at', { ascending: false })
     .limit(limit + 1);
-
+ 
   if (excludeSessionId) q = q.neq('id', excludeSessionId);
-
+ 
   const { data, error } = await q;
   if (error || !data) return [];
-
+ 
   return data
     .filter((s) => Array.isArray(s.messages) && s.messages.length > 0)
     .slice(0, limit)
@@ -194,7 +217,7 @@ export const getRecentSessionContext = async (
       };
     });
 };
-
+ 
 // ── Daily stats (for 30-day trend chart) ─────────────────────────────────
 // Aggregates spend + leads per day across ALL campaigns for a brand
 export const getDailyStats = async (brandId: string, days = 30): Promise<{ date: string; spend: number; leads: number; purchases: number; conversion_value: number }[]> => {
@@ -223,7 +246,7 @@ export const getDailyStats = async (brandId: string, days = 30): Promise<{ date:
   });
   return Array.from(map.entries()).map(([date, v]) => ({ date, ...v })).sort((a, b) => a.date.localeCompare(b.date));
 };
-
+ 
 // ── Date-range KPIs (for date range picker) ───────────────────────────────
 // Aggregates KPI totals + daily rows from campaign_daily_stats for any from/to range.
 export interface DailyKpiResult {
@@ -236,14 +259,14 @@ export interface DailyKpiResult {
   dailyRows: { date: string; spend: number; leads: number; purchases: number; conversion_value: number }[];
   hasData: boolean;
 }
-
+ 
 export const getDailyKpis = async (
   brandId: string,
   from: string,
   to: string,
 ): Promise<DailyKpiResult> => {
   const empty: DailyKpiResult = { spend: 0, leads: 0, impressions: 0, purchases: 0, revenue: 0, conversion_value: 0, dailyRows: [], hasData: false };
-
+ 
   const { data, error } = await supabase
     .from('campaign_daily_stats')
     .select('date, spend, leads, impressions, purchases, revenue, conversion_value')
@@ -251,14 +274,14 @@ export const getDailyKpis = async (
     .gte('date', from)
     .lte('date', to)
     .order('date', { ascending: true });
-
+ 
   if (error) { console.warn('getDailyKpis error:', error.message); return empty; }
   if (!data || data.length === 0) return empty;
-
+ 
   // Aggregate totals
   let spend = 0, leads = 0, impressions = 0, purchases = 0, revenue = 0, conversion_value = 0;
   const byDate = new Map<string, { spend: number; leads: number; purchases: number; conversion_value: number }>();
-
+ 
   data.forEach(row => {
     spend            += row.spend            ?? 0;
     leads            += row.leads            ?? 0;
@@ -274,14 +297,14 @@ export const getDailyKpis = async (
       conversion_value: d.conversion_value + (row.conversion_value ?? 0),
     });
   });
-
+ 
   const dailyRows = Array.from(byDate.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([date, v]) => ({ date, ...v }));
-
+ 
   return { spend, leads, impressions, purchases, revenue, conversion_value, dailyRows, hasData: true };
 };
-
+ 
 // ── Per-campaign date-range aggregates (campaign table / donut filtering) ─────
 // Returns a map: campaign internal UUID → aggregated metrics for the selected date range.
 // Used to override the all-time campaign.spend/impressions/clicks/leads fields when a
@@ -298,7 +321,7 @@ export interface CampaignRangeStats {
   reach: number;
   conversion_value: number;
 }
-
+ 
 export const getDailyCampaignStats = async (
   brandId:  string,
   from:     string,
@@ -310,9 +333,9 @@ export const getDailyCampaignStats = async (
     .eq('brand_id', brandId)
     .gte('date', from)
     .lte('date', to);
-
+ 
   if (error || !data || data.length === 0) return {};
-
+ 
   const result: Record<string, CampaignRangeStats> = {};
   data.forEach(row => {
     const ex = result[row.campaign_id] ?? {
@@ -342,7 +365,7 @@ export const getDailyCampaignStats = async (
   });
   return result;
 };
-
+ 
 // ── Check if brand has any daily stats history in DB ─────────────────────────
 export const checkHasDailyStats = async (brandId: string): Promise<boolean> => {
   const { data, error } = await supabase
@@ -356,8 +379,8 @@ export const checkHasDailyStats = async (brandId: string): Promise<boolean> => {
   }
   return (data?.length ?? 0) > 0;
 };
-
-
+ 
+ 
 // ── Top creatives (for Top Creative card) ────────────────────────────────
 export const getTopCreatives = async (brandId: string, limit = 3) => {
   const { data, error } = await supabase
@@ -373,7 +396,7 @@ export const getTopCreatives = async (brandId: string, limit = 3) => {
   }
   return data ?? [];
 };
-
+ 
 // ── System events (for Live Activity feed) ───────────────────────────────
 export const getSystemEvents = async (brandId: string, limit = 10) => {
   const { data, error } = await supabase
@@ -388,9 +411,9 @@ export const getSystemEvents = async (brandId: string, limit = 10) => {
   }
   return data ?? [];
 };
-
+ 
 // ── Campaign Drafts (Workshop) ────────────────────────────────────────────
-
+ 
 export interface CampaignDraftRow {
   id: string;
   user_id: string;
@@ -404,7 +427,7 @@ export interface CampaignDraftRow {
   created_at: string;
   updated_at: string;
 }
-
+ 
 /** Upsert a draft — pass draftId to update existing, omit to create new */
 export const saveDraft = async (payload: {
   draftId?: string;
@@ -424,7 +447,7 @@ export const saveDraft = async (payload: {
     status:        'draft' as const,
     draft_data:    payload.draftData,
   };
-
+ 
   if (payload.draftId) {
     // Update existing
     const { data, error } = await supabase
@@ -446,7 +469,7 @@ export const saveDraft = async (payload: {
     return data as CampaignDraftRow;
   }
 };
-
+ 
 /** Fetch all drafts for a brand (both draft + published via workshop) */
 export const getDrafts = async (brandId: string): Promise<CampaignDraftRow[]> => {
   const { data, error } = await supabase
@@ -460,7 +483,7 @@ export const getDrafts = async (brandId: string): Promise<CampaignDraftRow[]> =>
   }
   return (data ?? []) as CampaignDraftRow[];
 };
-
+ 
 /** Publish a draft — mark it published and link to campaigns row */
 export const publishDraft = async (
   draftId: string,
@@ -478,7 +501,7 @@ export const publishDraft = async (
   if (error) throw error;
   return data as CampaignDraftRow;
 };
-
+ 
 /** Delete a draft */
 export const deleteDraft = async (draftId: string): Promise<void> => {
   const { error } = await supabase
@@ -487,9 +510,9 @@ export const deleteDraft = async (draftId: string): Promise<void> => {
     .eq('id', draftId);
   if (error) throw error;
 };
-
+ 
 // ── Account ↔ Brand Linking ───────────────────────────────────────────────────
-
+ 
 /**
  * Reassign an ad_account to a different brand (or null to unlink).
  * Call this when the user connected to the wrong brand and needs to correct it.
@@ -504,9 +527,9 @@ export const relinkAdAccount = async (
     .eq('id', adAccountId);
   if (error) throw error;
 };
-
+ 
 // ── Notifications ─────────────────────────────────────────────────────────────
-
+ 
 export interface UserNotification {
   id: string;
   type: string;
@@ -515,7 +538,7 @@ export interface UserNotification {
   brand_id: string | null;
   created_at: string;
 }
-
+ 
 /**
  * Returns the most recent system events across ALL of a user's brands.
  * Used to populate the Topbar notifications panel.
@@ -529,11 +552,11 @@ export const getUserNotifications = async (
     .from('brands')
     .select('id')
     .eq('user_id', userId);
-
+ 
   if (brandErr || !brands || brands.length === 0) return [];
-
+ 
   const brandIds = brands.map((b) => b.id);
-
+ 
   // 2. Get system events for those brands
   const { data, error } = await supabase
     .from('system_events')
@@ -541,11 +564,11 @@ export const getUserNotifications = async (
     .in('brand_id', brandIds)
     .order('created_at', { ascending: false })
     .limit(limit);
-
+ 
   if (error) {
     console.warn('getUserNotifications error:', error.message);
     return [];
   }
-
+ 
   return (data ?? []) as UserNotification[];
 };
