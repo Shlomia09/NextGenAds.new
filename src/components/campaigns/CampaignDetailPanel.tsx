@@ -697,9 +697,9 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
 };
 
 // ─── Main Drawer (§33) ──────────────────────────────────────────
-interface Props { campaign: Campaign | null; onClose: () => void }
+interface Props { campaign: Campaign | null; rawCampaign?: Campaign | null; onClose: () => void }
 
-const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
+const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }) => {
   const [visible,   setVisible]   = useState(false);
   const [expanded,  setExpanded]  = useState(false);   // 480px → 720px
   const [actionMsg, setActionMsg] = useState<string | undefined>();
@@ -717,10 +717,15 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
 
   if (!campaign) return null;
 
-  const goal  = classifyObjective(campaign.objective);
+  // If date-filtered campaign has no spend (not active in selected range),
+  // fall back to all-time data so the panel never shows €0.00 for a real campaign.
+  const isDateFiltered = campaign.spend === 0 && rawCampaign && rawCampaign.spend > 0;
+  const displayCampaign = isDateFiltered ? rawCampaign! : campaign;
+
+  const goal  = classifyObjective(displayCampaign.objective);
   const meta  = GOAL_META[goal];
-  const cpm   = campaign.impressions > 0 ? (campaign.spend / campaign.impressions) * 1000 : 0;
-  const ctr   = campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100  : 0;
+  const cpm   = displayCampaign.impressions > 0 ? (displayCampaign.spend / displayCampaign.impressions) * 1000 : 0;
+  const ctr   = displayCampaign.impressions > 0 ? (displayCampaign.clicks / displayCampaign.impressions) * 100  : 0;
   const bench = BENCHMARKS[goal] || BENCHMARKS.default;
 
   const metaUrl = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${campaign.ad_account_id}`;
@@ -777,7 +782,19 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
               }}>
                 {meta.emoji} {meta.label}
               </span>
-              <StatusPill status={campaign.status} />
+              <StatusPill status={displayCampaign.status} />
+              {/* All-time fallback badge — shown when the date range had no activity */}
+              {isDateFiltered && (
+                <span style={{
+                  fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 500,
+                  background: 'var(--champagne-soft, rgba(196,131,106,0.12))',
+                  color: 'var(--champagne)',
+                  border: '1px solid var(--champagne)',
+                  borderRadius: 20, padding: '1px 7px',
+                }}>
+                  All-time data · not active in selected range
+                </span>
+              )}
             </div>
             {/* §33: Campaign name in Fraunces 20px */}
             <h2 style={{
@@ -785,7 +802,7 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
               color: 'var(--text)', margin: 0, letterSpacing: -0.2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
-              {campaign.name}
+              {displayCampaign.name}
             </h2>
           </div>
 
@@ -857,34 +874,34 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
                 <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 11, padding: '13px 15px' }}>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-2)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Spend</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(campaign.spend)}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(displayCampaign.spend)}</div>
                 </div>
                 <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Impressions</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>{formatNumber(campaign.impressions)}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>{formatNumber(displayCampaign.impressions)}</div>
                 </div>
-                {campaign.leads > 0 && <>
+                {displayCampaign.leads > 0 && <>
                   <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Leads</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(campaign.leads)}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(displayCampaign.leads)}</div>
                   </div>
                   <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CPL</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: campaign.cpl < (bench.cpl || 32) ? 'var(--green)' : 'var(--champagne)' }}>
-                      {formatCurrency(campaign.cpl)}
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: displayCampaign.cpl < (bench.cpl || 32) ? 'var(--green)' : 'var(--champagne)' }}>
+                      {formatCurrency(displayCampaign.cpl)}
                     </div>
                   </div>
                 </>}
-                {campaign.purchases > 0 && <>
+                {displayCampaign.purchases > 0 && <>
                   <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>ROAS</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: campaign.roas >= 3 ? 'var(--green)' : 'var(--champagne)' }}>
-                      {campaign.roas.toFixed(2)}x
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: displayCampaign.roas >= 3 ? 'var(--green)' : 'var(--champagne)' }}>
+                      {displayCampaign.roas.toFixed(2)}x
                     </div>
                   </div>
                   <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Revenue</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatCurrency(campaign.revenue)}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatCurrency(displayCampaign.revenue)}</div>
                   </div>
                 </>}
                 <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
@@ -907,18 +924,18 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>
                 Ad Sets
               </div>
-              <AdSetsSection campaignId={campaign.id} />
+              <AdSetsSection campaignId={displayCampaign.id} />
             </div>
 
             {/* vs Industry Benchmark */}
-            {campaign.spend > 0 && (
+            {displayCampaign.spend > 0 && (
               <div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 12 }}>
                   vs Industry Benchmark
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-                  {campaign.cpl > 0 && bench.cpl  && <MetricVsBenchmark label="CPL"  value={campaign.cpl}   benchmark={bench.cpl}  unit="€/lead" higherIsBetter={false} />}
-                  {campaign.roas > 0 && bench.roas && <MetricVsBenchmark label="ROAS" value={campaign.roas}  benchmark={bench.roas} unit="x"     higherIsBetter format="multiplier" />}
+                  {displayCampaign.cpl > 0 && bench.cpl  && <MetricVsBenchmark label="CPL"  value={displayCampaign.cpl}   benchmark={bench.cpl}  unit="€/lead" higherIsBetter={false} />}
+                  {displayCampaign.roas > 0 && bench.roas && <MetricVsBenchmark label="ROAS" value={displayCampaign.roas}  benchmark={bench.roas} unit="x"     higherIsBetter format="multiplier" />}
                   {cpm > 0 && bench.cpm            && <MetricVsBenchmark label="CPM"  value={cpm}            benchmark={bench.cpm}  unit="€/1k"  higherIsBetter={false} />}
                   {ctr > 0 && bench.ctr            && <MetricVsBenchmark label="CTR"  value={ctr}            benchmark={bench.ctr}  unit="%"     higherIsBetter format="percent" />}
                 </div>
@@ -926,20 +943,20 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
             )}
 
             {/* Signals */}
-            {campaign.spend > 0 && (campaign.cpl > 0 || ctr > 0) && (
+            {displayCampaign.spend > 0 && (displayCampaign.cpl > 0 || ctr > 0) && (
               <div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>
                   Signals
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                  {campaign.cpl > 0 && bench.cpl && campaign.cpl < bench.cpl * 0.8 && (
+                  {displayCampaign.cpl > 0 && bench.cpl && displayCampaign.cpl < bench.cpl * 0.8 && (
                     <SignalAlert type="good">
-                      Excellent CPL — {Math.round((1 - campaign.cpl / bench.cpl) * 100)}% below benchmark. Consider scaling budget now.
+                      Excellent CPL — {Math.round((1 - displayCampaign.cpl / bench.cpl) * 100)}% below benchmark. Consider scaling budget now.
                     </SignalAlert>
                   )}
-                  {campaign.cpl > 0 && bench.cpl && campaign.cpl > bench.cpl * 1.3 && (
+                  {displayCampaign.cpl > 0 && bench.cpl && displayCampaign.cpl > bench.cpl * 1.3 && (
                     <SignalAlert type="warning">
-                      CPL {Math.round((campaign.cpl / bench.cpl - 1) * 100)}% above benchmark. Test new creatives or narrow the audience.
+                      CPL {Math.round((displayCampaign.cpl / bench.cpl - 1) * 100)}% above benchmark. Test new creatives or narrow the audience.
                     </SignalAlert>
                   )}
                   {ctr > 0 && bench.ctr && ctr < bench.ctr * 0.7 && (
@@ -963,11 +980,11 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {[
-                  ['Campaign ID',      campaign.campaign_id_external],
-                  ['Last Sync',        new Date(campaign.synced_at).toLocaleString()],
-                  ['Start date',       campaign.date_start ? new Date(campaign.date_start).toLocaleDateString() : '—'],
-                  ['Daily Budget',     campaign.budget_daily     ? formatCurrency(campaign.budget_daily)     : '—'],
-                  ['Lifetime Budget',  campaign.budget_lifetime  ? formatCurrency(campaign.budget_lifetime)  : '—'],
+                  ['Campaign ID',      displayCampaign.campaign_id_external],
+                  ['Last Sync',        new Date(displayCampaign.synced_at).toLocaleString()],
+                  ['Start date',       displayCampaign.date_start ? new Date(displayCampaign.date_start).toLocaleDateString() : '—'],
+                  ['Daily Budget',     displayCampaign.budget_daily     ? formatCurrency(displayCampaign.budget_daily)     : '—'],
+                  ['Lifetime Budget',  displayCampaign.budget_lifetime  ? formatCurrency(displayCampaign.budget_lifetime)  : '—'],
                 ].map(([k, v]) => (
                   <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
                     <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>{k}</span>
@@ -1025,10 +1042,10 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, onClose }) => {
             </button>
 
             {/* Quick Actions */}
-            <QuickActions campaign={campaign} onAction={msg => setActionMsg(msg)} />
+            <QuickActions campaign={displayCampaign} onAction={msg => setActionMsg(msg)} />
 
             {/* Campaign Chat */}
-            <CampaignChat campaign={campaign} initialMsg={actionMsg} />
+            <CampaignChat campaign={displayCampaign} initialMsg={actionMsg} />
 
           </div>{/* /RIGHT column */}
 

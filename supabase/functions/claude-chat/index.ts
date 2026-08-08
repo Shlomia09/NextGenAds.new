@@ -446,7 +446,7 @@ serve(async (req) => {
       .from('ad_creatives')
       .select('ad_name, status, spend, impressions, clicks, leads, purchases, ctr, cpl, roas, ad_id_external, adset_id_external')
       .eq('brand_id', brand_id)
-      .order('leads', { ascending: false })
+      .order('spend', { ascending: false })   // sort by spend (works for both Leads and Sales accounts)
       .limit(15);
 
     // Fetch ad sets for Heinrick context
@@ -505,13 +505,21 @@ serve(async (req) => {
         }).join('\n')
       : '';
 
-    // Merge DB campaigns (may have more/updated data)
+    // Build a rich DB campaign block (all KPIs, not just leads)
     const dbBlock = dbCampaigns && dbCampaigns.length > 0
       ? dbCampaigns.map((c: Record<string, unknown>) => {
-          const parts = [`- ${c.name}: ${c.status} | Spend: €${c.spend} | ROAS: ${c.roas}x | Objective: ${c.objective}`];
+          const parts = [`- ${c.name}: ${c.status} | Spend: €${c.spend} | Objective: ${c.objective}`];
+          if ((c.purchases as number) > 0) {
+            parts.push(`  Purchases: ${c.purchases} | ROAS: ${(c.roas as number).toFixed(2)}x | Revenue: €${c.revenue}`);
+          }
           if ((c.leads as number) > 0) {
             const cpl = (c.cpl as number) ?? ((c.spend as number) / (c.leads as number));
-            parts.push(`  Leads: ${c.leads} | CPL: €${Number(cpl).toFixed(2)} | Purchases: ${c.purchases}`);
+            parts.push(`  Leads: ${c.leads} | CPL: €${Number(cpl).toFixed(2)}`);
+          }
+          if ((c.impressions as number) > 0) {
+            const ctr = ((c.clicks as number) / (c.impressions as number) * 100).toFixed(2);
+            const cpm = ((c.spend as number) / (c.impressions as number) * 1000).toFixed(2);
+            parts.push(`  Impressions: ${c.impressions} | CTR: ${ctr}% | CPM: €${cpm}`);
           }
           return parts.join('\n');
         }).join('\n')
@@ -557,6 +565,9 @@ Param shapes by action type:
 - pause_campaign / activate_campaign: use campaign_id_external field
 
 NEVER include action_proposal without explicit user confirmation. Always explain your reasoning first.
+
+IMPORTANT — Language Rule:
+Always respond in the SAME LANGUAGE the user writes in. If the user writes in English, respond in English. If in Hebrew, respond in Hebrew. If in Italian/Spanish/French etc., match that language. Never switch languages unless the user explicitly asks you to.
 
 Analyze all data above in context of the benchmark knowledge when answering.`;
 

@@ -835,7 +835,7 @@ const CampaignRow: React.FC<{ campaign: Campaign; showBrand?: string; onClick: (
 const Campaigns: React.FC = () => {
   const { user }        = useAuth();
   const queryClient     = useQueryClient();
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<{ filtered: Campaign; raw: Campaign } | null>(null);
   const [syncing,       setSyncing]       = useState(false);
   const [syncMsg,       setSyncMsg]       = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string>('all');
@@ -1377,15 +1377,19 @@ const Campaigns: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedCampaigns.map((c, idx) => (
-                <CampaignRow
-                  key={c.id}
-                  campaign={c}
-                  showBrand={brands.length > 1 ? getBrandName(c.brand_id) : undefined}
-                  onClick={() => setSelectedCampaign(c)}
-                  isLast={idx === sortedCampaigns.length - 1}
-                />
-              ))}
+              {sortedCampaigns.map((c, idx) => {
+                // Find the original all-time row to pass alongside the date-filtered row
+                const rawC = campaigns.find(r => r.id === c.id) ?? c;
+                return (
+                  <CampaignRow
+                    key={c.id}
+                    campaign={c}
+                    showBrand={brands.length > 1 ? getBrandName(c.brand_id) : undefined}
+                    onClick={() => setSelectedCampaign({ filtered: c, raw: rawC })}
+                    isLast={idx === sortedCampaigns.length - 1}
+                  />
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -1394,7 +1398,8 @@ const Campaigns: React.FC = () => {
       {/* ── Detail panel ─────────────────────────────────── */}
       {selectedCampaign && (
         <CampaignDetailPanel
-          campaign={selectedCampaign}
+          campaign={selectedCampaign.filtered}
+          rawCampaign={selectedCampaign.raw}
           onClose={() => setSelectedCampaign(null)}
         />
       )}
