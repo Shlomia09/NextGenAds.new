@@ -112,8 +112,8 @@ const computeHealth = (campaigns: Campaign[], benchmarks: BenchmarkMetric[]): { 
 };
  
 // ─── Card wrapper ───────────────────────────────────────────────
-const Card: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
-  <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, boxShadow: 'var(--shadow)', padding: '18px 20px', ...style }}>
+const Card: React.FC<{ children: React.ReactNode; style?: React.CSSProperties; className?: string }> = ({ children, style, className }) => (
+  <div className={className} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, boxShadow: 'var(--shadow)', padding: '18px 20px', ...style }}>
     {children}
   </div>
 );
@@ -395,7 +395,7 @@ const Dashboard: React.FC = () => {
       <div style={{ height: 'calc(100vh - 44px)', overflowY: 'auto', background: 'var(--bg)', padding: '20px 24px 32px' }}>
  
         {/* ════════ WELCOME STRIP (full width) ════════ */}
-        <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', gap: 20, marginBottom: 20 }}>
+        <div className="dash-welcome-strip" style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', gap: 20, marginBottom: 20 }}>
           {/* Greeting */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 500, color: 'var(--text)', margin: '0 0 4px', letterSpacing: -0.5 }}>
@@ -407,7 +407,7 @@ const Dashboard: React.FC = () => {
           </div>
  
           {/* Today pulse card */}
-          <Card style={{ padding: '14px 20px', minWidth: 300, display: 'flex', alignItems: 'center', gap: 14, position: 'relative', overflow: 'hidden' }}>
+          <Card className="dash-pulse-card" style={{ padding: '14px 20px', minWidth: 300, display: 'flex', alignItems: 'center', gap: 14, position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'var(--accent)', opacity: 0.08, filter: 'blur(20px)' }} />
             <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--accent-soft)', border: '1px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Zap size={16} style={{ color: 'var(--accent)' }} />
@@ -429,7 +429,7 @@ const Dashboard: React.FC = () => {
         </div>
  
         {/* ════════ BENTO GRID — 1.6fr / 1fr ════════ */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 20, alignItems: 'start' }}>
+        <div className="dash-bento-grid" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 20, alignItems: 'start' }}>
  
           {/* ══ LEFT COLUMN ══════════════════════════════════════ */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -524,7 +524,7 @@ const Dashboard: React.FC = () => {
  
               {/* Totals row below chart */}
               {!isLoading && campaigns.length > 0 && (
-                <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                <div className="dash-kpi-totals" style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
                   {[
                     { label: 'Total Spend',          value: formatCurrency(totalSpend),      color: 'var(--accent)' },
                     { label: `Total ${convLabel}`,    value: totalResults > 0 ? formatNumber(totalResults) : '—', color: 'var(--green)', hide: totalResults === 0 },

@@ -1082,7 +1082,7 @@ const Campaigns: React.FC = () => {
   if (isLoading) {
     return (
       <div className="page-container">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 16 }}>
+        <div className="camp-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 16 }}>
           {[1,2,3,4].map(i => (
             <div key={i} style={{
               background: 'var(--surface-2)', borderRadius: 14, height: 120,
@@ -1206,7 +1206,7 @@ const Campaigns: React.FC = () => {
         <span style={{ width: 1, height: 22, background: 'var(--border)', display: 'inline-block', margin: '0 2px' }} />
 
         {/* Status filter pills */}
-        <div style={{ display: 'flex', gap: 5 }}>
+        <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
           {(['all', 'ACTIVE', 'PAUSED'] as const).map(s => {
             const label = s === 'all' ? 'All Status' : s === 'ACTIVE' ? '🟢 Active' : '⏸ Paused';
             const isActive = statusFilter === s;
@@ -1261,7 +1261,7 @@ const Campaigns: React.FC = () => {
       </div>
 
       {/* ── KPI Row (§28) — 4 colored cards ─────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 16 }}>
+      <div className="camp-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 16 }}>
         <KpiCard
           label="TOTAL SPEND"
           value={formatCurrency(totalSpend)}
@@ -1310,7 +1310,7 @@ const Campaigns: React.FC = () => {
 
       {/* ── Chart panels (§29) — trend + donut ──────────── */}
       {campaigns.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1.7fr 1fr', gap: 14, marginBottom: 16 }}>
+        <div className="camp-chart-grid" style={{ display: 'grid', gridTemplateColumns: '1.7fr 1fr', gap: 14, marginBottom: 16 }}>
           <TrendPanel
             dailyRows={dailyKpis?.dailyRows ?? []}
             totalSpend={totalSpend}
@@ -1339,7 +1339,8 @@ const Campaigns: React.FC = () => {
             </button>
           </div>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
             <thead>
               <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
                 {([
@@ -1392,6 +1393,7 @@ const Campaigns: React.FC = () => {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 

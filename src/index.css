@@ -86,9 +86,157 @@ input, textarea, select {
   color: var(--text);
 }
 
+/* ============================================================
+   SIDEBAR — mobile classes (Sidebar.tsx references these)
+   ============================================================ */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: 230px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: transform 0.28s cubic-bezier(0.32,0.72,0,1);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-logo-wrap {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1;
+}
+.sidebar-logo em { font-style: italic; color: var(--accent); }
+
+.sidebar-tagline {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-2);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+}
+.sidebar-nav-item:hover,
+.sidebar-nav-item.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.sidebar-nav-item.active { font-weight: 500; }
+
+.sidebar-footer {
+  padding: 14px 10px;
+  border-top: 1px solid var(--border-soft);
+  flex-shrink: 0;
+}
+
+/* Hamburger button — hidden on desktop */
+.sb-hamburger {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 16px;
+  z-index: 200;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 9px;
+  color: var(--text-2);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background 0.15s;
+}
+.sb-hamburger:hover { background: var(--surface-2); }
+
+/* Overlay backdrop */
+.sb-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99;
+  backdrop-filter: blur(2px);
+}
+
+/* ============================================================
+   RESPONSIVE — mobile (≤ 900px)
+   ============================================================ */
 @media (max-width: 900px) {
-  .main-content { margin-left: 0; padding-top: 60px; }
-  .page-container { padding: 20px 16px; }
+  /* Shell */
+  .main-content  { margin-left: 0; padding-top: 56px; }
+  .page-container { padding: 16px 14px; }
+
+  /* Sidebar: slide in from left, hidden by default */
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+  .sidebar-open {
+    transform: translateX(0);
+    box-shadow: 4px 0 30px rgba(0,0,0,0.35);
+  }
+
+  /* Show hamburger + overlay on mobile */
+  .sb-hamburger { display: flex; align-items: center; justify-content: center; }
+  .sb-overlay   { display: block; }
+
+  /* Dashboard: bento grid → single column */
+  .dash-bento-grid    { grid-template-columns: 1fr !important; }
+  /* Dashboard: welcome strip → stack vertically */
+  .dash-welcome-strip { flex-direction: column !important; align-items: flex-start !important; }
+  .dash-welcome-strip .dash-pulse-card { min-width: 0 !important; width: 100% !important; }
+  /* Dashboard: KPI totals row → 2 columns */
+  .dash-kpi-totals    { grid-template-columns: repeat(2,1fr) !important; }
+
+  /* Campaigns: KPI row → 2 columns */
+  .camp-kpi-grid      { grid-template-columns: repeat(2,1fr) !important; }
+  /* Campaigns: chart + donut → stack */
+  .camp-chart-grid    { grid-template-columns: 1fr !important; }
+
+  /* Campaign table: hide non-essential columns */
+  .camp-col-impressions,
+  .camp-col-clicks,
+  .camp-col-frequency { display: none !important; }
+}
+
+/* Extra small — phones */
+@media (max-width: 480px) {
+  .page-container { padding: 12px 10px; }
+  /* KPI grids → single column on very small */
+  .camp-kpi-grid   { grid-template-columns: repeat(2,1fr) !important; }
+  .dash-kpi-totals { grid-template-columns: repeat(2,1fr) !important; }
 }
 
 /* ============================================================
