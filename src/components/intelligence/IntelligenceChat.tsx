@@ -200,7 +200,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
     }
   };
 
-  // ── Execute a Heinrick-proposed action via meta-action edge function ──────
+  // ── Execute a Heinrick-proposed action ────────────────────────────────────
   const executeAction = async (proposal: ActionProposal, confirmed: boolean) => {
     setPendingAction(null);
     if (!confirmed) {
@@ -215,16 +215,47 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
 
     setExecutingAction(true);
     try {
-      const body: Record<string, unknown> = {
-        action:                 proposal.type,
-        ad_account_id:          proposal.ad_account_id,
-        campaign_id_external:   proposal.campaign_id_external,
-        ad_id_external:         proposal.ad_id_external,
-        params:                 proposal.params,
-        value:                  (proposal.params as Record<string, unknown> | undefined)?.value,
-      };
+      // Route monitored action types through log-direct-action (baseline + monitoring).
+      // Non-monitored types (create_campaign, duplicate_ad, duplicate_adset) stay on meta-action.
+      const monitoredActions = ['pause_campaign', 'activate_campaign', 'scale_budget'];
+      const useMonitored = monitoredActions.includes(proposal.type) && proposal.campaign_id_external;
 
-      const { data, error } = await supabase.functions.invoke('meta-action', { body });
+      let data: Record<string, unknown> | null = null;
+      let error: { message: string } | null = null;
+
+      if (useMonitored) {
+        // We need campaign_id (internal UUID). Look it up from campaigns by campaign_id_external.
+        const { data: campRow } = await supabase
+          .from('campaigns')
+          .select('id')
+          .eq('campaign_id_external', proposal.campaign_id_external!)
+          .single();
+
+        const body: Record<string, unknown> = {
+          action:               proposal.type,
+          ad_account_id:        proposal.ad_account_id,
+          campaign_id_external: proposal.campaign_id_external,
+          campaign_id:          campRow?.id ?? null,
+          brand_id:             brand.id,
+          source:               'ai_chat',
+          ...((proposal.params as Record<string, unknown> | undefined) ?? {}),
+        };
+        const res = await supabase.functions.invoke('log-direct-action', { body });
+        data  = res.data;
+        error = res.error;
+      } else {
+        const body: Record<string, unknown> = {
+          action:               proposal.type,
+          ad_account_id:        proposal.ad_account_id,
+          campaign_id_external: proposal.campaign_id_external,
+          ad_id_external:       proposal.ad_id_external,
+          params:               proposal.params,
+          value:                (proposal.params as Record<string, unknown> | undefined)?.value,
+        };
+        const res = await supabase.functions.invoke('meta-action', { body });
+        data  = res.data;
+        error = res.error;
+      }
 
       const resultMsg: ChatMessage = {
         role: 'assistant',
@@ -245,6 +276,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
       setExecutingAction(false);
     }
   };
+
 
   // Render AI message content — bolds **…** patterns using DM Mono accent
   const renderAIContent = (content: string) => {

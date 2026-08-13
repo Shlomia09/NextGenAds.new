@@ -419,12 +419,20 @@ const QuickActions: React.FC<{ campaign: Campaign; onAction: (msg: string) => vo
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
-      const result = await callEdge('meta-action', {
+      // Route through log-direct-action for baseline snapshot + monitoring
+      // (falls back to meta-action for unsupported action types)
+      const loggableActions = ['pause_campaign', 'activate_campaign', 'scale_budget'];
+      const fnName = loggableActions.includes(action) ? 'log-direct-action' : 'meta-action';
+      const body: Record<string, unknown> = {
         action,
         campaign_id_external: campaign.campaign_id_external,
         ad_account_id: campaign.ad_account_id,
-        value,
-      }, session.access_token);
+        source: 'quick_action',
+        campaign_id: campaign.id,
+        brand_id: campaign.brand_id,
+        ...(value !== undefined ? { new_budget: value } : {}),
+      };
+      const result = await callEdge(fnName, body, session.access_token);
       setFeedback(`✓ ${result.message || label + ' successful'}`);
       onAction(`Action "${label}" was executed: ${result.message}`);
     } catch (err) {
