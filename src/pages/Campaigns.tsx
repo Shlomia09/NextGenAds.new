@@ -17,6 +17,7 @@ import { formatCurrency, formatNumber } from '../lib/benchmarks';
 import { classifyObjective, GOAL_META } from '../lib/objective';
 import { resolvePrimaryConversion } from '../lib/conversions';
 import CampaignDetailPanel from '../components/campaigns/CampaignDetailPanel';
+import { exportCampaignsCsv } from '../lib/exportCsv';
 import type { GoalType } from '../lib/objective';
 import type { Campaign } from '../types';
 
@@ -1136,6 +1137,18 @@ const Campaigns: React.FC = () => {
           >
             <RefreshCw size={14} strokeWidth={1.5} className={syncing ? 'animate-spin' : ''} />
             {syncing ? 'Syncing…' : 'Sync Meta'}
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={() => exportCampaignsCsv(mergedCampaigns, {
+              dateLabel,
+              brandName: brands.find(b => b.id === activeBrandId)?.name,
+            })}
+            disabled={mergedCampaigns.length === 0}
+            title={mergedCampaigns.length === 0 ? 'No campaigns to export' : `Export ${mergedCampaigns.length} campaign${mergedCampaigns.length !== 1 ? 's' : ''} as CSV`}
+            style={{ display: 'flex', alignItems: 'center', gap: 7, boxShadow: 'var(--shadow)' }}
+          >
+            ↓ Export CSV
           </button>
           <a
             href="https://adsmanager.facebook.com"
