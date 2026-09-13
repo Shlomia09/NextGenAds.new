@@ -80,6 +80,72 @@ const VERTICAL_BENCHMARKS: Record<string, string> = {
   `,
 };
 
+// ── Resolve primary conversion per campaign (mirrors src/lib/conversions.ts) ──
+// Intentionally duplicated — cannot import from src/lib in Deno edge functions.
+// Mirror any changes to getCampaignConversionValue() here. See HANDOFF.md.
+function resolveCampaignConversionForPrompt(c: Record<string, number | string | null | undefined>): string {
+  const evt = ((c.conversion_event as string) ?? '').trim();
+  const spend = (c.spend as number) ?? 0;
+
+  if (evt && evt !== 'Multiple') {
+    let value = 0;
+    if (evt === 'Purchases')        value = (c.purchases as number) || (c.conversion_value as number) || 0;
+    else if (evt === 'ATC' || evt === 'Checkout') value = (c.atc as number) || (c.conversion_value as number) || 0;
+    else if (evt === 'Leads' || evt === 'Registrations' || evt === 'Subscriptions')
+                                    value = (c.leads as number) > 0 ? (c.leads as number) : ((c.conversion_value as number) || 0);
+    else if (evt === 'Page Views')  value = (c.page_views as number) || (c.conversion_value as number) || 0;
+    else if (evt === 'Clicks')      value = (c.clicks as number) || 0;
+    else if (evt === 'Reach')       value = (c.reach as number) || 0;
+    else if (evt === 'View Content') value = (c.conversion_value as number) || 0;
+    else                            value = (c.conversion_value as number) || 0;
+
+    if (value <= 0) return '';
+    const cost = spend > 0 && value > 0 ? spend / value : 0;
+    const costStr = cost > 0 ? ` | Cost/${evt}: €${cost.toFixed(2)}` : '';
+    return `${evt}: ${value}${costStr}`;
+  }
+
+  // Objective fallback
+  const obj = ((c.objective as string) ?? '').toUpperCase();
+  if (obj.includes('LEADS') || obj.includes('LEAD_GENERATION')) {
+    const leads = (c.leads as number) || 0;
+    if (leads > 0) return `Leads: ${leads} | CPL: €${((c.cpl as number) || (spend > 0 && leads > 0 ? spend / leads : 0)).toFixed(2)}`;
+  }
+  if (obj.includes('SALES') || obj.includes('CONVERSIONS') || obj.includes('CATALOG')) {
+    const roas = (c.roas as number) || 0;
+    const rev  = (c.revenue as number) || 0;
+    if (roas > 0) return `ROAS: ${roas.toFixed(2)}x | Revenue: €${rev.toFixed(2)}`;
+  }
+  if (obj.includes('TRAFFIC') || obj.includes('LINK_CLICKS')) {
+    const pv    = (c.page_views as number) || 0;
+    const clicks = (c.clicks as number) || 0;
+    const val   = pv > 0 ? pv : clicks;
+    const label = pv > 0 ? 'Page Views' : 'Clicks';
+    if (val > 0) {
+      const cost = spend > 0 && val > 0 ? spend / val : 0;
+      return `${label}: ${val}${cost > 0 ? ` | CPC: €${cost.toFixed(2)}` : ''}`;
+    }
+  }
+  if (obj.includes('AWARENESS') || obj.includes('REACH') || obj.includes('BRAND')) {
+    const reach = (c.reach as number) || 0;
+    const freq  = (c.frequency as number) || 0;
+    const impr  = (c.impressions as number) || 0;
+    if (reach > 0) return `Reach: ${reach.toLocaleString()} | Freq: ${freq.toFixed(1)}x${impr > 0 ? ` | CPM: €${(spend / impr * 1000).toFixed(2)}` : ''}`;
+  }
+  if (obj.includes('ENGAGEMENT') || obj.includes('POST_ENGAGEMENT')) {
+    const clicks = (c.clicks as number) || 0;
+    const impr   = (c.impressions as number) || 0;
+    if (clicks > 0) return `Clicks: ${clicks} | CTR: ${impr > 0 ? ((clicks / impr) * 100).toFixed(2) : '—'}%`;
+  }
+  // Unknown / fallback
+  const clicks = (c.clicks as number) || 0;
+  if (clicks > 0) {
+    const impr = (c.impressions as number) || 0;
+    return `Clicks: ${clicks} | CTR: ${impr > 0 ? ((clicks / impr) * 100).toFixed(2) : '—'}%`;
+  }
+  return '';
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -136,17 +202,17 @@ serve(async (req) => {
     const benchmarkData = VERTICAL_BENCHMARKS[vertical] || VERTICAL_BENCHMARKS.default;
 
     // ── Build per-campaign analysis ──────────────────────────────────────
-    const campaignDetails = allCampaigns.slice(0, 8).map((c: {
-      name: string; status: string; objective: string; spend: number;
-      leads: number; cpl: number; roas: number; revenue: number;
-      impressions: number; clicks: number; frequency: number; reach: number;
-      campaign_id_external: string;
-    }) => {
-      const cpm = c.impressions > 0 ? (c.spend / c.impressions) * 1000 : 0;
-      const ctr = c.impressions > 0 ? (c.clicks / c.impressions) * 100 : 0;
-      return `  - "${c.name}" [${c.status}] | Obj: ${c.objective} | Spend: €${c.spend.toFixed(2)} | ${
-        c.leads > 0 ? `Leads: ${c.leads} | CPL: €${c.cpl.toFixed(2)}` : ''
-      }${c.roas > 0 ? ` | ROAS: ${c.roas.toFixed(2)}x | Revenue: €${c.revenue.toFixed(2)}` : ''} | CPM: €${cpm.toFixed(2)} | CTR: ${ctr.toFixed(2)}% | Freq: ${c.frequency?.toFixed(1) || '—'}`;
+    const campaignDetails = allCampaigns.slice(0, 8).map((c: Record<string, number | string | null | undefined>) => {
+      const spend      = (c.spend      as number) ?? 0;
+      const impressions = (c.impressions as number) ?? 0;
+      const clicks     = (c.clicks     as number) ?? 0;
+      const frequency  = (c.frequency  as number) ?? 0;
+      const cpm = impressions > 0 ? (spend / impressions) * 1000 : 0;
+      const ctr = impressions > 0 ? (clicks / impressions) * 100  : 0;
+      const convStr = resolveCampaignConversionForPrompt(c);
+      return `  - "${c.name}" [${c.status}] | Obj: ${c.objective} | Spend: €${spend.toFixed(2)}${
+        convStr ? ` | ${convStr}` : ' | No conversion data'
+      } | CPM: €${cpm.toFixed(2)} | CTR: ${ctr.toFixed(2)}% | Freq: ${frequency?.toFixed(1) || '—'}`;
     }).join('\n');
 
     // ── AI Optimization Prompt ───────────────────────────────────────────
@@ -163,6 +229,15 @@ ACCOUNT PERFORMANCE (AGGREGATE):
 - Active Campaigns: ${activeCampaigns.length} / ${allCampaigns.length}
 ${totalLeads > 0 ? `- Total Leads: ${totalLeads} | Avg CPL: €${avgCpl.toFixed(2)}` : ''}
 ${totalRevenue > 0 ? `- Total Revenue: €${totalRevenue.toFixed(2)} | ROAS: ${avgRoas.toFixed(2)}x | Purchases: ${totalPurchases}` : ''}
+${totalLeads === 0 && totalRevenue === 0 ? (() => {
+  const totalPageViews = allCampaigns.reduce((s: number, c: Record<string, unknown>) => s + ((c.page_views as number) || 0), 0);
+  const totalReach     = allCampaigns.reduce((s: number, c: Record<string, unknown>) => s + ((c.reach     as number) || 0), 0);
+  const totalConvVal   = allCampaigns.reduce((s: number, c: Record<string, unknown>) => s + ((c.conversion_value as number) || 0), 0);
+  if (totalPageViews > 0) return `- Total Page Views: ${totalPageViews.toLocaleString()} | CPC: €${totalClicks > 0 ? (totalSpend / totalClicks).toFixed(2) : '—'}`;
+  if (totalReach > 0)     return `- Total Reach: ${totalReach.toLocaleString()} | Avg CPM: €${avgCpm.toFixed(2)}`;
+  if (totalConvVal > 0)   return `- Total Conversion Events: ${totalConvVal}`;
+  return '- No conversion data — campaigns may need a sync';
+})() : ''}
 - Avg CPM: €${avgCpm.toFixed(2)} | Avg CTR: ${avgCtr.toFixed(2)}% | Avg Frequency: ${avgFrequency.toFixed(1)}x
 
 CAMPAIGN BREAKDOWN:
