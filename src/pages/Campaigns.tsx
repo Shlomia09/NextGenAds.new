@@ -15,7 +15,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useBrand } from '../contexts/BrandContext';
 import { formatCurrency, formatNumber } from '../lib/benchmarks';
 import { classifyObjective, GOAL_META } from '../lib/objective';
-import { resolvePrimaryConversion } from '../lib/conversions';
+import { resolvePrimaryConversion, getPrimaryConversionMetric } from '../lib/conversions';
 import CampaignDetailPanel from '../components/campaigns/CampaignDetailPanel';
 import { exportCampaignsCsv } from '../lib/exportCsv';
 import type { GoalType } from '../lib/objective';
@@ -240,63 +240,25 @@ const ResultsCell: React.FC<{ campaign: Campaign; goal: GoalType; isLast: boolea
     );
   }
 
-  // ── Fallback: data not yet synced with promoted_object — infer from objective ──
-  switch (goal) {
-    case 'sales':
-      return (
-        <td style={cellStyle}>
-          <div style={{ ...numStyle, color: (campaign.atc ?? 0) > 0 ? 'var(--champagne)' : 'var(--text-3)' }}>
-            {(campaign.atc ?? 0) > 0 ? formatNumber(campaign.atc!) : dash}
-          </div>
-          <div style={subStyle}>
-            {(campaign.atc ?? 0) > 0 ? `ATC · CTR ${ctr.toFixed(1)}%` : 'Sync for goal data'}
-          </div>
-        </td>
-      );
-    case 'leads':
-      return (
-        <td style={cellStyle}>
-          <div style={{ ...numStyle, color: campaign.leads > 0 ? 'var(--green)' : 'var(--text-3)' }}>
-            {campaign.leads > 0 ? formatNumber(campaign.leads) : dash}
-          </div>
-          <div style={subStyle}>
-            {campaign.leads > 0 ? `Leads · CPL ${formatCurrency(campaign.cpl)}` : '—'}
-          </div>
-        </td>
-      );
-    case 'traffic':
-      return (
-        <td style={cellStyle}>
-          <div style={{ ...numStyle, color: 'var(--blue)' }}>
-            {(campaign.page_views ?? 0) > 0
-              ? formatNumber(campaign.page_views!)
-              : campaign.clicks > 0 ? formatNumber(campaign.clicks) : dash}
-          </div>
-          <div style={subStyle}>
-            {(campaign.page_views ?? 0) > 0 ? 'Page Views' : 'Clicks'}{ctr > 0 && ` · CTR ${ctr.toFixed(1)}%`}
-          </div>
-        </td>
-      );
-    case 'awareness':
-      return (
-        <td style={cellStyle}>
-          <div style={{ ...numStyle, color: 'var(--blue)' }}>
-            {campaign.reach > 0 ? formatNumber(campaign.reach) : dash}
-          </div>
-          <div style={subStyle}>
-            {campaign.reach > 0 ? `Reach · ${campaign.frequency.toFixed(1)}x freq.` : '—'}
-          </div>
-        </td>
-      );
-    default:
-      return (
-        <td style={cellStyle}>
-          <span style={{ ...numStyle, color: 'var(--text-3)', fontWeight: 400 }}>
-            {campaign.clicks > 0 ? formatNumber(campaign.clicks) + ' clicks' : '—'}
-          </span>
-        </td>
-      );
-  }
+  // ── Fallback: no conversion_event — use GOAL_META via getPrimaryConversionMetric ──
+  const m = getPrimaryConversionMetric(campaign);
+  const fColor = (() => {
+    if (m.key === 'leads' || m.key === 'purchases') return m.value > 0 ? 'var(--green)' : 'var(--text-3)';
+    if (m.key === 'reach' || m.key === 'page_views' || m.key === 'clicks') return 'var(--blue)';
+    if (m.key === 'atc') return 'var(--champagne)';
+    return 'var(--text-3)';
+  })();
+  const fSub = m.hasData && m.value > 0
+    ? `${m.label} · ${m.costLabel} ${m.costLabel === 'ROAS' ? `${m.costValue.toFixed(2)}x` : formatCurrency(m.costValue)}${ctr > 0 ? ` · CTR ${ctr.toFixed(1)}%` : ''}`
+    : m.hasData ? '—' : 'Sync for goal data';
+  return (
+    <td style={cellStyle}>
+      <div style={{ ...numStyle, color: fColor }}>
+        {m.hasData && m.value > 0 ? formatNumber(m.value) : dash}
+      </div>
+      <div style={subStyle}>{fSub}</div>
+    </td>
+  );
 };
 
 // ─── Sales cell — always shows purchase/revenue regardless of campaign objective ─
