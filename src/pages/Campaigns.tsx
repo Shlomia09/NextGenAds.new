@@ -177,7 +177,7 @@ const StatusPill: React.FC<{ status: string }> = ({ status }) => {
 // Primary: campaign.conversion_event (from Meta's promoted_object.custom_event_type)
 // 'Multiple' = campaign has adsets with different conversion goals (mirrors Meta behavior)
 // Fallback: inferred from objective + per-field DB columns (atc, page_views, leads, reach)
-const ResultsCell: React.FC<{ campaign: Campaign; goal: GoalType; isLast: boolean }> = ({ campaign, goal, isLast }) => {
+const ResultsCell: React.FC<{ campaign: Campaign; goal: GoalType; isLast: boolean }> = ({ campaign, goal: _goal, isLast }) => {
   const ctr = campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100 : 0;
   const cellStyle = {
     padding: '16px 22px',

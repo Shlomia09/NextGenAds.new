@@ -191,7 +191,7 @@ export function getPrimaryConversionMetric(campaign: Campaign): CampaignConversi
     leads:     campaign.leads,
     clicks:    campaign.clicks,
     reach:     campaign.reach,
-    bookings:  (campaign as Record<string, unknown>).bookings as number | null | undefined,
+    bookings:  undefined, // Campaign type does not include bookings; hasData=false for this fallback
   };
 
   const rawValue = valueMap[field];
