@@ -8,6 +8,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { formatCurrency, formatNumber } from '../../lib/benchmarks';
 import { classifyObjective, GOAL_META } from '../../lib/objective';
+import { getPrimaryConversionMetric } from '../../lib/conversions';
 import type { Campaign } from '../../types';
 
 // ─── Benchmark data per objective ─────────────────────────────
@@ -338,17 +339,21 @@ const AdSetsSection: React.FC<{ campaignId: string }> = ({ campaignId }) => {
                   {adset.conversion_event ?? adset.optimization_goal ?? '—'}
                 </div>
               </div>
-              {/* Results */}
+              {/* Results — label from conversion_event (already in Goal column), fallback to 'Results' */}
               <div>
-                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 2 }}>Results</div>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 2 }}>
+                  {adset.conversion_event ?? 'Results'}
+                </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5, color: adset.results > 0 ? goalColor : 'var(--text-3)', fontWeight: 500 }}>
                   {adset.results > 0 ? adset.results.toLocaleString() : '—'}
                 </div>
               </div>
-              {/* Cost/Result */}
+              {/* Cost per result — label derived from conversion_event */}
               {adset.cost_per_result > 0 && (
                 <div>
-                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 2 }}>Cost/Result</div>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 2 }}>
+                    {adset.conversion_event ? `Cost/${adset.conversion_event}` : 'Cost/Result'}
+                  </div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5, color: 'var(--text-2)', fontWeight: 500 }}>
                     {formatCurrency(adset.cost_per_result)}
                   </div>
@@ -888,30 +893,41 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Impressions</div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>{formatNumber(displayCampaign.impressions)}</div>
                 </div>
-                {displayCampaign.leads > 0 && <>
-                  <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Leads</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(displayCampaign.leads)}</div>
-                  </div>
-                  <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CPL</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: displayCampaign.cpl < (bench.cpl || 32) ? 'var(--green)' : 'var(--champagne)' }}>
-                      {formatCurrency(displayCampaign.cpl)}
+                {/* Dynamic primary conversion metric — works for ALL objective types */}
+                {(() => {
+                  const m = getPrimaryConversionMetric(displayCampaign);
+                  if (!m.hasData) return (
+                    <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px', gridColumn: 'span 2' }}>
+                      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{m.label || 'Results'}</div>
+                      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)' }}>No data yet — sync to load</div>
                     </div>
-                  </div>
-                </>}
-                {displayCampaign.purchases > 0 && <>
-                  <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>ROAS</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: displayCampaign.roas >= 3 ? 'var(--green)' : 'var(--champagne)' }}>
-                      {displayCampaign.roas.toFixed(2)}x
-                    </div>
-                  </div>
-                  <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
-                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Revenue</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatCurrency(displayCampaign.revenue)}</div>
-                  </div>
-                </>}
+                  );
+                  // Color: green for leads/purchases, blue for reach/traffic, champagne for ATC
+                  const valueColor = (() => {
+                    if (m.key === 'leads' || m.key === 'purchases') return m.value > 0 ? 'var(--green)' : 'var(--text-3)';
+                    if (m.key === 'reach' || m.key === 'page_views' || m.key === 'clicks') return 'var(--blue)';
+                    if (m.key === 'atc') return 'var(--champagne)';
+                    return 'var(--text-2)';
+                  })();
+                  return (
+                    <>
+                      <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                        <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{m.label}</div>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: valueColor }}>
+                          {m.value > 0 ? formatNumber(m.value) : '—'}
+                        </div>
+                      </div>
+                      {m.costValue > 0 && (
+                        <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
+                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{m.costLabel}</div>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: m.key === 'purchases' && (displayCampaign.roas ?? 0) >= 3 ? 'var(--green)' : m.key === 'purchases' ? 'var(--champagne)' : m.key === 'leads' && displayCampaign.cpl < (bench.cpl || 32) ? 'var(--green)' : 'var(--champagne)' }}>
+                            {m.costLabel === 'ROAS' ? `${m.costValue.toFixed(2)}x` : formatCurrency(m.costValue)}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
                 <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CPM</div>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: cpm > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
@@ -951,22 +967,40 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
             )}
 
             {/* Signals */}
-            {displayCampaign.spend > 0 && (displayCampaign.cpl > 0 || ctr > 0) && (
+            {displayCampaign.spend > 0 && (() => { const m = getPrimaryConversionMetric(displayCampaign); return m.hasData || ctr > 0; })() && (
               <div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>
                   Signals
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                  {displayCampaign.cpl > 0 && bench.cpl && displayCampaign.cpl < bench.cpl * 0.8 && (
-                    <SignalAlert type="good">
-                      Excellent CPL — {Math.round((1 - displayCampaign.cpl / bench.cpl) * 100)}% below benchmark. Consider scaling budget now.
-                    </SignalAlert>
-                  )}
-                  {displayCampaign.cpl > 0 && bench.cpl && displayCampaign.cpl > bench.cpl * 1.3 && (
-                    <SignalAlert type="warning">
-                      CPL {Math.round((displayCampaign.cpl / bench.cpl - 1) * 100)}% above benchmark. Test new creatives or narrow the audience.
-                    </SignalAlert>
-                  )}
+                  {(() => {
+                    const m = getPrimaryConversionMetric(displayCampaign);
+                    if (m.key === 'leads' && m.costValue > 0 && bench.cpl) {
+                      if (m.costValue < bench.cpl * 0.8) return (
+                        <SignalAlert type="good">
+                          Excellent {m.costLabel} — {Math.round((1 - m.costValue / bench.cpl) * 100)}% below benchmark. Consider scaling budget now.
+                        </SignalAlert>
+                      );
+                      if (m.costValue > bench.cpl * 1.3) return (
+                        <SignalAlert type="warning">
+                          {m.costLabel} {Math.round((m.costValue / bench.cpl - 1) * 100)}% above benchmark. Test new creatives or narrow the audience.
+                        </SignalAlert>
+                      );
+                    }
+                    if (m.key === 'purchases' && m.costValue > 0 && bench.roas) {
+                      if (m.costValue >= bench.roas) return (
+                        <SignalAlert type="good">
+                          ROAS {m.costValue.toFixed(2)}x meets or beats benchmark {bench.roas}x. Consider scaling budget.
+                        </SignalAlert>
+                      );
+                      if (m.costValue < bench.roas * 0.6) return (
+                        <SignalAlert type="warning">
+                          ROAS {m.costValue.toFixed(2)}x is below benchmark {bench.roas}x. Review creative and audience targeting.
+                        </SignalAlert>
+                      );
+                    }
+                    return null;
+                  })()}
                   {ctr > 0 && bench.ctr && ctr < bench.ctr * 0.7 && (
                     <SignalAlert type="warning">
                       CTR {ctr.toFixed(2)}% is below benchmark {bench.ctr}%. A creative refresh is needed.
