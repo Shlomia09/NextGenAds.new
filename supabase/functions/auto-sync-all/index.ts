@@ -178,6 +178,17 @@ async function syncAccount(
   } catch (err) {
     result.error = err instanceof Error ? err.message : String(err);
     console.error(`[auto-sync-all] Account ${externalAccountId} failed:`, result.error);
+    // Log the failure to system_events so it surfaces in the product.
+    // This is separate from the pg_cron "succeeded" status which only reflects HTTP acceptance.
+    try {
+      await supabase.from('system_events').insert({
+        brand_id,
+        user_id,
+        type:     'auto_sync_error',
+        label:    `Auto-sync FAILED for account ${externalAccountId}: ${result.error}`,
+        metadata: { ad_account_id: adAccountId, account_id: externalAccountId, error: result.error, trigger: 'pg_cron' },
+      });
+    } catch (_) { /* don't swallow original error */ }
   }
 
   return result;
@@ -195,7 +206,24 @@ serve(async (req) => {
     // pg_cron sends the service_role JWT in the Authorization header.
     // We compare the incoming JWT against the known service_role key.
     const authHeader = req.headers.get('Authorization') || '';
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
+    // ── Vault sanity check — catch truncated/malformed secrets loudly ────
+    // A real service_role JWT is ~220 chars and starts with 'eyJ'.
+    // If the stored secret is obviously wrong, we fail with a distinct error
+    // rather than a bare 401 that silently poisons every cron run.
+    const MIN_JWT_LENGTH = 100;
+    if (!serviceRoleKey || serviceRoleKey.length < MIN_JWT_LENGTH || !serviceRoleKey.startsWith('eyJ')) {
+      const msg = `MISCONFIGURATION: Vault secret 'supabase_service_role_key' is ${serviceRoleKey.length} chars — expected ~220 starting with 'eyJ'. Re-store the full JWT in Supabase Vault.`;
+      console.error('[auto-sync-all]', msg);
+      // Best-effort: try to log to system_events even with the broken key
+      try {
+        const sb = createClient(Deno.env.get('SUPABASE_URL')!, serviceRoleKey);
+        await sb.from('system_events').insert({ type: 'auto_sync_error', label: msg, metadata: { key_length: serviceRoleKey.length, trigger: 'pg_cron' } });
+      } catch (_) { /* key is broken — log to console only */ }
+      return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     if (!authHeader.includes(serviceRoleKey)) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized — service_role required' }),
@@ -240,6 +268,30 @@ serve(async (req) => {
     const errors = results.filter(r => r.error);
 
     console.log(`[auto-sync-all] Done: ${adAccounts.length} accounts, ${totalCampaigns} campaigns, ${errors.length} errors`);
+
+    // ── Log overall run outcome to system_events ─────────────────────────────
+    // Every cron run gets a row. This is the audit trail that lets the product
+    // surface sync health — pg_cron "succeeded" only means HTTP was accepted.
+    const runType  = errors.length === 0 ? 'auto_sync' : 'auto_sync_error';
+    const runLabel = errors.length === 0
+      ? `Auto-sync OK: ${adAccounts.length} account${adAccounts.length !== 1 ? 's' : ''}, ${totalCampaigns} campaigns synced`
+      : `Auto-sync PARTIAL: ${errors.length}/${adAccounts.length} accounts failed, ${totalCampaigns} campaigns synced`;
+    try {
+      await supabase.from('system_events').insert({
+        type:     runType,
+        label:    runLabel,
+        metadata: {
+          accounts_checked: adAccounts.length,
+          accounts_synced:  results.filter(r => !r.error).length,
+          total_campaigns:  totalCampaigns,
+          errors:           errors.map(r => ({ account: r.account_id, error: r.error })),
+          trigger:          'pg_cron',
+          timestamp:        new Date().toISOString(),
+        },
+      });
+    } catch (logErr) {
+      console.error('[auto-sync-all] Failed to write run summary to system_events:', logErr);
+    }
 
     return new Response(
       JSON.stringify({
