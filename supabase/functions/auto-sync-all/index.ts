@@ -140,7 +140,6 @@ async function syncAccount(
       return {
         brand_id,
         ad_account_id:       adAccountId,
-        user_id,
         platform:            'meta',
         campaign_id_external: c.id,
         name:                c.name,
