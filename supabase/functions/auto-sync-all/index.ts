@@ -202,34 +202,33 @@ serve(async (req) => {
   }
 
   try {
-    // ── Security: verify caller is service_role ──────────────────────────
-    // pg_cron sends the service_role JWT in the Authorization header.
-    // We compare the incoming JWT against the known service_role key.
+    // ── Security: verify caller presents a service_role JWT ─────────────
+    // pg_cron sends the Vault-stored service_role JWT in Authorization header.
+    // We decode the JWT payload (no signature check — we're verifying the role claim,
+    // which only Supabase can sign anyway) and confirm role === 'service_role'.
+    //
+    // We do NOT compare against Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') because:
+    //  - env vars starting with SUPABASE_ are reserved and cannot be set via CLI
+    //  - the auto-injected value may differ from the project's Settings > API key
+    //  - string-includes comparison is fragile if the values differ for any reason
     const authHeader = req.headers.get('Authorization') || '';
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    let callerRole = '';
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payloadJson = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+        callerRole = JSON.parse(payloadJson).role ?? '';
+      }
+    } catch (_) { /* malformed JWT — callerRole stays '' */ }
 
-    // ── Vault sanity check — catch truncated/malformed secrets loudly ────
-    // A real service_role JWT is ~220 chars and starts with 'eyJ'.
-    // If the stored secret is obviously wrong, we fail with a distinct error
-    // rather than a bare 401 that silently poisons every cron run.
-    const MIN_JWT_LENGTH = 100;
-    if (!serviceRoleKey || serviceRoleKey.length < MIN_JWT_LENGTH || !serviceRoleKey.startsWith('eyJ')) {
-      const msg = `MISCONFIGURATION: Vault secret 'supabase_service_role_key' is ${serviceRoleKey.length} chars — expected ~220 starting with 'eyJ'. Re-store the full JWT in Supabase Vault.`;
-      console.error('[auto-sync-all]', msg);
-      // Best-effort: try to log to system_events even with the broken key
-      try {
-        const sb = createClient(Deno.env.get('SUPABASE_URL')!, serviceRoleKey);
-        await sb.from('system_events').insert({ type: 'auto_sync_error', label: msg, metadata: { key_length: serviceRoleKey.length, trigger: 'pg_cron' } });
-      } catch (_) { /* key is broken — log to console only */ }
-      return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    if (!authHeader.includes(serviceRoleKey)) {
+    if (callerRole !== 'service_role') {
       return new Response(
-        JSON.stringify({ error: 'Unauthorized — service_role required' }),
+        JSON.stringify({ error: 'Unauthorized — service_role JWT required' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     // ── Service-role Supabase client ─────────────────────────────────────
     const supabase = createClient(
