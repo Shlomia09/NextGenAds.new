@@ -231,6 +231,9 @@ serve(async (req) => {
 
 
     // ── Service-role Supabase client ─────────────────────────────────────
+    // SUPABASE_SERVICE_ROLE_KEY is auto-injected by Supabase to the project's
+    // real service_role key — used only for DB access, NOT for auth comparison.
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       serviceRoleKey,
