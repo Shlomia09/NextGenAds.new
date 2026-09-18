@@ -21,6 +21,10 @@
 
 import type { Campaign } from '../types';
 import { classifyObjective, GOAL_META } from './objective';
+// CONVERSION_EVENT_MAP: event label -> DB column + cost label
+// SOURCE OF TRUTH: supabase/functions/_shared/conversionEventMap.ts
+// This frontend mirror (src/lib/conversionEventMap.ts) must stay identical to it.
+import { CONVERSION_EVENT_MAP } from './conversionEventMap';
 
 // ── Map conversion_event label -> DB column numeric value ────────────────────
 export function getCampaignConversionValue(campaign: Campaign): number {
@@ -44,12 +48,9 @@ export function getCampaignConversionValue(campaign: Campaign): number {
 }
 
 // ── Resolve the CPA label for a given conversion event ───────────────────────
+// Derived from CONVERSION_EVENT_MAP so it stays in sync with the shared map.
 export function getCpaLabel(conversionEvent: string): string {
-  if (conversionEvent === 'Leads' || conversionEvent === 'Registrations') return 'AVG CPL';
-  if (conversionEvent === 'Purchases') return 'AVG CPA';
-  if (conversionEvent === 'Page Views') return 'CPV';
-  if (conversionEvent === 'Clicks') return 'AVG CPC';
-  return 'AVG CPA';
+  return CONVERSION_EVENT_MAP[conversionEvent]?.costLabel ?? 'AVG CPA';
 }
 
 // ── Output shape ─────────────────────────────────────────────────────────────

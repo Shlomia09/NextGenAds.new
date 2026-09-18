@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import Anthropic from 'npm:@anthropic-ai/sdk';
 import { createClient } from 'npm:@supabase/supabase-js';
+import { CONVERSION_EVENT_MAP } from '../_shared/conversionEventMap.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -80,32 +81,39 @@ const VERTICAL_BENCHMARKS: Record<string, string> = {
   `,
 };
 
-// ── Resolve primary conversion per campaign (mirrors src/lib/conversions.ts) ──
-// Intentionally duplicated — cannot import from src/lib in Deno edge functions.
-// Mirror any changes to getCampaignConversionValue() here. See HANDOFF.md.
+// ── Resolve primary conversion per campaign for the Claude prompt ──────────────
+// Event-label path uses CONVERSION_EVENT_MAP (imported from _shared/) as the
+// single source of truth. Objective-fallback is still inline because it maps
+// objective strings to columns, not event labels -- no shared map exists for that.
 function resolveCampaignConversionForPrompt(c: Record<string, number | string | null | undefined>): string {
   const evt = ((c.conversion_event as string) ?? '').trim();
   const spend = (c.spend as number) ?? 0;
 
   if (evt && evt !== 'Multiple') {
-    let value = 0;
-    if (evt === 'Purchases')        value = (c.purchases as number) || (c.conversion_value as number) || 0;
-    else if (evt === 'ATC' || evt === 'Checkout') value = (c.atc as number) || (c.conversion_value as number) || 0;
-    else if (evt === 'Leads' || evt === 'Registrations' || evt === 'Subscriptions')
-                                    value = (c.leads as number) > 0 ? (c.leads as number) : ((c.conversion_value as number) || 0);
-    else if (evt === 'Page Views')  value = (c.page_views as number) || (c.conversion_value as number) || 0;
-    else if (evt === 'Clicks')      value = (c.clicks as number) || 0;
-    else if (evt === 'Reach')       value = (c.reach as number) || 0;
-    else if (evt === 'View Content') value = (c.conversion_value as number) || 0;
-    else                            value = (c.conversion_value as number) || 0;
-
-    if (value <= 0) return '';
-    const cost = spend > 0 && value > 0 ? spend / value : 0;
-    const costStr = cost > 0 ? ` | Cost/${evt}: €${cost.toFixed(2)}` : '';
-    return `${evt}: ${value}${costStr}`;
+    const entry = CONVERSION_EVENT_MAP[evt];
+    if (entry) {
+      const col = entry.column;
+      // Prefer the specific column; fall back to conversion_value for generic events.
+      const raw = col === 'conversion_value'
+        ? (c.conversion_value as number) || 0
+        : (c[col] as number) > 0
+          ? (c[col] as number)
+          : col === 'leads'
+            ? ((c.leads as number) > 0 ? (c.leads as number) : ((c.conversion_value as number) || 0))
+            : ((c[col] as number) || (c.conversion_value as number) || 0);
+      if (raw <= 0) return '';
+      const cost = spend > 0 ? spend / raw : 0;
+      const costStr = cost > 0 ? ` | ${entry.costLabel} €${cost.toFixed(2)}` : '';
+      return `${evt}: ${raw}${costStr}`;
+    }
+    // Unknown event label — use conversion_value generically
+    const val = (c.conversion_value as number) || 0;
+    if (val <= 0) return '';
+    const cost = spend > 0 ? spend / val : 0;
+    return `${evt}: ${val}${cost > 0 ? ` | Cost/Result: €${cost.toFixed(2)}` : ''}`;
   }
 
-  // Objective fallback
+  // Objective fallback (conversion_event is empty or 'Multiple')
   const obj = ((c.objective as string) ?? '').toUpperCase();
   if (obj.includes('LEADS') || obj.includes('LEAD_GENERATION')) {
     const leads = (c.leads as number) || 0;
