@@ -991,6 +991,26 @@ const Campaigns: React.FC = () => {
   const metaAccounts  = adAccounts.filter(a => a.platform === 'meta');
   const getBrandName  = (id: string) => brands.find(b => b.id === id)?.name || '';
 
+  // ── Staleness detection ──────────────────────────────────────────────────────
+  // Derive last sync time per ad_account_id from the campaigns already in memory.
+  // Threshold: 26 hours (cron is hourly — allows 2 missed runs before alerting).
+  // Compares against wall-clock time so it works correctly across timezones.
+  const STALE_MS = 26 * 60 * 60 * 1000;
+  const staleAccountIds = useMemo(() => {
+    const latestByAccount: Record<string, number> = {};
+    for (const c of allCampaigns) {
+      if (!c.ad_account_id || !c.synced_at) continue;
+      const t = new Date(c.synced_at).getTime();
+      if (!latestByAccount[c.ad_account_id] || t > latestByAccount[c.ad_account_id]) {
+        latestByAccount[c.ad_account_id] = t;
+      }
+    }
+    const now = Date.now();
+    return Object.entries(latestByAccount)
+      .filter(([, t]) => now - t > STALE_MS)
+      .map(([id]) => id);
+  }, [allCampaigns]);
+
   // ─── KPI aggregations — dynamic conversion type ───────────────────────────
   // resolvePrimaryConversion inspects campaign.conversion_event across all visible
   // campaigns and returns the dominant type (or "mixed" if multiple types exist).
@@ -1123,6 +1143,24 @@ const Campaigns: React.FC = () => {
           </a>
         </div>
       </div>
+
+      {/* ── Staleness warning banner ──────────────────────────── */}
+      {staleAccountIds.length > 0 && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          background: 'color-mix(in srgb, var(--champagne) 12%, var(--surface))',
+          border: '1px solid color-mix(in srgb, var(--champagne) 40%, transparent)',
+          borderRadius: 10, padding: '9px 14px', marginBottom: 14,
+          fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-2)',
+        }}>
+          <span style={{ fontSize: 14 }}>⚠️</span>
+          <span>
+            Data may be stale — last sync was over 26 hours ago for{' '}
+            <strong style={{ color: 'var(--text)' }}>{staleAccountIds.length} account{staleAccountIds.length > 1 ? 's' : ''}</strong>.
+            Auto-sync may be broken. Click <strong style={{ color: 'var(--text)' }}>Sync Meta</strong> to refresh, then check System Events for errors.
+          </span>
+        </div>
+      )}
 
       {/* ── Filters bar ─────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
