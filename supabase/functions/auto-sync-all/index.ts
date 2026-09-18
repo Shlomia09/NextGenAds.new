@@ -160,7 +160,7 @@ async function syncAccount(
 
     const { error: upsertErr } = await supabase
       .from('campaigns')
-      .upsert(campaignRows, { onConflict: 'ad_account_id,campaign_id_external' });
+      .upsert(campaignRows, { onConflict: 'brand_id,platform,campaign_id_external' });
     if (upsertErr) throw new Error(`DB upsert: ${upsertErr.message}`);
 
     result.synced = campaignRows.length;
