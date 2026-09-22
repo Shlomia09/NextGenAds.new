@@ -129,10 +129,10 @@ const DemoDashboard: React.FC = () => {
       <aside style={{ width: 220, background: '#2C1810', borderRight: '0.5px solid #3d2a1e', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '22px 20px 16px', borderBottom: '0.5px solid #3d2a1e' }}>
           <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: '#F5E6D8', letterSpacing: '0.04em' }}>
-            Next<span style={{ fontStyle: 'italic', color: '#C4836A' }}>Gen</span>Ads
+            Rouge
           </div>
           <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A5A48', marginTop: 4 }}>
-            Campaign Intelligence
+            Beauty campaign intelligence
           </div>
         </div>
 
