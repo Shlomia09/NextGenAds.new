@@ -57,12 +57,12 @@ const Sidebar: React.FC<SidebarProps> = () => {
                 flexShrink: 0,
                 lineHeight: 1,
               }}>
-                N
+                R
               </div>
               {/* Wordmark */}
               <div>
-                <div className="sidebar-logo">NextAds<em>Gen</em></div>
-                <div className="sidebar-tagline">Campaign Intelligence</div>
+                <div className="sidebar-logo">Rouge</div>
+                <div className="sidebar-tagline">Beauty campaign intelligence</div>
               </div>
             </div>
             <button className="sb-close-btn" onClick={() => setOpen(false)} aria-label="Close">

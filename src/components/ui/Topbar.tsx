@@ -120,7 +120,7 @@ const Topbar: React.FC<TopbarProps> = ({ kpis, conversionType: _ct, title: _t })
                   { label: 'Billing & Invoices',     href: '/settings',       emoji: '💳' },
                   { label: 'Connect Ad Account',      href: '/connect',        emoji: '🔗' },
                   { label: 'Meta Ads Manager',        href: 'https://adsmanager.facebook.com', emoji: '📊', external: true },
-                  { label: 'Support',                 href: 'mailto:support@nextadsgen.com',   emoji: '✉️', external: true },
+                  { label: 'Support',                 href: 'mailto:support@askrouge.com',   emoji: '✉️', external: true },
                 ].map(item => (
                   <a
                     key={item.label}

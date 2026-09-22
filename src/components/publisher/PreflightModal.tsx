@@ -70,7 +70,7 @@ const PreflightModal: React.FC<Props> = ({
           age_max: draft.age_max || 55,
           gender: draft.gender || 'all',
         },
-        campaign_name: draft.campaign_name || 'NextGenAds Campaign',
+        campaign_name: draft.campaign_name || 'Rouge Campaign',
         creative: {
           type: 'image',
           image_base64: imageBase64,

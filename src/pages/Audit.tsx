@@ -285,7 +285,7 @@ const Audit: React.FC = () => {
                 <Lock size={28} color="#C4836A" strokeWidth={1.5} />
               </div>
               <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 400, marginBottom: 8 }}>
-                Fix this with <em style={{ fontStyle: 'italic', color: '#C4836A' }}>NextAdsGen Starter</em>
+                Fix this with <em style={{ fontStyle: 'italic', color: '#C4836A' }}>Rouge Starter</em>
               </h2>
               <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 13, fontWeight: 300, color: '#8B6050', lineHeight: 1.7, marginBottom: 24, maxWidth: 460, margin: '0 auto 24px' }}>
                 Get AI-powered recommendations, full 9-year benchmark comparison, and monthly audit reports — all tailored to your Beauty brand.

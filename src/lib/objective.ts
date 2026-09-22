@@ -1,5 +1,5 @@
 /**
- * NextAdsGen — Campaign Objective Intelligence
+ * Rouge — Campaign Objective Intelligence
  *
  * Central module for classifying Meta campaign objectives and providing
  * goal-appropriate labels, KPI definitions, and benchmark contexts.

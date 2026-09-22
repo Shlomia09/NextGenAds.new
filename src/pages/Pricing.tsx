@@ -626,7 +626,7 @@ export default function Pricing() {
                 <thead>
                   <tr>
                     <th style={{ textAlign: 'left' }}>Feature</th>
-                    <th className="nextads-col">NextAdsGen</th>
+                    <th className="nextads-col">Rouge</th>
                     <th>Madgicx</th>
                     <th>Revealbot</th>
                   </tr>

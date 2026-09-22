@@ -1,7 +1,7 @@
 /**
  * lib/exportCsv.ts
  *
- * Client-side CSV export utility for NextAdsGen.
+ * Client-side CSV export utility for Rouge.
  * No dependencies — uses native browser APIs only.
  *
  * Usage:
@@ -59,7 +59,7 @@ export function exportCampaignsCsv(campaigns: Campaign[], opts: ExportOptions): 
   const { dateLabel, brandName = 'all-brands' } = opts;
 
   const today    = new Date().toISOString().split('T')[0];
-  const filename = `nextadsgen_campaigns_${slug(brandName)}_${slug(dateLabel)}_${today}.csv`;
+  const filename = `rouge_campaigns_${slug(brandName)}_${slug(dateLabel)}_${today}.csv`;
 
   // ── Header row ──────────────────────────────────────────────────────────────
   const headers = [
@@ -178,7 +178,7 @@ export function exportCampaignsCsv(campaigns: Campaign[], opts: ExportOptions): 
 
   const csvContent = toCsv([
     // Meta header (date range context)
-    [`NextAdsGen Export — ${dateLabel}`, `Generated: ${new Date().toLocaleString()}`, '', ...Array(headers.length - 2).fill('')],
+    [`Rouge Export — ${dateLabel}`, `Generated: ${new Date().toLocaleString()}`, '', ...Array(headers.length - 2).fill('')],
     [],
     headers,
     ...rows,

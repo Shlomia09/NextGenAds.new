@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 /* ─────────────────────────────────────────────────────────────
-   NextAdsGen — Cinematic Landing Page
+   Rouge — Beauty Campaign Intelligence Landing Page
    Design-system: §56-58 (business model), §60 (hero wall + spotlight)
    Reference: nextadsgen-landing-home-v3.html
    Rules:
@@ -585,8 +585,8 @@ export default function Landing() {
         {/* ── NAV ───────────────────────────────────────────── */}
         <nav ref={navRef} className="lp-nav">
           <a href="/" className="lp-logo">
-            <div className="lp-logo-mark">N</div>
-            <div className="lp-logo-name">NextAds<em>Gen</em></div>
+            <div className="lp-logo-mark">R</div>
+            <div className="lp-logo-name">Rouge</div>
           </a>
           <div className="lp-nav-links">
             <a href="#how">How it works</a>
@@ -643,8 +643,9 @@ export default function Landing() {
               <h1>Campaign intelligence for <em>beauty</em> brands</h1>
 
               <p>
-                Upload a creative. AI writes the copy, launches to Meta &amp; Google,
-                and optimizes your budget, around the clock.
+                Rouge reads your account every morning, tells you which creative is
+                dying, and drafts the copy to replace it — from what already works in
+                your account. Your visuals stay yours.
               </p>
 
               <div className="lp-actions">
@@ -740,7 +741,7 @@ export default function Landing() {
           <div className="eyebrow reveal">What it does</div>
           <h2 className="section-title reveal d1">An entire ads team, in one platform</h2>
           <p className="section-sub reveal d2">
-            From creative to copy to optimization. NextAdsGen runs the parts
+            From creative to copy to optimization. Rouge runs the parts
             that used to take a team of specialists.
           </p>
           <div className="feat-grid">
@@ -786,7 +787,7 @@ export default function Landing() {
               <div className="reveal">
                 <div className="step-n">01</div>
                 <h3>Upload your creative</h3>
-                <p>Drop in an image or video. The engine reads it and understands what it's looking at.</p>
+                <p>Drop in an image or video. Rouge reads it and tells you what she's looking at.</p>
               </div>
               <div
                 className="step-visual has-image reveal d1"
@@ -796,8 +797,8 @@ export default function Landing() {
             <div className="step-row">
               <div className="reveal">
                 <div className="step-n">02</div>
-                <h3>AI writes the campaign</h3>
-                <p>Headlines, primary text, audience, budget. All drafted for you, tuned to beauty buyers, ready to edit.</p>
+                <h3>Rouge writes the copy</h3>
+                <p>Headlines, primary text, hooks — drafted from your own top performers, the creative they sit with, and nine years of beauty data. Never from thin air, never published without you.</p>
               </div>
               <div
                 className="step-visual has-image reveal d1"
@@ -832,7 +833,7 @@ export default function Landing() {
         {/* ── FINAL CTA ─────────────────────────────────────── */}
         <section className="lp-cta-final" id="results">
           <div className="glow" />
-          <h2 className="reveal">Your campaigns deserve an <em>intelligence engine</em></h2>
+          <h2 className="reveal">Your campaigns deserve a <em>Rouge</em></h2>
           <p className="reveal d1">Join the beauty brands running smarter campaigns with less effort.</p>
           <div className="reveal d2">
             <button
@@ -856,10 +857,10 @@ export default function Landing() {
         {/* ── FOOTER ────────────────────────────────────────── */}
         <footer className="lp-footer">
           <a href="/" className="lp-logo" style={{ textDecoration: 'none' }}>
-            <div className="lp-logo-mark" style={{ width: 30, height: 30, fontSize: 16 }}>N</div>
-            <div className="lp-logo-name" style={{ fontSize: 15 }}>NextAds<em>Gen</em></div>
+            <div className="lp-logo-mark" style={{ width: 30, height: 30, fontSize: 16 }}>R</div>
+            <div className="lp-logo-name" style={{ fontSize: 15 }}>Rouge</div>
           </a>
-          <div>© 2026 NextAdsGen · Campaign Intelligence for Beauty</div>
+          <div>© 2026 Rouge · Beauty Campaign Intelligence</div>
         </footer>
       </div>
     </>
