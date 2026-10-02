@@ -315,7 +315,7 @@ const MetaCallback: React.FC = () => {
   if (status === 'loading') return (
     <Card>
       <div style={{ width: 48, height: 48, border: `1.5px solid ${T.hint}`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: T.text }}>Connecting Meta Ads…</div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: T.text }}>Connecting Meta Ads…</div>
       <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.6, margin: 0 }}>
         Fetching your ad accounts. This takes a moment.
       </p>
@@ -334,7 +334,7 @@ const MetaCallback: React.FC = () => {
           <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.accent, marginBottom: 8 }}>
             Meta Ads · {accounts.length} account{accounts.length !== 1 ? 's' : ''} found
           </div>
-          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: T.text, marginBottom: 8 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 600, color: T.text, marginBottom: 8 }}>
             Select accounts to connect
           </div>
           <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.55, margin: 0 }}>
@@ -449,7 +449,7 @@ const MetaCallback: React.FC = () => {
           <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.accent, marginBottom: 8 }}>
             Step 2 of 2 · Configure Accounts
           </div>
-          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: T.text, marginBottom: 8 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, color: T.text, marginBottom: 8 }}>
             Set up each account
           </div>
           <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.55, margin: 0 }}>
@@ -492,7 +492,7 @@ const MetaCallback: React.FC = () => {
                 <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.muted, marginBottom: 4 }}>
                   Account {idx + 1}
                 </div>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: T.text }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 600, color: T.text }}>
                   {cfg.account_name}
                 </div>
               </div>
@@ -639,7 +639,7 @@ const MetaCallback: React.FC = () => {
   if (status === 'saving') return (
     <Card>
       <div style={{ width: 48, height: 48, border: `1.5px solid ${T.hint}`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: T.text }}>Saving selection…</div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: T.text }}>Saving selection…</div>
     </Card>
   );
 
@@ -649,7 +649,7 @@ const MetaCallback: React.FC = () => {
       <div style={{ width: 52, height: 52, background: 'rgba(16,185,129,0.1)', border: '0.5px solid rgba(16,185,129,0.3)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <CheckCircle size={24} color="#10B981" strokeWidth={1.5} />
       </div>
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: T.text }}>Connected!</div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: T.text }}>Connected!</div>
       <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, margin: 0 }}>Redirecting…</p>
     </Card>
   );
@@ -660,7 +660,7 @@ const MetaCallback: React.FC = () => {
       <div style={{ width: 52, height: 52, background: 'rgba(239,68,68,0.1)', border: '0.5px solid rgba(239,68,68,0.3)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <XCircle size={24} color="#EF4444" strokeWidth={1.5} />
       </div>
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: T.text }}>Connection Failed</div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: T.text }}>Connection Failed</div>
       <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.6, margin: 0 }}>{errorMsg}</p>
       <button onClick={() => navigate('/connect')}
         style={{ background: T.accent, color: '#0F0A07', border: 'none', borderRadius: 4, padding: '10px 24px', fontFamily: "'Outfit', sans-serif", fontSize: 10, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer' }}>

@@ -587,11 +587,11 @@ const Onboarding: React.FC = () => {
         .ob-left-inner { display: flex; flex-direction: column; gap: 22px; }
 
         .ob-logo {
-          font-family: 'Playfair Display', serif;
-          font-size: 20px; font-weight: 400;
-          color: #F5E6D8; letter-spacing: 0.03em;
+          font-family: var(--font-display);
+          font-size: 20px; font-weight: 600;
+          color: #F5E6D8; letter-spacing: -0.01em;
         }
-        .ob-logo em { font-style: italic; color: #C4836A; }
+        .ob-logo em { color: #C4836A; }
 
         .ob-left-tagline {
           font-family: 'Outfit', sans-serif;
@@ -651,11 +651,11 @@ const Onboarding: React.FC = () => {
         .ob-step-content { display: flex; flex-direction: column; gap: 18px; }
 
         .ob-title {
-          font-family: 'Playfair Display', serif; font-size: 26px;
-          font-weight: 400; color: var(--text-primary);
-          letter-spacing: -0.01em; line-height: 1.2;
+          font-family: var(--font-display); font-size: 26px;
+          font-weight: 600; color: var(--text-primary);
+          letter-spacing: -0.02em; line-height: 1.2;
         }
-        .ob-title em { font-style: italic; color: var(--rose-gold); }
+        .ob-title em { color: var(--rose-gold); }
 
         .ob-subtitle {
           font-family: 'Outfit', sans-serif; font-size: 12px;

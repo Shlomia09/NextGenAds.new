@@ -90,23 +90,31 @@
 
 | תפקיד | פונט | שימוש |
 |---|---|---|
-| **Display** | Fraunces | כותרות, מספרי-הירו — נשמת היופי |
+| **Display** | Manrope 600/700 | כותרות, מספרי-הירו — נקי, ניטרלי, מקצועי |
 | **UI** | Inter | טקסט, ניווט, תוויות, כפתורים — דיוק טכנולוגי |
 | **Mono** | JetBrains Mono | **כל** נתון מספרי — תחושת דאטה |
 
+```
+Display / Headings: Manrope 600 (700 for hero numbers only)
+UI / Body: Inter 400/500/600
+Mono: JetBrains Mono 400/500
+No italic on headings or display text.
+Metric values use font-variant-numeric: tabular-nums.
+```
+
 טעינה:
 \`\`\`html
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 \`\`\`
 
 ### 3.2 סולם גדלים (Type Scale)
 
 | אלמנט | פונט | גודל | משקל | letter-spacing |
 |---|---|---|---|---|
-| מספר-הירו (Total Spend) | Fraunces | 52px | 500 | -1px |
-| · אגורות בתוכו | Fraunces | 30px | 500 | — |
-| כותרת עמוד (H1) | Fraunces | 34px | 500 | -0.5px |
-| כותרת סקשן (H2) | Fraunces | 22px | 500 | -0.3px |
+| מספר-הירו (Total Spend) | Manrope | 52px | 700 | -0.02em |
+| · אגורות בתוכו | Manrope | 30px | 600 | — |
+| כותרת עמוד (H1) | Manrope | 34px | 600 | -0.02em |
+| כותרת סקשן (H2) | Manrope | 22px | 600 | -0.01em |
 | כותרת כרטיס (H3) | Inter | 16px | 500 | — |
 | שם מותג בסיידבר | Inter | 17px | 500 | 0.2px |
 | ערך KPI משני | JetBrains Mono | 23px | 500 | — |
@@ -118,9 +126,9 @@
 | תת-שורה (CPL, impr.) | JetBrains Mono | 10.5px | 400 | — |
 
 ### 3.3 כללי ברזל
-- **שני משקלים בלבד:** 400 רגיל, 500 מודגש. אף פעם לא 600/700 בגוף.
+- **משקלים display:** 600 כותרות, 700 הירו בלבד. אסור italic בכותרות.
 - **כל מספר מספרי ← JetBrains Mono.** בלי יוצאים מן הכלל. זה מייצר את ה-precision.
-- **כל כותרת ומספר-הירו ← Fraunces.** זה מייצר את היופי.
+- **כל כותרת ומספר-הירו ← Manrope.** זה מייצר את המקצועיות.
 - **Sentence case** בכל מקום. תוויות-עמודה ב-UPPERCASE עם letter-spacing מותרות.
 
 ---

@@ -319,12 +319,13 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-page-title {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: 28px;
-          font-weight: 400;
+          font-weight: 600;
           color: var(--text-primary);
           margin: 4px 0 2px;
           line-height: 1.2;
+          letter-spacing: -0.02em;
         }
 
         .sd-page-sub {
@@ -472,9 +473,9 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-empty-text {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: 15px;
-          font-weight: 400;
+          font-weight: 600;
           color: var(--text-primary);
           margin: 0;
         }

@@ -580,9 +580,9 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
 
         /* ── Column titles ── */
         .cd-col-title {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: 16px;
-          font-weight: 400;
+          font-weight: 600;
           color: var(--text-primary);
           margin: 0;
           display: flex;
@@ -672,9 +672,9 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-empty-title {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: 15px;
-          font-weight: 400;
+          font-weight: 600;
           color: var(--text-primary);
           margin: 0;
         }

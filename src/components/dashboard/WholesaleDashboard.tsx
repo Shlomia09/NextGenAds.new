@@ -334,12 +334,13 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-page-title {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: 28px;
-          font-weight: 500;
+          font-weight: 600;
           color: var(--text-primary);
           margin: 4px 0 2px;
           line-height: 1.2;
+          letter-spacing: -0.02em;
         }
 
         .wd-page-sub {

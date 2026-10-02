@@ -124,11 +124,11 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         </button>
       </div>
 
-      {/* Title — Playfair Display */}
+      {/* Title — display font */}
       <div style={{
-        fontFamily: "'Playfair Display', serif",
+        fontFamily: 'var(--font-display)',
         fontSize: 13,
-        fontWeight: 400,
+        fontWeight: 600,
         color: '#1A1410',
         lineHeight: 1.35,
       }}>

@@ -173,7 +173,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
           {/* Title */}
           <h2
             style={{
-              fontFamily: '"Playfair Display", serif',
+              fontFamily: 'var(--font-display)',
               fontSize: '18px',
               color: '#F5E6D8',
               margin: '0 0 8px 0',

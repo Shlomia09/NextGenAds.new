@@ -809,7 +809,7 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
                 </span>
               )}
             </div>
-            {/* §33: Campaign name in Fraunces 20px */}
+            {/* §33: Campaign name in Manrope 20px */}
             <h2 style={{
               fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 500,
               color: 'var(--text)', margin: 0, letterSpacing: -0.2,

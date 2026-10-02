@@ -347,9 +347,9 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           <div>
             <div
               style={{
-                fontFamily: "'Playfair Display', serif",
+                fontFamily: 'var(--font-display)',
                 fontSize: 13,
-                fontWeight: 400,
+                fontWeight: 600,
                 color: T.textPrimary,
                 lineHeight: 1.2,
               }}
@@ -472,9 +472,9 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
 
             <p
               style={{
-                fontFamily: "'Playfair Display', serif",
+                fontFamily: 'var(--font-display)',
                 fontSize: 13,
-                fontWeight: 400,
+                fontWeight: 600,
                 color: T.textPrimary,
                 margin: 0,
               }}

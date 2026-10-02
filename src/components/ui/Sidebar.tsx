@@ -51,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontFamily: "'Fraunces', serif",
+                fontFamily: 'var(--font-display)',
                 fontSize: '20px',
                 fontWeight: 600,
                 flexShrink: 0,

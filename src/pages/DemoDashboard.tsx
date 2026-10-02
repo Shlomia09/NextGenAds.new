@@ -128,7 +128,7 @@ const DemoDashboard: React.FC = () => {
       {/* ── Sidebar ── */}
       <aside style={{ width: 220, background: '#2C1810', borderRight: '0.5px solid #3d2a1e', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '22px 20px 16px', borderBottom: '0.5px solid #3d2a1e' }}>
-          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: '#F5E6D8', letterSpacing: '0.04em' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 600, color: '#F5E6D8', letterSpacing: '-0.01em' }}>
             Rouge
           </div>
           <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A5A48', marginTop: 4 }}>
@@ -336,7 +336,7 @@ const DemoDashboard: React.FC = () => {
                     <Sparkles size={12} strokeWidth={1.5} />
                   </div>
                   <div>
-                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: 'var(--text-primary)' }}>Rouge</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Rouge</div>
                     <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, fontWeight: 300, color: 'var(--text-muted)', marginTop: 1 }}>
                       NeoLumo · €150 AOV avg · <span style={{ fontFamily: 'var(--font-mono)' }}>4.20x</span> ROAS
                     </div>
@@ -350,7 +350,7 @@ const DemoDashboard: React.FC = () => {
                       <div style={{ width: 44, height: 44, background: 'var(--rose-gold-light)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--rose-gold)' }}>
                         <Sparkles size={18} strokeWidth={1.5} />
                       </div>
-                      <p style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: 'var(--text-primary)' }}>Ask Rouge</p>
+                      <p style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>Ask Rouge</p>
                       <p style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 300, color: 'var(--text-secondary)', maxWidth: 220, lineHeight: 1.5 }}>Full context of NeoLumo + 9 years of benchmark data</p>
                       {[
                         'Why is my ROAS dropping?',

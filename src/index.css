@@ -116,7 +116,7 @@ input, textarea, select {
   color: var(--text);
   line-height: 1;
 }
-.sidebar-logo em { font-style: italic; color: var(--accent); }
+.sidebar-logo em { color: var(--accent); }
 
 .sidebar-tagline {
   font-family: var(--font-ui);
@@ -291,12 +291,13 @@ input, textarea, select {
   font-weight: 500;
   color: var(--color-text-primary);
   line-height: 1.2;
+  letter-spacing: var(--tracking-title);
 }
-.section-title em { font-style: italic; color: var(--rose); }
+.section-title em { color: var(--rose); }
 
 /* Typography utilities */
 .font-serif        { font-family: var(--font-serif); }
-.font-serif-italic { font-family: var(--font-serif); font-style: italic; }
+.font-serif-italic { font-family: var(--font-serif); }
 .font-mono         { font-family: var(--font-mono); }
 .font-sans         { font-family: var(--font-sans); }
 
@@ -638,6 +639,7 @@ input, textarea, select {
   color: var(--color-text-primary);
   line-height: 1;
   margin-bottom: 8px;
+  letter-spacing: var(--tracking-title);
 }
 .metric-value.good    { color: var(--color-positive); }
 .metric-value.bad     { color: var(--color-negative); }
@@ -973,6 +975,7 @@ input, textarea, select {
   font-size: 18px;
   font-weight: 500;
   color: var(--color-text-primary);
+  letter-spacing: var(--tracking-title);
 }
 
 /* ============================================================

@@ -271,7 +271,7 @@ const Connect: React.FC = () => {
                 <Link2Off size={18} color="#EF4444" strokeWidth={1.5} />
               </div>
               <div>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: '#F5E6D8', marginBottom: 3 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 600, color: '#F5E6D8', marginBottom: 3 }}>
                   Disconnect account?
                 </div>
                 <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#4a2e1e' }}>
@@ -738,7 +738,7 @@ const Connect: React.FC = () => {
           color: white; flex-shrink: 0;
         }
 
-        .conn-name { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--text-primary, #F5E6D8); }
+        .conn-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary, #F5E6D8); }
         .conn-desc { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 300; color: var(--text-muted, #8B6050); margin-top: 2px; }
 
         .conn-account-info {

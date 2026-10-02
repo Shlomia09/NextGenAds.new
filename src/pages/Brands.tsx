@@ -316,10 +316,10 @@ const Brands: React.FC = () => {
           width: 38px; height: 38px;
           background: #2C1810; border-radius: 4px;
           display: flex; align-items: center; justify-content: center;
-          font-family: 'Playfair Display', serif; font-size: 16px;
-          font-weight: 400; color: #C4836A; flex-shrink: 0;
+          font-family: var(--font-display); font-size: 16px;
+          font-weight: 600; color: #C4836A; flex-shrink: 0;
         }
-        .brand-name { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 400; color: var(--text-primary); }
+        .brand-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary); }
         .brand-cat { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }
         .brand-stage-pill {
           margin-left: auto; padding: 3px 8px; border-radius: 2px;

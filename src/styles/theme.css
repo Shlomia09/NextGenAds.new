@@ -7,9 +7,12 @@
 
 /* ── Shared: fonts, radius, motion (theme-independent) ── */
 :root {
-  --font-display: 'Fraunces', serif;
+  --font-display: 'Manrope', system-ui, sans-serif;
   --font-ui:      'Inter', -apple-system, sans-serif;
   --font-mono:    'JetBrains Mono', monospace;
+  /* Manrope display sizing */
+  --tracking-display: -0.02em;   /* tighten large headings */
+  --tracking-title:   -0.01em;   /* tighten section titles */
   /* Legacy aliases */
   --font-serif: var(--font-display);
   --font-sans:  var(--font-ui);
@@ -219,4 +222,15 @@
   --color-border-default:    var(--border);
   --color-border-subtle:     var(--border-soft);
   --color-surface-brand:     var(--accent-soft);
+}
+
+/* ── Numeric display: tabular alignment for KPI/metric values ── */
+.metric-value,
+.kpi-value,
+.stat-number,
+[class*="-spend"],
+[class*="-roas"],
+[class*="-cpl"],
+[class*="-cpm"] {
+  font-variant-numeric: tabular-nums;
 }

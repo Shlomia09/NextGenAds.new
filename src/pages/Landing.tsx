@@ -354,7 +354,7 @@ export default function Landing() {
           font-size:clamp(42px,7vw,86px);line-height:1.02;letter-spacing:-2px;
           max-width:14ch;opacity:0;animation:lp-rise 1s .25s forwards;
         }
-        .lp-hero-stage h1 em { font-style:italic;color:var(--accent); }
+        .lp-hero-stage h1 em { color:var(--accent); }
         .lp-hero-stage p {
           font-size:clamp(16px,2vw,20px);color:var(--text-2);max-width:52ch;
           margin:28px auto 0;line-height:1.6;
@@ -540,7 +540,7 @@ export default function Landing() {
           font-size:clamp(34px,5.5vw,64px);letter-spacing:-1.5px;line-height:1.05;
           max-width:16ch;margin:0 auto;position:relative;
         }
-        .lp-cta-final h2 em { font-style:italic;color:var(--accent); }
+        .lp-cta-final h2 em { color:var(--accent); }
         .lp-cta-final p {
           color:var(--text-2);font-size:18px;margin:24px auto 36px;
           max-width:48ch;position:relative;
@@ -578,7 +578,7 @@ export default function Landing() {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,400;9..144,0,500;9..144,1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
 

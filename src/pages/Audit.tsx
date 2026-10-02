@@ -106,8 +106,8 @@ const Audit: React.FC = () => {
         background: '#0F0A07',
       }}>
         <Link to="/" style={{ textDecoration: 'none' }}>
-          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 400, color: '#F5E6D8' }}>
-            NextAds<em style={{ fontStyle: 'italic', color: '#C4836A' }}>Gen</em>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: '#F5E6D8' }}>
+            NextAds<em style={{ color: '#C4836A' }}>Gen</em>
           </div>
         </Link>
         <Link to="/pricing" style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6b4030', textDecoration: 'none' }}>
@@ -125,8 +125,8 @@ const Audit: React.FC = () => {
               Free Benchmark Audit
               <span style={{ display: 'block', width: 16, height: 0.5, background: '#4a2e1e' }} />
             </div>
-            <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 40, fontWeight: 400, lineHeight: 1.2, marginBottom: 16 }}>
-              See exactly where your<br /><em style={{ fontStyle: 'italic', color: '#C4836A' }}>ads are losing money</em>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 40, fontWeight: 600, lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.02em' }}>
+              See exactly where your<br /><em style={{ color: '#C4836A' }}>ads are losing money</em>
             </h1>
             <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 14, fontWeight: 300, color: '#8B6050', lineHeight: 1.7, marginBottom: 36 }}>
               Get a one-time free benchmark audit comparing your Meta Ads performance<br />
@@ -142,7 +142,7 @@ const Audit: React.FC = () => {
               ].map(s => (
                 <div key={s.n} style={{ background: '#1C1208', border: '0.5px solid #2a1a0e', borderRadius: 6, padding: '16px' }}>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#C4836A', marginBottom: 8 }}>{s.n}</div>
-                  <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 14, color: '#F5E6D8', marginBottom: 4 }}>{s.title}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: '#F5E6D8', marginBottom: 4 }}>{s.title}</div>
                   <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, color: '#6b4030' }}>{s.sub}</div>
                 </div>
               ))}
@@ -170,7 +170,7 @@ const Audit: React.FC = () => {
         {/* ── STEP 2: Auth ── */}
         {step === 'auth' && (
           <div style={{ maxWidth: 400, margin: '0 auto', animation: 'fade-in 0.4s ease' }}>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 400, marginBottom: 8, textAlign: 'center' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 600, marginBottom: 8, textAlign: 'center', letterSpacing: '-0.01em' }}>
               {isLogin ? 'Sign in' : 'Create free account'}
             </h2>
             <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, color: '#8B6050', textAlign: 'center', marginBottom: 28 }}>
@@ -225,8 +225,8 @@ const Audit: React.FC = () => {
                 Your Free Benchmark Audit
                 <span style={{ display: 'block', width: 16, height: 0.5, background: '#4a2e1e' }} />
               </div>
-              <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 32, fontWeight: 400, lineHeight: 1.2, marginBottom: 8 }}>
-                Your Meta Ads vs <em style={{ fontStyle: 'italic', color: '#C4836A' }}>847 Beauty brands</em>
+              <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 600, lineHeight: 1.2, marginBottom: 8, letterSpacing: '-0.02em' }}>
+                Your Meta Ads vs <em style={{ color: '#C4836A' }}>847 Beauty brands</em>
               </h1>
               <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: '#8B6050' }}>
                 Based on 9-year anonymized dataset · EU &amp; US markets · 2015–2024
@@ -284,8 +284,8 @@ const Audit: React.FC = () => {
               <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center' }}>
                 <Lock size={28} color="#C4836A" strokeWidth={1.5} />
               </div>
-              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 400, marginBottom: 8 }}>
-                Fix this with <em style={{ fontStyle: 'italic', color: '#C4836A' }}>Rouge Starter</em>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 600, marginBottom: 8, letterSpacing: '-0.01em' }}>
+                Fix this with <em style={{ color: '#C4836A' }}>Rouge Starter</em>
               </h2>
               <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 13, fontWeight: 300, color: '#8B6050', lineHeight: 1.7, marginBottom: 24, maxWidth: 460, margin: '0 auto 24px' }}>
                 Get AI-powered recommendations, full 9-year benchmark comparison, and monthly audit reports — all tailored to your Beauty brand.

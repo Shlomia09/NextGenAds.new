@@ -267,17 +267,16 @@ const Login: React.FC = () => {
         }
 
         .login-headline {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: 42px;
-          font-weight: 400;
+          font-weight: 600;
           line-height: 1.15;
           color: #F5E6D8;
-          letter-spacing: -0.01em;
+          letter-spacing: -0.02em;
           margin-bottom: 20px;
         }
 
         .login-headline em {
-          font-style: italic;
           color: var(--rose-gold);
         }
 
@@ -369,8 +368,8 @@ const Login: React.FC = () => {
         }
 
         .login-quote {
-          font-family: 'Playfair Display', serif;
-          font-style: italic;
+          font-family: var(--font-display);
+          font-weight: 600;
           font-size: 14px;
           color: #8B6050;
           border-left: 1px solid #3d2a1e;
@@ -397,16 +396,15 @@ const Login: React.FC = () => {
         }
 
         .login-logo {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: 20px;
-          font-weight: 400;
+          font-weight: 600;
           color: var(--text-primary);
-          letter-spacing: 0.02em;
+          letter-spacing: -0.01em;
           margin-bottom: 4px;
         }
 
         .login-logo em {
-          font-style: italic;
           color: var(--rose-gold);
         }
 

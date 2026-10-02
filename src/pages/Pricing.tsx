@@ -100,7 +100,7 @@ export default function Pricing() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
 
         .pricing-page * {
           box-sizing: border-box;
@@ -142,16 +142,16 @@ export default function Pricing() {
         }
 
         .pricing-h1 {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: clamp(34px, 5vw, 52px);
           font-weight: 700;
           color: #F5E6D8;
           text-align: center;
           margin: 0 0 14px;
           line-height: 1.15;
+          letter-spacing: -0.02em;
         }
         .pricing-h1 em {
-          font-style: italic;
           color: #C4836A;
         }
 
@@ -225,7 +225,7 @@ export default function Pricing() {
           margin-bottom: 4px;
         }
         .free-audit-title {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: 18px;
           font-weight: 600;
           color: #F5E6D8;
@@ -291,11 +291,12 @@ export default function Pricing() {
         }
 
         .plan-name {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: 22px;
           font-weight: 600;
           color: #F5E6D8;
           margin: 0 0 12px;
+          letter-spacing: -0.01em;
         }
 
         .plan-price-row {
@@ -446,12 +447,13 @@ export default function Pricing() {
           margin-top: 16px;
         }
         .comparison-title {
-          font-family: 'Playfair Display', serif;
+          font-family: var(--font-display);
           font-size: 18px;
           font-weight: 600;
           color: #F5E6D8;
           margin: 0 0 20px;
           text-align: center;
+          letter-spacing: -0.01em;
         }
         .comparison-table-wrap {
           overflow-x: auto;
