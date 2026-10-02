@@ -19,7 +19,7 @@ interface SalonDashboardProps {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Salon-specific quick questions for the Intelligence Engine
+// Salon-specific quick questions for Rouge
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SALON_QUICK_QUESTIONS = [
@@ -220,7 +220,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
 
         {/* ── COLUMN 3 — Intelligence Chat ───────────────────────────────── */}
         <div className="sd-col sd-col-chat">
-          <div className="section-eyebrow" style={{ marginBottom: 12 }}>Intelligence Engine</div>
+          <div className="section-eyebrow" style={{ marginBottom: 12 }}>Rouge</div>
           <div className="sd-chat-wrap">
             <IntelligenceChat
               brand={brand}

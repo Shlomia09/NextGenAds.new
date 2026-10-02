@@ -183,7 +183,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
       } else {
         const errorMsg: ChatMessage = {
           role: 'assistant',
-          content: 'Unable to connect to the Intelligence Engine. Please check your API configuration.',
+          content: 'Unable to reach Rouge right now. Please check your API configuration.',
           timestamp: new Date().toISOString(),
         };
         setMessages((prev) => [...prev, errorMsg]);
@@ -354,7 +354,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 lineHeight: 1.2,
               }}
             >
-              Intelligence Engine
+              Rouge
             </div>
             <div
               style={{
@@ -479,7 +479,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 margin: 0,
               }}
             >
-              Ask the Intelligence Engine
+              Ask Rouge
             </p>
             <p
               style={{

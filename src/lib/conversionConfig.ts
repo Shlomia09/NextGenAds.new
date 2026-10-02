@@ -1,5 +1,5 @@
 /**
- * NextAdsGen — Conversion Type Configuration
+ * Rouge — Conversion Type Configuration
  * Single source of truth for KPI definitions, labels, colors,
  * and benchmark context strings per account conversion type.
  */

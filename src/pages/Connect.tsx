@@ -296,7 +296,7 @@ const Connect: React.FC = () => {
             )}
 
             <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: '#8B6050', lineHeight: 1.65, margin: 0 }}>
-              Do you want to keep the campaign data already synced to NextAdsGen, or delete everything?
+              Do you want to keep the campaign data already synced to Rouge, or delete everything?
             </p>
 
             {/* Two action buttons */}

@@ -1,5 +1,5 @@
 // ============================================================
-// NextGenAds — Type Definitions
+// Rouge — Type Definitions
 // ============================================================
  
 export type Platform = 'meta' | 'google';

@@ -261,7 +261,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
                 benchmarkValue={m.benchmark_value}
                 unit={m.unit}
                 higherIsBetter={m.higher_is_better}
-                benchmarkSource="NextGenAds Beauty Clinic Index · 2024"
+                benchmarkSource="Rouge Beauty Clinic Index · 2024"
               />
             ))}
           </div>

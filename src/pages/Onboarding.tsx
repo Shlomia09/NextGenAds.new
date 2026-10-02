@@ -191,7 +191,7 @@ const Onboarding: React.FC = () => {
     <div className="ob-page">
       <div className="ob-left">
         <div className="ob-left-inner">
-          <div className="ob-logo">NextGen<em>Ads</em></div>
+          <div className="ob-logo">Rouge</div>
           <p className="ob-left-tagline">{leftCopy}</p>
           <div className="ob-step-list">
             {STEPS.map((label, i) => (
@@ -270,7 +270,7 @@ const Onboarding: React.FC = () => {
           {step === 2 && (
             <div className="ob-step-content animate-fade-in">
               <h2 className="ob-title">Business <em>Details</em></h2>
-              <p className="ob-subtitle">Help us calibrate your intelligence engine</p>
+              <p className="ob-subtitle">Help us calibrate Rouge for your account</p>
 
               {/* ECOMMERCE */}
               {bt === 'ecommerce' && (
