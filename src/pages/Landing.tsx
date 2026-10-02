@@ -354,7 +354,10 @@ export default function Landing() {
           font-size:clamp(42px,7vw,86px);line-height:1.02;letter-spacing:-2px;
           max-width:14ch;opacity:0;animation:lp-rise 1s .25s forwards;
         }
-        .lp-hero-stage h1 em { color:var(--accent); }
+        .lp-hero-stage h1 .beauty-slant {
+          display:inline-block;transform:skewX(-10deg);
+          color:var(--accent);margin-right:0.05em;
+        }
         .lp-hero-stage p {
           font-size:clamp(16px,2vw,20px);color:var(--text-2);max-width:52ch;
           margin:28px auto 0;line-height:1.6;
@@ -640,7 +643,7 @@ export default function Landing() {
                 Trained on 9 years of beauty campaign data
               </div>
 
-              <h1>Campaign intelligence for <em>beauty</em> brands</h1>
+              <h1>Campaign intelligence for <span className="beauty-slant">beauty</span> brands</h1>
 
               <p>
                 Rouge reads your account every morning, tells you which creative is
