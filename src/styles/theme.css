@@ -21,7 +21,8 @@
   --t-h1:      clamp(28px, 3.2vw, 40px);
   --t-h2:      26px;
   --t-h3:      18px;
-  --t-metric:  34px;
+  --t-metric:    clamp(26px, 2.4vw, 34px);   /* was a fixed 34px — clamped so it is safe in dense grids */
+  --t-metric-sm: 26px;
   --t-body:    14px;
   --t-label:   11px;
   --t-micro:   10px;

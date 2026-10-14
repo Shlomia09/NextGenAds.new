@@ -118,7 +118,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
           <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--text)', textTransform: 'uppercase', marginBottom: 6 }}>
             Meta ROAS
           </div>
-          <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: 'var(--text)', lineHeight: 1.1, marginBottom: 6 }}>
+          <div style={{ fontFamily: mono, fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 600, color: 'var(--text)', lineHeight: 1.1, marginBottom: 6 }}>
             {data.meta_roas.toFixed(1)}x
           </div>
           <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.4 }}>
@@ -136,7 +136,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
           <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>
             True ROAS
           </div>
-          <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: data.true_roas > 0 ? roasColor : 'var(--text-3)', lineHeight: 1.1, marginBottom: 6 }}>
+          <div style={{ fontFamily: mono, fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 600, color: data.true_roas > 0 ? roasColor : 'var(--text-3)', lineHeight: 1.1, marginBottom: 6 }}>
             {data.true_roas > 0 ? `${data.true_roas.toFixed(1)}x` : '—'}
           </div>
           <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.4 }}>
@@ -153,7 +153,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
           <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>
             Attribution Gap
           </div>
-          <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: gapColor, lineHeight: 1.1, marginBottom: 6 }}>
+          <div style={{ fontFamily: mono, fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 600, color: gapColor, lineHeight: 1.1, marginBottom: 6 }}>
             {data.gap_pct > 0 ? `-${data.gap_pct.toFixed(0)}%` : '—'}
           </div>
           <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.4 }}>

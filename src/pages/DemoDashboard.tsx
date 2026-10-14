@@ -246,7 +246,7 @@ const DemoDashboard: React.FC = () => {
                       <div className="live-dot" style={{ background: dotColor }} />
                       {label}
                     </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', fontWeight: 500, letterSpacing: 'var(--track-metric)', color: statusColor, lineHeight: 1 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric-sm)', fontWeight: 500, letterSpacing: 'var(--track-metric)', color: statusColor, lineHeight: 1 }}>
                       {fmtVal(your)}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-secondary)', borderRadius: 2, padding: '5px 8px' }}>

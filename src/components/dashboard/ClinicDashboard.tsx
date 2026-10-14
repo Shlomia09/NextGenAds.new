@@ -505,7 +505,8 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
 
         .cd-kpi-value {
           font-family: var(--font-mono);
-          font-size: 18px;
+          font-size: var(--t-metric);
+          letter-spacing: var(--track-metric);
           font-weight: 500;
           color: var(--text-primary);
           line-height: 1.1;

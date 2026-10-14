@@ -338,7 +338,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ label, value, icon, kcVar, barPct, tr
 
     {/* Value */}
     <div style={{
-      fontFamily: 'var(--font-mono)', fontSize: 25, fontWeight: 500,
+      fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500,
       color: 'var(--text)', lineHeight: 1,
     }}>
       {value}
@@ -534,7 +534,7 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
         ].map(({ label, value, color }) => (
           <div key={label}>
             <div style={{ fontSize: 10.5, letterSpacing: 1, color: 'var(--text-2)', marginBottom: 5, fontFamily: 'var(--font-ui)', fontWeight: 500 }}>{label}</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 21, fontWeight: 500, color }}>{value}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color, lineHeight: 1 }}>{value}</div>
           </div>
         ))}
       </div>

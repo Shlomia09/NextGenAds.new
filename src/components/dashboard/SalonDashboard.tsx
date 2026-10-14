@@ -378,7 +378,8 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         .sd-kpi-value {
           font-family: var(--font-mono);
           font-weight: 500;
-          font-size: 20px;
+          font-size: var(--t-metric);
+          letter-spacing: var(--track-metric);
           color: var(--text-primary);
           line-height: 1;
         }

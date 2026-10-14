@@ -221,7 +221,7 @@ const MetricVsBenchmark: React.FC<{
         {label}
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: 'var(--text)' }}>
           {fmt(value)}
         </span>
         <span style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)' }}>{unit}</span>
@@ -887,11 +887,11 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
                 <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 11, padding: '13px 15px' }}>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-2)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Spend</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--text)' }}>{formatCurrency(displayCampaign.spend)}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: 'var(--text)' }}>{formatCurrency(displayCampaign.spend)}</div>
                 </div>
                 <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Impressions</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>{formatNumber(displayCampaign.impressions)}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: 'var(--text)' }}>{formatNumber(displayCampaign.impressions)}</div>
                 </div>
                 {/* Dynamic primary conversion metric — works for ALL objective types */}
                 {(() => {
@@ -913,14 +913,14 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
                     <>
                       <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{m.label}</div>
-                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: valueColor }}>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: valueColor }}>
                           {m.value > 0 ? formatNumber(m.value) : '—'}
                         </div>
                       </div>
                       {m.costValue > 0 && (
                         <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{m.costLabel}</div>
-                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: m.key === 'purchases' && (displayCampaign.roas ?? 0) >= 3 ? 'var(--green)' : m.key === 'purchases' ? 'var(--champagne)' : m.key === 'leads' && displayCampaign.cpl < (bench.cpl || 32) ? 'var(--green)' : 'var(--champagne)' }}>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: m.key === 'purchases' && (displayCampaign.roas ?? 0) >= 3 ? 'var(--green)' : m.key === 'purchases' ? 'var(--champagne)' : m.key === 'leads' && displayCampaign.cpl < (bench.cpl || 32) ? 'var(--green)' : 'var(--champagne)' }}>
                             {m.costLabel === 'ROAS' ? `${m.costValue.toFixed(2)}x` : formatCurrency(m.costValue)}
                           </div>
                         </div>
@@ -930,13 +930,13 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
                 })()}
                 <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CPM</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: cpm > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: cpm > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
                     {cpm > 0 ? formatCurrency(cpm) : '—'}
                   </div>
                 </div>
                 <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>CTR</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: ctr > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: ctr > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
                     {ctr > 0 ? `${ctr.toFixed(2)}%` : '—'}
                   </div>
                 </div>

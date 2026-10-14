@@ -424,7 +424,8 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
 
         .ecom-kpi-value {
           font-family: var(--font-mono);
-          font-size: 14px;
+          font-size: var(--t-metric);
+          letter-spacing: var(--track-metric);
           font-weight: 500;
           color: var(--text-primary);
         }

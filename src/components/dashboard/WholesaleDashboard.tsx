@@ -402,7 +402,8 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
 
         .wd-kpi-value {
           font-family: var(--font-mono);
-          font-size: 18px;
+          font-size: var(--t-metric);
+          letter-spacing: var(--track-metric);
           font-weight: 500;
           color: var(--text-primary);
           line-height: 1;

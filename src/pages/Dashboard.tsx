@@ -482,12 +482,12 @@ const Dashboard: React.FC = () => {
                   {/* Summary KPIs above the chart */}
                   <div style={{ display: 'flex', gap: 20 }}>
                     <div>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>{formatCurrency(totalSpend)}</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: 'var(--text)' }}>{formatCurrency(totalSpend)}</span>
                       <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginLeft: 6 }}>spend</span>
                     </div>
                     {totalResults > 0 && (
                       <div>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(totalResults)}</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: 'var(--green)' }}>{formatNumber(totalResults)}</span>
                         <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginLeft: 6 }}>{convLabel.toLowerCase()}</span>
                       </div>
                     )}
@@ -533,7 +533,7 @@ const Dashboard: React.FC = () => {
                   ].filter(m => !m.hide).map(m => (
                     <div key={m.label} style={{ background: 'var(--surface-2)', borderRadius: 10, padding: '10px 12px', border: '1px solid var(--border-soft)' }}>
                       <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>{m.label}</div>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 500, color: m.color }}>{m.value}</div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: m.color, lineHeight: 1 }}>{m.value}</div>
                     </div>
                   ))}
                 </div>

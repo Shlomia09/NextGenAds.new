@@ -624,7 +624,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text)', marginBottom: 6 }}>
                             Monthly limit reached
                           </div>
-                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--text)', marginBottom: 4 }}>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: 'var(--text)', marginBottom: 4 }}>
                             {used} / {limit} queries
                           </div>
                           <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.55, margin: '0 0 12px' }}>
