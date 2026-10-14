@@ -163,7 +163,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
         }
         .sidebar-rouge-logo { height: 22px; }
         .sidebar-tagline {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-ui);
           font-size: 8.5px;
           letter-spacing: 2.5px;
           text-transform: uppercase;
@@ -181,7 +181,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
           display: flex;
           align-items: center;
           gap: 8px;
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 400;
           color: var(--text-2);
@@ -213,7 +213,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
           gap: 12px;
           padding: 10px 12px;
           border-radius: 9px;
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13.5px;
           font-weight: 500;
           letter-spacing: 0.3px;
@@ -249,7 +249,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
           align-items: center;
           text-align: center;
           padding: 6px 0 12px;
-          font-family: 'JetBrains Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 8px;
           letter-spacing: 3px;
           color: var(--text-3);

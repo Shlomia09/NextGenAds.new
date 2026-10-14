@@ -411,7 +411,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-kpi-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 9px;
           font-weight: 400;
           letter-spacing: 0.16em;
@@ -479,14 +479,14 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-no-recs p {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 400;
           color: var(--text-secondary);
         }
 
         .ecom-no-recs span {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           font-weight: 300;
           color: var(--text-muted);
@@ -510,7 +510,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-table th {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 9px;
           font-weight: 500;
           letter-spacing: 0.14em;
@@ -523,7 +523,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-table td {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -538,7 +538,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         .ecom-table tr:hover td { background: var(--bg-secondary); }
 
         .ecom-td-name {
-          font-family: 'Outfit', sans-serif !important;
+          font-family: var(--font-ui) !important;
           font-weight: 400 !important;
           color: var(--text-primary) !important;
           max-width: 220px;
@@ -554,7 +554,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-status-chip {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 500;
           letter-spacing: 0.06em;

@@ -329,7 +329,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-page-sub {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -367,7 +367,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         .sd-kpi-item:last-child  { padding-right: 0; }
 
         .sd-kpi-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.16em;
@@ -433,7 +433,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-freq-warning-title {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 600;
           color: #92400E;
@@ -441,7 +441,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-freq-warning-body {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 300;
           color: #92400E;
@@ -481,7 +481,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-empty-sub {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -510,7 +510,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
           border: 0.5px solid var(--border-light);
           border-radius: var(--radius);
           padding: 8px 12px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -544,7 +544,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
 
         .sd-table th {
           padding: 10px 16px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.16em;
@@ -569,7 +569,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-td-name {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 400;
           color: var(--text-primary);
@@ -590,7 +590,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         .sd-td-empty {
           text-align: center;
           padding: 32px 16px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 300;
           color: var(--text-muted);

@@ -35,7 +35,7 @@ const ShopifyConnect: React.FC<ShopifyConnectProps> = ({ userId, brands }) => {
     window.location.href = url;
   };
 
-  const font  = "'Outfit', sans-serif";
+  const font  = 'var(--font-ui)';
   const mono  = "'DM Mono', monospace";
 
   const inputStyle: React.CSSProperties = {

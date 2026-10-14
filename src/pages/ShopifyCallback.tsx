@@ -34,7 +34,7 @@ const ShopifyCallback: React.FC = () => {
         animation: 'spin 1s linear infinite',
       }} />
       <p style={{
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 13,
         fontWeight: 300,
         color: '#8B6050',

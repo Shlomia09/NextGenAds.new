@@ -76,7 +76,7 @@ const KpiPill: React.FC<KpiPillProps> = ({ icon, label, value, highlight }) => (
   >
     <div
       style={{
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 9,
         fontWeight: 400,
         letterSpacing: '0.16em',
@@ -123,7 +123,7 @@ const SeasonalTip: React.FC = () => (
         display: 'flex',
         alignItems: 'center',
         gap: 7,
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 10,
         fontWeight: 400,
         letterSpacing: '0.16em',
@@ -136,7 +136,7 @@ const SeasonalTip: React.FC = () => (
     </div>
     <div
       style={{
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 13,
         fontWeight: 500,
         color: 'var(--text-primary)',
@@ -147,7 +147,7 @@ const SeasonalTip: React.FC = () => (
     </div>
     <p
       style={{
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 12,
         fontWeight: 300,
         color: 'var(--text-secondary)',
@@ -373,7 +373,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 10,
                 fontWeight: 400,
                 letterSpacing: '0.18em',
@@ -397,7 +397,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
             </div>
             <div
               style={{
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 10,
                 fontWeight: 300,
                 color: 'var(--text-muted)',
@@ -497,7 +497,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
           >
             <div
               style={{
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 9,
                 fontWeight: 400,
                 letterSpacing: '0.16em',
@@ -516,7 +516,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
                   border: '0.5px solid var(--border-light)',
                   borderRadius: 'var(--radius)',
                   padding: '7px 12px',
-                  fontFamily: "'Outfit', sans-serif",
+                  fontFamily: 'var(--font-ui)',
                   fontSize: 11,
                   fontWeight: 300,
                   color: 'var(--text-secondary)',
@@ -607,7 +607,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
                     colSpan={7}
                     style={{
                       textAlign: 'center',
-                      fontFamily: "'Outfit', sans-serif",
+                      fontFamily: 'var(--font-ui)',
                       fontSize: 12,
                       fontWeight: 300,
                       color: 'var(--text-muted)',

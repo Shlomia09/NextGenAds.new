@@ -207,17 +207,17 @@ const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ 
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: text3, maxTicksLimit: 7, font: { family: 'JetBrains Mono', size: 10 } },
+            ticks: { color: text3, maxTicksLimit: 7, font: { family: get('--font-mono'), size: 10 } },
           },
           y: {
             position: 'left',
             grid: { color: grid },
-            ticks: { color: text3, font: { family: 'JetBrains Mono', size: 10 }, callback: v => '€' + v },
+            ticks: { color: text3, font: { family: get('--font-mono'), size: 10 }, callback: v => '€' + v },
           },
           y1: {
             position: 'right',
             grid: { display: false },
-            ticks: { color: text3, font: { family: 'JetBrains Mono', size: 10 } },
+            ticks: { color: text3, font: { family: get('--font-mono'), size: 10 } },
           },
         },
       },

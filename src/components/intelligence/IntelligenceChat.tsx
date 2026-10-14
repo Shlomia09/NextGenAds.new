@@ -358,7 +358,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             </div>
             <div
               style={{
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 8,
                 fontWeight: 300,
                 color: T.textHint,
@@ -412,7 +412,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             border: T.border,
             borderRadius: T.radius,
             padding: '4px 9px',
-            fontFamily: "'Outfit', sans-serif",
+            fontFamily: 'var(--font-ui)',
             fontSize: 9,
             fontWeight: 300,
             color: T.textMuted,
@@ -483,7 +483,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             </p>
             <p
               style={{
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 9,
                 fontWeight: 300,
                 color: T.textHint,
@@ -517,7 +517,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                     border: hoveredQuick === q ? `0.5px solid ${T.accent}` : '0.5px solid #C4836A',
                     borderRadius: T.radius,
                     padding: '7px 12px',
-                    fontFamily: "'Outfit', sans-serif",
+                    fontFamily: 'var(--font-ui)',
                     fontSize: 10,
                     fontWeight: 300,
                     color: '#C4836A',
@@ -585,7 +585,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                         color: '#FFFFFF',
                         borderRadius: T.radius,
                         padding: '8px 12px',
-                        fontFamily: "'Outfit', sans-serif",
+                        fontFamily: 'var(--font-ui)',
                         fontSize: 11,
                         fontWeight: 400,
                         lineHeight: 1.5,
@@ -600,7 +600,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                         color: T.textBody,
                         borderRadius: T.radius,
                         padding: '9px 13px',
-                        fontFamily: "'Outfit', sans-serif",
+                        fontFamily: 'var(--font-ui)',
                         fontSize: 11,
                         fontWeight: 300,
                         lineHeight: 1.65,
@@ -621,13 +621,13 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                           borderRadius: 4, padding: '12px 14px',
                           marginRight: '10%',
                         }}>
-                          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C4836A', marginBottom: 6 }}>
+                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C4836A', marginBottom: 6 }}>
                             Monthly limit reached
                           </div>
                           <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 500, color: '#C4836A', marginBottom: 4 }}>
                             {used} / {limit} queries
                           </div>
-                          <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: '0 0 12px' }}>
+                          <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: '0 0 12px' }}>
                             You've used all {limit} Intelligence Chat queries for this month.
                             Upgrade to Growth for unlimited queries.
                           </p>
@@ -637,7 +637,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                               display: 'inline-block',
                               background: '#C4836A', color: '#FFFFFF',
                               borderRadius: 3, padding: '7px 16px',
-                              fontFamily: "'Outfit', sans-serif", fontSize: 9,
+                              fontFamily: 'var(--font-ui)', fontSize: 9,
                               fontWeight: 500, letterSpacing: '0.12em',
                               textTransform: 'uppercase', textDecoration: 'none',
                             }}
@@ -723,7 +723,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               ))}
               <span
                 style={{
-                  fontFamily: "'Outfit', sans-serif",
+                  fontFamily: 'var(--font-ui)',
                   fontSize: 10,
                   fontWeight: 300,
                   color: T.textHint,
@@ -825,7 +825,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             borderRadius: T.radius,
             padding: '8px 12px',
             color: T.textPrimary,
-            fontFamily: "'Outfit', sans-serif",
+            fontFamily: 'var(--font-ui)',
             fontSize: 11,
             fontWeight: 300,
             resize: 'none',

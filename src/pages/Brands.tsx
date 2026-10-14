@@ -271,7 +271,7 @@ const Brands: React.FC = () => {
         : brands.length === 0
         ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 20, color: 'var(--text-primary)', marginBottom: 12 }}>No brands yet</p>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: 20, color: 'var(--text-primary)', marginBottom: 12 }}>No brands yet</p>
             <p style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 300, color: 'var(--text-secondary)', marginBottom: 20 }}>Create your first brand to activate benchmark intelligence</p>
             <button className="btn btn-primary" onClick={() => navigate('/onboarding')}>
               <Plus size={13} strokeWidth={1.5} />
@@ -320,23 +320,23 @@ const Brands: React.FC = () => {
           font-weight: 600; color: #C4836A; flex-shrink: 0;
         }
         .brand-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary); }
-        .brand-cat { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }
+        .brand-cat { font-family: var(--font-ui); font-size: 11px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }
         .brand-stage-pill {
           margin-left: auto; padding: 3px 8px; border-radius: 2px;
-          font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 400;
+          font-family: var(--font-ui); font-size: 9px; font-weight: 400;
           letter-spacing: 0.12em; text-transform: uppercase;
         }
         .brand-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         .brand-metric { background: var(--bg-secondary); border-radius: 2px; padding: 8px; }
         .brand-metric-label {
           display: flex; align-items: center; gap: 3px;
-          font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 400;
+          font-family: var(--font-ui); font-size: 9px; font-weight: 400;
           letter-spacing: 0.12em; text-transform: uppercase;
           color: var(--text-hint); margin-bottom: 4px;
         }
         .brand-metric-value { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: var(--text-primary); }
         .brand-funnel-pill {
-          font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 300;
+          font-family: var(--font-ui); font-size: 11px; font-weight: 300;
           color: var(--rose-gold-dark); background: var(--rose-gold-light);
           border: 0.5px solid var(--border-rose); border-radius: 2px;
           padding: 5px 10px; line-height: 1.4;

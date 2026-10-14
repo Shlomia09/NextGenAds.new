@@ -33,7 +33,7 @@ const BenchmarkAvailabilityBadge: React.FC<Props> = ({ availability, aovLabel, m
 
       <div>
         <div style={{
-          fontFamily: "'Outfit', sans-serif",
+          fontFamily: 'var(--font-ui)',
           fontSize: 10,
           fontWeight: 500,
           letterSpacing: '0.04em',

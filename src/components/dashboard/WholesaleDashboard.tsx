@@ -344,7 +344,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-page-sub {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -391,7 +391,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-kpi-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.16em;
@@ -482,7 +482,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-empty-recs p {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 400;
           color: var(--text-secondary);
@@ -490,7 +490,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-empty-recs span {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           font-weight: 300;
           color: var(--text-muted);
@@ -512,7 +512,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-quick-hints-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 9px;
           font-weight: 400;
           letter-spacing: 0.18em;
@@ -528,7 +528,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-quick-hint-pill {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -553,7 +553,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         .wd-table {
           width: 100%;
           border-collapse: collapse;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
         }
 
@@ -562,7 +562,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-table th {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 9px;
           font-weight: 400;
           letter-spacing: 0.18em;
@@ -604,7 +604,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-campaign-name {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 400;
           color: var(--text-primary);
@@ -638,7 +638,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         .wd-td-empty {
           text-align: center;
           padding: 32px 12px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 300;
           color: var(--text-muted);

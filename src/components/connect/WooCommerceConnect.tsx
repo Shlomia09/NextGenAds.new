@@ -68,7 +68,7 @@ const WooCommerceConnect: React.FC<WooCommerceConnectProps> = ({ userId, brands 
     }
   };
 
-  const font = "'Outfit', sans-serif";
+  const font = 'var(--font-ui)';
   const mono = "'DM Mono', monospace";
 
   const inputStyle: React.CSSProperties = {

@@ -228,7 +228,7 @@ const Intelligence: React.FC = () => {
           {!activeBrand ? (
             <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', gap: 14 }}>
               <Sparkles size={28} strokeWidth={1.5} style={{ color: 'var(--rose-gold)' }} />
-              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 400, color: 'var(--text-primary)' }}>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 400, color: 'var(--text-primary)' }}>
                 Set up a brand to start
               </p>
               <a href="/onboarding" className="btn btn-primary">Get Started</a>

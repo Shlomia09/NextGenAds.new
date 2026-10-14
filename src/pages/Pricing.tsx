@@ -109,7 +109,7 @@ export default function Pricing() {
         .pricing-page {
           background: #0F0A07;
           color: #F5E6D8;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           min-height: 100vh;
           padding: 80px 24px 120px;
         }
@@ -133,7 +133,7 @@ export default function Pricing() {
           background: #C4836A;
         }
         .pricing-eyebrow-text {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           font-weight: 500;
           letter-spacing: 0.18em;
@@ -156,7 +156,7 @@ export default function Pricing() {
         }
 
         .pricing-subtitle {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-weight: 300;
           font-size: 15px;
           color: #8B6050;
@@ -180,7 +180,7 @@ export default function Pricing() {
         }
         .toggle-btn {
           padding: 10px 22px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 500;
           cursor: pointer;
@@ -216,7 +216,7 @@ export default function Pricing() {
           flex-wrap: wrap;
         }
         .free-audit-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           font-weight: 500;
           letter-spacing: 0.14em;
@@ -232,7 +232,7 @@ export default function Pricing() {
           margin: 0 0 3px;
         }
         .free-audit-sub {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-weight: 300;
           font-size: 12px;
           color: #8B6050;
@@ -274,7 +274,7 @@ export default function Pricing() {
         .popular-bar {
           background: #C4836A;
           padding: 6px 14px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 9px;
           font-weight: 500;
           letter-spacing: 0.18em;
@@ -316,7 +316,7 @@ export default function Pricing() {
           color: #C4836A;
         }
         .plan-price-suffix {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           color: #8B6050;
           align-self: flex-end;
@@ -330,7 +330,7 @@ export default function Pricing() {
         }
 
         .plan-description {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-weight: 300;
           font-size: 12px;
           color: #8B6050;
@@ -362,7 +362,7 @@ export default function Pricing() {
           flex-shrink: 0;
         }
         .feature-text {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-weight: 300;
           font-size: 12px;
           color: #C4A090;
@@ -381,7 +381,7 @@ export default function Pricing() {
           color: #0F0A07;
           border: none;
           border-radius: 5px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 600;
           letter-spacing: 0.03em;
@@ -408,7 +408,7 @@ export default function Pricing() {
           color: #C4836A;
           border: 1px solid #C4836A;
           border-radius: 5px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 500;
           letter-spacing: 0.03em;
@@ -470,7 +470,7 @@ export default function Pricing() {
           padding: 13px 20px;
           text-align: center;
           border-bottom: 0.5px solid #2a1a0e;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
         }
         .comparison-table th {

@@ -188,7 +188,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
           {/* Description */}
           <p
             style={{
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'var(--font-ui)',
               fontWeight: 300,
               fontSize: '12px',
               color: '#8B6050',
@@ -220,7 +220,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
             >
               <div
                 style={{
-                  fontFamily: 'Outfit, sans-serif',
+                  fontFamily: 'var(--font-ui)',
                   fontSize: '8px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
@@ -232,7 +232,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
               </div>
               <div
                 style={{
-                  fontFamily: 'Outfit, sans-serif',
+                  fontFamily: 'var(--font-ui)',
                   fontSize: '12px',
                   color: '#8B6050',
                   marginBottom: '4px',
@@ -251,7 +251,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
                 {currentPlan.price === 0 ? '€0' : `€${currentPlan.price}`}
                 <span
                   style={{
-                    fontFamily: 'Outfit, sans-serif',
+                    fontFamily: 'var(--font-ui)',
                     fontSize: '10px',
                     color: '#4a2e1e',
                     marginLeft: '2px',
@@ -274,7 +274,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
             >
               <div
                 style={{
-                  fontFamily: 'Outfit, sans-serif',
+                  fontFamily: 'var(--font-ui)',
                   fontSize: '8px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
@@ -286,7 +286,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
               </div>
               <div
                 style={{
-                  fontFamily: 'Outfit, sans-serif',
+                  fontFamily: 'var(--font-ui)',
                   fontSize: '12px',
                   fontWeight: 500,
                   color: '#F5E6D8',
@@ -306,7 +306,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
                 {requiredPlan.price === 0 ? '€0' : `€${requiredPlan.price}`}
                 <span
                   style={{
-                    fontFamily: 'Outfit, sans-serif',
+                    fontFamily: 'var(--font-ui)',
                     fontSize: '10px',
                     color: 'rgba(196,131,106,0.6)',
                     marginLeft: '2px',
@@ -330,7 +330,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
                 border: 'none',
                 borderRadius: '6px',
                 padding: '12px 16px',
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -358,7 +358,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
                 background: 'none',
                 border: 'none',
                 color: '#4a2e1e',
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '12px',
                 cursor: 'pointer',
                 padding: '8px',

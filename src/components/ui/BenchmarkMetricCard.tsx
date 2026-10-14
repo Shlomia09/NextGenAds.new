@@ -141,7 +141,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           display: flex;
           align-items: center;
           gap: 6px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 8px;
           font-weight: 400;
           letter-spacing: 0.18em;
@@ -174,7 +174,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .bm-bench-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 8px;
           font-weight: 300;
           color: var(--text-secondary, #6B5044);
@@ -188,7 +188,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .metric-benchmark {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 8px;
           font-weight: 400;
           padding: 3px 7px;
@@ -215,7 +215,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .bm-source {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 7px;
           font-weight: 300;
           color: var(--text-hint, #8B6A5A);

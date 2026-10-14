@@ -104,7 +104,6 @@
   --field:                   var(--surface-2);       /* was undefined — CampaignWorkshop */
   --ink:                     var(--on-accent);       /* was undefined — text on accent buttons */
   --rose-gold-pale:          var(--border-control);  /* was undefined — hover borders */
-  --font-serif:              var(--font-display);   /* alias — 8 usages, migrate in commit 4 */
   --copper:                  var(--accent);
   --rose-gold:               var(--accent);
   --rose-gold-light:         var(--accent-soft);
@@ -207,7 +206,6 @@
   --field:                   var(--surface-2);       /* was undefined — CampaignWorkshop */
   --ink:                     var(--on-accent);       /* was undefined — text on accent buttons */
   --rose-gold-pale:          var(--border-control);  /* was undefined — hover borders */
-  --font-serif:              var(--font-display);   /* alias — 8 usages, migrate in commit 4 */
   --copper:                  var(--accent);
   --rose-gold:               var(--accent);
   --rose-gold-light:         var(--accent-soft);

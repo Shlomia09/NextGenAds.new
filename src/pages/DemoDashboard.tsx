@@ -131,7 +131,7 @@ const DemoDashboard: React.FC = () => {
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 600, color: '#F5E6D8', letterSpacing: '-0.01em' }}>
             Rouge
           </div>
-          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A5A48', marginTop: 4 }}>
+          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A5A48', marginTop: 4 }}>
             Beauty campaign intelligence
           </div>
         </div>
@@ -139,7 +139,7 @@ const DemoDashboard: React.FC = () => {
         {/* Demo pill */}
         <div style={{ margin: '10px 12px', background: 'rgba(196,131,106,0.1)', border: '0.5px solid rgba(196,131,106,0.3)', borderRadius: 3, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 7 }}>
           <div className="live-dot" />
-          <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, fontWeight: 300, color: '#C4A090' }}>Demo Mode</span>
+          <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 300, color: '#C4A090' }}>Demo Mode</span>
         </div>
 
         <nav style={{ flex: 1, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -152,7 +152,7 @@ const DemoDashboard: React.FC = () => {
         </nav>
 
         <div style={{ padding: '14px 12px', borderTop: '0.5px solid #3d2a1e' }}>
-          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 300, color: '#8B6050', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, color: '#8B6050', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>
             <div className="live-dot" style={{ background: '#C4836A' }} />
             9-Year Benchmark Active
           </div>
@@ -165,7 +165,7 @@ const DemoDashboard: React.FC = () => {
         <div style={{ background: '#2C1810', borderBottom: '0.5px solid #3d2a1e', padding: '9px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Sparkles size={12} strokeWidth={1.5} style={{ color: '#C4836A' }} />
-            <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#C4A090', letterSpacing: '0.04em' }}>
+            <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#C4A090', letterSpacing: '0.04em' }}>
               Demo Mode — NeoLumo Spain · Mock data · No auth required
             </span>
           </div>
@@ -454,7 +454,7 @@ const DemoDashboard: React.FC = () => {
           gap: 9px;
           padding: 9px 12px;
           border-radius: 2px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           font-weight: 300;
           letter-spacing: 0.1em;

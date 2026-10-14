@@ -78,7 +78,7 @@ const Settings: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 7px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 500;
           color: var(--text-primary);

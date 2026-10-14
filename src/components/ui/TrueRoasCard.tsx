@@ -6,7 +6,7 @@ interface TrueRoasCardProps {
   loading?: boolean;
 }
 
-const font = "'Outfit', sans-serif";
+const font = 'var(--font-ui)';
 const mono = "'DM Mono', monospace";
 
 function getRoasColor(roas: number) {

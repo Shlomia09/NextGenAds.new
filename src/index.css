@@ -239,7 +239,7 @@ input, textarea, select {
 .page-title {
   font-family: var(--font-display);
   font-size: 34px;
-  font-weight: 500;
+  font-weight: 800;
   color: var(--text);
   line-height: 1;
   letter-spacing: -0.5px;
@@ -278,7 +278,7 @@ input, textarea, select {
 }
 
 .section-title {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: 20px;
   font-weight: 500;
   color: var(--color-text-primary);
@@ -288,8 +288,8 @@ input, textarea, select {
 .section-title em { color: var(--rose); }
 
 /* Typography utilities */
-.font-serif        { font-family: var(--font-serif); }
-.font-serif-italic { font-family: var(--font-serif); }
+.font-serif        { font-family: var(--font-display); }
+.font-serif-italic { font-family: var(--font-accent); font-style: italic; }
 .font-mono         { font-family: var(--font-mono); }
 .font-sans         { font-family: var(--font-sans); }
 
@@ -625,7 +625,7 @@ input, textarea, select {
 }
 
 .metric-value {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: 24px;
   font-weight: 500;
   color: var(--color-text-primary);
@@ -759,7 +759,7 @@ input, textarea, select {
 .rec-card.medium   { border-left: 2.5px solid #C4836A; }
 
 .rec-title {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 500;
   color: var(--color-text-primary);
@@ -963,7 +963,7 @@ input, textarea, select {
   box-shadow: var(--shadow-lg);
 }
 .modal-title {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: 18px;
   font-weight: 500;
   color: var(--color-text-primary);

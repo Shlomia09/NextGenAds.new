@@ -78,7 +78,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             background: config.badgeBg,
             color: config.badgeColor,
             border: `0.5px solid ${config.badgeBorder}`,
-            fontFamily: "'Outfit', sans-serif",
+            fontFamily: 'var(--font-ui)',
             fontSize: 8,
             fontWeight: 500,
             letterSpacing: '0.1em',
@@ -94,7 +94,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             background: '#F8F6F3',
             color: '#6B5044',
             border: '0.5px solid #E8E4DF',
-            fontFamily: "'Outfit', sans-serif",
+            fontFamily: 'var(--font-ui)',
             fontSize: 8,
             fontWeight: 400,
             letterSpacing: '0.1em',
@@ -135,9 +135,9 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         {rec.title}
       </div>
 
-      {/* Description — Outfit 300 */}
+      {/* Description — font-ui 300 */}
       <p style={{
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 11,
         fontWeight: 300,
         color: '#6B5044',
@@ -177,19 +177,19 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6A5A' }}>
+            <div style={{ fontFamily: 'var(--font-ui)', fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6A5A' }}>
               Recommended Action
             </div>
-            <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#6B5044', lineHeight: 1.55, margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#6B5044', lineHeight: 1.55, margin: 0 }}>
               {rec.action}
             </p>
           </div>
           {rec.reasoning && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6A5A' }}>
+              <div style={{ fontFamily: 'var(--font-ui)', fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6A5A' }}>
                 AI Reasoning
               </div>
-              <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#6B5044', lineHeight: 1.55, margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#6B5044', lineHeight: 1.55, margin: 0 }}>
                 {rec.reasoning}
               </p>
             </div>
@@ -213,7 +213,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             background: '#10B981', color: '#FFFFFF',
             border: 'none', borderRadius: 2,
             padding: '6px 12px',
-            fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 500,
+            fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 500,
             letterSpacing: '0.12em', textTransform: 'uppercase',
             cursor: 'pointer', transition: 'background 0.15s',
           }}
@@ -230,7 +230,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             background: 'transparent', color: '#6B5044',
             border: '0.5px solid #E8E4DF', borderRadius: 2,
             padding: '6px 12px',
-            fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 400,
+            fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 400,
             letterSpacing: '0.1em', textTransform: 'uppercase',
             cursor: 'pointer', transition: 'all 0.15s',
           }}
@@ -248,7 +248,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             background: 'transparent', color: '#8B6A5A',
             border: 'none',
             padding: '6px',
-            fontFamily: "'Outfit', sans-serif", fontSize: 9, fontWeight: 400,
+            fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 400,
             letterSpacing: '0.1em', textTransform: 'uppercase',
             cursor: 'pointer', transition: 'color 0.15s',
           }}

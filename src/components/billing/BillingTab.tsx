@@ -113,7 +113,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
           justifyContent: 'center',
           height: '200px',
           color: '#4a2e1e',
-          fontFamily: 'Outfit, sans-serif',
+          fontFamily: 'var(--font-ui)',
           fontSize: '13px',
         }}
       >
@@ -153,7 +153,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
             <span
               style={{
                 ...planBadgeStyle,
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '9px',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
@@ -169,7 +169,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                 background: statusBadge.bg,
                 border: `0.5px solid ${statusBadge.border}`,
                 color: statusBadge.color,
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '9px',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
@@ -196,7 +196,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
             </span>
             <span
               style={{
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '12px',
                 color: '#4a2e1e',
               }}
@@ -212,7 +212,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '11px',
                 color: '#F59E0B',
                 marginBottom: '16px',
@@ -231,7 +231,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '11px',
                 color: '#8B6050',
                 marginBottom: '16px',
@@ -255,7 +255,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                 background: 'rgba(196,131,106,0.08)',
                 border: '0.5px solid rgba(196,131,106,0.25)',
                 color: '#C4836A',
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '12px',
                 fontWeight: 500,
                 padding: '8px 14px',
@@ -287,7 +287,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                   background: '#C4836A',
                   border: 'none',
                   color: '#0F0A07',
-                  fontFamily: 'Outfit, sans-serif',
+                  fontFamily: 'var(--font-ui)',
                   fontSize: '12px',
                   fontWeight: 600,
                   padding: '8px 14px',
@@ -316,7 +316,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
         >
           <div
             style={{
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'var(--font-ui)',
               fontSize: '9px',
               textTransform: 'uppercase',
               letterSpacing: '0.09em',
@@ -367,7 +367,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
         >
           <div
             style={{
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'var(--font-ui)',
               fontSize: '10px',
               textTransform: 'uppercase',
               letterSpacing: '0.09em',
@@ -380,7 +380,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
           </div>
           <p
             style={{
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'var(--font-ui)',
               fontSize: '12px',
               color: '#8B6050',
               margin: '0 0 12px 0',
@@ -399,7 +399,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
               background: 'rgba(239,68,68,0.07)',
               border: '0.5px solid rgba(239,68,68,0.3)',
               color: '#EF4444',
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'var(--font-ui)',
               fontSize: '12px',
               fontWeight: 500,
               padding: '8px 14px',
@@ -450,7 +450,7 @@ const UsageMeter: React.FC<UsageMeterProps> = ({ icon, label, used, limit }) => 
           {icon}
           <span
             style={{
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'var(--font-ui)',
               fontSize: '9px',
               textTransform: 'uppercase',
               letterSpacing: '0.07em',
@@ -470,7 +470,7 @@ const UsageMeter: React.FC<UsageMeterProps> = ({ icon, label, used, limit }) => 
           }}
         >
           {isUnlimited
-            ? <span style={{ color: '#10B981', fontSize: '11px', fontFamily: 'Outfit, sans-serif' }}>Unlimited</span>
+            ? <span style={{ color: '#10B981', fontSize: '11px', fontFamily: 'var(--font-ui)' }}>Unlimited</span>
             : `${used} / ${limit}`}
         </span>
       </div>

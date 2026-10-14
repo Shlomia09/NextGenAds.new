@@ -112,7 +112,7 @@ const StatusBadge: React.FC<{ status: Campaign['status'] }> = ({ status }) => {
   return (
     <span
       style={{
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 10,
         fontWeight: 500,
         letterSpacing: '0.08em',
@@ -495,7 +495,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-kpi-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.14em;
@@ -522,7 +522,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
           position: absolute;
           top: 8px;
           right: 12px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 9px;
           font-weight: 400;
           letter-spacing: 0.1em;
@@ -627,7 +627,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-hints-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 9px;
           font-weight: 400;
           letter-spacing: 0.16em;
@@ -643,7 +643,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-hint-pill {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 300;
           color: var(--text-muted);
@@ -680,7 +680,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-empty-sub {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -703,7 +703,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-mock-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 300;
           color: var(--text-hint);
@@ -725,7 +725,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-th {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.14em;
@@ -773,7 +773,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-campaign-name {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 400;
           color: var(--text-primary);
@@ -804,7 +804,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-tfoot-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 500;
           letter-spacing: 0.12em;

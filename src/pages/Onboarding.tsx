@@ -594,7 +594,7 @@ const Onboarding: React.FC = () => {
         }
 
         .ob-left-tagline {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px; font-weight: 300;
           color: #8B6050; line-height: 1.65;
         }
@@ -603,7 +603,7 @@ const Onboarding: React.FC = () => {
 
         .ob-step-item {
           display: flex; align-items: center; gap: 12px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px; font-weight: 300; letter-spacing: 0.06em;
           color: #4d3a2e; transition: color var(--transition);
         }
@@ -622,7 +622,7 @@ const Onboarding: React.FC = () => {
 
         .ob-type-preview {
           display: flex; align-items: center; gap: 8px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px; font-weight: 300; color: #C4A090;
           padding: 8px 12px; background: #3d2a1e;
           border: 0.5px solid #4d3a2e; border-radius: 4px;
@@ -658,7 +658,7 @@ const Onboarding: React.FC = () => {
         .ob-title em { color: var(--rose-gold); }
 
         .ob-subtitle {
-          font-family: 'Outfit', sans-serif; font-size: 12px;
+          font-family: var(--font-ui); font-size: 12px;
           font-weight: 300; color: var(--text-muted);
           line-height: 1.5; margin-top: -10px;
         }
@@ -670,7 +670,7 @@ const Onboarding: React.FC = () => {
           padding: 9px 10px;
           background: var(--bg-card); border: 0.5px solid var(--border-light);
           border-radius: var(--radius);
-          font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 300;
+          font-family: var(--font-ui); font-size: 12px; font-weight: 300;
           color: var(--text-secondary); cursor: pointer;
           transition: all var(--transition); text-align: center;
         }
@@ -698,17 +698,17 @@ const Onboarding: React.FC = () => {
         .ob-type-icon { font-size: 22px; margin-bottom: 4px; }
 
         .ob-type-title {
-          font-family: 'Outfit', sans-serif; font-size: 13px;
+          font-family: var(--font-ui); font-size: 13px;
           font-weight: 500; color: var(--text-primary);
         }
 
         .ob-type-sub {
-          font-family: 'Outfit', sans-serif; font-size: 11px;
+          font-family: var(--font-ui); font-size: 11px;
           font-weight: 300; color: var(--text-secondary);
         }
 
         .ob-type-desc {
-          font-family: 'Outfit', sans-serif; font-size: 10px;
+          font-family: var(--font-ui); font-size: 10px;
           font-weight: 300; color: var(--text-muted);
         }
 
@@ -726,12 +726,12 @@ const Onboarding: React.FC = () => {
           display: flex; flex-direction: column; gap: 5px;
         }
         .ob-funnel-eyebrow {
-          font-family: 'Outfit', sans-serif; font-size: 9px;
+          font-family: var(--font-ui); font-size: 9px;
           font-weight: 400; letter-spacing: 0.2em;
           text-transform: uppercase; color: var(--rose-gold-dark);
         }
         .ob-funnel-value {
-          font-family: 'Outfit', sans-serif; font-size: 13px;
+          font-family: var(--font-ui); font-size: 13px;
           font-weight: 500; color: var(--text-primary);
         }
         .ob-funnel-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); line-height: 1.6; }
@@ -748,8 +748,8 @@ const Onboarding: React.FC = () => {
         }
         .ob-stage-btn:hover { border-color: var(--rose-gold-pale); }
         .ob-stage-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-        .ob-stage-label { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 3px; }
-        .ob-stage-desc  { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 300; color: var(--text-secondary); line-height: 1.4; }
+        .ob-stage-label { font-family: var(--font-ui); font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 3px; }
+        .ob-stage-desc  { font-family: var(--font-ui); font-size: 11px; font-weight: 300; color: var(--text-secondary); line-height: 1.4; }
 
         .ob-nav {
           display: flex; align-items: center; gap: 10px;

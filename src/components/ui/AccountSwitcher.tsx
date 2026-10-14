@@ -125,7 +125,7 @@ const AccountSwitcher: React.FC = () => {
         <span
           style={{
             flex: 1,
-            fontFamily: "'Outfit', sans-serif",
+            fontFamily: 'var(--font-ui)',
             fontSize: 11,
             fontWeight: 300,
             color: activeAccount ? '#1A1410' : '#A09890',
@@ -170,7 +170,7 @@ const AccountSwitcher: React.FC = () => {
             <div
               style={{
                 padding: '10px 12px',
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 10,
                 color: '#A09890',
                 fontWeight: 300,
@@ -247,7 +247,7 @@ const AccountSwitcher: React.FC = () => {
                       <div style={{ flex: 1, overflow: 'hidden' }}>
                         <div
                           style={{
-                            fontFamily: "'Outfit', sans-serif",
+                            fontFamily: 'var(--font-ui)',
                             fontSize: 11,
                             fontWeight: isActive ? 400 : 300,
                             color: isActive ? '#1A1410' : '#5C4035',
@@ -303,7 +303,7 @@ const AccountSwitcher: React.FC = () => {
             <Plus size={10} strokeWidth={1.5} style={{ color: '#C4836A', flexShrink: 0 }} />
             <span
               style={{
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 10,
                 fontWeight: 300,
                 color: '#C4836A',

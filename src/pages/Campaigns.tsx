@@ -471,23 +471,23 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: text3, maxTicksLimit: 7, font: { family: "'JetBrains Mono',monospace", size: 10.5 } },
+            ticks: { color: text3, maxTicksLimit: 7, font: { family: cssv('--font-mono'), size: 10.5 } },
           },
           y: {
             position: 'left',
             grid: { color: grid },
-            ticks: { color: text3, callback: (v) => '€' + v, font: { family: "'JetBrains Mono',monospace", size: 10.5 } },
+            ticks: { color: text3, callback: (v) => '€' + v, font: { family: cssv('--font-mono'), size: 10.5 } },
           },
           y1: {
             position: 'right',
             grid: { display: false },
-            ticks: { color: text3, font: { family: "'JetBrains Mono',monospace", size: 10.5 } },
+            ticks: { color: text3, font: { family: cssv('--font-mono'), size: 10.5 } },
           },
         },
       },
     };
 
-    Chart.defaults.font.family = "'JetBrains Mono','Inter',monospace";
+    Chart.defaults.font.family = cssv('--font-mono');
     Chart.defaults.font.size   = 10.5;
     Chart.defaults.color       = text2;
 
