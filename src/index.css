@@ -109,14 +109,6 @@ input, textarea, select {
   flex-shrink: 0;
 }
 
-.sidebar-logo {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1;
-}
-.sidebar-logo em { color: var(--accent); }
 
 .sidebar-tagline {
   font-family: var(--font-ui);

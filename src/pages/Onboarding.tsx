@@ -5,6 +5,7 @@ import { createBrand } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { getAovBracket, MARKETS, CATEGORIES, BUSINESS_TYPE_LABELS, LEFT_PANEL_COPY } from '../lib/benchmarks';
 import type { BusinessType, BusinessGoal } from '../types';
+import { RougeLogo } from '../components/brand/RougeLogo';
 
 const STEPS = ['Brand Basics', 'Business Type', 'Business Details', 'Stage & Launch'];
 
@@ -191,7 +192,7 @@ const Onboarding: React.FC = () => {
     <div className="ob-page">
       <div className="ob-left">
         <div className="ob-left-inner">
-          <div className="ob-logo">Rouge</div>
+          <RougeLogo variant="lockup" className="ob-rouge-logo" />
           <p className="ob-left-tagline">{leftCopy}</p>
           <div className="ob-step-list">
             {STEPS.map((label, i) => (
@@ -586,12 +587,11 @@ const Onboarding: React.FC = () => {
 
         .ob-left-inner { display: flex; flex-direction: column; gap: 22px; }
 
-        .ob-logo {
-          font-family: var(--font-display);
-          font-size: 20px; font-weight: 600;
-          color: #F5E6D8; letter-spacing: -0.01em;
+        .ob-rouge-logo {
+          height: 24px; width: auto; align-self: flex-start;
+          /* TODO(commit-5): hardcoded — left panel is still #2C1810 */
+          color: #F3F0EA;
         }
-        .ob-logo em { color: #C4836A; }
 
         .ob-left-tagline {
           font-family: 'Outfit', sans-serif;

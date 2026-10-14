@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RougeLogo } from '../components/brand/RougeLogo';
 
 /* ─────────────────────────────────────────────────────────────
    Rouge — Beauty Campaign Intelligence Landing Page
@@ -216,16 +217,9 @@ export default function Landing() {
           background:rgba(11,10,9,0.72);backdrop-filter:blur(16px);
           border-bottom:1px solid var(--border);padding:14px 48px;
         }
-        .lp-logo { display:flex;align-items:center;gap:11px;text-decoration:none; }
-        .lp-logo-mark {
-          width:36px;height:36px;border-radius:10px;
-          background:linear-gradient(135deg,#E3A88E,#C97B5E);
-          display:flex;align-items:center;justify-content:center;
-          color:#2A1A12;font-family:var(--font-display);font-weight:600;font-size:19px;
-          box-shadow:0 4px 16px rgba(201,123,94,0.4);flex-shrink:0;
-        }
-        .lp-logo-name { font-size:18px;font-weight:500;letter-spacing:.2px;color:var(--text); }
-        .lp-logo-name em { color:var(--accent);font-style:normal; }
+        .lp-logo { display:flex;align-items:center;text-decoration:none;color:var(--text); }
+        .lp-rouge-logo { height:24px; }
+        .lp-rouge-logo-sm { height:20px; }
         .lp-nav-links { display:flex;align-items:center;gap:34px; }
         .lp-nav-links a { color:var(--text-2);text-decoration:none;font-size:14px;transition:.2s; }
         .lp-nav-links a:hover { color:var(--text); }
@@ -588,8 +582,7 @@ export default function Landing() {
         {/* ── NAV ───────────────────────────────────────────── */}
         <nav ref={navRef} className="lp-nav">
           <a href="/" className="lp-logo">
-            <div className="lp-logo-mark">R</div>
-            <div className="lp-logo-name">Rouge</div>
+            <RougeLogo variant="lockup" className="lp-rouge-logo" />
           </a>
           <div className="lp-nav-links">
             <a href="#how">How it works</a>
@@ -859,9 +852,8 @@ export default function Landing() {
 
         {/* ── FOOTER ────────────────────────────────────────── */}
         <footer className="lp-footer">
-          <a href="/" className="lp-logo" style={{ textDecoration: 'none' }}>
-            <div className="lp-logo-mark" style={{ width: 30, height: 30, fontSize: 16 }}>R</div>
-            <div className="lp-logo-name" style={{ fontSize: 15 }}>Rouge</div>
+          <a href="/" className="lp-logo">
+            <RougeLogo variant="lockup" className="lp-rouge-logo-sm" />
           </a>
           <div>© 2026 Rouge · Beauty Campaign Intelligence</div>
         </footer>

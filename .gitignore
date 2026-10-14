@@ -3,3 +3,6 @@ dist
 .env
 .env.local
 .env.*.local
+
+# brand asset staging (duplicates public/brand and src/components/brand)
+brand-assets/
