@@ -153,7 +153,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: var(--accent);
+          background: var(--green);
           flex-shrink: 0;
         }
 

@@ -565,7 +565,7 @@ const DonutPanel: React.FC<DonutPanelProps> = ({ campaigns }) => {
   const totalSpend = useMemo(() => campaigns.reduce((s, c) => s + c.spend, 0), [campaigns]);
 
   const SERIES_COLORS = [
-    '--text-2', '--green', '--blue', '--purple', '--accent',   // spend, conversions, reach, frequency, decay
+    '--text-2', '--green', '--blue', '--purple', '--champagne',   // positional only — red is a state layer, never a slot
   ];
 
   const buildChart = useCallback(() => {

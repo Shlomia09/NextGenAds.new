@@ -139,8 +139,8 @@ const DemoDashboard: React.FC = () => {
         </div>
 
         {/* Demo pill */}
-        <div style={{ margin: '10px 12px', background: 'var(--accent-soft)', border: '0.5px solid var(--accent-soft)', borderRadius: 3, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 7 }}>
-          <div className="live-dot" />
+        <div style={{ margin: '10px 12px', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 3, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 7 }}>
+          <div className="live-dot live-dot--demo" />
           <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 300, color: 'var(--text)' }}>Demo Mode</span>
         </div>
 
@@ -155,7 +155,7 @@ const DemoDashboard: React.FC = () => {
 
         <div style={{ padding: '14px 12px', borderTop: '0.5px solid var(--border)' }}>
           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, color: 'var(--text-2)', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div className="live-dot" style={{ background: 'var(--accent)' }} />
+            <div className="live-dot" />
             9-Year Benchmark Active
           </div>
         </div>

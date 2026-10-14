@@ -733,14 +733,16 @@ input, textarea, select {
 /* ============================================================
    LIVE DOT
    ============================================================ */
+/* live = data is flowing; --demo = a caveat, the data is not real. Never red. */
 .live-dot {
   width: 5px; height: 5px;
-  background: var(--rose);
+  background: var(--green);
   border-radius: 50%;
   animation: pulse-subtle 2.5s ease-in-out infinite;
   display: inline-block;
   flex-shrink: 0;
 }
+.live-dot--demo { background: var(--amber); }
 
 /* ============================================================
    RECOMMENDATION CARDS
