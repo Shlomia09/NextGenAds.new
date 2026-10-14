@@ -68,7 +68,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ placement = 'sidebar' }) => {
         color: '#C4836A',
         padding: '6px 12px',
         cursor: 'pointer',
-        fontFamily: "'DM Mono', monospace",
+        fontFamily: 'var(--font-mono)',
         fontSize: '8px',
         letterSpacing: '0.15em',
         textTransform: 'uppercase' as const,

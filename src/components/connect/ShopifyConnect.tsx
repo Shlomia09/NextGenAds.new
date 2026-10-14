@@ -36,7 +36,7 @@ const ShopifyConnect: React.FC<ShopifyConnectProps> = ({ userId, brands }) => {
   };
 
   const font  = 'var(--font-ui)';
-  const mono  = "'DM Mono', monospace";
+  const mono  = 'var(--font-mono)';
 
   const inputStyle: React.CSSProperties = {
     width: '100%',

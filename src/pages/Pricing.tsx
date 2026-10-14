@@ -227,7 +227,7 @@ export default function Pricing() {
         .free-audit-title {
           font-family: var(--font-display);
           font-size: 18px;
-          font-weight: 600;
+          font-weight: 800;
           color: #F5E6D8;
           margin: 0 0 3px;
         }
@@ -293,7 +293,7 @@ export default function Pricing() {
         .plan-name {
           font-family: var(--font-display);
           font-size: 22px;
-          font-weight: 600;
+          font-weight: 800;
           color: #F5E6D8;
           margin: 0 0 12px;
           letter-spacing: -0.01em;
@@ -306,7 +306,7 @@ export default function Pricing() {
           flex-wrap: wrap;
         }
         .plan-price-main {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 48px;
           font-weight: 500;
           line-height: 1;
@@ -323,7 +323,7 @@ export default function Pricing() {
           padding-bottom: 4px;
         }
         .plan-price-sub {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 12px;
           color: #8B6050;
           margin-top: 4px;
@@ -449,7 +449,7 @@ export default function Pricing() {
         .comparison-title {
           font-family: var(--font-display);
           font-size: 18px;
-          font-weight: 600;
+          font-weight: 800;
           color: #F5E6D8;
           margin: 0 0 20px;
           text-align: center;

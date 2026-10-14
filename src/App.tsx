@@ -13,10 +13,10 @@ class AppErrorBoundary extends Component<{ children: React.ReactNode }, { error:
     if (this.state.error) {
       return (
         <div style={{ minHeight: '100vh', background: '#0F0A07', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 }}>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#EF4444', letterSpacing: '0.2em' }}>APP CRASH</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#EF4444', letterSpacing: '0.2em' }}>APP CRASH</div>
           <div style={{ background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: 24, maxWidth: 700, width: '100%' }}>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 14, color: '#F5E6D8', marginBottom: 12 }}>{this.state.error}</div>
-            {this.state.stack && <pre style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: '#8B6050', overflow: 'auto', maxHeight: 300, margin: 0 }}>{this.state.stack}</pre>}
+            {this.state.stack && <pre style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: '#8B6050', overflow: 'auto', maxHeight: 300, margin: 0 }}>{this.state.stack}</pre>}
           </div>
           <button onClick={() => window.location.reload()} style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: '#C4836A', background: 'rgba(196,131,106,0.08)', border: '0.5px solid rgba(196,131,106,0.3)', borderRadius: 4, padding: '8px 16px', cursor: 'pointer' }}>Reload</button>
         </div>

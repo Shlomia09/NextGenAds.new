@@ -381,7 +381,7 @@ const Dashboard: React.FC = () => {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 44px)' }}>
       <div style={{ textAlign: 'center', padding: '60px 40px' }}>
         <Sparkles size={32} style={{ color: 'var(--accent)', marginBottom: 16 }} strokeWidth={1.5} />
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 500, color: 'var(--text)', margin: '0 0 8px' }}>No Brand Connected Yet</h2>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: 'var(--text)', margin: '0 0 8px' }}>No Brand Connected Yet</h2>
         <p style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-2)', margin: '0 0 24px' }}>Complete the onboarding to activate your Intelligence Dashboard</p>
         <a href="/onboarding" style={{ background: 'var(--accent)', color: '#2A1A12', padding: '10px 22px', borderRadius: 10, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 500 }}>Set Up Your Brand</a>
       </div>
@@ -398,7 +398,7 @@ const Dashboard: React.FC = () => {
         <div className="dash-welcome-strip" style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', gap: 20, marginBottom: 20 }}>
           {/* Greeting */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 500, color: 'var(--text)', margin: '0 0 4px', letterSpacing: -0.5 }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800, color: 'var(--text)', margin: '0 0 4px', letterSpacing: -0.5 }}>
               {greeting()}{user?.email ? `, ${displayName(user.email)}` : ''}
             </h1>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)' }}>
@@ -555,7 +555,7 @@ const Dashboard: React.FC = () => {
                   <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--accent-soft)', border: '1px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
                     <Sparkles size={18} style={{ color: 'var(--accent)' }} />
                   </div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 500, color: 'var(--text)', marginBottom: 6 }}>Ask your first question</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>Ask your first question</div>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)', marginBottom: 14 }}>Your AI Intelligence sessions will appear here.</div>
                   <button onClick={() => navigate('/intelligence')} style={{ background: 'var(--accent)', color: '#2A1A12', border: 'none', borderRadius: 9, padding: '8px 16px', fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}>
                     Open Intelligence →
@@ -609,7 +609,7 @@ const Dashboard: React.FC = () => {
                       </div>
                     </div>
                     <div>
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 500, color: 'var(--text)', marginBottom: 3 }}>{health.grade}</div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 3 }}>{health.grade}</div>
                       <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>Based on {campaigns.length} campaigns vs 9yr benchmark</div>
                     </div>
                   </div>
@@ -802,7 +802,7 @@ const Dashboard: React.FC = () => {
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setLearnMoreRec(null)}>
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: 24, maxWidth: 500, width: '92vw', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8 }}>AI Recommendation</div>
-            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 500, color: 'var(--text)', margin: '0 0 12px' }}>{learnMoreRec.title}</h3>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: 'var(--text)', margin: '0 0 12px' }}>{learnMoreRec.title}</h3>
             <p style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6, margin: '0 0 16px' }}>{learnMoreRec.description}</p>
             <div style={{ borderTop: '1px solid var(--border-soft)', paddingTop: 14, marginBottom: 14 }}>
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Recommended Action</div>

@@ -504,7 +504,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-kpi-value {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 18px;
           font-weight: 500;
           color: var(--text-primary);
@@ -582,7 +582,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         .cd-col-title {
           font-family: var(--font-display);
           font-size: 16px;
-          font-weight: 600;
+          font-weight: 700;
           color: var(--text-primary);
           margin: 0;
           display: flex;
@@ -599,7 +599,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
           background: var(--rose-gold);
           color: #fff;
           border-radius: 50%;
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 10px;
           font-weight: 500;
         }
@@ -674,7 +674,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         .cd-empty-title {
           font-family: var(--font-display);
           font-size: 15px;
-          font-weight: 600;
+          font-weight: 700;
           color: var(--text-primary);
           margin: 0;
         }
@@ -748,7 +748,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-td-mono {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 12px;
           font-weight: 500;
           color: var(--text-primary);
@@ -785,7 +785,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         }
 
         .cd-platform-badge {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 9px;
           font-weight: 400;
           letter-spacing: 0.06em;
@@ -821,7 +821,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
 
         /* ── rec-benchmark-ref (used by RecommendationCard) ── */
         .rec-benchmark-ref {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 11px;
           font-weight: 400;
           color: var(--rose-gold);

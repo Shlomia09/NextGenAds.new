@@ -271,7 +271,7 @@ const Brands: React.FC = () => {
         : brands.length === 0
         ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <p style={{ fontFamily: 'var(--font-display)', fontSize: 20, color: 'var(--text-primary)', marginBottom: 12 }}>No brands yet</p>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12 }}>No brands yet</p>
             <p style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 300, color: 'var(--text-secondary)', marginBottom: 20 }}>Create your first brand to activate benchmark intelligence</p>
             <button className="btn btn-primary" onClick={() => navigate('/onboarding')}>
               <Plus size={13} strokeWidth={1.5} />
@@ -317,9 +317,9 @@ const Brands: React.FC = () => {
           background: #2C1810; border-radius: 4px;
           display: flex; align-items: center; justify-content: center;
           font-family: var(--font-display); font-size: 16px;
-          font-weight: 600; color: #C4836A; flex-shrink: 0;
+          font-weight: 700; color: #C4836A; flex-shrink: 0;
         }
-        .brand-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .brand-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-primary); }
         .brand-cat { font-family: var(--font-ui); font-size: 11px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }
         .brand-stage-pill {
           margin-left: auto; padding: 3px 8px; border-radius: 2px;
@@ -334,7 +334,7 @@ const Brands: React.FC = () => {
           letter-spacing: 0.12em; text-transform: uppercase;
           color: var(--text-hint); margin-bottom: 4px;
         }
-        .brand-metric-value { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: var(--text-primary); }
+        .brand-metric-value { font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--text-primary); }
         .brand-funnel-pill {
           font-family: var(--font-ui); font-size: 11px; font-weight: 300;
           color: var(--rose-gold-dark); background: var(--rose-gold-light);

@@ -278,7 +278,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
   };
 
 
-  // Render AI message content — bolds **…** patterns using DM Mono accent
+  // Render AI message content — bolds **…** patterns using --font-mono accent
   const renderAIContent = (content: string) => {
     const parts = content.split(/(\*\*[^*]+\*\*)/g);
     return parts.map((part, idx) => {
@@ -287,7 +287,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           <strong
             key={idx}
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: 'var(--font-mono)',
               fontWeight: 500,
               color: T.accent,
             }}
@@ -349,7 +349,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 13,
-                fontWeight: 600,
+                fontWeight: 700,
                 color: T.textPrimary,
                 lineHeight: 1.2,
               }}
@@ -388,7 +388,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               <Database size={9} strokeWidth={1.5} style={{ color: '#633806' }} />
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   fontSize: 8,
                   fontWeight: 400,
                   color: '#633806',
@@ -474,7 +474,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 13,
-                fontWeight: 600,
+                fontWeight: 700,
                 color: T.textPrimary,
                 margin: 0,
               }}
@@ -624,7 +624,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C4836A', marginBottom: 6 }}>
                             Monthly limit reached
                           </div>
-                          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 500, color: '#C4836A', marginBottom: 4 }}>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: '#C4836A', marginBottom: 4 }}>
                             {used} / {limit} queries
                           </div>
                           <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: '0 0 12px' }}>
@@ -655,7 +655,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               {/* Timestamp */}
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   fontSize: 9,
                   fontWeight: 400,
                   color: T.textHint,

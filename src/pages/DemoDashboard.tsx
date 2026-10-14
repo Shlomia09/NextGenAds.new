@@ -128,7 +128,7 @@ const DemoDashboard: React.FC = () => {
       {/* ── Sidebar ── */}
       <aside style={{ width: 220, background: '#2C1810', borderRight: '0.5px solid #3d2a1e', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '22px 20px 16px', borderBottom: '0.5px solid #3d2a1e' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 600, color: '#F5E6D8', letterSpacing: '-0.01em' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 700, color: '#F5E6D8', letterSpacing: '-0.01em' }}>
             Rouge
           </div>
           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A5A48', marginTop: 4 }}>
@@ -273,9 +273,9 @@ const DemoDashboard: React.FC = () => {
                         <stop offset="95%" stopColor="#C4836A" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="day" tick={{ fontSize: 8, fill: 'var(--text-hint)', fontFamily: 'DM Mono' }} axisLine={false} tickLine={false} interval={3} />
-                    <YAxis tick={{ fontSize: 8, fill: 'var(--text-hint)', fontFamily: 'DM Mono' }} axisLine={false} tickLine={false} width={24} domain={[0, 6]} />
-                    <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-light)', borderRadius: 4, fontSize: 10, fontFamily: 'DM Mono' }} />
+                    <XAxis dataKey="day" tick={{ fontSize: 8, fill: 'var(--text-hint)', fontFamily: 'var(--font-mono)' }} axisLine={false} tickLine={false} interval={3} />
+                    <YAxis tick={{ fontSize: 8, fill: 'var(--text-hint)', fontFamily: 'var(--font-mono)' }} axisLine={false} tickLine={false} width={24} domain={[0, 6]} />
+                    <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-light)', borderRadius: 4, fontSize: 10, fontFamily: 'var(--font-mono)' }} />
                     <Area type="monotone" dataKey="roas"  stroke="#C4836A" fill="url(#dg)" strokeWidth={1.5} name="Your ROAS" />
                     <Area type="monotone" dataKey="bench" stroke="var(--text-hint)" fill="none" strokeDasharray="3 3" strokeWidth={1} name="Benchmark" />
                   </AreaChart>
@@ -336,7 +336,7 @@ const DemoDashboard: React.FC = () => {
                     <Sparkles size={12} strokeWidth={1.5} />
                   </div>
                   <div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Rouge</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Rouge</div>
                     <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, fontWeight: 300, color: 'var(--text-muted)', marginTop: 1 }}>
                       NeoLumo · €150 AOV avg · <span style={{ fontFamily: 'var(--font-mono)' }}>4.20x</span> ROAS
                     </div>
@@ -350,7 +350,7 @@ const DemoDashboard: React.FC = () => {
                       <div style={{ width: 44, height: 44, background: 'var(--rose-gold-light)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--rose-gold)' }}>
                         <Sparkles size={18} strokeWidth={1.5} />
                       </div>
-                      <p style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>Ask Rouge</p>
+                      <p style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Ask Rouge</p>
                       <p style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 300, color: 'var(--text-secondary)', maxWidth: 220, lineHeight: 1.5 }}>Full context of NeoLumo + 9 years of benchmark data</p>
                       {[
                         'Why is my ROAS dropping?',

@@ -614,7 +614,7 @@ const Onboarding: React.FC = () => {
           width: 22px; height: 22px; border-radius: 50%;
           background: #3d2a1e; border: 0.5px solid #4d3a2e;
           display: flex; align-items: center; justify-content: center;
-          font-family: 'DM Mono', monospace; font-size: 10px; color: #6d4a3e;
+          font-family: var(--font-mono); font-size: 10px; color: #6d4a3e;
           flex-shrink: 0; transition: all var(--transition);
         }
         .ob-step-item.active .ob-step-num { border-color: #C4836A; color: #C4836A; }
@@ -644,7 +644,7 @@ const Onboarding: React.FC = () => {
         .ob-progress-fill { height: 100%; background: var(--rose-gold); border-radius: 1px; transition: width 0.4s ease; }
 
         .ob-step-label-top {
-          font-family: 'DM Mono', monospace; font-size: 10px;
+          font-family: var(--font-mono); font-size: 10px;
           font-weight: 400; color: var(--text-hint); letter-spacing: 0.04em;
         }
 
@@ -652,7 +652,7 @@ const Onboarding: React.FC = () => {
 
         .ob-title {
           font-family: var(--font-display); font-size: 26px;
-          font-weight: 600; color: var(--text-primary);
+          font-weight: 800; color: var(--text-primary);
           letter-spacing: -0.02em; line-height: 1.2;
         }
         .ob-title em { color: var(--rose-gold); }
@@ -734,7 +734,7 @@ const Onboarding: React.FC = () => {
           font-family: var(--font-ui); font-size: 13px;
           font-weight: 500; color: var(--text-primary);
         }
-        .ob-funnel-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); line-height: 1.6; }
+        .ob-funnel-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); line-height: 1.6; }
         .ob-funnel-meta span { font-weight: 500; color: var(--rose-gold-dark); }
 
         /* Stage buttons */

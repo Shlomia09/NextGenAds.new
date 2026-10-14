@@ -43,12 +43,12 @@ const AuditResultCard: React.FC<{
         {label}
       </div>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-        <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 32, fontWeight: 500, color: isGood ? '#10B981' : '#EF4444', lineHeight: 1 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 32, fontWeight: 500, color: isGood ? '#10B981' : '#EF4444', lineHeight: 1 }}>
           {prefix}{yours}{suffix}
         </div>
         <div style={{ paddingBottom: 4 }}>
           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: '#4a2e1e', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Benchmark</div>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: '#8B6050' }}>{prefix}{benchmark}{suffix}</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: '#8B6050' }}>{prefix}{benchmark}{suffix}</div>
         </div>
       </div>
       <div style={{
@@ -106,7 +106,7 @@ const Audit: React.FC = () => {
         background: '#0F0A07',
       }}>
         <Link to="/" style={{ textDecoration: 'none' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: '#F5E6D8' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: '#F5E6D8' }}>
             NextAds<em style={{ color: '#C4836A' }}>Gen</em>
           </div>
         </Link>
@@ -125,7 +125,7 @@ const Audit: React.FC = () => {
               Free Benchmark Audit
               <span style={{ display: 'block', width: 16, height: 0.5, background: '#4a2e1e' }} />
             </div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 40, fontWeight: 600, lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.02em' }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 40, fontWeight: 800, lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.02em' }}>
               See exactly where your<br /><em style={{ color: '#C4836A' }}>ads are losing money</em>
             </h1>
             <p style={{ fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 300, color: '#8B6050', lineHeight: 1.7, marginBottom: 36 }}>
@@ -141,8 +141,8 @@ const Audit: React.FC = () => {
                 { n: '03', title: 'Get your report', sub: 'Instant benchmark comparison' },
               ].map(s => (
                 <div key={s.n} style={{ background: '#1C1208', border: '0.5px solid #2a1a0e', borderRadius: 6, padding: '16px' }}>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#C4836A', marginBottom: 8 }}>{s.n}</div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: '#F5E6D8', marginBottom: 4 }}>{s.title}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#C4836A', marginBottom: 8 }}>{s.n}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: '#F5E6D8', marginBottom: 4 }}>{s.title}</div>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: '#6b4030' }}>{s.sub}</div>
                 </div>
               ))}
@@ -170,7 +170,7 @@ const Audit: React.FC = () => {
         {/* ── STEP 2: Auth ── */}
         {step === 'auth' && (
           <div style={{ maxWidth: 400, margin: '0 auto', animation: 'fade-in 0.4s ease' }}>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 600, marginBottom: 8, textAlign: 'center', letterSpacing: '-0.01em' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 800, marginBottom: 8, textAlign: 'center', letterSpacing: '-0.01em' }}>
               {isLogin ? 'Sign in' : 'Create free account'}
             </h2>
             <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: '#8B6050', textAlign: 'center', marginBottom: 28 }}>
@@ -225,7 +225,7 @@ const Audit: React.FC = () => {
                 Your Free Benchmark Audit
                 <span style={{ display: 'block', width: 16, height: 0.5, background: '#4a2e1e' }} />
               </div>
-              <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 600, lineHeight: 1.2, marginBottom: 8, letterSpacing: '-0.02em' }}>
+              <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginBottom: 8, letterSpacing: '-0.02em' }}>
                 Your Meta Ads vs <em style={{ color: '#C4836A' }}>847 Beauty brands</em>
               </h1>
               <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: '#8B6050' }}>
@@ -244,7 +244,7 @@ const Audit: React.FC = () => {
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: '#EF4444', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2 }}>
                   Estimated monthly loss vs benchmark brands
                 </div>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 28, fontWeight: 500, color: '#EF4444', lineHeight: 1 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 28, fontWeight: 500, color: '#EF4444', lineHeight: 1 }}>
                   €{MONTHLY_LOSS.toLocaleString()}/mo
                 </div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: '#8B6050', marginTop: 2 }}>
@@ -284,7 +284,7 @@ const Audit: React.FC = () => {
               <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center' }}>
                 <Lock size={28} color="#C4836A" strokeWidth={1.5} />
               </div>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 600, marginBottom: 8, letterSpacing: '-0.01em' }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800, marginBottom: 8, letterSpacing: '-0.01em' }}>
                 Fix this with <em style={{ color: '#C4836A' }}>Rouge Starter</em>
               </h2>
               <p style={{ fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 300, color: '#8B6050', lineHeight: 1.7, marginBottom: 24, maxWidth: 460, margin: '0 auto 24px' }}>
@@ -301,7 +301,7 @@ const Audit: React.FC = () => {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8, marginBottom: 20 }}>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 40, fontWeight: 500, color: '#C4836A' }}>€149</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 40, fontWeight: 500, color: '#C4836A' }}>€149</span>
                 <span style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: '#8B6050' }}>/month</span>
                 <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: '#6b4030' }}>· Cancel anytime</span>
               </div>

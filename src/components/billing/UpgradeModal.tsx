@@ -177,7 +177,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
               fontSize: '18px',
               color: '#F5E6D8',
               margin: '0 0 8px 0',
-              fontWeight: 600,
+              fontWeight: 800,
               lineHeight: 1.3,
               paddingRight: '24px',
             }}
@@ -242,7 +242,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
               </div>
               <div
                 style={{
-                  fontFamily: '"DM Mono", monospace',
+                  fontFamily: 'var(--font-mono)',
                   fontSize: '20px',
                   color: '#6b4030',
                   fontWeight: 400,
@@ -297,7 +297,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
               </div>
               <div
                 style={{
-                  fontFamily: '"DM Mono", monospace',
+                  fontFamily: 'var(--font-mono)',
                   fontSize: '20px',
                   color: '#C4836A',
                   fontWeight: 400,

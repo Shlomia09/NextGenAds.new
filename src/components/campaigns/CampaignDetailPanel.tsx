@@ -811,7 +811,7 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
             </div>
             {/* §33: Campaign name in display font 20px */}
             <h2 style={{
-              fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 500,
+              fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800,
               color: 'var(--text)', margin: 0, letterSpacing: -0.2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>

@@ -719,7 +719,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--green-soft)', border: '1px solid var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
             <CheckCircle2 size={28} style={{ color: 'var(--green)' }} />
           </div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 500, color: 'var(--text)', margin: '0 0 10px' }}>Campaign submitted!</h2>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 800, color: 'var(--text)', margin: '0 0 10px' }}>Campaign submitted!</h2>
           <p style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-2)', margin: '0 0 24px', lineHeight: 1.6 }}>
             "{form.campaignName}" has been submitted to your {form.platform === 'meta' ? 'Meta Ads' : 'Google Ads'} account in paused state. Review it in Ads Manager before activating.
           </p>
@@ -743,7 +743,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
       <div style={{ marginBottom: 18 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 7 }}>
           <Wand2 size={20} style={{ color: 'var(--accent)' }} strokeWidth={1.5} />
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 500, letterSpacing: -0.4, margin: 0, color: 'var(--text)' }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, letterSpacing: -0.4, margin: 0, color: 'var(--text)' }}>
             Campaign Workshop
           </h1>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 20, padding: '3px 10px', fontSize: 11, fontFamily: 'var(--font-ui)', color: 'var(--text-3)' }}>
@@ -807,7 +807,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             {/* ════ STEP 1 — CREATIVE ═══════════════════════════ */}
             {step === 1 && (
               <>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Creative</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 800, marginBottom: 4, color: 'var(--text)' }}>Creative</div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 20 }}>
                   {form.platform === 'google'
                     ? 'Google Search ads are text-only. Write your headlines and descriptions.'
@@ -923,7 +923,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             {/* ════ STEP 2 — GOAL & PLATFORM ════════════════════ */}
             {step === 2 && (
               <>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Goal &amp; platform</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 800, marginBottom: 4, color: 'var(--text)' }}>Goal &amp; platform</div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 20 }}>What this campaign should achieve, and where it runs.</div>
 
                 <MB>
@@ -1006,7 +1006,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             {/* ════ STEP 3 — BUDGET & SCHEDULE ════════════════ */}
             {step === 3 && (
               <>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Budget &amp; schedule</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 800, marginBottom: 4, color: 'var(--text)' }}>Budget &amp; schedule</div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 20 }}>Set your spend and when the campaign runs.</div>
 
                 <MB>
@@ -1040,7 +1040,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             {/* ════ STEP 4 — AUDIENCE (full geo + AI) ══════════ */}
             {step === 4 && (
               <>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Audience</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 800, marginBottom: 4, color: 'var(--text)' }}>Audience</div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 16 }}>Who should see this ad.</div>
 
                 {/* ── AI Build Audience button ── */}
@@ -1350,7 +1350,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             {/* ════ STEP 5 — REVIEW & PUBLISH ═════════════════ */}
             {step === 5 && (
               <>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Review &amp; publish</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 800, marginBottom: 4, color: 'var(--text)' }}>Review &amp; publish</div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 20 }}>Confirm everything looks right, then publish to your platform.</div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
@@ -1443,7 +1443,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, boxShadow: 'var(--shadow)', overflow: 'hidden', marginBottom: 14 }}>
             {/* Preview header */}
             <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 500, color: 'var(--text)' }}>Live preview</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>Live preview</div>
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-2)', display: 'flex', alignItems: 'center', gap: 5 }}>
                 <span style={{ color: 'var(--accent)', fontSize: 12 }}>●</span>
                 {form.platform === 'meta' ? 'Meta feed' : form.platform === 'google' ? 'Google Search' : 'Preview'}
@@ -1549,7 +1549,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <div>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, letterSpacing: '1px', color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 4 }}>Workshop</div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 500, color: 'var(--text)', margin: 0 }}>Your campaigns</h2>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: 'var(--text)', margin: 0 }}>Your campaigns</h2>
           </div>
         </div>
 
@@ -1572,7 +1572,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             /* Empty state */
             <div style={{ padding: '48px 24px', textAlign: 'center' }}>
               <div style={{ fontSize: 32, marginBottom: 12 }}>✦</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 500, color: 'var(--text-2)', marginBottom: 8 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 700, color: 'var(--text-2)', marginBottom: 8 }}>
                 No campaigns yet
               </div>
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-3)' }}>

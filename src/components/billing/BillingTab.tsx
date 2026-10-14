@@ -186,7 +186,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '8px' }}>
             <span
               style={{
-                fontFamily: '"DM Mono", monospace',
+                fontFamily: 'var(--font-mono)',
                 fontSize: '28px',
                 color: '#F5E6D8',
                 fontWeight: 400,
@@ -463,7 +463,7 @@ const UsageMeter: React.FC<UsageMeterProps> = ({ icon, label, used, limit }) => 
         </div>
         <span
           style={{
-            fontFamily: '"DM Mono", monospace',
+            fontFamily: 'var(--font-mono)',
             fontSize: '14px',
             color: '#F5E6D8',
             fontWeight: 400,

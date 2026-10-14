@@ -191,12 +191,12 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
                 </defs>
                 <XAxis
                   dataKey="day"
-                  tick={{ fontSize: 9, fill: 'var(--text-hint)', fontFamily: 'DM Mono' }}
+                  tick={{ fontSize: 9, fill: 'var(--text-hint)', fontFamily: 'var(--font-mono)' }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 9, fill: 'var(--text-hint)', fontFamily: 'DM Mono' }}
+                  tick={{ fontSize: 9, fill: 'var(--text-hint)', fontFamily: 'var(--font-mono)' }}
                   axisLine={false}
                   tickLine={false}
                   width={28}
@@ -207,7 +207,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
                     border: '0.5px solid var(--border-light)',
                     borderRadius: 4,
                     fontSize: 11,
-                    fontFamily: 'DM Mono',
+                    fontFamily: 'var(--font-mono)',
                   }}
                 />
                 <Area
@@ -423,7 +423,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-kpi-value {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 14px;
           font-weight: 500;
           color: var(--text-primary);
@@ -453,7 +453,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
 
         /* ── Bench source tag ────────────────────────────────── */
         .bench-source-tag {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 9px;
           font-weight: 400;
           color: var(--text-hint);
@@ -547,7 +547,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-table td.mono {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 12px;
           font-weight: 500;
           color: var(--text-primary);

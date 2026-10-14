@@ -336,7 +336,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         .wd-page-title {
           font-family: var(--font-display);
           font-size: 28px;
-          font-weight: 600;
+          font-weight: 800;
           color: var(--text-primary);
           margin: 4px 0 2px;
           line-height: 1.2;
@@ -401,7 +401,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-kpi-value {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 18px;
           font-weight: 500;
           color: var(--text-primary);
@@ -611,7 +611,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-campaign-platform {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 9px;
           font-weight: 400;
           color: var(--text-muted);
@@ -620,7 +620,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-td-mono {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 12px;
           font-weight: 500;
           color: var(--text-primary);
@@ -629,7 +629,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-qualified-pill {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 12px;
           font-weight: 500;
           color: var(--rose-gold-dark);

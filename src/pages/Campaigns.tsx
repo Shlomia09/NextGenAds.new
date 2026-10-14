@@ -510,7 +510,7 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
     }}>
       {/* Panel header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 500, letterSpacing: -0.2 }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, letterSpacing: -0.2 }}>
           Performance · <span style={{ color: 'var(--accent)' }}>{dateLabel}</span>
         </div>
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
@@ -638,7 +638,7 @@ const DonutPanel: React.FC<DonutPanelProps> = ({ campaigns }) => {
       borderRadius: 16, boxShadow: 'var(--shadow)', padding: '20px 22px',
     }}>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 500, letterSpacing: -0.2 }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, letterSpacing: -0.2 }}>
           Spend by campaign
         </div>
       </div>
@@ -653,7 +653,7 @@ const DonutPanel: React.FC<DonutPanelProps> = ({ campaigns }) => {
           pointerEvents: 'none',
         }}>
           <div style={{
-            fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 500,
+            fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800,
             color: 'var(--accent)', lineHeight: 1,
           }}>
             {formatCurrency(totalSpend)}
@@ -1093,7 +1093,7 @@ const Campaigns: React.FC = () => {
             <span style={{ display: 'inline-block', width: 22, height: 1, background: 'var(--text-3)' }} />
             Campaign Intelligence
           </div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: 32, letterSpacing: -0.5, lineHeight: 1 }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 32, letterSpacing: -0.5, lineHeight: 1 }}>
             Campaigns
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 13, color: 'var(--text-2)', fontSize: 13, marginTop: 9, fontFamily: 'var(--font-ui)', flexWrap: 'wrap' }}>
@@ -1341,7 +1341,7 @@ const Campaigns: React.FC = () => {
         {campaigns.length === 0 ? (
           <div style={{ padding: '60px 32px', textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 500, color: 'var(--text)', marginBottom: 8 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: 'var(--text)', marginBottom: 8 }}>
               No campaigns yet
             </div>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 14, color: 'var(--text-2)', marginBottom: 20 }}>

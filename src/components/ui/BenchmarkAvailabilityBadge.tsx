@@ -42,7 +42,7 @@ const BenchmarkAvailabilityBadge: React.FC<Props> = ({ availability, aovLabel, m
           {isFull ? '9yr Benchmark Active' : 'Partial Benchmark Active'}
         </div>
         <div style={{
-          fontFamily: "'DM Mono', monospace",
+          fontFamily: 'var(--font-mono)',
           fontSize: 8,
           fontWeight: 400,
           marginTop: 2,

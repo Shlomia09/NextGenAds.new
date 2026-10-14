@@ -93,7 +93,7 @@ const KpiPill: React.FC<KpiPillProps> = ({ icon, label, value, highlight }) => (
     </div>
     <div
       style={{
-        fontFamily: "'DM Mono', monospace",
+        fontFamily: 'var(--font-mono)',
         fontSize: 15,
         fontWeight: 500,
         color: highlight ? 'var(--rose-gold)' : 'var(--text-primary)',
@@ -156,14 +156,14 @@ const SeasonalTip: React.FC = () => (
       }}
     >
       Check seasonal campaigns — Gift vouchers perform{' '}
-      <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 500, color: 'var(--rose-gold)' }}>
+      <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 500, color: 'var(--rose-gold)' }}>
         3.2×
       </span>{' '}
       better in Oct–Dec. Consider launching a campaign now to capture pre-peak bookings.
     </p>
     <div
       style={{
-        fontFamily: "'DM Mono', monospace",
+        fontFamily: 'var(--font-mono)',
         fontSize: 10,
         color: 'var(--rose-gold)',
         background: 'var(--rose-gold-light)',
@@ -386,7 +386,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
             </div>
             <div
               style={{
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: 'var(--font-mono)',
                 fontSize: 22,
                 fontWeight: 500,
                 color: seasonal.color,
@@ -406,7 +406,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
               {now.toLocaleString('default', { month: 'long' })} ·{' '}
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   background: seasonal.bgColor,
                   color: seasonal.color,
                   padding: '1px 6px',
@@ -567,7 +567,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
                         <div style={{ fontWeight: 400 }}>{c.name}</div>
                         <div
                           style={{
-                            fontFamily: "'DM Mono', monospace",
+                            fontFamily: 'var(--font-mono)',
                             fontSize: 9,
                             color: 'var(--text-hint)',
                             marginTop: 1,

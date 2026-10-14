@@ -128,7 +128,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
       <div style={{
         fontFamily: 'var(--font-display)',
         fontSize: 13,
-        fontWeight: 600,
+        fontWeight: 700,
         color: '#1A1410',
         lineHeight: 1.35,
       }}>
@@ -152,7 +152,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         background: 'rgba(196,131,106,0.10)',
         border: '0.5px solid rgba(196,131,106,0.2)',
         color: '#C4836A',
-        fontFamily: "'DM Mono', monospace",
+        fontFamily: 'var(--font-mono)',
         fontSize: 8,
         padding: '3px 8px',
         display: 'inline-block',

@@ -182,11 +182,11 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
               <div className="sd-freq-warning-title">⚠️ Creative Fatigue Warning</div>
               <p className="sd-freq-warning-body">
                 Your frequency is{' '}
-                <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
                   {avgFrequency.toFixed(2)}x
                 </span>{' '}
                 — above the{' '}
-                <span style={{ fontFamily: "'DM Mono', monospace" }}>3.5x</span>{' '}
+                <span style={{ fontFamily: 'var(--font-mono)' }}>3.5x</span>{' '}
                 benchmark. Local audiences burn out fast. Refresh creative or pause.
               </p>
             </div>
@@ -321,7 +321,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         .sd-page-title {
           font-family: var(--font-display);
           font-size: 28px;
-          font-weight: 600;
+          font-weight: 800;
           color: var(--text-primary);
           margin: 4px 0 2px;
           line-height: 1.2;
@@ -376,7 +376,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-kpi-value {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-weight: 500;
           font-size: 20px;
           color: var(--text-primary);
@@ -475,7 +475,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         .sd-empty-text {
           font-family: var(--font-display);
           font-size: 15px;
-          font-weight: 600;
+          font-weight: 700;
           color: var(--text-primary);
           margin: 0;
         }
@@ -580,7 +580,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-td-mono {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-weight: 500;
           font-size: 13px;
           color: var(--text-primary);

@@ -9,7 +9,7 @@ class ConnectErrorBoundary extends Component<{ children: React.ReactNode }, { er
       return (
         <div style={{ minHeight: '100vh', background: '#0F0A07', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
           <div style={{ background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: 24, maxWidth: 600, width: '100%' }}>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#EF4444', marginBottom: 8 }}>RENDER ERROR</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#EF4444', marginBottom: 8 }}>RENDER ERROR</div>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: '#F5E6D8', wordBreak: 'break-all' }}>{this.state.error}</div>
           </div>
         </div>
@@ -271,10 +271,10 @@ const Connect: React.FC = () => {
                 <Link2Off size={18} color="#EF4444" strokeWidth={1.5} />
               </div>
               <div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 600, color: '#F5E6D8', marginBottom: 3 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: '#F5E6D8', marginBottom: 3 }}>
                   Disconnect account?
                 </div>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#4a2e1e' }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: '#4a2e1e' }}>
                   {disconnectTarget.name}
                 </div>
               </div>
@@ -681,7 +681,7 @@ const Connect: React.FC = () => {
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: '#F5E6D8' }}>
                       {account.store_url}
                     </div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: '#4a2e1e', marginTop: 2 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: '#4a2e1e', marginTop: 2 }}>
                       {account.platform.toUpperCase()} · Last synced:{' '}
                       {account.last_synced_at
                         ? new Date(account.last_synced_at).toLocaleDateString()
@@ -738,7 +738,7 @@ const Connect: React.FC = () => {
           color: white; flex-shrink: 0;
         }
 
-        .conn-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary, #F5E6D8); }
+        .conn-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-primary, #F5E6D8); }
         .conn-desc { font-family: var(--font-ui); font-size: 11px; font-weight: 300; color: var(--text-muted, #8B6050); margin-top: 2px; }
 
         .conn-account-info {
@@ -748,7 +748,7 @@ const Connect: React.FC = () => {
           display: flex; flex-direction: column; gap: 3px;
         }
         .conn-account-name { font-family: var(--font-ui); font-size: 12px; font-weight: 500; color: var(--text-primary, #F5E6D8); }
-        .conn-account-id  { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-hint, #4a2e1e); }
+        .conn-account-id  { font-family: var(--font-mono); font-size: 10px; color: var(--text-hint, #4a2e1e); }
 
         .conn-features { list-style: none; display: flex; flex-direction: column; gap: 6px; padding: 0; }
         .conn-features li {

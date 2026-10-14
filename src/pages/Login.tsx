@@ -269,7 +269,7 @@ const Login: React.FC = () => {
         .login-headline {
           font-family: var(--font-display);
           font-size: 42px;
-          font-weight: 600;
+          font-weight: 800;
           line-height: 1.15;
           color: #F5E6D8;
           letter-spacing: -0.02em;
@@ -303,7 +303,7 @@ const Login: React.FC = () => {
         }
 
         .login-proof-stat {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 22px;
           font-weight: 500;
           color: #F5E6D8;
@@ -361,7 +361,7 @@ const Login: React.FC = () => {
         .login-demo-btn:hover { background: #B06E55; }
 
         .login-demo-sub {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 9px;
           color: #6B4A38;
           letter-spacing: 0.06em;
@@ -369,7 +369,7 @@ const Login: React.FC = () => {
 
         .login-quote {
           font-family: var(--font-display);
-          font-weight: 600;
+          font-weight: 700;
           font-size: 14px;
           color: #8B6050;
           border-left: 1px solid #3d2a1e;
@@ -398,7 +398,7 @@ const Login: React.FC = () => {
         .login-logo {
           font-family: var(--font-display);
           font-size: 20px;
-          font-weight: 600;
+          font-weight: 800;
           color: var(--text-primary);
           letter-spacing: -0.01em;
           margin-bottom: 4px;

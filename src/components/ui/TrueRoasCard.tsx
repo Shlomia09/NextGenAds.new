@@ -7,7 +7,7 @@ interface TrueRoasCardProps {
 }
 
 const font = 'var(--font-ui)';
-const mono = "'DM Mono', monospace";
+const mono = 'var(--font-mono)';
 
 function getRoasColor(roas: number) {
   if (roas > 2.0) return '#10B981';

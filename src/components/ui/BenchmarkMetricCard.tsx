@@ -85,7 +85,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         {label}
       </div>
 
-      {/* Your value — DM Mono always */}
+      {/* Your value — --font-mono always */}
       <div className="bm-your-value" style={{ color: yourValueColor }}>
         {formatVal(yourValue)}
       </div>
@@ -158,7 +158,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .bm-your-value {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 26px;
           font-weight: 500;
           line-height: 1;
@@ -181,7 +181,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .bm-bench-value {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 8px;
           font-weight: 400;
           color: var(--text-hint, #8B6A5A);

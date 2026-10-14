@@ -194,7 +194,7 @@ const AccountSwitcher: React.FC = () => {
                 <div
                   style={{
                     padding: '6px 12px 2px',
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: 'var(--font-mono)',
                     fontSize: 8,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
@@ -260,7 +260,7 @@ const AccountSwitcher: React.FC = () => {
                         </div>
                         <div
                           style={{
-                            fontFamily: "'DM Mono', monospace",
+                            fontFamily: 'var(--font-mono)',
                             fontSize: 9,
                             color: '#A09890',
                             marginTop: 1,
