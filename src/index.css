@@ -370,13 +370,13 @@ input, textarea, select {
   border: 1px solid transparent;
 }
 
-/* Primary: border + text accent (per design system — NOT filled) */
+/* Primary: red as fill, never as text (CLAUDE.md red rule) */
 .btn-primary {
-  background: transparent;
-  color: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: transparent;
 }
-.btn-primary:hover { background: var(--accent-soft); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-deep); }
 
 .btn-secondary {
   background: transparent;

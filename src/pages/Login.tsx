@@ -177,7 +177,7 @@ const Login: React.FC = () => {
 
             <button
               type="submit"
-              className="btn btn-primary btn-lg full-width login-submit"
+              className="btn btn-primary btn-lg full-width"
               disabled={submitting}
             >
               {submitting
@@ -311,8 +311,8 @@ const Login: React.FC = () => {
 
         /* ——— Demo CTA box on dark panel ——— */
         .login-demo-cta {
-          background: var(--accent-soft);
-          border: 0.5px solid var(--accent-soft);
+          background: var(--surface-2);
+          border: 1px solid var(--border);
           border-radius: 6px;
           padding: 16px 18px;
           margin-bottom: 28px;
@@ -426,10 +426,6 @@ const Login: React.FC = () => {
           color: var(--text);
           border-bottom-color: var(--text);
         }
-
-        /* the one primary action on this screen: red as fill, never as text */
-        .login-submit { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-        .login-submit:hover:not(:disabled) { background: var(--accent-deep); border-color: var(--accent-deep); }
 
         .login-google-btn {
           display: flex;

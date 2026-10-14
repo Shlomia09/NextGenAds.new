@@ -216,7 +216,7 @@ Rouge היא הסמכות המקצועית של ענף הביוטי — לא מ�
 
 ### צ'ארטים
 
-- סדרות: spend = `--text-2`, conversions = `--green`, impressions = `--text-2`, benchmark = `--text-3` מקווקו. מקסימום 4 סדרות.
+- סדרות, לפי הסדר: (1) spend = `--text-2`, (2) conversions / leads / purchases = `--green`, (3) impressions / reach = `--blue`, (4) frequency / audience = `--purple`, (5) decay / half-life / flagged = `--accent`. benchmark = `--text-3` מקווקו. מקסימום 4 סדרות בצ'ארט אחד.
 - אדום (`--accent`) שמור לסדרת Half-Life / דעיכה בלבד. spend הוא לא התראה ולא מקבל אדום — לא בקו, לא ב-legend ולא בסכום.
 - `grid` ← `var(--grid)`. עובי קו **2.5px** (היה 1.5 — נעלם על ink). מילוי עמודות 85% עם stroke ב-`--border-control`.
 - **אל תיגע** במנגנון destroy+recreate בהחלפת theme. הוא נכון.

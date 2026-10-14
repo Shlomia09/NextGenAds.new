@@ -565,7 +565,7 @@ const DonutPanel: React.FC<DonutPanelProps> = ({ campaigns }) => {
   const totalSpend = useMemo(() => campaigns.reduce((s, c) => s + c.spend, 0), [campaigns]);
 
   const SERIES_COLORS = [
-    '--accent', '--champagne', '--blue', '--amber', '--green',
+    '--text-2', '--green', '--blue', '--purple', '--accent',   // spend, conversions, reach, frequency, decay
   ];
 
   const buildChart = useCallback(() => {
@@ -1278,7 +1278,7 @@ const Campaigns: React.FC = () => {
           label="TOTAL SPEND"
           value={formatCurrency(totalSpend)}
           icon="₠"
-          kcVar="--accent"
+          kcVar="--text"
           barPct={spendPct}
           trendUp={true}
           subText={`${activeCnt} active campaign${activeCnt !== 1 ? 's' : ''}`}

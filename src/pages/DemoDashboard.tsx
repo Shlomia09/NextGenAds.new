@@ -111,6 +111,8 @@ const DemoDashboard: React.FC = () => {
   const totalRevenue = MOCK_CAMPAIGNS.reduce((s, c) => s + c.revenue, 0);
   const totalPurch   = MOCK_CAMPAIGNS.reduce((s, c) => s + c.purchases, 0);
   const avgRoas      = totalSpend > 0 ? totalRevenue / totalSpend : 0;
+  const roasBench    = MOCK_BENCHMARKS.find(b => b.label === 'ROAS')?.bench ?? 0;
+  const roasColor    = avgRoas >= roasBench ? 'var(--green)' : 'var(--accent)';
 
   const sendChat = async () => {
     if (!chatInput.trim() || chatLoading) return;
@@ -164,7 +166,7 @@ const DemoDashboard: React.FC = () => {
         {/* Demo banner */}
         <div style={{ background: 'var(--bg)', borderBottom: '0.5px solid var(--border)', padding: '9px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Sparkles size={12} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
+            <Sparkles size={12} strokeWidth={1.5} style={{ color: 'var(--text-3)' }} />
             <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--text)', letterSpacing: '0.04em' }}>
               Demo Mode — NeoLumo Spain · Mock data · No auth required
             </span>
@@ -208,7 +210,7 @@ const DemoDashboard: React.FC = () => {
                 { icon: <Users size={10} strokeWidth={1.5} />,      label: 'Purchases', value: String(totalPurch) },
                 { icon: <BarChart3 size={10} strokeWidth={1.5} />,  label: 'ROAS',      value: `${avgRoas.toFixed(2)}x`, hl: true },
               ].map(({ icon, label, value, hl }) => (
-                <div key={label} style={{ background: hl ? 'var(--rose-gold-light)' : 'var(--bg-card)', border: `0.5px solid ${hl ? 'var(--border-rose)' : 'var(--border-light)'}`, borderRadius: 4, padding: '10px 14px' }}>
+                <div key={label} style={{ background: 'var(--bg-card)', border: `0.5px solid ${hl ? roasColor : 'var(--border-light)'}`, borderRadius: 4, padding: '10px 14px' }}>
                   <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, fontWeight: 400, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
                     {icon}{label}
                   </div>
@@ -236,11 +238,12 @@ const DemoDashboard: React.FC = () => {
                 const diff = ((your - bench) / bench * 100);
                 const beating = better ? your >= bench : your <= bench;
                 const statusColor = beating ? 'var(--success)' : 'var(--danger)';
+                const dotColor = your == null ? 'var(--text-3)' : beating ? 'var(--green)' : 'var(--accent)';
                 const fmtVal = (v: number) => unit === 'x' ? `${v.toFixed(2)}x` : unit === '%' ? `${v.toFixed(2)}%` : `€${v.toFixed(2)}`;
                 return (
                   <div key={label} style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-light)', borderRadius: 6, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 7 }}>
                     <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, fontWeight: 400, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div className="live-dot" style={{ background: 'var(--rose-gold)' }} />
+                      <div className="live-dot" style={{ background: dotColor }} />
                       {label}
                     </div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: 26, fontWeight: 500, color: statusColor, lineHeight: 1 }}>
@@ -332,7 +335,7 @@ const DemoDashboard: React.FC = () => {
               <div style={{ background: 'var(--bg-primary)', border: '0.5px solid var(--border-light)', borderRadius: 6, display: 'flex', flexDirection: 'column', minHeight: 520 }}>
                 {/* Chat header */}
                 <div style={{ padding: '12px 16px', borderBottom: '0.5px solid var(--border-light)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', gap: 10, borderRadius: '6px 6px 0 0' }}>
-                  <div style={{ width: 28, height: 28, background: 'var(--bg)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
+                  <div style={{ width: 28, height: 28, background: 'var(--bg)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)' }}>
                     <Sparkles size={12} strokeWidth={1.5} />
                   </div>
                   <div>
@@ -347,7 +350,7 @@ const DemoDashboard: React.FC = () => {
                 <div style={{ flex: 1, overflowY: 'auto', padding: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {chatMessages.length === 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, textAlign: 'center', gap: 10, padding: 20 }}>
-                      <div style={{ width: 44, height: 44, background: 'var(--rose-gold-light)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--rose-gold)' }}>
+                      <div style={{ width: 44, height: 44, background: 'var(--surface-2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)' }}>
                         <Sparkles size={18} strokeWidth={1.5} />
                       </div>
                       <p style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Ask Rouge</p>
@@ -368,7 +371,7 @@ const DemoDashboard: React.FC = () => {
 
                   {chatMessages.map((msg, i) => (
                     <div key={i} style={{ display: 'flex', flexDirection: msg.role === 'user' ? 'row-reverse' : 'row', gap: 8, alignItems: 'flex-start' }}>
-                      <div style={{ width: 22, height: 22, borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: msg.role === 'user' ? 'var(--bg)' : 'var(--rose-gold-light)', color: msg.role === 'user' ? 'var(--text)' : 'var(--rose-gold-dark)' }}>
+                      <div style={{ width: 22, height: 22, borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: msg.role === 'user' ? 'var(--bg)' : 'var(--surface-2)', color: msg.role === 'user' ? 'var(--text)' : 'var(--text-3)' }}>
                         {msg.role === 'user' ? <Users size={10} strokeWidth={1.5} /> : <Sparkles size={10} strokeWidth={1.5} />}
                       </div>
                       <div style={{ maxWidth: '82%', background: msg.role === 'user' ? 'var(--bg)' : 'var(--bg-card)', border: `0.5px solid ${msg.role === 'user' ? 'var(--border)' : 'var(--border-light)'}`, borderRadius: 4, padding: '9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, lineHeight: 1.6, color: msg.role === 'user' ? 'var(--text)' : 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
@@ -379,7 +382,7 @@ const DemoDashboard: React.FC = () => {
 
                   {chatLoading && (
                     <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                      <div style={{ width: 22, height: 22, borderRadius: 3, background: 'var(--rose-gold-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--rose-gold-dark)' }}>
+                      <div style={{ width: 22, height: 22, borderRadius: 3, background: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)' }}>
                         <Sparkles size={10} strokeWidth={1.5} />
                       </div>
                       <div style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-light)', borderRadius: 4, padding: '9px 12px', display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, color: 'var(--text-muted)' }}>
