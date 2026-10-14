@@ -121,7 +121,7 @@ const Intelligence: React.FC = () => {
             AI Strategist
           </div>
           <h1 className="page-title">
-            Intelligence <em style={{ color: 'var(--rose-gold)' }}>Engine</em>
+            Intelligence
           </h1>
           <p className="page-subtitle">
             9-year Beauty &amp; Cosmetics benchmark knowledge · Context-aware campaign strategist

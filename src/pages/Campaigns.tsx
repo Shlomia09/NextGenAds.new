@@ -401,7 +401,6 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
     if (!canvasRef.current) return;
     if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
 
-    const accent = cssv('--accent');
     const green  = cssv('--green');
     const text2  = cssv('--text-2');
     const text3  = cssv('--text-3');
@@ -412,8 +411,8 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
 
     const ctx = canvasRef.current.getContext('2d')!;
     const g1  = ctx.createLinearGradient(0, 0, 0, 240);
-    g1.addColorStop(0, accent + '55');
-    g1.addColorStop(1, accent + '05');
+    g1.addColorStop(0, text2 + '55');
+    g1.addColorStop(1, text2 + '05');
     const g2  = ctx.createLinearGradient(0, 0, 0, 240);
     g2.addColorStop(0, green + '40');
     g2.addColorStop(1, green + '03');
@@ -426,14 +425,14 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
           {
             label: 'Spend',
             data: spendData,
-            borderColor: accent,
+            borderColor: text2,   // spend is not an alert — red is reserved for decay series
             backgroundColor: g1,
             fill: true,
             tension: 0.4,
             borderWidth: 2,
             pointRadius: 0,
             pointHoverRadius: 4,
-            pointHoverBackgroundColor: accent,
+            pointHoverBackgroundColor: text2,
             yAxisID: 'y',
           },
           {
@@ -515,7 +514,7 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
         </div>
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
           {[
-            { color: 'var(--accent)', label: 'Spend' },
+            { color: 'var(--text-2)', label: 'Spend' },
             { color: 'var(--green)', label: conversionLabel },
           ].map(({ color, label }) => (
             <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: 'var(--text-2)', fontFamily: 'var(--font-ui)' }}>
@@ -529,7 +528,7 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
       {/* Stat row */}
       <div style={{ display: 'flex', gap: 30, marginBottom: 8 }}>
         {[
-          { label: 'TOTAL SPEND',              value: formatCurrency(totalSpend),   color: 'var(--accent)' },
+          { label: 'TOTAL SPEND',              value: formatCurrency(totalSpend),   color: 'var(--text)' },
           { label: `TOTAL ${conversionLabel.toUpperCase()}`, value: String(totalConversions), color: 'var(--green)'  },
           { label: 'IMPRESSIONS',               value: fmt(totalImpressions),        color: 'var(--blue)'   },
         ].map(({ label, value, color }) => (
@@ -654,7 +653,7 @@ const DonutPanel: React.FC<DonutPanelProps> = ({ campaigns }) => {
         }}>
           <div style={{
             fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800,
-            color: 'var(--accent)', lineHeight: 1,
+            color: 'var(--text)', lineHeight: 1,
           }}>
             {formatCurrency(totalSpend)}
           </div>

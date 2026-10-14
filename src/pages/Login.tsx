@@ -177,7 +177,7 @@ const Login: React.FC = () => {
 
             <button
               type="submit"
-              className="btn btn-primary btn-lg full-width"
+              className="btn btn-primary btn-lg full-width login-submit"
               disabled={submitting}
             >
               {submitting
@@ -226,17 +226,6 @@ const Login: React.FC = () => {
           overflow: hidden;
         }
 
-        .login-left::before {
-          content: '';
-          position: absolute;
-          top: -120px;
-          right: -120px;
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
-          pointer-events: none;
-        }
-
         .login-left-content {
           position: relative;
           z-index: 1;
@@ -264,7 +253,7 @@ const Login: React.FC = () => {
           display: block;
           width: 24px;
           height: 0.5px;
-          background: var(--rose-gold);
+          background: var(--border);
         }
 
         .login-headline {
@@ -345,21 +334,21 @@ const Login: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 9px;
-          background: var(--accent);
-          border: none;
+          background: transparent;
+          border: 1px solid var(--border-control);
           border-radius: 4px;
           padding: 11px 16px;
           font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 500;
           letter-spacing: 0.06em;
-          color: var(--on-accent);
+          color: var(--text);
           cursor: pointer;
           transition: background 0.2s;
           width: fit-content;
         }
 
-        .login-demo-btn:hover { background: var(--accent-deep); }
+        .login-demo-btn:hover { background: var(--surface-2); }
 
         .login-demo-sub {
           font-family: var(--font-mono);
@@ -424,18 +413,23 @@ const Login: React.FC = () => {
           font-size: 12px;
           font-weight: 400;
           letter-spacing: 0.04em;
-          color: var(--text-muted);
+          color: var(--text-2);
           background: transparent;
           border: none;
+          border-bottom: 2px solid transparent;
+          border-radius: 0;
           cursor: pointer;
           transition: all var(--transition);
         }
 
         .login-tab.active {
-          background: var(--bg-card);
-          color: var(--text-primary);
-          box-shadow: var(--shadow-sm);
+          color: var(--text);
+          border-bottom-color: var(--text);
         }
+
+        /* the one primary action on this screen: red as fill, never as text */
+        .login-submit { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+        .login-submit:hover:not(:disabled) { background: var(--accent-deep); border-color: var(--accent-deep); }
 
         .login-google-btn {
           display: flex;

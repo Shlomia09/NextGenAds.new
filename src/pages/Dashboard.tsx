@@ -747,7 +747,7 @@ const Dashboard: React.FC = () => {
                       {[
                         { label: 'CTR', value: ad.ctr > 0 ? `${ad.ctr.toFixed(2)}%` : '—', color: 'var(--blue)' },
                         { label: 'Leads', value: ad.leads > 0 ? String(ad.leads) : '—', color: 'var(--green)' },
-                        { label: 'CPL', value: ad.cpl > 0 ? formatCurrency(ad.cpl) : '—', color: 'var(--accent)' },
+                        { label: 'CPL', value: ad.cpl > 0 ? formatCurrency(ad.cpl) : '—', color: 'var(--text)' },
                       ].map(m => (
                         <div key={m.label} style={{ background: 'var(--surface-2)', borderRadius: 9, padding: '9px 10px', border: '1px solid var(--border-soft)' }}>
                           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 3 }}>{m.label}</div>

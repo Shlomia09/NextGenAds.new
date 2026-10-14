@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { cssToken } from '../../lib/cssToken';
+import { useTheme } from '../../context/ThemeContext';
 
 interface ThemeToggleProps {
   /** 'sidebar' (default): full-width pill inside the dark sidebar
@@ -9,18 +10,14 @@ interface ThemeToggleProps {
 }
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ placement = 'sidebar' }) => {
-  const [isDark, setIsDark] = useState(() => {
-    return document.documentElement.getAttribute('data-theme') === 'dark';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
+  // Theme lives in ThemeContext, which also persists it — no local copy here.
+  const { theme, toggle } = useTheme();
+  const isDark = theme === 'dark';
 
   if (placement === 'topbar') {
     return (
       <button
-        onClick={() => setIsDark(prev => !prev)}
+        onClick={toggle}
         aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
         title={isDark ? 'Light mode' : 'Dark mode'}
         style={{
@@ -55,7 +52,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ placement = 'sidebar' }) => {
   // placement === 'sidebar' (default)
   return (
     <button
-      onClick={() => setIsDark(prev => !prev)}
+      onClick={toggle}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       title={isDark ? 'Light mode' : 'Dark mode'}
       style={{
