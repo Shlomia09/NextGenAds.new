@@ -466,9 +466,9 @@ input, textarea, select {
   text-transform: uppercase;
 }
 
-.badge-critical { background: #FCEBEB; color: #791F1F; border: 0.5px solid rgba(226,75,74,0.3); }
+.badge-critical { background: #FCEBEB; color: #791F1F; border: 0.5px solid var(--red-soft); }
 .badge-high     { background: #FAEEDA; color: #633806; border: 0.5px solid rgba(245,158,11,0.3); }
-.badge-medium   { background: #FDF6F0; color: #C4836A; border: 0.5px solid rgba(196,131,106,0.3); }
+.badge-medium   { background: #FDF6F0; color: var(--accent); border: 0.5px solid var(--accent-soft); }
 .badge-success  { background: #EAF3DE; color: #27500A; border: 0.5px solid rgba(59,109,17,0.25); }
 .badge-neutral  { background: var(--color-surface-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-default); }
 
@@ -754,9 +754,9 @@ input, textarea, select {
   transition: box-shadow var(--transition);
 }
 .rec-card:hover { box-shadow: var(--shadow-sm); }
-.rec-card.critical { border-left: 2.5px solid #E24B4A; }
+.rec-card.critical { border-left: 2.5px solid var(--red); }
 .rec-card.high     { border-left: 2.5px solid #633806; }
-.rec-card.medium   { border-left: 2.5px solid #C4836A; }
+.rec-card.medium   { border-left: 2.5px solid var(--accent); }
 
 .rec-title {
   font-family: var(--font-display);
@@ -778,7 +778,7 @@ input, textarea, select {
 
 .rec-benchmark-ref {
   background: #FDF6F0;
-  border: 0.5px solid rgba(196,131,106,0.25);
+  border: 0.5px solid var(--accent-soft);
   color: var(--rose);
   font-family: var(--font-mono);
   font-size: 8px;
@@ -823,7 +823,7 @@ input, textarea, select {
   box-sizing: border-box;
 }
 .form-input::placeholder { color: var(--color-text-tertiary); }
-.form-input:focus { border-color: var(--rose); box-shadow: 0 0 0 2px rgba(196,131,106,0.1); }
+.form-input:focus { border-color: var(--rose); box-shadow: 0 0 0 2px var(--accent-soft); }
 
 .form-select {
   width: 100%;

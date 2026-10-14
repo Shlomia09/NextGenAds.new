@@ -26,9 +26,9 @@ const QUICK_QUESTIONS = [
 const T = {
   bgDeep:      '#F8F6F3',
   bgContainer: '#FFFFFF',
-  border:      '0.5px solid #E8E4DF',
-  borderColor: '#E8E4DF',
-  accent:      '#C4836A',
+  border:      '0.5px solid var(--border)',
+  borderColor: 'var(--border)',
+  accent:      'var(--accent)',
   accentHover: '#A86B52',
   textPrimary: '#1A1410',
   textBody:    '#3D2B1F',
@@ -379,7 +379,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 alignItems: 'center',
                 gap: 5,
                 background: '#FAEEDA',
-                border: '0.5px solid rgba(196,131,106,0.25)',
+                border: '0.5px solid var(--accent-soft)',
                 borderRadius: 4,
                 padding: '3px 8px',
                 marginLeft: 8,
@@ -457,8 +457,8 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               style={{
                 width: 44,
                 height: 44,
-                background: 'rgba(196,131,106,0.1)',
-                border: '0.5px solid rgba(196,131,106,0.2)',
+                background: 'var(--accent-soft)',
+                border: '0.5px solid var(--accent-soft)',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
@@ -513,14 +513,14 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                   onMouseLeave={() => setHoveredQuick(null)}
                   onClick={() => sendMessage(q)}
                   style={{
-                    background: hoveredQuick === q ? 'rgba(196,131,106,0.05)' : '#FDF6F0',
-                    border: hoveredQuick === q ? `0.5px solid ${T.accent}` : '0.5px solid #C4836A',
+                    background: hoveredQuick === q ? 'var(--accent-soft)' : '#FDF6F0',
+                    border: hoveredQuick === q ? `0.5px solid ${T.accent}` : '0.5px solid var(--accent)',
                     borderRadius: T.radius,
                     padding: '7px 12px',
                     fontFamily: 'var(--font-ui)',
                     fontSize: 10,
                     fontWeight: 300,
-                    color: '#C4836A',
+                    color: 'var(--accent)',
                     textAlign: 'left',
                     cursor: 'pointer',
                     transition: T.transition,
@@ -596,7 +596,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                     : {
                         // AI bubble: white with light border
                         background: '#FFFFFF',
-                        border: '0.5px solid #E8E4DF',
+                        border: '0.5px solid var(--border)',
                         color: T.textBody,
                         borderRadius: T.radius,
                         padding: '9px 13px',
@@ -616,15 +616,15 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                       const [, used, limit] = msg.content.split('__');
                       return (
                         <div style={{
-                          background: 'rgba(196,131,106,0.08)',
-                          border: '0.5px solid rgba(196,131,106,0.3)',
+                          background: 'var(--accent-soft)',
+                          border: '0.5px solid var(--accent-soft)',
                           borderRadius: 4, padding: '12px 14px',
                           marginRight: '10%',
                         }}>
-                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C4836A', marginBottom: 6 }}>
+                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 6 }}>
                             Monthly limit reached
                           </div>
-                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: '#C4836A', marginBottom: 4 }}>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--accent)', marginBottom: 4 }}>
                             {used} / {limit} queries
                           </div>
                           <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: '0 0 12px' }}>
@@ -635,7 +635,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                             href="/pricing"
                             style={{
                               display: 'inline-block',
-                              background: '#C4836A', color: '#FFFFFF',
+                              background: 'var(--accent)', color: '#FFFFFF',
                               borderRadius: 3, padding: '7px 16px',
                               fontFamily: 'var(--font-ui)', fontSize: 9,
                               fontWeight: 500, letterSpacing: '0.12em',
@@ -744,8 +744,8 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
         <div style={{
           margin: '0 14px 8px',
           padding: '12px 16px',
-          background: 'linear-gradient(135deg, rgba(196,131,106,0.12) 0%, rgba(196,131,106,0.06) 100%)',
-          border: '1px solid rgba(196,131,106,0.35)',
+          background: 'linear-gradient(135deg, var(--accent-soft) 0%, var(--accent-soft) 100%)',
+          border: '1px solid var(--accent-soft)',
           borderRadius: 10,
           backdropFilter: 'blur(8px)',
           flexShrink: 0,
@@ -821,7 +821,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           style={{
             flex: 1,
             background: '#FFFFFF',
-            border: inputFocused ? `1px solid ${T.accent}` : '1px solid #E8E4DF',
+            border: inputFocused ? `1px solid ${T.accent}` : '1px solid var(--border)',
             borderRadius: T.radius,
             padding: '8px 12px',
             color: T.textPrimary,
@@ -842,7 +842,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           style={{
             width: 32,
             height: 32,
-            background: sendHovered && input.trim() && !loading ? T.accentHover : '#C4836A',
+            background: sendHovered && input.trim() && !loading ? T.accentHover : 'var(--accent)',
             border: 'none',
             borderRadius: T.radius,
             display: 'flex',

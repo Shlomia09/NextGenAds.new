@@ -232,7 +232,7 @@ const Login: React.FC = () => {
           right: -120px;
           width: 400px;
           height: 400px;
-          background: radial-gradient(circle, rgba(196,131,106,0.08) 0%, transparent 70%);
+          background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
           pointer-events: none;
         }
 
@@ -321,8 +321,8 @@ const Login: React.FC = () => {
 
         /* ——— Demo CTA box on dark panel ——— */
         .login-demo-cta {
-          background: rgba(196,131,106,0.08);
-          border: 0.5px solid rgba(196,131,106,0.25);
+          background: var(--accent-soft);
+          border: 0.5px solid var(--accent-soft);
           border-radius: 6px;
           padding: 16px 18px;
           margin-bottom: 28px;
@@ -344,7 +344,7 @@ const Login: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 9px;
-          background: #C4836A;
+          background: var(--accent);
           border: none;
           border-radius: 4px;
           padding: 11px 16px;

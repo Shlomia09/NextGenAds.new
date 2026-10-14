@@ -1104,7 +1104,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                         <button key={r.id} onClick={() => applyRegion(r.id)} style={{
                           border: `1px solid ${allSel ? 'var(--accent)' : someSel ? 'var(--amber)' : 'var(--border)'}`,
                           borderRadius: 8, padding: '5px 11px',
-                          background: allSel ? 'var(--accent-soft)' : someSel ? 'rgba(217,176,106,0.1)' : 'var(--field)',
+                          background: allSel ? 'var(--accent-soft)' : someSel ? 'var(--amber-soft)' : 'var(--field)',
                           color: allSel ? 'var(--accent)' : someSel ? 'var(--amber)' : 'var(--text-2)',
                           fontFamily: 'var(--font-ui)', fontSize: 11.5, fontWeight: 500, cursor: 'pointer', transition: '.12s',
                         }}>
@@ -1480,7 +1480,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                     </div>
                   )}
                   {/* Creative area */}
-                  <div style={{ aspectRatio: '1/1', background: form.creativeUrl ? 'transparent' : 'linear-gradient(150deg, var(--accent) 0%, var(--accent-deep) 55%, #9E5436 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,.7)', fontSize: 28, overflow: 'hidden' }}>
+                  <div style={{ aspectRatio: '1/1', background: form.creativeUrl ? 'transparent' : 'linear-gradient(150deg, var(--accent) 0%, var(--accent-deep) 55%, var(--accent-deep) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,.7)', fontSize: 28, overflow: 'hidden' }}>
                     {form.creativeUrl
                       ? <img src={form.creativeUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       : '🖼'}

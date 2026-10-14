@@ -520,7 +520,7 @@ const Onboarding: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {([
                   { value: 'new',     label: 'New Account (0–3 months)',      desc: 'Pixel < 2 weeks. We apply the full warm-up protocol.',      dot: '#F59E0B' },
-                  { value: 'scaling', label: 'Growing (3–12 months)',         desc: 'Active account with data. Ready to grow budgets.',          dot: '#C4836A' },
+                  { value: 'scaling', label: 'Growing (3–12 months)',         desc: 'Active account with data. Ready to grow budgets.',          dot: 'var(--accent)' },
                   { value: 'mature',  label: 'Established (1+ year)',         desc: 'Rich history, lookalikes, and retargeting audiences built.', dot: '#10B981' },
                 ] as const).map(({ value, label, desc, dot }) => (
                   <button key={value}
@@ -617,8 +617,8 @@ const Onboarding: React.FC = () => {
           font-family: var(--font-mono); font-size: 10px; color: #6d4a3e;
           flex-shrink: 0; transition: all var(--transition);
         }
-        .ob-step-item.active .ob-step-num { border-color: #C4836A; color: #C4836A; }
-        .ob-step-item.done  .ob-step-num { background: #C4836A; border-color: #C4836A; color: white; }
+        .ob-step-item.active .ob-step-num { border-color: var(--accent); color: var(--accent); }
+        .ob-step-item.done  .ob-step-num { background: var(--accent); border-color: var(--accent); color: white; }
 
         .ob-type-preview {
           display: flex; align-items: center; gap: 8px;

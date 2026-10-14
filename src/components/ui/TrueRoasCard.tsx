@@ -29,7 +29,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
     return (
       <div style={{
         background: '#FFFFFF',
-        border: '0.5px solid #E8E4DF',
+        border: '0.5px solid var(--border)',
         borderRadius: 8,
         padding: '16px 20px',
         display: 'grid',
@@ -39,8 +39,8 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
       }}>
         {[0, 1, 2].map(i => (
           <div key={i} style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ height: 9, width: 80, background: '#E8E4DF', borderRadius: 2 }} />
-            <div style={{ height: 22, width: 60, background: '#E8E4DF', borderRadius: 2 }} />
+            <div style={{ height: 9, width: 80, background: 'var(--border)', borderRadius: 2 }} />
+            <div style={{ height: 22, width: 60, background: 'var(--border)', borderRadius: 2 }} />
           </div>
         ))}
       </div>
@@ -51,7 +51,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
     return (
       <div style={{
         background: '#FFFFFF',
-        border: '0.5px solid rgba(196,131,106,0.2)',
+        border: '0.5px solid var(--accent-soft)',
         borderRadius: 8,
         padding: '16px 20px',
         display: 'flex',
@@ -61,10 +61,10 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
         marginBottom: 16,
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.2em', color: '#C4836A', textTransform: 'uppercase' }}>
+          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.2em', color: 'var(--accent)', textTransform: 'uppercase' }}>
             True ROAS
           </div>
-          <div style={{ fontFamily: font, fontSize: 13, fontWeight: 300, color: '#6B5044' }}>
+          <div style={{ fontFamily: font, fontSize: 13, fontWeight: 300, color: 'var(--text-2)' }}>
             🔗 Connect Shopify or WooCommerce to see True ROAS
           </div>
         </div>
@@ -74,9 +74,9 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
             fontFamily: font,
             fontSize: 11,
             fontWeight: 500,
-            color: '#C4836A',
-            background: 'rgba(196,131,106,0.08)',
-            border: '0.5px solid rgba(196,131,106,0.3)',
+            color: 'var(--accent)',
+            background: 'var(--accent-soft)',
+            border: '0.5px solid var(--accent-soft)',
             borderRadius: 4,
             padding: '7px 14px',
             textDecoration: 'none',
@@ -98,7 +98,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
   return (
     <div style={{
       background: '#FFFFFF',
-      border: '0.5px solid #E8E4DF',
+      border: '0.5px solid var(--border)',
       borderRadius: 8,
       overflow: 'hidden',
       marginBottom: 16,
@@ -107,21 +107,21 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr 1fr',
-        borderBottom: data.utm_coverage_pct < 80 ? '0.5px solid #E8E4DF' : 'none',
+        borderBottom: data.utm_coverage_pct < 80 ? '0.5px solid var(--border)' : 'none',
       }}>
 
         {/* Panel 1: Meta ROAS */}
         <div style={{
           padding: '16px 18px',
-          borderRight: '0.5px solid #E8E4DF',
+          borderRight: '0.5px solid var(--border)',
         }}>
-          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: '#C4836A', textTransform: 'uppercase', marginBottom: 6 }}>
+          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 6 }}>
             Meta ROAS
           </div>
-          <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: '#C4836A', lineHeight: 1.1, marginBottom: 6 }}>
+          <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: 'var(--accent)', lineHeight: 1.1, marginBottom: 6 }}>
             {data.meta_roas.toFixed(1)}x
           </div>
-          <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: '#6B5044', lineHeight: 1.4 }}>
+          <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.4 }}>
             Meta claimed<br />
             <span style={{ fontSize: 9, color: '#8B6A5A' }}>(view-through included)</span>
           </div>
@@ -130,7 +130,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
         {/* Panel 2: True ROAS */}
         <div style={{
           padding: '16px 18px',
-          borderRight: '0.5px solid #E8E4DF',
+          borderRight: '0.5px solid var(--border)',
           background: data.true_roas > 0 ? `${roasColor}0D` : 'transparent',
         }}>
           <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: '#8B6A5A', textTransform: 'uppercase', marginBottom: 6 }}>
@@ -139,7 +139,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
           <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: data.true_roas > 0 ? roasColor : '#8B6A5A', lineHeight: 1.1, marginBottom: 6 }}>
             {data.true_roas > 0 ? `${data.true_roas.toFixed(1)}x` : '—'}
           </div>
-          <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: '#6B5044', lineHeight: 1.4 }}>
+          <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.4 }}>
             Verified revenue<br />
             <span style={{ fontSize: 9, color: '#8B6A5A' }}>UTM: facebook orders</span>
           </div>
@@ -156,7 +156,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
           <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: gapColor, lineHeight: 1.1, marginBottom: 6 }}>
             {data.gap_pct > 0 ? `-${data.gap_pct.toFixed(0)}%` : '—'}
           </div>
-          <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: '#6B5044', lineHeight: 1.4 }}>
+          <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.4 }}>
             {data.gap_pct > 35
               ? '⚠ Above industry avg'
               : data.gap_pct > 0

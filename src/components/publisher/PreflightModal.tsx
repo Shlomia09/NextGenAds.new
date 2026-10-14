@@ -235,7 +235,7 @@ const PreflightModal: React.FC<Props> = ({
           )}
 
           {/* Copy */}
-          <div style={{ background: 'rgba(196,131,106,0.04)', border: '0.5px solid rgba(196,131,106,0.15)', borderRadius: 10, padding: '14px 16px' }}>
+          <div style={{ background: 'var(--accent-soft)', border: '0.5px solid var(--accent-soft)', borderRadius: 10, padding: '14px 16px' }}>
             <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--rose-gold)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Ad Copy</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
@@ -252,7 +252,7 @@ const PreflightModal: React.FC<Props> = ({
           </div>
 
           {/* Campaign details */}
-          <div style={{ background: '#F8F6F3', border: '0.5px solid #E8E4DF', borderRadius: 10, padding: '14px 16px' }}>
+          <div style={{ background: '#F8F6F3', border: '0.5px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
             <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Campaign Settings</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
@@ -311,7 +311,7 @@ const PreflightModal: React.FC<Props> = ({
             disabled={loading}
             style={{
               width: '100%',
-              background: loading ? 'rgba(196,131,106,0.3)' : 'linear-gradient(135deg, var(--rose-gold), #a0554a)',
+              background: loading ? 'var(--accent-soft)' : 'linear-gradient(135deg, var(--rose-gold), #a0554a)',
               border: 'none', borderRadius: 10, padding: '14px 20px',
               fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500, color: 'white',
               cursor: loading ? 'not-allowed' : 'pointer',

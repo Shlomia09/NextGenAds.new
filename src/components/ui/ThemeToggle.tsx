@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
+import { cssToken } from '../../lib/cssToken';
 
 interface ThemeToggleProps {
   /** 'sidebar' (default): full-width pill inside the dark sidebar
@@ -37,8 +38,8 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ placement = 'sidebar' }) => {
         }}
         onMouseEnter={e => {
           const el = e.currentTarget as HTMLButtonElement;
-          el.style.borderColor = '#C4836A';
-          el.style.color = '#C4836A';
+          el.style.borderColor = cssToken('--accent');
+          el.style.color = cssToken('--accent');
         }}
         onMouseLeave={e => {
           const el = e.currentTarget as HTMLButtonElement;
@@ -62,10 +63,10 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ placement = 'sidebar' }) => {
         alignItems: 'center',
         justifyContent: 'center',
         gap: '6px',
-        background: 'rgba(196,131,106,0.08)',
-        border: '0.5px solid rgba(196,131,106,0.20)',
+        background: 'var(--accent-soft)',
+        border: '0.5px solid var(--accent-soft)',
         borderRadius: '4px',
-        color: '#C4836A',
+        color: 'var(--accent)',
         padding: '6px 12px',
         cursor: 'pointer',
         fontFamily: 'var(--font-mono)',
@@ -77,10 +78,10 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ placement = 'sidebar' }) => {
         maxWidth: '140px',
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,131,106,0.14)';
+        (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent-soft)';
       }}
       onMouseLeave={e => {
-        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(196,131,106,0.08)';
+        (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent-soft)';
       }}
     >
       {isDark ? <Sun size={11} strokeWidth={1.5} /> : <Moon size={11} strokeWidth={1.5} />}

@@ -758,7 +758,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
         .cd-td-right  { text-align: right; }
 
         .cd-tr-even {
-          background: rgba(196, 131, 106, 0.02);
+          background: var(--accent-soft);
         }
 
         .cd-table tbody tr:hover {

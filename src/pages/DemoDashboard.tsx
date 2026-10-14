@@ -137,7 +137,7 @@ const DemoDashboard: React.FC = () => {
         </div>
 
         {/* Demo pill */}
-        <div style={{ margin: '10px 12px', background: 'rgba(196,131,106,0.1)', border: '0.5px solid rgba(196,131,106,0.3)', borderRadius: 3, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 7 }}>
+        <div style={{ margin: '10px 12px', background: 'var(--accent-soft)', border: '0.5px solid var(--accent-soft)', borderRadius: 3, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 7 }}>
           <div className="live-dot" />
           <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 300, color: '#C4A090' }}>Demo Mode</span>
         </div>
@@ -153,7 +153,7 @@ const DemoDashboard: React.FC = () => {
 
         <div style={{ padding: '14px 12px', borderTop: '0.5px solid #3d2a1e' }}>
           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, color: '#8B6050', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div className="live-dot" style={{ background: '#C4836A' }} />
+            <div className="live-dot" style={{ background: 'var(--accent)' }} />
             9-Year Benchmark Active
           </div>
         </div>
@@ -164,7 +164,7 @@ const DemoDashboard: React.FC = () => {
         {/* Demo banner */}
         <div style={{ background: '#2C1810', borderBottom: '0.5px solid #3d2a1e', padding: '9px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Sparkles size={12} strokeWidth={1.5} style={{ color: '#C4836A' }} />
+            <Sparkles size={12} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
             <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#C4A090', letterSpacing: '0.04em' }}>
               Demo Mode — NeoLumo Spain · Mock data · No auth required
             </span>
@@ -269,14 +269,14 @@ const DemoDashboard: React.FC = () => {
                   <AreaChart data={ROAS_TREND}>
                     <defs>
                       <linearGradient id="dg" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#C4836A" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="#C4836A" stopOpacity={0} />
+                        <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <XAxis dataKey="day" tick={{ fontSize: 8, fill: 'var(--text-hint)', fontFamily: 'var(--font-mono)' }} axisLine={false} tickLine={false} interval={3} />
                     <YAxis tick={{ fontSize: 8, fill: 'var(--text-hint)', fontFamily: 'var(--font-mono)' }} axisLine={false} tickLine={false} width={24} domain={[0, 6]} />
                     <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-light)', borderRadius: 4, fontSize: 10, fontFamily: 'var(--font-mono)' }} />
-                    <Area type="monotone" dataKey="roas"  stroke="#C4836A" fill="url(#dg)" strokeWidth={1.5} name="Your ROAS" />
+                    <Area type="monotone" dataKey="roas"  stroke="var(--accent)" fill="url(#dg)" strokeWidth={1.5} name="Your ROAS" />
                     <Area type="monotone" dataKey="bench" stroke="var(--text-hint)" fill="none" strokeDasharray="3 3" strokeWidth={1} name="Benchmark" />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -332,7 +332,7 @@ const DemoDashboard: React.FC = () => {
               <div style={{ background: 'var(--bg-primary)', border: '0.5px solid var(--border-light)', borderRadius: 6, display: 'flex', flexDirection: 'column', minHeight: 520 }}>
                 {/* Chat header */}
                 <div style={{ padding: '12px 16px', borderBottom: '0.5px solid var(--border-light)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', gap: 10, borderRadius: '6px 6px 0 0' }}>
-                  <div style={{ width: 28, height: 28, background: '#2C1810', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C4836A' }}>
+                  <div style={{ width: 28, height: 28, background: '#2C1810', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
                     <Sparkles size={12} strokeWidth={1.5} />
                   </div>
                   <div>
@@ -467,12 +467,12 @@ const DemoDashboard: React.FC = () => {
 
         .demo-nav-item.active {
           color: #C4A090;
-          border-left-color: #C4836A;
-          background: rgba(196, 131, 106, 0.08);
+          border-left-color: var(--accent);
+          background: var(--accent-soft);
           opacity: 1 !important;
         }
 
-        .demo-nav-item:hover { color: #C4A090; background: rgba(196,131,106,0.06); }
+        .demo-nav-item:hover { color: #C4A090; background: var(--accent-soft); }
       `}</style>
     </div>
   );

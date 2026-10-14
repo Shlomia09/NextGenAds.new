@@ -13,26 +13,26 @@ const priorityConfig = {
   critical: {
     icon: <AlertTriangle size={10} strokeWidth={1.5} />,
     label: 'Critical',
-    borderColor: '#E24B4A',
+    borderColor: 'var(--red)',
     badgeBg: '#FCEBEB',
     badgeColor: '#791F1F',
-    badgeBorder: 'rgba(226,75,74,0.25)',
+    badgeBorder: 'var(--red-soft)',
   },
   high: {
     icon: <Zap size={10} strokeWidth={1.5} />,
     label: 'High',
-    borderColor: '#C4836A',
+    borderColor: 'var(--accent)',
     badgeBg: '#FAEEDA',
     badgeColor: '#633806',
-    badgeBorder: 'rgba(196,131,106,0.35)',
+    badgeBorder: 'var(--accent-soft)',
   },
   medium: {
     icon: <Info size={10} strokeWidth={1.5} />,
     label: 'Medium',
-    borderColor: '#C4836A',
+    borderColor: 'var(--accent)',
     badgeBg: '#FDF6F0',
-    badgeColor: '#C4836A',
-    badgeBorder: 'rgba(196,131,106,0.25)',
+    badgeColor: 'var(--accent)',
+    badgeBorder: 'var(--accent-soft)',
   },
 };
 
@@ -57,7 +57,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
     <div
       style={{
         background: '#FFFFFF',
-        border: '0.5px solid #E8E4DF',
+        border: '0.5px solid var(--border)',
         borderLeft: `2.5px solid ${config.borderColor}`,
         borderRadius: 6,
         padding: '12px 14px',
@@ -92,8 +92,8 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           {/* Type badge */}
           <span style={{
             background: '#F8F6F3',
-            color: '#6B5044',
-            border: '0.5px solid #E8E4DF',
+            color: 'var(--text-2)',
+            border: '0.5px solid var(--border)',
             fontFamily: 'var(--font-ui)',
             fontSize: 8,
             fontWeight: 400,
@@ -117,7 +117,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             alignItems: 'center',
             transition: 'color 0.15s',
           }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#C4836A')}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
           onMouseLeave={e => (e.currentTarget.style.color = '#8B6A5A')}
         >
           {expanded ? <ChevronUp size={13} strokeWidth={1.5} /> : <ChevronDown size={13} strokeWidth={1.5} />}
@@ -140,7 +140,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         fontFamily: 'var(--font-ui)',
         fontSize: 11,
         fontWeight: 300,
-        color: '#6B5044',
+        color: 'var(--text-2)',
         lineHeight: 1.6,
         margin: 0,
       }}>
@@ -149,9 +149,9 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
       {/* Benchmark reference pill */}
       <span style={{
-        background: 'rgba(196,131,106,0.10)',
-        border: '0.5px solid rgba(196,131,106,0.2)',
-        color: '#C4836A',
+        background: 'var(--accent-soft)',
+        border: '0.5px solid var(--accent-soft)',
+        color: 'var(--accent)',
         fontFamily: 'var(--font-mono)',
         fontSize: 8,
         padding: '3px 8px',
@@ -173,14 +173,14 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             padding: '10px 12px',
             background: '#F8F6F3',
             borderRadius: 4,
-            border: '0.5px solid #E8E4DF',
+            border: '0.5px solid var(--border)',
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6A5A' }}>
               Recommended Action
             </div>
-            <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#6B5044', lineHeight: 1.55, margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.55, margin: 0 }}>
               {rec.action}
             </p>
           </div>
@@ -189,7 +189,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 8, fontWeight: 400, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6A5A' }}>
                 AI Reasoning
               </div>
-              <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#6B5044', lineHeight: 1.55, margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.55, margin: 0 }}>
                 {rec.reasoning}
               </p>
             </div>
@@ -204,7 +204,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         gap: 6,
         flexWrap: 'wrap',
         paddingTop: 6,
-        borderTop: '0.5px solid #E8E4DF',
+        borderTop: '0.5px solid var(--border)',
       }}>
         <button
           onClick={() => onApprove(rec.id)}
@@ -227,15 +227,15 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           onClick={() => onLearnMore(rec)}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 5,
-            background: 'transparent', color: '#6B5044',
-            border: '0.5px solid #E8E4DF', borderRadius: 2,
+            background: 'transparent', color: 'var(--text-2)',
+            border: '0.5px solid var(--border)', borderRadius: 2,
             padding: '6px 12px',
             fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 400,
             letterSpacing: '0.1em', textTransform: 'uppercase',
             cursor: 'pointer', transition: 'all 0.15s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = '#C4836A'; e.currentTarget.style.color = '#C4836A'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8E4DF'; e.currentTarget.style.color = '#6B5044'; }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)'; }}
         >
           <Info size={11} strokeWidth={1.5} />
           Details
@@ -252,7 +252,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             letterSpacing: '0.1em', textTransform: 'uppercase',
             cursor: 'pointer', transition: 'color 0.15s',
           }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#C4836A')}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
           onMouseLeave={e => (e.currentTarget.style.color = '#8B6A5A')}
         >
           <XCircle size={11} strokeWidth={1.5} />

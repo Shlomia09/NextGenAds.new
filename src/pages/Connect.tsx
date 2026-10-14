@@ -35,7 +35,7 @@ const MetaLogo = () => (
 );
 
 const GoogleAdsLogo = () => (
-  <div style={{ width: 40, height: 40, background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+  <div style={{ width: 40, height: 40, background: '#FFFFFF', border: '0.5px solid var(--border)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
     <svg width="22" height="22" viewBox="0 0 48 48">
       <path fill="#4285F4" d="M45 20H25v8h11.3C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-8 20-20 0-1.3-.2-2.7-.5-4z"/>
       <path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3.1 0 5.9 1.1 8.1 2.9l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/>
@@ -307,14 +307,14 @@ const Connect: React.FC = () => {
                 disabled={disconnecting}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10,
-                  background: 'rgba(196,131,106,0.08)', border: '0.5px solid rgba(196,131,106,0.3)',
+                  background: 'var(--accent-soft)', border: '0.5px solid var(--accent-soft)',
                   borderRadius: 5, padding: '13px 16px', cursor: 'pointer',
                   textAlign: 'left', width: '100%', transition: 'background 0.15s',
                 }}
               >
-                <Link2Off size={16} color="#C4836A" strokeWidth={1.5} style={{ flexShrink: 0 }} />
+                <Link2Off size={16} color="var(--accent)" strokeWidth={1.5} style={{ flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: '#C4836A', marginBottom: 2 }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--accent)', marginBottom: 2 }}>
                     Disconnect only
                   </div>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 300, color: '#8B6050' }}>
@@ -465,8 +465,8 @@ const Connect: React.FC = () => {
 
                     {/* ── Brand assignment row ── */}
                     <div style={{
-                      background: 'rgba(196,131,106,0.04)',
-                      border: '0.5px solid rgba(196,131,106,0.15)',
+                      background: 'var(--accent-soft)',
+                      border: '0.5px solid var(--accent-soft)',
                       borderRadius: 4, padding: '8px 10px',
                       display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
                     }}>
@@ -518,8 +518,8 @@ const Connect: React.FC = () => {
                           <button
                             onClick={() => setRelinkingId(account.id)}
                             style={{
-                              background: 'rgba(196,131,106,0.1)',
-                              border: '0.5px solid rgba(196,131,106,0.3)',
+                              background: 'var(--accent-soft)',
+                              border: '0.5px solid var(--accent-soft)',
                               borderRadius: 3, padding: '3px 8px',
                               fontFamily: 'var(--font-sans)', fontSize: 10,
                               color: 'var(--accent)', cursor: 'pointer', flexShrink: 0,
@@ -645,7 +645,7 @@ const Connect: React.FC = () => {
           fontFamily: 'var(--font-sans)',
           fontSize: 9,
           letterSpacing: '0.2em',
-          color: 'var(--rose-gold, #C4836A)',
+          color: 'var(--rose-gold, var(--accent))',
           textTransform: 'uppercase',
           marginBottom: 16,
         }}
@@ -726,7 +726,7 @@ const Connect: React.FC = () => {
           gap: 14px;
           transition: border-color 0.15s, box-shadow 0.15s;
         }
-        .conn-card:hover { border-color: rgba(196,131,106,0.3); box-shadow: 0 4px 20px rgba(196,131,106,0.05); }
+        .conn-card:hover { border-color: var(--accent-soft); box-shadow: 0 4px 20px var(--accent-soft); }
         .conn-soon { opacity: 0.65; }
 
         .conn-header { display: flex; align-items: center; gap: 12px; }
@@ -756,7 +756,7 @@ const Connect: React.FC = () => {
           color: var(--text-secondary, #8B6050);
           padding-left: 14px; position: relative;
         }
-        .conn-features li::before { content: '·'; position: absolute; left: 0; color: #C4836A; font-size: 10px; }
+        .conn-features li::before { content: '·'; position: absolute; left: 0; color: var(--accent); font-size: 10px; }
 
         .live-dot {
           width: 6px; height: 6px; border-radius: 50%;
@@ -769,14 +769,14 @@ const Connect: React.FC = () => {
 
         .conn-benchmark-note {
           margin-top: 24px;
-          background: rgba(196,131,106,0.05);
-          border: 0.5px solid rgba(196,131,106,0.15);
+          background: var(--accent-soft);
+          border: 0.5px solid var(--accent-soft);
           border-radius: 6px; padding: 16px 20px;
         }
         .conn-bench-eyebrow {
           font-family: var(--font-ui); font-size: 9px;
           font-weight: 400; letter-spacing: 0.22em; text-transform: uppercase;
-          color: #C4836A; margin-bottom: 6px;
+          color: var(--accent); margin-bottom: 6px;
         }
         .conn-benchmark-note p {
           font-family: var(--font-ui); font-size: 13px;

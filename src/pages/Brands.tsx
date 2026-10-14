@@ -6,6 +6,7 @@ import { getBrands, relinkAdAccount, getAdAccounts } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { getAovBracket, MARKETS } from '../lib/benchmarks';
 import type { Brand } from '../types';
+import { cssToken } from '../lib/cssToken';
 
 // ── Brand Card ────────────────────────────────────────────────────────────────
 interface BrandCardProps {
@@ -23,7 +24,7 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, linkedAccounts, allAccount
 
   const stageDot: Record<string, string> = {
     new:     '#F59E0B',
-    scaling: '#C4836A',
+    scaling: cssToken('--accent'),
     mature:  '#10B981',
   };
 
@@ -130,8 +131,8 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, linkedAccounts, allAccount
                   onClick={() => setLinkingOpen(true)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 5,
-                    background: 'rgba(196,131,106,0.08)',
-                    border: '0.5px solid rgba(196,131,106,0.25)',
+                    background: 'var(--accent-soft)',
+                    border: '0.5px solid var(--accent-soft)',
                     borderRadius: 4, padding: '5px 10px',
                     fontFamily: 'var(--font-sans)', fontSize: 11,
                     color: 'var(--accent)', cursor: 'pointer', alignSelf: 'flex-start',
@@ -317,7 +318,7 @@ const Brands: React.FC = () => {
           background: #2C1810; border-radius: 4px;
           display: flex; align-items: center; justify-content: center;
           font-family: var(--font-display); font-size: 16px;
-          font-weight: 700; color: #C4836A; flex-shrink: 0;
+          font-weight: 700; color: var(--accent); flex-shrink: 0;
         }
         .brand-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-primary); }
         .brand-cat { font-family: var(--font-ui); font-size: 11px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }

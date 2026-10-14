@@ -129,9 +129,9 @@ export default function PlatformSelector({ brandId, selected, selectedAccountId,
               borderRadius: 10,
               border: isSelected
                 ? '1px solid var(--rose-gold)'
-                : '0.5px solid #E8E4DF',
+                : '0.5px solid var(--border)',
               background: isSelected
-                ? 'rgba(196,131,106,0.08)'
+                ? 'var(--accent-soft)'
                 : '#FFFFFF',
               cursor: isDisabled ? 'not-allowed' : 'pointer',
               opacity: isDisabled ? 0.5 : 1,

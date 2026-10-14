@@ -4,6 +4,8 @@
  * and benchmark context strings per account conversion type.
  */
 
+import { cssToken } from './cssToken';
+
 export type ConversionType = 'ecommerce' | 'leads' | 'bookings' | 'app' | 'awareness';
 
 // ─── Conversion type display metadata ────────────────────────
@@ -26,8 +28,8 @@ export const CONVERSION_META: Record<ConversionType, ConversionTypeMeta> = {
   leads: {
     label:       'Lead Generation',
     emoji:       '📋',
-    color:       '#C4836A',
-    bg:          'rgba(196,131,106,0.10)',
+    get color()  { return cssToken('--accent'); },
+    get bg()     { return cssToken('--accent-soft'); },
     description: 'CPL, Leads, Cost per Booking',
   },
   bookings: {
@@ -100,7 +102,7 @@ export const KPI_CONFIG: Record<ConversionType, KpiDef[]> = {
   ],
   leads: [
     { key: 'spend',    label: 'Total Spend',  compute: cs => fmt(cs.reduce((s,c) => s + c.spend, 0)) },
-    { key: 'leads',    label: 'Total Leads',  color: '#C4836A', compute: cs => fmtN(cs.reduce((s,c) => s + c.leads, 0)) },
+    { key: 'leads',    label: 'Total Leads',  get color() { return cssToken('--accent'); }, compute: cs => fmtN(cs.reduce((s,c) => s + c.leads, 0)) },
     { key: 'cpl',      label: 'Avg CPL',      compute: cs => {
       const sp = cs.reduce((s,c) => s + c.spend, 0);
       const le = cs.reduce((s,c) => s + c.leads, 0);

@@ -18,7 +18,7 @@ class AppErrorBoundary extends Component<{ children: React.ReactNode }, { error:
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 14, color: '#F5E6D8', marginBottom: 12 }}>{this.state.error}</div>
             {this.state.stack && <pre style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: '#8B6050', overflow: 'auto', maxHeight: 300, margin: 0 }}>{this.state.stack}</pre>}
           </div>
-          <button onClick={() => window.location.reload()} style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: '#C4836A', background: 'rgba(196,131,106,0.08)', border: '0.5px solid rgba(196,131,106,0.3)', borderRadius: 4, padding: '8px 16px', cursor: 'pointer' }}>Reload</button>
+          <button onClick={() => window.location.reload()} style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--accent)', background: 'var(--accent-soft)', border: '0.5px solid var(--accent-soft)', borderRadius: 4, padding: '8px 16px', cursor: 'pointer' }}>Reload</button>
         </div>
       );
     }
@@ -54,7 +54,7 @@ const queryClient = new QueryClient({
 
 const LoadingScreen: React.FC = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#0F0A07', gap: 12 }}>
-    <div className="animate-spin" style={{ width: 18, height: 18, border: '1.5px solid #2a1a0e', borderTopColor: '#C4836A', borderRadius: '50%' }} />
+    <div className="animate-spin" style={{ width: 18, height: 18, border: '1.5px solid #2a1a0e', borderTopColor: 'var(--accent)', borderRadius: '50%' }} />
     <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, color: '#6b4030', letterSpacing: '0.1em' }}>Loading…</span>
   </div>
 );

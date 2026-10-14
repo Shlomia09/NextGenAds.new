@@ -1,4 +1,5 @@
 import { useSubscription } from './useSubscription';
+import { cssToken } from '../lib/cssToken';
 
 export type PlanId = 'free' | 'starter' | 'growth' | 'scale';
 export type FeatureKey = 'execute' | 'more_brands' | 'unlimited_chat' | 'white_label' | 'agency_view' | 'api_access';
@@ -112,7 +113,7 @@ export const PLAN_META: Record<PlanId, {
 }> = {
   free:    { label: 'Free',    monthly: 0,   yearly: 0,    color: '#6b4030' },
   starter: { label: 'Starter', monthly: 149, yearly: 1490, color: '#C4A090' },
-  growth:  { label: 'Growth',  monthly: 349, yearly: 3490, color: '#C4836A' },
+  growth:  { label: 'Growth',  monthly: 349, yearly: 3490, get color() { return cssToken('--accent'); } },
   scale:   { label: 'Scale',   monthly: 749, yearly: 7490, color: '#D4A847' },
 };
 

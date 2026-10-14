@@ -107,7 +107,7 @@ const Audit: React.FC = () => {
       }}>
         <Link to="/" style={{ textDecoration: 'none' }}>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: '#F5E6D8' }}>
-            NextAds<em style={{ color: '#C4836A' }}>Gen</em>
+            NextAds<em style={{ color: 'var(--accent)' }}>Gen</em>
           </div>
         </Link>
         <Link to="/pricing" style={{ fontFamily: 'var(--font-ui)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6b4030', textDecoration: 'none' }}>
@@ -126,7 +126,7 @@ const Audit: React.FC = () => {
               <span style={{ display: 'block', width: 16, height: 0.5, background: '#4a2e1e' }} />
             </div>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 40, fontWeight: 800, lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.02em' }}>
-              See exactly where your<br /><em style={{ color: '#C4836A' }}>ads are losing money</em>
+              See exactly where your<br /><em style={{ color: 'var(--accent)' }}>ads are losing money</em>
             </h1>
             <p style={{ fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 300, color: '#8B6050', lineHeight: 1.7, marginBottom: 36 }}>
               Get a one-time free benchmark audit comparing your Meta Ads performance<br />
@@ -141,7 +141,7 @@ const Audit: React.FC = () => {
                 { n: '03', title: 'Get your report', sub: 'Instant benchmark comparison' },
               ].map(s => (
                 <div key={s.n} style={{ background: '#1C1208', border: '0.5px solid #2a1a0e', borderRadius: 6, padding: '16px' }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#C4836A', marginBottom: 8 }}>{s.n}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--accent)', marginBottom: 8 }}>{s.n}</div>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: '#F5E6D8', marginBottom: 4 }}>{s.title}</div>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: '#6b4030' }}>{s.sub}</div>
                 </div>
@@ -151,7 +151,7 @@ const Audit: React.FC = () => {
             <button
               onClick={() => setStep('auth')}
               style={{
-                background: '#C4836A', color: '#0F0A07', border: 'none',
+                background: 'var(--accent)', color: '#0F0A07', border: 'none',
                 padding: '14px 36px', borderRadius: 4,
                 fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500,
                 letterSpacing: '0.14em', textTransform: 'uppercase', cursor: 'pointer',
@@ -201,13 +201,13 @@ const Audit: React.FC = () => {
               )}
               <button
                 type="submit" disabled={loading}
-                style={{ background: '#C4836A', color: '#0F0A07', border: 'none', borderRadius: 4, padding: '12px', fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', cursor: 'pointer', opacity: loading ? 0.6 : 1 }}
+                style={{ background: 'var(--accent)', color: '#0F0A07', border: 'none', borderRadius: 4, padding: '12px', fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', cursor: 'pointer', opacity: loading ? 0.6 : 1 }}
               >
                 {loading ? 'Loading…' : isLogin ? 'Sign In' : 'Create Account & Get Report'}
               </button>
               <div style={{ textAlign: 'center', fontFamily: 'var(--font-ui)', fontSize: 11, color: '#6b4030' }}>
                 {isLogin ? "Don't have an account? " : "Already have an account? "}
-                <button type="button" onClick={() => setIsLogin(!isLogin)} style={{ background: 'none', border: 'none', color: '#C4836A', cursor: 'pointer', fontFamily: 'var(--font-ui)', fontSize: 11 }}>
+                <button type="button" onClick={() => setIsLogin(!isLogin)} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontFamily: 'var(--font-ui)', fontSize: 11 }}>
                   {isLogin ? 'Sign up free' : 'Sign in'}
                 </button>
               </div>
@@ -226,7 +226,7 @@ const Audit: React.FC = () => {
                 <span style={{ display: 'block', width: 16, height: 0.5, background: '#4a2e1e' }} />
               </div>
               <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginBottom: 8, letterSpacing: '-0.02em' }}>
-                Your Meta Ads vs <em style={{ color: '#C4836A' }}>847 Beauty brands</em>
+                Your Meta Ads vs <em style={{ color: 'var(--accent)' }}>847 Beauty brands</em>
               </h1>
               <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: '#8B6050' }}>
                 Based on 9-year anonymized dataset · EU &amp; US markets · 2015–2024
@@ -275,17 +275,17 @@ const Audit: React.FC = () => {
 
             {/* Hard paywall below */}
             <div style={{
-              background: '#1C1208', border: '1px solid rgba(196,131,106,0.4)',
+              background: '#1C1208', border: '1px solid var(--accent-soft)',
               borderRadius: 8, padding: '32px', textAlign: 'center', position: 'relative',
               overflow: 'hidden',
             }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, #C4836A, #D4A847, #C4836A)' }} />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, var(--accent), #D4A847, var(--accent))' }} />
 
               <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center' }}>
-                <Lock size={28} color="#C4836A" strokeWidth={1.5} />
+                <Lock size={28} color="var(--accent)" strokeWidth={1.5} />
               </div>
               <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800, marginBottom: 8, letterSpacing: '-0.01em' }}>
-                Fix this with <em style={{ color: '#C4836A' }}>Rouge Starter</em>
+                Fix this with <em style={{ color: 'var(--accent)' }}>Rouge Starter</em>
               </h2>
               <p style={{ fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 300, color: '#8B6050', lineHeight: 1.7, marginBottom: 24, maxWidth: 460, margin: '0 auto 24px' }}>
                 Get AI-powered recommendations, full 9-year benchmark comparison, and monthly audit reports — all tailored to your Beauty brand.
@@ -301,7 +301,7 @@ const Audit: React.FC = () => {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8, marginBottom: 20 }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 40, fontWeight: 500, color: '#C4836A' }}>€149</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 40, fontWeight: 500, color: 'var(--accent)' }}>€149</span>
                 <span style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: '#8B6050' }}>/month</span>
                 <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: '#6b4030' }}>· Cancel anytime</span>
               </div>
@@ -309,7 +309,7 @@ const Audit: React.FC = () => {
               <button
                 onClick={() => navigate('/pricing')}
                 style={{
-                  background: '#C4836A', color: '#0F0A07', border: 'none', borderRadius: 4,
+                  background: 'var(--accent)', color: '#0F0A07', border: 'none', borderRadius: 4,
                   padding: '14px 40px',
                   fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500,
                   letterSpacing: '0.14em', textTransform: 'uppercase', cursor: 'pointer',

@@ -39,7 +39,7 @@ function getSeasonalIndex(month: number): { label: string; color: string; bgColo
   // month is 0-indexed (0 = January)
   if (month === 10 || month === 11) {
     // November / December
-    return { label: 'Peak Season', color: '#C4836A', bgColor: 'var(--rose-gold-light)' };
+    return { label: 'Peak Season', color: 'var(--accent)', bgColor: 'var(--rose-gold-light)' };
   }
   if (month === 0) {
     // January

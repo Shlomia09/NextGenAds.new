@@ -125,7 +125,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
             <div className="ecom-kpi-label">{icon}{label}</div>
             <div
               className="ecom-kpi-value"
-              style={highlight ? { color: '#C4836A' } : {}}
+              style={highlight ? { color: 'var(--accent)' } : {}}
             >
               {value}
             </div>
@@ -185,8 +185,8 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
               <AreaChart data={mockRoasTrend}>
                 <defs>
                   <linearGradient id="ecom-rg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="#C4836A" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#C4836A" stopOpacity={0} />
+                    <stop offset="5%"  stopColor="var(--accent)" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -213,7 +213,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
                 <Area
                   type="monotone"
                   dataKey="roas"
-                  stroke="#C4836A"
+                  stroke="var(--accent)"
                   fill="url(#ecom-rg)"
                   strokeWidth={1.5}
                   name="Your ROAS"

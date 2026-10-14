@@ -11,7 +11,7 @@ interface BillingTabProps {
 function getPlanBadgeStyle(planId: string): React.CSSProperties {
   const map: Record<string, { background: string; color: string; border: string }> = {
     free:    { background: 'rgba(74,46,30,0.2)',    color: '#8B6050',  border: '0.5px solid #4a2e1e' },
-    starter: { background: 'rgba(196,131,106,0.1)', color: '#C4836A',  border: '0.5px solid rgba(196,131,106,0.3)' },
+    starter: { background: 'var(--accent-soft)', color: 'var(--accent)',  border: '0.5px solid var(--accent-soft)' },
     growth:  { background: 'rgba(16,185,129,0.1)',  color: '#10B981',  border: '0.5px solid rgba(16,185,129,0.3)' },
     scale:   { background: 'rgba(139,92,246,0.1)',  color: '#A78BFA',  border: '0.5px solid rgba(139,92,246,0.3)' },
   };
@@ -252,9 +252,9 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: 'rgba(196,131,106,0.08)',
-                border: '0.5px solid rgba(196,131,106,0.25)',
-                color: '#C4836A',
+                background: 'var(--accent-soft)',
+                border: '0.5px solid var(--accent-soft)',
+                color: 'var(--accent)',
                 fontFamily: 'var(--font-ui)',
                 fontSize: '12px',
                 fontWeight: 500,
@@ -284,7 +284,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  background: '#C4836A',
+                  background: 'var(--accent)',
                   border: 'none',
                   color: '#0F0A07',
                   fontFamily: 'var(--font-ui)',
@@ -332,7 +332,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
 
             {/* Intelligence Chat */}
             <UsageMeter
-              icon={<Zap size={12} color="#C4836A" />}
+              icon={<Zap size={12} color="var(--accent)" />}
               label="Intelligence Chat"
               used={chatUsed}
               limit={chatLimit}
@@ -340,7 +340,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
 
             {/* Brands */}
             <UsageMeter
-              icon={<Users size={12} color="#C4836A" />}
+              icon={<Users size={12} color="var(--accent)" />}
               label="Brands"
               used={brandsUsed}
               limit={brandsLimit}
@@ -348,7 +348,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
 
             {/* Ad Accounts */}
             <UsageMeter
-              icon={<CreditCard size={12} color="#C4836A" />}
+              icon={<CreditCard size={12} color="var(--accent)" />}
               label="Ad Accounts"
               used={adAccountsUsed}
               limit={adAccountsLimit}

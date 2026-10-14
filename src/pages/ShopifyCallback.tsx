@@ -29,7 +29,7 @@ const ShopifyCallback: React.FC = () => {
         width: 20,
         height: 20,
         border: '1.5px solid #2a1a0e',
-        borderTopColor: '#C4836A',
+        borderTopColor: 'var(--accent)',
         borderRadius: '50%',
         animation: 'spin 1s linear infinite',
       }} />

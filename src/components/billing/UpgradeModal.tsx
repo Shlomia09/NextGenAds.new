@@ -159,15 +159,15 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
               width: '48px',
               height: '48px',
               borderRadius: '50%',
-              background: 'rgba(196,131,106,0.1)',
-              border: '0.5px solid rgba(196,131,106,0.2)',
+              background: 'var(--accent-soft)',
+              border: '0.5px solid var(--accent-soft)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '16px',
             }}
           >
-            <Icon size={22} color="#C4836A" />
+            <Icon size={22} color="var(--accent)" />
           </div>
 
           {/* Title */}
@@ -265,8 +265,8 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
             {/* Required Plan */}
             <div
               style={{
-                background: 'rgba(196,131,106,0.06)',
-                border: '1px solid rgba(196,131,106,0.3)',
+                background: 'var(--accent-soft)',
+                border: '1px solid var(--accent-soft)',
                 borderRadius: '6px',
                 padding: '12px',
                 textAlign: 'center',
@@ -278,7 +278,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
                   fontSize: '8px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
-                  color: '#C4836A',
+                  color: 'var(--accent)',
                   marginBottom: '4px',
                 }}
               >
@@ -299,7 +299,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '20px',
-                  color: '#C4836A',
+                  color: 'var(--accent)',
                   fontWeight: 400,
                 }}
               >
@@ -308,7 +308,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
                   style={{
                     fontFamily: 'var(--font-ui)',
                     fontSize: '10px',
-                    color: 'rgba(196,131,106,0.6)',
+                    color: 'var(--text-3)',
                     marginLeft: '2px',
                   }}
                 >
@@ -325,7 +325,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({
               onClick={handleUpgrade}
               style={{
                 width: '100%',
-                background: '#C4836A',
+                background: 'var(--accent)',
                 color: '#0F0A07',
                 border: 'none',
                 borderRadius: '6px',

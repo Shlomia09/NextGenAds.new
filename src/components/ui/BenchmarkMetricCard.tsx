@@ -29,11 +29,11 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
 
   // Light mode value colors: above benchmark = dark green, below = red, neutral = copper
   const yourValueColor = (() => {
-    if (isNeutral) return '#C4836A';
+    if (isNeutral) return 'var(--accent)';
     if (higherIsBetter) {
-      return yourValue >= benchmarkValue ? '#3B6D11' : '#E24B4A';
+      return yourValue >= benchmarkValue ? '#3B6D11' : 'var(--red)';
     } else {
-      return yourValue <= benchmarkValue ? '#3B6D11' : '#E24B4A';
+      return yourValue <= benchmarkValue ? '#3B6D11' : 'var(--red)';
     }
   })();
 
@@ -58,7 +58,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
 
           .bm-card {
             background: #FFFFFF;
-            border: 0.5px solid #E8E4DF;
+            border: 0.5px solid var(--border);
             border-radius: 4px;
             padding: 14px 16px;
             display: flex;
@@ -123,7 +123,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
 
         .bm-card {
           background: #FFFFFF;
-          border: 0.5px solid #E8E4DF;
+          border: 0.5px solid var(--border);
           border-radius: 4px;
           padding: 14px 16px;
           display: flex;
@@ -133,8 +133,8 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .bm-card:hover {
-          border-color: #C4836A;
-          box-shadow: 0 2px 12px rgba(196, 131, 106, 0.08);
+          border-color: var(--accent);
+          box-shadow: 0 2px 12px var(--accent-soft);
         }
 
         .bm-label {
@@ -146,14 +146,14 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           font-weight: 400;
           letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: var(--text-secondary, #6B5044);
+          color: var(--text-secondary, var(--text-2));
         }
 
         .live-dot {
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: #C4836A;
+          background: var(--accent);
           flex-shrink: 0;
         }
 
@@ -177,7 +177,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           font-family: var(--font-ui);
           font-size: 8px;
           font-weight: 300;
-          color: var(--text-secondary, #6B5044);
+          color: var(--text-secondary, var(--text-2));
         }
 
         .bm-bench-value {
@@ -210,8 +210,8 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .metric-benchmark.neutral {
-          background: rgba(196,131,106,0.10);
-          color: #C4836A;
+          background: var(--accent-soft);
+          color: var(--accent);
         }
 
         .bm-source {

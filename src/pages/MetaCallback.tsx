@@ -31,7 +31,7 @@ const T = {
   bg:      '#0F0A07',
   surface: '#1C1208',
   border:  '0.5px solid #2a1a0e',
-  accent:  '#C4836A',
+  accent:  'var(--accent)',
   text:    '#F5E6D8',
   muted:   '#8B6050',
   hint:    '#4a2e1e',
@@ -367,9 +367,9 @@ const MetaCallback: React.FC = () => {
                 onClick={() => toggleAccount(account.id)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  background: isSelected ? 'rgba(196,131,106,0.07)' : isConnected ? 'rgba(16,185,129,0.04)' : T.bg,
+                  background: isSelected ? 'var(--accent-soft)' : isConnected ? 'rgba(16,185,129,0.04)' : T.bg,
                   border: isSelected
-                    ? `0.5px solid rgba(196,131,106,0.4)`
+                    ? `0.5px solid var(--accent-soft)`
                     : isConnected
                     ? '0.5px solid rgba(16,185,129,0.25)'
                     : T.border,
@@ -460,7 +460,7 @@ const MetaCallback: React.FC = () => {
         {/* No brands notice */}
         {!brandsLoading && brands.length === 0 && (
           <div style={{
-            background: 'rgba(196,131,106,0.08)', border: T.border, borderRadius: 8,
+            background: 'var(--accent-soft)', border: T.border, borderRadius: 8,
             padding: '16px 20px', marginBottom: 20, textAlign: 'center',
           }}>
             <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: T.muted, margin: '0 0 12px' }}>

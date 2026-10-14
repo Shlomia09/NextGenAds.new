@@ -800,7 +800,7 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
               {isDateFiltered && (
                 <span style={{
                   fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 500,
-                  background: 'var(--champagne-soft, rgba(196,131,106,0.12))',
+                  background: 'var(--champagne-soft, var(--accent-soft))',
                   color: 'var(--champagne)',
                   border: '1px solid var(--champagne)',
                   borderRadius: 20, padding: '1px 7px',

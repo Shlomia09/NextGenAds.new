@@ -50,7 +50,7 @@ function mapEvent(e: { id: string; type: string; label: string; metadata: Record
         id: e.id, title: 'New AI recommendations', body: e.label || 'Your AI strategist has new insights.',
         time: e.created_at, category: 'ai', unread,
         icon: <Sparkles size={14} strokeWidth={1.5} />,
-        accentColor: '#C4836A',
+        accentColor: 'var(--accent)',
       };
     case 'roas_alert':
     case 'budget_alert':
@@ -137,7 +137,7 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
         time:     new Date().toISOString(),
         category: 'billing',
         icon:     <CreditCard size={14} strokeWidth={1.5} />,
-        accentColor: '#C4836A',
+        accentColor: 'var(--accent)',
         unread:   false,
       });
     }
@@ -154,7 +154,7 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
         time: new Date().toISOString(),
         category: 'system',
         icon: <Bell size={14} strokeWidth={1.5} />,
-        accentColor: '#C4836A',
+        accentColor: 'var(--accent)',
         unread: false,
       });
     }
@@ -234,7 +234,7 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
               borderBottom: i < notifications.length - 1 ? '0.5px solid var(--border-light)' : 'none',
               display:      'flex',
               gap:           12,
-              background:   n.unread ? 'rgba(196,131,106,0.04)' : 'transparent',
+              background:   n.unread ? 'var(--accent-soft)' : 'transparent',
               transition:   'background 0.15s',
             }}
           >
