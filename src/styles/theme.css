@@ -68,7 +68,7 @@
   --shadow-lg: 0 18px 50px rgba(0,0,0,0.7);
   --grid:      #2E2C31;
 
-  --logo-grad: none;
+  --logo-grad: var(--accent);
 
   /* ── All legacy aliases ── */
   --rose:                    var(--accent);
@@ -99,6 +99,7 @@
   --border-light:            var(--border-soft);
   --border-rose:             var(--accent-deep);
   --on-accent:               var(--bg);
+  --font-serif:              var(--font-display);   /* alias — 8 usages, migrate in commit 4 */
   --copper:                  var(--accent);
   --rose-gold:               var(--accent);
   --rose-gold-light:         var(--accent-soft);
@@ -165,7 +166,7 @@
   --shadow-lg: 0 18px 44px rgba(18,17,19,0.16);
   --grid:      #D5CFC3;
 
-  --logo-grad: none;
+  --logo-grad: var(--accent);
 
   /* ── All legacy aliases ── */
   --rose:                    var(--accent);
@@ -196,6 +197,7 @@
   --border-light:            var(--border-soft);
   --border-rose:             var(--accent-deep);
   --on-accent:               var(--bg);
+  --font-serif:              var(--font-display);   /* alias — 8 usages, migrate in commit 4 */
   --copper:                  var(--accent);
   --rose-gold:               var(--accent);
   --rose-gold-light:         var(--accent-soft);
