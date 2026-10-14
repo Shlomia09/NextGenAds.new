@@ -99,6 +99,11 @@
   --border-light:            var(--border-soft);
   --border-rose:             var(--accent-deep);
   --on-accent:               var(--bg);
+  --bg-primary:              var(--bg);              /* was undefined — 7 usages */
+  --bg2:                     var(--surface-2);       /* was undefined — Landing */
+  --field:                   var(--surface-2);       /* was undefined — CampaignWorkshop */
+  --ink:                     var(--on-accent);       /* was undefined — text on accent buttons */
+  --rose-gold-pale:          var(--border-control);  /* was undefined — hover borders */
   --font-serif:              var(--font-display);   /* alias — 8 usages, migrate in commit 4 */
   --copper:                  var(--accent);
   --rose-gold:               var(--accent);
@@ -197,6 +202,11 @@
   --border-light:            var(--border-soft);
   --border-rose:             var(--accent-deep);
   --on-accent:               var(--bg);
+  --bg-primary:              var(--bg);              /* was undefined — 7 usages */
+  --bg2:                     var(--surface-2);       /* was undefined — Landing */
+  --field:                   var(--surface-2);       /* was undefined — CampaignWorkshop */
+  --ink:                     var(--on-accent);       /* was undefined — text on accent buttons */
+  --rose-gold-pale:          var(--border-control);  /* was undefined — hover borders */
   --font-serif:              var(--font-display);   /* alias — 8 usages, migrate in commit 4 */
   --copper:                  var(--accent);
   --rose-gold:               var(--accent);

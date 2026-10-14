@@ -6,3 +6,4 @@ dist
 
 # brand asset staging (duplicates public/brand and src/components/brand)
 brand-assets/
+public/brand/
