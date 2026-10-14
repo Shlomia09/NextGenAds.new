@@ -10,15 +10,15 @@ const font = 'var(--font-ui)';
 const mono = 'var(--font-mono)';
 
 function getRoasColor(roas: number) {
-  if (roas > 2.0) return '#10B981';
-  if (roas > 1.0) return '#F59E0B';
-  return '#EF4444';
+  if (roas > 2.0) return 'var(--green)';
+  if (roas > 1.0) return 'var(--amber)';
+  return 'var(--red)';
 }
 
 function getGapColor(gap_pct: number) {
-  if (gap_pct > 40) return '#EF4444';
-  if (gap_pct > 25) return '#F59E0B';
-  return '#10B981';
+  if (gap_pct > 40) return 'var(--red)';
+  if (gap_pct > 25) return 'var(--amber)';
+  return 'var(--green)';
 }
 
 const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
@@ -28,7 +28,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
   if (loading) {
     return (
       <div style={{
-        background: '#FFFFFF',
+        background: 'var(--surface)',
         border: '0.5px solid var(--border)',
         borderRadius: 8,
         padding: '16px 20px',
@@ -50,7 +50,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
   if (!data.has_ecommerce) {
     return (
       <div style={{
-        background: '#FFFFFF',
+        background: 'var(--surface)',
         border: '0.5px solid var(--accent-soft)',
         borderRadius: 8,
         padding: '16px 20px',
@@ -61,7 +61,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
         marginBottom: 16,
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.2em', color: 'var(--accent)', textTransform: 'uppercase' }}>
+          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.2em', color: 'var(--text)', textTransform: 'uppercase' }}>
             True ROAS
           </div>
           <div style={{ fontFamily: font, fontSize: 13, fontWeight: 300, color: 'var(--text-2)' }}>
@@ -74,7 +74,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
             fontFamily: font,
             fontSize: 11,
             fontWeight: 500,
-            color: 'var(--accent)',
+            color: 'var(--text)',
             background: 'var(--accent-soft)',
             border: '0.5px solid var(--accent-soft)',
             borderRadius: 4,
@@ -97,7 +97,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
 
   return (
     <div style={{
-      background: '#FFFFFF',
+      background: 'var(--surface)',
       border: '0.5px solid var(--border)',
       borderRadius: 8,
       overflow: 'hidden',
@@ -115,15 +115,15 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
           padding: '16px 18px',
           borderRight: '0.5px solid var(--border)',
         }}>
-          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 6 }}>
+          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--text)', textTransform: 'uppercase', marginBottom: 6 }}>
             Meta ROAS
           </div>
-          <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: 'var(--accent)', lineHeight: 1.1, marginBottom: 6 }}>
+          <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: 'var(--text)', lineHeight: 1.1, marginBottom: 6 }}>
             {data.meta_roas.toFixed(1)}x
           </div>
           <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.4 }}>
             Meta claimed<br />
-            <span style={{ fontSize: 9, color: '#8B6A5A' }}>(view-through included)</span>
+            <span style={{ fontSize: 9, color: 'var(--text-3)' }}>(view-through included)</span>
           </div>
         </div>
 
@@ -133,15 +133,15 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
           borderRight: '0.5px solid var(--border)',
           background: data.true_roas > 0 ? `${roasColor}0D` : 'transparent',
         }}>
-          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: '#8B6A5A', textTransform: 'uppercase', marginBottom: 6 }}>
+          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>
             True ROAS
           </div>
-          <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: data.true_roas > 0 ? roasColor : '#8B6A5A', lineHeight: 1.1, marginBottom: 6 }}>
+          <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: data.true_roas > 0 ? roasColor : 'var(--text-3)', lineHeight: 1.1, marginBottom: 6 }}>
             {data.true_roas > 0 ? `${data.true_roas.toFixed(1)}x` : '—'}
           </div>
           <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.4 }}>
             Verified revenue<br />
-            <span style={{ fontSize: 9, color: '#8B6A5A' }}>UTM: facebook orders</span>
+            <span style={{ fontSize: 9, color: 'var(--text-3)' }}>UTM: facebook orders</span>
           </div>
         </div>
 
@@ -150,7 +150,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
           padding: '16px 18px',
           background: data.gap_pct > 0 ? `${gapColor}0D` : 'transparent',
         }}>
-          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: '#8B6A5A', textTransform: 'uppercase', marginBottom: 6 }}>
+          <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>
             Attribution Gap
           </div>
           <div style={{ fontFamily: mono, fontSize: 22, fontWeight: 600, color: gapColor, lineHeight: 1.1, marginBottom: 6 }}>
@@ -162,7 +162,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
               : data.gap_pct > 0
               ? '✓ Within normal range'
               : 'No gap detected'}<br />
-            <span style={{ fontSize: 9, color: '#8B6A5A' }}>Industry: 25–35%</span>
+            <span style={{ fontSize: 9, color: 'var(--text-3)' }}>Industry: 25–35%</span>
           </div>
         </div>
       </div>
@@ -177,7 +177,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
           gap: 8,
         }}>
           <span style={{ fontSize: 12, marginTop: 1, flexShrink: 0 }}>⚠</span>
-          <div style={{ fontFamily: font, fontSize: 11, fontWeight: 300, color: '#B45309', lineHeight: 1.5 }}>
+          <div style={{ fontFamily: font, fontSize: 11, fontWeight: 300, color: 'var(--amber)', lineHeight: 1.5 }}>
             <strong>{(100 - data.utm_coverage_pct).toFixed(0)}%</strong> of your orders have no UTM source.
             Add <code style={{ fontFamily: mono, fontSize: 10, background: 'rgba(245,158,11,0.1)', padding: '1px 4px', borderRadius: 2 }}>?utm_source=facebook</code> to your Meta ad URLs for accurate attribution.
           </div>

@@ -24,16 +24,16 @@ const QUICK_QUESTIONS = [
 
 // ─── Light token palette (inline-only, no CSS vars) ──────────────────────────
 const T = {
-  bgDeep:      '#F8F6F3',
-  bgContainer: '#FFFFFF',
+  bgDeep:      'var(--bg)',
+  bgContainer: 'var(--surface)',
   border:      '0.5px solid var(--border)',
   borderColor: 'var(--border)',
   accent:      'var(--accent)',
-  accentHover: '#A86B52',
-  textPrimary: '#1A1410',
-  textBody:    '#3D2B1F',
-  textMuted:   '#8B6050',
-  textHint:    '#A09890',
+  accentHover: 'var(--accent-deep)',
+  textPrimary: 'var(--text)',
+  textBody:    'var(--text-2)',
+  textMuted:   'var(--text-2)',
+  textHint:    'var(--text-3)',
   radius:      '5px',
   transition:  'all 0.18s ease',
 } as const;
@@ -378,20 +378,20 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
-                background: '#FAEEDA',
+                background: 'var(--amber-soft)',
                 border: '0.5px solid var(--accent-soft)',
                 borderRadius: 4,
                 padding: '3px 8px',
                 marginLeft: 8,
               }}
             >
-              <Database size={9} strokeWidth={1.5} style={{ color: '#633806' }} />
+              <Database size={9} strokeWidth={1.5} style={{ color: 'var(--amber)' }} />
               <span
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: 8,
                   fontWeight: 400,
-                  color: '#633806',
+                  color: 'var(--amber)',
                   letterSpacing: '0.04em',
                 }}
               >
@@ -513,14 +513,14 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                   onMouseLeave={() => setHoveredQuick(null)}
                   onClick={() => sendMessage(q)}
                   style={{
-                    background: hoveredQuick === q ? 'var(--accent-soft)' : '#FDF6F0',
+                    background: hoveredQuick === q ? 'var(--accent-soft)' : 'var(--surface)',
                     border: hoveredQuick === q ? `0.5px solid ${T.accent}` : '0.5px solid var(--accent)',
                     borderRadius: T.radius,
                     padding: '7px 12px',
                     fontFamily: 'var(--font-ui)',
                     fontSize: 10,
                     fontWeight: 300,
-                    color: 'var(--accent)',
+                    color: 'var(--text)',
                     textAlign: 'left',
                     cursor: 'pointer',
                     transition: T.transition,
@@ -556,8 +556,8 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 justifyContent: 'center',
                 flexShrink: 0,
                 // user avatar stays dark (intentional contrast), AI avatar light
-                background: msg.role === 'user' ? '#1A1410' : T.bgContainer,
-                color: msg.role === 'user' ? '#FFFFFF' : T.accent,
+                background: msg.role === 'user' ? 'var(--bg-sidebar)' : T.bgContainer,
+                color: msg.role === 'user' ? 'var(--text)' : T.accent,
               }}
             >
               {msg.role === 'user'
@@ -581,8 +581,8 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                   msg.role === 'user'
                     ? {
                         // User bubble: dark for intentional contrast
-                        background: '#1A1410',
-                        color: '#FFFFFF',
+                        background: 'var(--bg-sidebar)',
+                        color: 'var(--text)',
                         borderRadius: T.radius,
                         padding: '8px 12px',
                         fontFamily: 'var(--font-ui)',
@@ -595,7 +595,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                       }
                     : {
                         // AI bubble: white with light border
-                        background: '#FFFFFF',
+                        background: 'var(--surface)',
                         border: '0.5px solid var(--border)',
                         color: T.textBody,
                         borderRadius: T.radius,
@@ -621,13 +621,13 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                           borderRadius: 4, padding: '12px 14px',
                           marginRight: '10%',
                         }}>
-                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 6 }}>
+                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text)', marginBottom: 6 }}>
                             Monthly limit reached
                           </div>
-                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--accent)', marginBottom: 4 }}>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--text)', marginBottom: 4 }}>
                             {used} / {limit} queries
                           </div>
-                          <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: '0 0 12px' }}>
+                          <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.55, margin: '0 0 12px' }}>
                             You've used all {limit} Intelligence Chat queries for this month.
                             Upgrade to Growth for unlimited queries.
                           </p>
@@ -635,7 +635,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                             href="/pricing"
                             style={{
                               display: 'inline-block',
-                              background: 'var(--accent)', color: '#FFFFFF',
+                              background: 'var(--accent)', color: 'var(--on-accent)',
                               borderRadius: 3, padding: '7px 16px',
                               fontFamily: 'var(--font-ui)', fontSize: 9,
                               fontWeight: 500, letterSpacing: '0.12em',
@@ -698,7 +698,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
 
             <div
               style={{
-                background: '#FFFFFF',
+                background: 'var(--surface)',
                 border: T.border,
                 borderRadius: T.radius,
                 padding: '9px 13px',
@@ -820,7 +820,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           rows={2}
           style={{
             flex: 1,
-            background: '#FFFFFF',
+            background: 'var(--surface)',
             border: inputFocused ? `1px solid ${T.accent}` : '1px solid var(--border)',
             borderRadius: T.radius,
             padding: '8px 12px',
@@ -848,7 +848,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#FFFFFF',
+            color: 'var(--text)',
             cursor: !input.trim() || loading ? 'not-allowed' : 'pointer',
             opacity: !input.trim() || loading ? 0.35 : 1,
             flexShrink: 0,
@@ -866,7 +866,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
           40%            { transform: translateY(-4px); opacity: 1; }
         }
-        .ic-container textarea::placeholder { color: #A09890; }
+        .ic-container textarea::placeholder { color: var(--text-3); }
       `}</style>
     </div>
   );

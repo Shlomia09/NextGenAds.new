@@ -701,8 +701,8 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
           onMouseLeave={e => { if (!loading && input.trim()) (e.currentTarget.style.background = 'var(--accent)'); }}
         >
           {loading
-            ? <Loader2 size={14} color="#2A1A12" style={{ animation: 'spin 1s linear infinite' }} />
-            : <Send size={14} color="#2A1A12" />}
+            ? <Loader2 size={14} color="var(--text)" style={{ animation: 'spin 1s linear infinite' }} />
+            : <Send size={14} color="var(--text)" />}
         </button>
       </div>
     </div>
@@ -887,7 +887,7 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
                 <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 11, padding: '13px 15px' }}>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-2)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Spend</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(displayCampaign.spend)}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 22, fontWeight: 500, color: 'var(--text)' }}>{formatCurrency(displayCampaign.spend)}</div>
                 </div>
                 <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-soft)', borderRadius: 11, padding: '13px 15px' }}>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Impressions</div>
@@ -1069,7 +1069,7 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
             <button
               onClick={() => setActionMsg("Please give me a full performance analysis of this campaign with specific recommendations. Use ## What's working and ## What to fix sections with bullet points.")}
               style={{
-                background: 'var(--accent)', color: '#2A1A12',
+                background: 'var(--accent)', color: 'var(--on-accent)',
                 borderRadius: 10, width: '100%',
                 fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 500,
                 padding: '12px 16px', border: 'none', cursor: 'pointer',
@@ -1079,7 +1079,7 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
               onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-deep)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent)')}
             >
-              <Sparkles size={14} color="#2A1A12" />
+              <Sparkles size={14} color="var(--on-accent)" />
               Generate AI Analysis
             </button>
 

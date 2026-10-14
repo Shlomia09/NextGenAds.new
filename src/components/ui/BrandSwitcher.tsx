@@ -62,7 +62,7 @@ const BrandSwitcher: React.FC = () => {
         }}
       >
         {loading
-          ? <Loader2 size={13} style={{ color: 'var(--accent)', animation: 'wspin 1s linear infinite', flexShrink: 0 }} />
+          ? <Loader2 size={13} style={{ color: 'var(--text)', animation: 'wspin 1s linear infinite', flexShrink: 0 }} />
           : activeBrand
             ? <span style={{ fontSize: 14, flexShrink: 0 }}>{getEmoji(activeBrand)}</span>
             : <Building2 size={13} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
@@ -166,7 +166,7 @@ const BrandSwitcher: React.FC = () => {
           >
             <Plus size={13} strokeWidth={2} style={{ color: 'var(--accent)', flexShrink: 0 }} />
             <span style={{
-              fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--accent)',
+              fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)',
             }}>
               Add brand
             </span>

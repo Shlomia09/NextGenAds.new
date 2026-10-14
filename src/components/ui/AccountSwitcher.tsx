@@ -109,7 +109,7 @@ const AccountSwitcher: React.FC = () => {
           alignItems: 'center',
           gap: 6,
           width: '100%',
-          background: '#FFFFFF',
+          background: 'var(--surface)',
           border: open ? '0.5px solid var(--accent)' : '0.5px solid var(--border)',
           borderRadius: 4,
           padding: '7px 10px',
@@ -128,7 +128,7 @@ const AccountSwitcher: React.FC = () => {
             fontFamily: 'var(--font-ui)',
             fontSize: 11,
             fontWeight: 300,
-            color: activeAccount ? '#1A1410' : '#A09890',
+            color: activeAccount ? 'var(--text)' : 'var(--text-3)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -141,7 +141,7 @@ const AccountSwitcher: React.FC = () => {
           size={11}
           strokeWidth={1.5}
           style={{
-            color: '#A09890',
+            color: 'var(--text-3)',
             flexShrink: 0,
             transform: open ? 'rotate(180deg)' : 'none',
             transition: 'transform 0.15s',
@@ -157,7 +157,7 @@ const AccountSwitcher: React.FC = () => {
             top: 'calc(100% + 4px)',
             left: 0,
             right: 0,
-            background: '#FFFFFF',
+            background: 'var(--surface)',
             border: '0.5px solid var(--border)',
             borderRadius: 4,
             zIndex: 200,
@@ -172,7 +172,7 @@ const AccountSwitcher: React.FC = () => {
                 padding: '10px 12px',
                 fontFamily: 'var(--font-ui)',
                 fontSize: 10,
-                color: '#A09890',
+                color: 'var(--text-3)',
                 fontWeight: 300,
               }}
             >
@@ -198,7 +198,7 @@ const AccountSwitcher: React.FC = () => {
                     fontSize: 8,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
-                    color: '#A09890',
+                    color: 'var(--text-3)',
                     fontWeight: 400,
                   }}
                 >
@@ -250,7 +250,7 @@ const AccountSwitcher: React.FC = () => {
                             fontFamily: 'var(--font-ui)',
                             fontSize: 11,
                             fontWeight: isActive ? 400 : 300,
-                            color: isActive ? '#1A1410' : '#5C4035',
+                            color: isActive ? 'var(--text)' : 'var(--text-2)',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -262,7 +262,7 @@ const AccountSwitcher: React.FC = () => {
                           style={{
                             fontFamily: 'var(--font-mono)',
                             fontSize: 9,
-                            color: '#A09890',
+                            color: 'var(--text-3)',
                             marginTop: 1,
                           }}
                         >
@@ -306,7 +306,7 @@ const AccountSwitcher: React.FC = () => {
                 fontFamily: 'var(--font-ui)',
                 fontSize: 10,
                 fontWeight: 300,
-                color: 'var(--accent)',
+                color: 'var(--text)',
                 letterSpacing: '0.02em',
               }}
             >

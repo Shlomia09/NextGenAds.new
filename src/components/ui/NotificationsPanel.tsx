@@ -43,7 +43,7 @@ function mapEvent(e: { id: string; type: string; label: string; metadata: Record
         id: e.id, title: 'Sync complete', body: e.label || 'Meta campaigns updated successfully.',
         time: e.created_at, category: 'sync', unread,
         icon: <RefreshCw size={14} strokeWidth={1.5} />,
-        accentColor: '#10B981',
+        accentColor: 'var(--green)',
       };
     case 'recommendation_generated':
       return {
@@ -58,14 +58,14 @@ function mapEvent(e: { id: string; type: string; label: string; metadata: Record
         id: e.id, title: 'Performance alert', body: e.label || 'A campaign needs attention.',
         time: e.created_at, category: 'alert', unread,
         icon: <AlertTriangle size={14} strokeWidth={1.5} />,
-        accentColor: '#F59E0B',
+        accentColor: 'var(--amber)',
       };
     default:
       return {
         id: e.id, title: e.label || 'System event', body: String(e.metadata?.summary ?? ''),
         time: e.created_at, category: 'system', unread,
         icon: <CheckCircle size={14} strokeWidth={1.5} />,
-        accentColor: '#6B7280',
+        accentColor: 'var(--text-2)',
       };
   }
 }
@@ -125,7 +125,7 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
         time:     periodStart,
         category: 'billing',
         icon:     <CreditCard size={14} strokeWidth={1.5} />,
-        accentColor: '#10B981',
+        accentColor: 'var(--green)',
         unread: new Date(periodStart).getTime() > seenAt,
       });
     } else if (!subLoading && !subscription) {
@@ -202,7 +202,7 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
           {unreadCount > 0 && (
             <span style={{
               background:   'var(--accent)',
-              color:        '#2A1A12',
+              color:        'var(--on-accent)',
               borderRadius:  10,
               fontFamily:   'var(--font-mono)',
               fontSize:       9,

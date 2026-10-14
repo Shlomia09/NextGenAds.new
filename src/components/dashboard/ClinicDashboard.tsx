@@ -103,10 +103,10 @@ const MOCK_CAMPAIGNS: Campaign[] = [
 // ─────────────────────────────────────────────────────────────────
 const StatusBadge: React.FC<{ status: Campaign['status'] }> = ({ status }) => {
   const config: Record<Campaign['status'], { label: string; color: string; bg: string }> = {
-    ACTIVE:   { label: 'Active',   color: '#065F46', bg: 'rgba(16,185,129,0.10)' },
-    PAUSED:   { label: 'Paused',   color: '#92400E', bg: 'rgba(245,158,11,0.10)' },
-    ARCHIVED: { label: 'Archived', color: '#6B7280', bg: 'rgba(107,114,128,0.10)' },
-    DELETED:  { label: 'Deleted',  color: '#991B1B', bg: 'rgba(239,68,68,0.10)'  },
+    ACTIVE:   { label: 'Active',   color: 'var(--green)', bg: 'rgba(16,185,129,0.10)' },
+    PAUSED:   { label: 'Paused',   color: 'var(--amber)', bg: 'rgba(245,158,11,0.10)' },
+    ARCHIVED: { label: 'Archived', color: 'var(--text-2)', bg: 'rgba(107,114,128,0.10)' },
+    DELETED:  { label: 'Deleted',  color: 'var(--red)', bg: 'rgba(239,68,68,0.10)'  },
   };
   const c = config[status] ?? config.ARCHIVED;
   return (
@@ -824,7 +824,7 @@ const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
           font-family: var(--font-mono);
           font-size: 11px;
           font-weight: 400;
-          color: var(--rose-gold);
+          color: var(--text);
           background: var(--rose-gold-light);
           border-radius: 3px;
           padding: 2px 7px;

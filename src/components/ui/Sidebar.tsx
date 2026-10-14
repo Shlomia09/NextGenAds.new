@@ -227,7 +227,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
         }
         .sidebar-nav-item.active {
           background: var(--accent-soft);
-          color: var(--accent);
+          color: var(--text);
         }
 
         /* ── Bottom ── */

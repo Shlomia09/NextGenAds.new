@@ -25,7 +25,7 @@ const BenchmarkAvailabilityBadge: React.FC<Props> = ({ availability, aovLabel, m
         <div style={{
           width: 7, height: 7,
           borderRadius: '50%',
-          background: isFull ? '#10B981' : '#F59E0B',
+          background: isFull ? 'var(--green)' : 'var(--amber)',
           flexShrink: 0,
           animation: 'pulse-subtle 2.5s ease-in-out infinite',
         }} />
@@ -37,7 +37,7 @@ const BenchmarkAvailabilityBadge: React.FC<Props> = ({ availability, aovLabel, m
           fontSize: 10,
           fontWeight: 500,
           letterSpacing: '0.04em',
-          color: isFull ? '#10B981' : '#F59E0B',
+          color: isFull ? 'var(--green)' : 'var(--amber)',
         }}>
           {isFull ? '9yr Benchmark Active' : 'Partial Benchmark Active'}
         </div>

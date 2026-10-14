@@ -36,10 +36,10 @@ interface EcommerceDashboardProps {
 
 // ─── Status badge helper ──────────────────────────────────────
 const statusColors: Record<string, { bg: string; color: string }> = {
-  ACTIVE:   { bg: 'rgba(16,185,129,0.08)',  color: '#065F46' },
-  PAUSED:   { bg: 'rgba(245,158,11,0.08)',  color: '#92400E' },
-  ARCHIVED: { bg: 'rgba(100,116,139,0.08)', color: '#475569' },
-  DELETED:  { bg: 'rgba(239,68,68,0.08)',   color: '#991B1B' },
+  ACTIVE:   { bg: 'rgba(16,185,129,0.08)',  color: 'var(--green)' },
+  PAUSED:   { bg: 'rgba(245,158,11,0.08)',  color: 'var(--amber)' },
+  ARCHIVED: { bg: 'rgba(100,116,139,0.08)', color: 'var(--text-2)' },
+  DELETED:  { bg: 'rgba(239,68,68,0.08)',   color: 'var(--red)' },
 };
 
 // ─── Component ────────────────────────────────────────────────
@@ -125,7 +125,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
             <div className="ecom-kpi-label">{icon}{label}</div>
             <div
               className="ecom-kpi-value"
-              style={highlight ? { color: 'var(--accent)' } : {}}
+              style={highlight ? { color: 'var(--text)' } : {}}
             >
               {value}
             </div>

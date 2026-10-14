@@ -519,9 +519,9 @@ const Onboarding: React.FC = () => {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {([
-                  { value: 'new',     label: 'New Account (0–3 months)',      desc: 'Pixel < 2 weeks. We apply the full warm-up protocol.',      dot: '#F59E0B' },
+                  { value: 'new',     label: 'New Account (0–3 months)',      desc: 'Pixel < 2 weeks. We apply the full warm-up protocol.',      dot: 'var(--amber)' },
                   { value: 'scaling', label: 'Growing (3–12 months)',         desc: 'Active account with data. Ready to grow budgets.',          dot: 'var(--accent)' },
-                  { value: 'mature',  label: 'Established (1+ year)',         desc: 'Rich history, lookalikes, and retargeting audiences built.', dot: '#10B981' },
+                  { value: 'mature',  label: 'Established (1+ year)',         desc: 'Rich history, lookalikes, and retargeting audiences built.', dot: 'var(--green)' },
                 ] as const).map(({ value, label, desc, dot }) => (
                   <button key={value}
                     className={`ob-stage-btn ${form.stage === value ? 'selected' : ''}`}
@@ -546,7 +546,7 @@ const Onboarding: React.FC = () => {
               </div>
 
               {error && (
-                <div style={{ background: '#FEE2E2', border: '0.5px solid rgba(239,68,68,0.2)', borderRadius: 4, padding: '9px 12px', fontSize: 12, color: '#991B1B', fontFamily: 'var(--font-sans)', fontWeight: 300 }}>
+                <div style={{ background: 'var(--red-soft)', border: '0.5px solid rgba(239,68,68,0.2)', borderRadius: 4, padding: '9px 12px', fontSize: 12, color: 'var(--red)', fontFamily: 'var(--font-sans)', fontWeight: 300 }}>
                   {error}
                 </div>
               )}
@@ -579,7 +579,7 @@ const Onboarding: React.FC = () => {
 
         .ob-left {
           width: 36%;
-          background: #2C1810;
+          background: var(--bg);
           display: flex; align-items: center;
           padding: 48px;
           position: sticky; top: 0; height: 100vh;
@@ -589,14 +589,13 @@ const Onboarding: React.FC = () => {
 
         .ob-rouge-logo {
           height: 24px; width: auto; align-self: flex-start;
-          /* TODO(commit-5): hardcoded — left panel is still #2C1810 */
-          color: #F3F0EA;
+          color: var(--text);
         }
 
         .ob-left-tagline {
           font-family: var(--font-ui);
           font-size: 13px; font-weight: 300;
-          color: #8B6050; line-height: 1.65;
+          color: var(--text-2); line-height: 1.65;
         }
 
         .ob-step-list { display: flex; flex-direction: column; gap: 10px; }
@@ -605,27 +604,27 @@ const Onboarding: React.FC = () => {
           display: flex; align-items: center; gap: 12px;
           font-family: var(--font-ui);
           font-size: 12px; font-weight: 300; letter-spacing: 0.06em;
-          color: #4d3a2e; transition: color var(--transition);
+          color: var(--text-2); transition: color var(--transition);
         }
-        .ob-step-item.active { color: #C4A090; }
-        .ob-step-item.done   { color: #8B6050; }
+        .ob-step-item.active { color: var(--text); }
+        .ob-step-item.done   { color: var(--text-2); }
 
         .ob-step-num {
           width: 22px; height: 22px; border-radius: 50%;
-          background: #3d2a1e; border: 0.5px solid #4d3a2e;
+          background: var(--bg); border: 0.5px solid var(--border);
           display: flex; align-items: center; justify-content: center;
-          font-family: var(--font-mono); font-size: 10px; color: #6d4a3e;
+          font-family: var(--font-mono); font-size: 10px; color: var(--text-2);
           flex-shrink: 0; transition: all var(--transition);
         }
-        .ob-step-item.active .ob-step-num { border-color: var(--accent); color: var(--accent); }
+        .ob-step-item.active .ob-step-num { border-color: var(--accent); color: var(--text); }
         .ob-step-item.done  .ob-step-num { background: var(--accent); border-color: var(--accent); color: white; }
 
         .ob-type-preview {
           display: flex; align-items: center; gap: 8px;
           font-family: var(--font-ui);
-          font-size: 11px; font-weight: 300; color: #C4A090;
-          padding: 8px 12px; background: #3d2a1e;
-          border: 0.5px solid #4d3a2e; border-radius: 4px;
+          font-size: 11px; font-weight: 300; color: var(--text);
+          padding: 8px 12px; background: var(--bg);
+          border: 0.5px solid var(--border); border-radius: 4px;
           margin-top: 4px;
         }
 
@@ -728,14 +727,14 @@ const Onboarding: React.FC = () => {
         .ob-funnel-eyebrow {
           font-family: var(--font-ui); font-size: 9px;
           font-weight: 400; letter-spacing: 0.2em;
-          text-transform: uppercase; color: var(--rose-gold-dark);
+          text-transform: uppercase; color: var(--text);
         }
         .ob-funnel-value {
           font-family: var(--font-ui); font-size: 13px;
           font-weight: 500; color: var(--text-primary);
         }
         .ob-funnel-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); line-height: 1.6; }
-        .ob-funnel-meta span { font-weight: 500; color: var(--rose-gold-dark); }
+        .ob-funnel-meta span { font-weight: 500; color: var(--text); }
 
         /* Stage buttons */
         .ob-stage-btn {

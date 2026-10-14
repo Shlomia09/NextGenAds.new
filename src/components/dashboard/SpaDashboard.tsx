@@ -51,7 +51,7 @@ function getSeasonalIndex(month: number): { label: string; color: string; bgColo
   }
   if (month >= 5 && month <= 7) {
     // June–August — summer bookings
-    return { label: 'Summer Peak', color: '#059669', bgColor: 'rgba(5,150,105,0.07)' };
+    return { label: 'Summer Peak', color: 'var(--green)', bgColor: 'rgba(5,150,105,0.07)' };
   }
   return { label: 'On Track', color: 'var(--success)', bgColor: 'rgba(5,150,105,0.07)' };
 }
@@ -128,7 +128,7 @@ const SeasonalTip: React.FC = () => (
         fontWeight: 400,
         letterSpacing: '0.16em',
         textTransform: 'uppercase' as const,
-        color: 'var(--rose-gold)',
+        color: 'var(--text)',
       }}
     >
       <Leaf size={11} strokeWidth={1.5} />
@@ -156,7 +156,7 @@ const SeasonalTip: React.FC = () => (
       }}
     >
       Check seasonal campaigns — Gift vouchers perform{' '}
-      <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 500, color: 'var(--rose-gold)' }}>
+      <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 500, color: 'var(--text)' }}>
         3.2×
       </span>{' '}
       better in Oct–Dec. Consider launching a campaign now to capture pre-peak bookings.
@@ -165,7 +165,7 @@ const SeasonalTip: React.FC = () => (
       style={{
         fontFamily: 'var(--font-mono)',
         fontSize: 10,
-        color: 'var(--rose-gold)',
+        color: 'var(--text)',
         background: 'var(--rose-gold-light)',
         padding: '3px 8px',
         borderRadius: 2,

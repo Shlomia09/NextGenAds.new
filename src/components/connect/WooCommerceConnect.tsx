@@ -73,13 +73,13 @@ const WooCommerceConnect: React.FC<WooCommerceConnectProps> = ({ userId, brands 
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
-    background: 'var(--app-bg, #0F0A07)',
-    border: '0.5px solid var(--app-border, #2a1a0e)',
+    background: 'var(--app-bg)',
+    border: '0.5px solid var(--app-border)',
     borderRadius: 4,
     padding: '9px 12px',
     fontFamily: mono,
     fontSize: 11,
-    color: 'var(--text-primary, #F5E6D8)',
+    color: 'var(--text-primary)',
     outline: 'none',
     boxSizing: 'border-box',
     transition: 'border-color 0.15s',
@@ -90,7 +90,7 @@ const WooCommerceConnect: React.FC<WooCommerceConnectProps> = ({ userId, brands 
     fontSize: 9,
     letterSpacing: '0.16em',
     textTransform: 'uppercase',
-    color: '#8B6050',
+    color: 'var(--text-2)',
   };
 
   return (
@@ -174,7 +174,7 @@ const WooCommerceConnect: React.FC<WooCommerceConnectProps> = ({ userId, brands 
         <div style={{
           background: 'rgba(16,185,129,0.06)', border: '0.5px solid rgba(16,185,129,0.2)',
           borderRadius: 4, padding: '7px 11px',
-          fontFamily: font, fontSize: 11, color: '#10B981',
+          fontFamily: font, fontSize: 11, color: 'var(--green)',
           display: 'flex', alignItems: 'center', gap: 6,
         }}>
           <CheckCircle size={11} strokeWidth={1.5} />
@@ -187,7 +187,7 @@ const WooCommerceConnect: React.FC<WooCommerceConnectProps> = ({ userId, brands 
         <div style={{
           background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.2)',
           borderRadius: 4, padding: '7px 11px',
-          fontFamily: font, fontSize: 11, color: '#EF4444',
+          fontFamily: font, fontSize: 11, color: 'var(--red)',
           display: 'flex', alignItems: 'flex-start', gap: 6,
         }}>
           <AlertCircle size={11} strokeWidth={1.5} style={{ flexShrink: 0, marginTop: 1 }} />

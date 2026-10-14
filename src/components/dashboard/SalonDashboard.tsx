@@ -423,7 +423,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
 
         /* ── Frequency Warning Card ────────────────────────────────────── */
         .sd-freq-warning {
-          background: #FEF3C7;
+          background: var(--amber-soft);
           border: 1px solid rgba(245,158,11,0.3);
           border-radius: var(--radius-lg);
           padding: 14px 16px;
@@ -436,7 +436,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
           font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 600;
-          color: #92400E;
+          color: var(--amber);
           letter-spacing: 0.01em;
         }
 
@@ -444,7 +444,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
           font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 300;
-          color: #92400E;
+          color: var(--amber);
           line-height: 1.6;
           margin: 0;
         }
@@ -598,7 +598,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
 
         .badge-active {
           background: rgba(16,185,129,0.08);
-          color: #047857;
+          color: var(--green);
           border: 0.5px solid rgba(16,185,129,0.2);
         }
       `}</style>

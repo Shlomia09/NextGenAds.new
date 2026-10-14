@@ -192,7 +192,7 @@ const ResultsCell: React.FC<{ campaign: Campaign; goal: GoalType; isLast: boolea
   if (campaign.conversion_event === 'Multiple') {
     return (
       <td style={cellStyle}>
-        <div style={{ ...numStyle, color: 'var(--accent)', fontSize: 12 }}>Multiple</div>
+        <div style={{ ...numStyle, color: 'var(--text)', fontSize: 12 }}>Multiple</div>
         <div style={subStyle}>conv. goals · open for details</div>
       </td>
     );
@@ -511,7 +511,7 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
       {/* Panel header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, letterSpacing: -0.2 }}>
-          Performance · <span style={{ color: 'var(--accent)' }}>{dateLabel}</span>
+          Performance · <span style={{ color: 'var(--text)' }}>{dateLabel}</span>
         </div>
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
           {[
@@ -1102,7 +1102,7 @@ const Campaigns: React.FC = () => {
             <span>{campaigns.length} total</span>
             <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--text-3)', display: 'inline-block' }} />
             {metaAccounts.length > 0
-              ? <span style={{ color: 'var(--accent)' }}>{metaAccounts.length} Meta account{metaAccounts.length > 1 ? 's' : ''}</span>
+              ? <span style={{ color: 'var(--text)' }}>{metaAccounts.length} Meta account{metaAccounts.length > 1 ? 's' : ''}</span>
               : <span style={{ color: 'var(--red)' }}>No account connected</span>}
           </div>
         </div>

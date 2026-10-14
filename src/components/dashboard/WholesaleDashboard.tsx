@@ -91,7 +91,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
             <span key={m} className="badge badge-neutral">{m}</span>
           ))}
           {brand.target_buyers?.map((b) => (
-            <span key={b} className="badge" style={{ background: 'var(--rose-gold-light)', color: 'var(--rose-gold-dark)', borderColor: 'var(--rose-gold-pale)' }}>{b}</span>
+            <span key={b} className="badge" style={{ background: 'var(--rose-gold-light)', color: 'var(--text)', borderColor: 'var(--rose-gold-pale)' }}>{b}</span>
           ))}
         </div>
       </div>
@@ -409,7 +409,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
         }
 
         .wd-kpi-highlight {
-          color: var(--rose-gold);
+          color: var(--text);
         }
 
         .wd-kpi-divider {
@@ -632,7 +632,7 @@ const WholesaleDashboard: React.FC<WholesaleDashboardProps> = ({
           font-family: var(--font-mono);
           font-size: 12px;
           font-weight: 500;
-          color: var(--rose-gold-dark);
+          color: var(--text);
         }
 
         .wd-td-empty {

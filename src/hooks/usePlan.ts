@@ -111,10 +111,10 @@ export const PLAN_META: Record<PlanId, {
   yearly: number;
   color: string;
 }> = {
-  free:    { label: 'Free',    monthly: 0,   yearly: 0,    color: '#6b4030' },
-  starter: { label: 'Starter', monthly: 149, yearly: 1490, color: '#C4A090' },
+  free:    { label: 'Free',    monthly: 0,   yearly: 0,    color: 'var(--text-2)' },
+  starter: { label: 'Starter', monthly: 149, yearly: 1490, color: 'var(--text)' },
   growth:  { label: 'Growth',  monthly: 349, yearly: 3490, get color() { return cssToken('--accent'); } },
-  scale:   { label: 'Scale',   monthly: 749, yearly: 7490, color: '#D4A847' },
+  scale:   { label: 'Scale',   monthly: 749, yearly: 7490, color: 'var(--champagne)' },
 };
 
 export { PLAN_ORDER };

@@ -126,12 +126,12 @@ const DemoDashboard: React.FC = () => {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
       {/* ── Sidebar ── */}
-      <aside style={{ width: 220, background: '#2C1810', borderRight: '0.5px solid #3d2a1e', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-        <div style={{ padding: '22px 20px 16px', borderBottom: '0.5px solid #3d2a1e' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 700, color: '#F5E6D8', letterSpacing: '-0.01em' }}>
+      <aside style={{ width: 220, background: 'var(--bg-sidebar)', borderRight: '0.5px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+        <div style={{ padding: '22px 20px 16px', borderBottom: '0.5px solid var(--border)' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em' }}>
             Rouge
           </div>
-          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A5A48', marginTop: 4 }}>
+          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--text-2)', marginTop: 4 }}>
             Beauty campaign intelligence
           </div>
         </div>
@@ -139,7 +139,7 @@ const DemoDashboard: React.FC = () => {
         {/* Demo pill */}
         <div style={{ margin: '10px 12px', background: 'var(--accent-soft)', border: '0.5px solid var(--accent-soft)', borderRadius: 3, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 7 }}>
           <div className="live-dot" />
-          <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 300, color: '#C4A090' }}>Demo Mode</span>
+          <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 300, color: 'var(--text)' }}>Demo Mode</span>
         </div>
 
         <nav style={{ flex: 1, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -151,8 +151,8 @@ const DemoDashboard: React.FC = () => {
           <DemoNavItem icon={<Settings size={14} strokeWidth={1.5} />} label="Settings" />
         </nav>
 
-        <div style={{ padding: '14px 12px', borderTop: '0.5px solid #3d2a1e' }}>
-          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, color: '#8B6050', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ padding: '14px 12px', borderTop: '0.5px solid var(--border)' }}>
+          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, color: 'var(--text-2)', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>
             <div className="live-dot" style={{ background: 'var(--accent)' }} />
             9-Year Benchmark Active
           </div>
@@ -162,10 +162,10 @@ const DemoDashboard: React.FC = () => {
       {/* ── Main ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Demo banner */}
-        <div style={{ background: '#2C1810', borderBottom: '0.5px solid #3d2a1e', padding: '9px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ background: 'var(--bg)', borderBottom: '0.5px solid var(--border)', padding: '9px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Sparkles size={12} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />
-            <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: '#C4A090', letterSpacing: '0.04em' }}>
+            <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--text)', letterSpacing: '0.04em' }}>
               Demo Mode — NeoLumo Spain · Mock data · No auth required
             </span>
           </div>
@@ -174,7 +174,7 @@ const DemoDashboard: React.FC = () => {
               Create Real Account
               <ChevronRight size={11} strokeWidth={1.5} />
             </button>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/')} style={{ color: '#7A5A48' }}>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/')} style={{ color: 'var(--text-2)' }}>
               <X size={11} strokeWidth={1.5} />
               Exit Demo
             </button>
@@ -195,7 +195,7 @@ const DemoDashboard: React.FC = () => {
               </h1>
               <p className="page-subtitle">
                 AOV {MOCK_BRAND.currency}{MOCK_BRAND.aov_min}–{MOCK_BRAND.aov_max} ·{' '}
-                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--rose-gold)' }}>{MOCK_BRAND.bracket}</span> ·{' '}
+                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text)' }}>{MOCK_BRAND.bracket}</span> ·{' '}
                 {MOCK_BRAND.funnel}
               </p>
             </div>
@@ -307,7 +307,7 @@ const DemoDashboard: React.FC = () => {
                     </div>
                     <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>{rec.title}</div>
                     <p style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{rec.desc}</p>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--rose-gold)', background: 'var(--rose-gold-light)', padding: '3px 8px', display: 'inline-block' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text)', background: 'var(--rose-gold-light)', padding: '3px 8px', display: 'inline-block' }}>
                       {rec.benchmark}
                     </div>
                     <div style={{ paddingTop: 6, borderTop: '0.5px solid var(--border-light)', display: 'flex', gap: 6 }}>
@@ -332,7 +332,7 @@ const DemoDashboard: React.FC = () => {
               <div style={{ background: 'var(--bg-primary)', border: '0.5px solid var(--border-light)', borderRadius: 6, display: 'flex', flexDirection: 'column', minHeight: 520 }}>
                 {/* Chat header */}
                 <div style={{ padding: '12px 16px', borderBottom: '0.5px solid var(--border-light)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', gap: 10, borderRadius: '6px 6px 0 0' }}>
-                  <div style={{ width: 28, height: 28, background: '#2C1810', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
+                  <div style={{ width: 28, height: 28, background: 'var(--bg)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>
                     <Sparkles size={12} strokeWidth={1.5} />
                   </div>
                   <div>
@@ -368,10 +368,10 @@ const DemoDashboard: React.FC = () => {
 
                   {chatMessages.map((msg, i) => (
                     <div key={i} style={{ display: 'flex', flexDirection: msg.role === 'user' ? 'row-reverse' : 'row', gap: 8, alignItems: 'flex-start' }}>
-                      <div style={{ width: 22, height: 22, borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: msg.role === 'user' ? '#2C1810' : 'var(--rose-gold-light)', color: msg.role === 'user' ? '#E8C4A8' : 'var(--rose-gold-dark)' }}>
+                      <div style={{ width: 22, height: 22, borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: msg.role === 'user' ? 'var(--bg)' : 'var(--rose-gold-light)', color: msg.role === 'user' ? 'var(--text)' : 'var(--rose-gold-dark)' }}>
                         {msg.role === 'user' ? <Users size={10} strokeWidth={1.5} /> : <Sparkles size={10} strokeWidth={1.5} />}
                       </div>
-                      <div style={{ maxWidth: '82%', background: msg.role === 'user' ? '#2C1810' : 'var(--bg-card)', border: `0.5px solid ${msg.role === 'user' ? '#3d2a1e' : 'var(--border-light)'}`, borderRadius: 4, padding: '9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, lineHeight: 1.6, color: msg.role === 'user' ? '#E8C4A8' : 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                      <div style={{ maxWidth: '82%', background: msg.role === 'user' ? 'var(--bg)' : 'var(--bg-card)', border: `0.5px solid ${msg.role === 'user' ? 'var(--border)' : 'var(--border-light)'}`, borderRadius: 4, padding: '9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, lineHeight: 1.6, color: msg.role === 'user' ? 'var(--text)' : 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                         {msg.content}
                       </div>
                     </div>
@@ -459,20 +459,20 @@ const DemoDashboard: React.FC = () => {
           font-weight: 300;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #7A5A48;
+          color: var(--text-2);
           transition: all var(--transition);
           border-left: 2px solid transparent;
           cursor: pointer;
         }
 
         .demo-nav-item.active {
-          color: #C4A090;
+          color: var(--text);
           border-left-color: var(--accent);
           background: var(--accent-soft);
           opacity: 1 !important;
         }
 
-        .demo-nav-item:hover { color: #C4A090; background: var(--accent-soft); }
+        .demo-nav-item:hover { color: var(--text); background: var(--accent-soft); }
       `}</style>
     </div>
   );

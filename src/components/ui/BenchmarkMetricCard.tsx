@@ -31,9 +31,9 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
   const yourValueColor = (() => {
     if (isNeutral) return 'var(--accent)';
     if (higherIsBetter) {
-      return yourValue >= benchmarkValue ? '#3B6D11' : 'var(--red)';
+      return yourValue >= benchmarkValue ? 'var(--green)' : 'var(--red)';
     } else {
-      return yourValue <= benchmarkValue ? '#3B6D11' : 'var(--red)';
+      return yourValue <= benchmarkValue ? 'var(--green)' : 'var(--red)';
     }
   })();
 
@@ -57,7 +57,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           }
 
           .bm-card {
-            background: #FFFFFF;
+            background: var(--surface);
             border: 0.5px solid var(--border);
             border-radius: 4px;
             padding: 14px 16px;
@@ -68,7 +68,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
 
           .skeleton {
             border-radius: 3px;
-            background: linear-gradient(90deg, #F8F6F3 25%, #FFFFFF 50%, #F8F6F3 75%);
+            background: linear-gradient(90deg, var(--surface) 25%, var(--surface) 50%, var(--surface) 75%);
             background-size: 200% 100%;
             animation: shimmer 1.8s infinite;
           }
@@ -122,7 +122,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .bm-card {
-          background: #FFFFFF;
+          background: var(--surface);
           border: 0.5px solid var(--border);
           border-radius: 4px;
           padding: 14px 16px;
@@ -169,7 +169,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           align-items: center;
           justify-content: space-between;
           padding: 5px 8px;
-          background: #F0ECE8;
+          background: var(--surface);
           border-radius: 2px;
         }
 
@@ -184,7 +184,7 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
           font-family: var(--font-mono);
           font-size: 8px;
           font-weight: 400;
-          color: var(--text-hint, #8B6A5A);
+          color: var(--text-hint);
         }
 
         .metric-benchmark {
@@ -200,32 +200,32 @@ const BenchmarkMetricCard: React.FC<BenchmarkMetricCardProps> = ({
         }
 
         .metric-benchmark.above {
-          background: #EAF3DE;
-          color: #27500A;
+          background: var(--green-soft);
+          color: var(--green);
         }
 
         .metric-benchmark.below {
-          background: #FCEBEB;
-          color: #791F1F;
+          background: var(--red-soft);
+          color: var(--red);
         }
 
         .metric-benchmark.neutral {
           background: var(--accent-soft);
-          color: var(--accent);
+          color: var(--text);
         }
 
         .bm-source {
           font-family: var(--font-ui);
           font-size: 7px;
           font-weight: 300;
-          color: var(--text-hint, #8B6A5A);
+          color: var(--text-hint);
           font-style: italic;
           margin-top: 2px;
         }
 
         .skeleton {
           border-radius: 3px;
-          background: linear-gradient(90deg, #F8F6F3 25%, #FFFFFF 50%, #F8F6F3 75%);
+          background: linear-gradient(90deg, var(--surface) 25%, var(--surface) 50%, var(--surface) 75%);
           background-size: 200% 100%;
           animation: shimmer 1.8s infinite;
         }

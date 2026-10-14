@@ -65,7 +65,7 @@ const adsManagerLinkStyle: React.CSSProperties = {
 const avatarStyle: React.CSSProperties = {
   width: 30, height: 30, borderRadius: '50%',
   background: 'linear-gradient(135deg, var(--accent), var(--accent-deep))',
-  color: '#2A1A12', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  color: 'var(--text)', display: 'flex', alignItems: 'center', justifyContent: 'center',
   fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 700,
   letterSpacing: '0.02em', flexShrink: 0, cursor: 'default', userSelect: 'none' as const,
 };

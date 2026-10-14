@@ -177,7 +177,7 @@ const Intelligence: React.FC = () => {
                 lineHeight: 1.5,
               }}>
                 No sessions yet.<br />
-                <span style={{ color: 'var(--rose-gold)' }}>Ask your first question</span> to start.
+                <span style={{ color: 'var(--text)' }}>Ask your first question</span> to start.
               </div>
             )}
 
@@ -271,7 +271,7 @@ const Intelligence: React.FC = () => {
         }
         .int-session-item.active {
           background: var(--rose-gold-light);
-          color: var(--rose-gold-dark);
+          color: var(--text);
           border: 0.5px solid var(--border-rose);
         }
       `}</style>

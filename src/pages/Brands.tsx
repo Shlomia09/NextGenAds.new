@@ -23,9 +23,9 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, linkedAccounts, allAccount
   const [saving, setSaving] = useState(false);
 
   const stageDot: Record<string, string> = {
-    new:     '#F59E0B',
+    new:     cssToken('--amber'),
     scaling: cssToken('--accent'),
-    mature:  '#10B981',
+    mature:  cssToken('--green'),
   };
 
   const handleLink = async (adAccountId: string) => {
@@ -92,7 +92,7 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, linkedAccounts, allAccount
 
         {linkedAccounts.length === 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--amber)', display: 'flex', alignItems: 'center', gap: 5 }}>
               ⚠ No Meta account linked
             </span>
             {/* Link button */}
@@ -135,7 +135,7 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, linkedAccounts, allAccount
                     border: '0.5px solid var(--accent-soft)',
                     borderRadius: 4, padding: '5px 10px',
                     fontFamily: 'var(--font-sans)', fontSize: 11,
-                    color: 'var(--accent)', cursor: 'pointer', alignSelf: 'flex-start',
+                    color: 'var(--text)', cursor: 'pointer', alignSelf: 'flex-start',
                   }}
                 >
                   <Link size={10} strokeWidth={1.5} /> Link account
@@ -315,10 +315,10 @@ const Brands: React.FC = () => {
         .brand-card-top { display: flex; align-items: center; gap: 12px; }
         .brand-avatar {
           width: 38px; height: 38px;
-          background: #2C1810; border-radius: 4px;
+          background: var(--bg); border-radius: 4px;
           display: flex; align-items: center; justify-content: center;
           font-family: var(--font-display); font-size: 16px;
-          font-weight: 700; color: var(--accent); flex-shrink: 0;
+          font-weight: 700; color: var(--text); flex-shrink: 0;
         }
         .brand-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-primary); }
         .brand-cat { font-family: var(--font-ui); font-size: 11px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }
@@ -338,7 +338,7 @@ const Brands: React.FC = () => {
         .brand-metric-value { font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--text-primary); }
         .brand-funnel-pill {
           font-family: var(--font-ui); font-size: 11px; font-weight: 300;
-          color: var(--rose-gold-dark); background: var(--rose-gold-light);
+          color: var(--text); background: var(--rose-gold-light);
           border: 0.5px solid var(--border-rose); border-radius: 2px;
           padding: 5px 10px; line-height: 1.4;
         }

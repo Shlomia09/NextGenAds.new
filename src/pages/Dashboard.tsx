@@ -383,7 +383,7 @@ const Dashboard: React.FC = () => {
         <Sparkles size={32} style={{ color: 'var(--accent)', marginBottom: 16 }} strokeWidth={1.5} />
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: 'var(--text)', margin: '0 0 8px' }}>No Brand Connected Yet</h2>
         <p style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-2)', margin: '0 0 24px' }}>Complete the onboarding to activate your Intelligence Dashboard</p>
-        <a href="/onboarding" style={{ background: 'var(--accent)', color: '#2A1A12', padding: '10px 22px', borderRadius: 10, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 500 }}>Set Up Your Brand</a>
+        <a href="/onboarding" style={{ background: 'var(--accent)', color: 'var(--on-accent)', padding: '10px 22px', borderRadius: 10, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 500 }}>Set Up Your Brand</a>
       </div>
     </div>
   );
@@ -440,13 +440,13 @@ const Dashboard: React.FC = () => {
               {adAccounts.length === 0 ? (
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)', padding: '12px 0' }}>
                   No Meta accounts connected.{' '}
-                  <a href="/settings" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Connect now →</a>
+                  <a href="/settings" style={{ color: 'var(--text)', textDecoration: 'none' }}>Connect now →</a>
                 </div>
               ) : accountStats.map(({ account, campaigns: numC, active, spend, results }) => {
                 const initials = (account.display_name || account.account_name).split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
                 return (
                   <div key={account.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '11px 14px', background: 'var(--surface-2)', borderRadius: 12, marginBottom: 8, border: '1px solid var(--border-soft)' }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, var(--accent), var(--accent-deep))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 500, color: '#2A1A12' }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, var(--accent), var(--accent-deep))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 500, color: 'var(--text)' }}>
                       {initials}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -459,7 +459,7 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div style={{ display: 'flex', gap: 16, flexShrink: 0 }}>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(spend)}</div>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>{formatCurrency(spend)}</div>
                         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)' }}>spend</div>
                       </div>
                       {results > 0 && (
@@ -482,7 +482,7 @@ const Dashboard: React.FC = () => {
                   {/* Summary KPIs above the chart */}
                   <div style={{ display: 'flex', gap: 20 }}>
                     <div>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(totalSpend)}</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--text)' }}>{formatCurrency(totalSpend)}</span>
                       <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginLeft: 6 }}>spend</span>
                     </div>
                     {totalResults > 0 && (
@@ -544,7 +544,7 @@ const Dashboard: React.FC = () => {
             <Card>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <SectionLabel style={{ marginBottom: 0 }}>Recent intelligence</SectionLabel>
-                <button onClick={() => navigate('/intelligence')} style={{ background: 'none', border: 'none', fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--accent)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <button onClick={() => navigate('/intelligence')} style={{ background: 'none', border: 'none', fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                   All sessions <ChevronRight size={11} />
                 </button>
               </div>
@@ -557,7 +557,7 @@ const Dashboard: React.FC = () => {
                   </div>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>Ask your first question</div>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)', marginBottom: 14 }}>Your AI Intelligence sessions will appear here.</div>
-                  <button onClick={() => navigate('/intelligence')} style={{ background: 'var(--accent)', color: '#2A1A12', border: 'none', borderRadius: 9, padding: '8px 16px', fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}>
+                  <button onClick={() => navigate('/intelligence')} style={{ background: 'var(--accent)', color: 'var(--on-accent)', border: 'none', borderRadius: 9, padding: '8px 16px', fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}>
                     Open Intelligence →
                   </button>
                 </div>
@@ -660,9 +660,9 @@ const Dashboard: React.FC = () => {
               ) : pendingRecs.map(rec => {
                 const isHigh = rec.priority === 'critical';
                 return (
-                  <div key={rec.id} style={{ background: isHigh ? 'var(--red-soft, rgba(220,50,50,0.06))' : 'var(--surface-2)', border: `1px solid ${isHigh ? 'var(--red, #e05252)' : 'var(--border-soft)'}`, borderRadius: 11, padding: '11px 13px', marginBottom: 9 }}>
+                  <div key={rec.id} style={{ background: isHigh ? 'var(--red-soft, rgba(220,50,50,0.06))' : 'var(--surface-2)', border: `1px solid ${isHigh ? 'var(--red)' : 'var(--border-soft)'}`, borderRadius: 11, padding: '11px 13px', marginBottom: 9 }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-                      <AlertTriangle size={13} style={{ color: isHigh ? 'var(--red, #e05252)' : 'var(--champagne)', flexShrink: 0, marginTop: 1 }} />
+                      <AlertTriangle size={13} style={{ color: isHigh ? 'var(--red)' : 'var(--champagne)', flexShrink: 0, marginTop: 1 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)', marginBottom: 3 }}>{rec.title}</div>
                         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-2)', lineHeight: 1.4, marginBottom: 8 }}>
@@ -673,7 +673,7 @@ const Dashboard: React.FC = () => {
                             <button
                               onClick={() => executeRecMutation.mutate(rec.id)}
                               disabled={executeRecMutation.isPending}
-                              style={{ padding: '4px 11px', background: 'var(--accent)', color: '#2A1A12', border: 'none', borderRadius: 7, fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500, cursor: executeRecMutation.isPending ? 'default' : 'pointer', opacity: executeRecMutation.isPending ? 0.6 : 1 }}>
+                              style={{ padding: '4px 11px', background: 'var(--accent)', color: 'var(--on-accent)', border: 'none', borderRadius: 7, fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500, cursor: executeRecMutation.isPending ? 'default' : 'pointer', opacity: executeRecMutation.isPending ? 0.6 : 1 }}>
                               {executeRecMutation.isPending ? 'Executing…' : 'Approve & Execute'}
                             </button>
                           ) : (
@@ -720,7 +720,7 @@ const Dashboard: React.FC = () => {
                   <div key={ad.id}>
                     {/* Winner badge */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                      <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 20, padding: '2px 10px', fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 500, color: 'var(--accent)' }}>
+                      <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 20, padding: '2px 10px', fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 500, color: 'var(--text)' }}>
                         ✦ Winning
                       </div>
                       <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)' }}>top by leads</div>

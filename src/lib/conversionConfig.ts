@@ -21,7 +21,7 @@ export const CONVERSION_META: Record<ConversionType, ConversionTypeMeta> = {
   ecommerce: {
     label:       'eCommerce / Sales',
     emoji:       '🛒',
-    color:       '#10B981',
+    get color() { return cssToken('--green'); },
     bg:          'rgba(16,185,129,0.10)',
     description: 'ROAS, Revenue, Orders, CAC',
   },
@@ -35,7 +35,7 @@ export const CONVERSION_META: Record<ConversionType, ConversionTypeMeta> = {
   bookings: {
     label:       'Bookings / Appointments',
     emoji:       '📅',
-    color:       '#60A5FA',
+    get color() { return cssToken('--blue'); },
     bg:          'rgba(96,165,250,0.10)',
     description: 'Appointments, CPB, Show Rate',
   },
@@ -49,7 +49,7 @@ export const CONVERSION_META: Record<ConversionType, ConversionTypeMeta> = {
   awareness: {
     label:       'Brand Awareness',
     emoji:       '👁',
-    color:       '#FBBF24',
+    get color() { return cssToken('--amber'); },
     bg:          'rgba(251,191,36,0.10)',
     description: 'Reach, CPM, Frequency',
   },
@@ -87,7 +87,7 @@ const fmtN = (n: number) => n === 0 ? '—' : n >= 1000 ? `${(n / 1000).toFixed(
 export const KPI_CONFIG: Record<ConversionType, KpiDef[]> = {
   ecommerce: [
     { key: 'spend',    label: 'Total Spend',  compute: cs => fmt(cs.reduce((s,c) => s + c.spend, 0)) },
-    { key: 'revenue',  label: 'Revenue',      color: '#10B981', compute: cs => fmt(cs.reduce((s,c) => s + c.revenue, 0)) },
+    { key: 'revenue',  label: 'Revenue',      get color() { return cssToken('--green'); }, compute: cs => fmt(cs.reduce((s,c) => s + c.revenue, 0)) },
     { key: 'roas',     label: 'Avg ROAS',     suffix: 'x', compute: cs => {
       const sp = cs.reduce((s,c) => s + c.spend, 0);
       const rv = cs.reduce((s,c) => s + c.revenue, 0);
@@ -117,7 +117,7 @@ export const KPI_CONFIG: Record<ConversionType, KpiDef[]> = {
   ],
   bookings: [
     { key: 'spend',       label: 'Total Spend',      compute: cs => fmt(cs.reduce((s,c) => s + c.spend, 0)) },
-    { key: 'bookings',    label: 'Appointments',  color: '#60A5FA', compute: cs => fmtN(cs.reduce((s,c) => s + c.bookings, 0)) },
+    { key: 'bookings',    label: 'Appointments',  get color() { return cssToken('--blue'); }, compute: cs => fmtN(cs.reduce((s,c) => s + c.bookings, 0)) },
     { key: 'cpb',         label: 'Cost / Booking',   compute: cs => {
       const sp = cs.reduce((s,c) => s + c.spend, 0);
       const bk = cs.reduce((s,c) => s + c.bookings, 0);
@@ -132,7 +132,7 @@ export const KPI_CONFIG: Record<ConversionType, KpiDef[]> = {
   ],
   awareness: [
     { key: 'spend',       label: 'Total Spend',   compute: cs => fmt(cs.reduce((s,c) => s + c.spend, 0)) },
-    { key: 'reach',       label: 'Total Reach',   color: '#FBBF24', compute: cs => fmtN(cs.reduce((s,c) => s + c.reach, 0)) },
+    { key: 'reach',       label: 'Total Reach',   get color() { return cssToken('--amber'); }, compute: cs => fmtN(cs.reduce((s,c) => s + c.reach, 0)) },
     { key: 'cpm',         label: 'Avg CPM',       compute: cs => {
       const sp = cs.reduce((s,c) => s + c.spend, 0);
       const im = cs.reduce((s,c) => s + c.impressions, 0);

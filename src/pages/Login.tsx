@@ -217,7 +217,7 @@ const Login: React.FC = () => {
         /* ——— Left dark panel ——— */
         .login-left {
           width: 52%;
-          background: #2C1810;
+          background: var(--bg);
           display: flex;
           align-items: center;
           padding: 60px 64px;
@@ -251,7 +251,7 @@ const Login: React.FC = () => {
           font-weight: 400;
           letter-spacing: 0.28em;
           text-transform: uppercase;
-          color: var(--rose-gold);
+          color: var(--text);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -271,7 +271,7 @@ const Login: React.FC = () => {
           font-size: 42px;
           font-weight: 800;
           line-height: 1.15;
-          color: #F5E6D8;
+          color: var(--text);
           letter-spacing: -0.02em;
           margin-bottom: 20px;
         }
@@ -284,7 +284,7 @@ const Login: React.FC = () => {
           font-family: var(--font-ui);
           font-size: 14px;
           font-weight: 300;
-          color: #C4A090;
+          color: var(--text);
           line-height: 1.6;
           margin-bottom: 32px;
           max-width: 360px;
@@ -306,7 +306,7 @@ const Login: React.FC = () => {
           font-family: var(--font-mono);
           font-size: 22px;
           font-weight: 500;
-          color: #F5E6D8;
+          color: var(--text);
           line-height: 1;
         }
 
@@ -316,7 +316,7 @@ const Login: React.FC = () => {
           font-weight: 300;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #7A5A48;
+          color: var(--text-2);
         }
 
         /* ——— Demo CTA box on dark panel ——— */
@@ -337,7 +337,7 @@ const Login: React.FC = () => {
           font-weight: 300;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #8B6050;
+          color: var(--text-2);
         }
 
         .login-demo-btn {
@@ -352,18 +352,18 @@ const Login: React.FC = () => {
           font-size: 13px;
           font-weight: 500;
           letter-spacing: 0.06em;
-          color: #FDF6F0;
+          color: var(--on-accent);
           cursor: pointer;
           transition: background 0.2s;
           width: fit-content;
         }
 
-        .login-demo-btn:hover { background: #B06E55; }
+        .login-demo-btn:hover { background: var(--accent-deep); }
 
         .login-demo-sub {
           font-family: var(--font-mono);
           font-size: 9px;
-          color: #6B4A38;
+          color: var(--text-2);
           letter-spacing: 0.06em;
         }
 
@@ -371,8 +371,8 @@ const Login: React.FC = () => {
           font-family: var(--font-display);
           font-weight: 700;
           font-size: 14px;
-          color: #8B6050;
-          border-left: 1px solid #3d2a1e;
+          color: var(--text-2);
+          border-left: 1px solid var(--border);
           padding-left: 16px;
           line-height: 1.6;
         }
@@ -515,14 +515,14 @@ const Login: React.FC = () => {
           display: flex;
           align-items: flex-start;
           gap: 7px;
-          background: #FEE2E2;
+          background: var(--red-soft);
           border: 0.5px solid rgba(239,68,68,0.2);
           border-radius: var(--radius);
           padding: 10px 12px;
           font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 300;
-          color: #991B1B;
+          color: var(--red);
           line-height: 1.5;
         }
 
@@ -531,7 +531,7 @@ const Login: React.FC = () => {
         .login-error-hint {
           margin-top: 4px;
           font-size: 11px;
-          color: #7f1d1d;
+          color: var(--red);
         }
 
         .login-error-demo {
@@ -539,7 +539,7 @@ const Login: React.FC = () => {
           border: none;
           font-family: inherit;
           font-size: inherit;
-          color: #B45309;
+          color: var(--amber);
           cursor: pointer;
           text-decoration: underline;
           padding: 0;
