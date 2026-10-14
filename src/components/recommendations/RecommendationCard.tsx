@@ -127,8 +127,9 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
       {/* Title — display font */}
       <div style={{
         fontFamily: 'var(--font-display)',
-        fontSize: 13,
+        fontSize: 'var(--t-h3)',
         fontWeight: 700,
+        letterSpacing: 'var(--track-h3)',
         color: 'var(--text)',
         lineHeight: 1.35,
       }}>

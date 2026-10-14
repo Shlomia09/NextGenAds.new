@@ -192,7 +192,7 @@ const DemoDashboard: React.FC = () => {
                 <div className="live-dot" />
                 Live Intelligence
               </div>
-              <h1 className="section-title">
+              <h1 className="page-title">
                 {MOCK_BRAND.name} <em>Dashboard</em>
               </h1>
               <p className="page-subtitle">
@@ -214,7 +214,7 @@ const DemoDashboard: React.FC = () => {
                   <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, fontWeight: 400, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
                     {icon}{label}
                   </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 500, color: hl ? 'var(--success)' : 'var(--text-primary)' }}>{value}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', fontWeight: 500, letterSpacing: 'var(--track-metric)', lineHeight: 1, color: hl ? 'var(--success)' : 'var(--text-primary)' }}>{value}</div>
                 </div>
               ))}
             </div>
@@ -246,7 +246,7 @@ const DemoDashboard: React.FC = () => {
                       <div className="live-dot" style={{ background: dotColor }} />
                       {label}
                     </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 26, fontWeight: 500, color: statusColor, lineHeight: 1 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', fontWeight: 500, letterSpacing: 'var(--track-metric)', color: statusColor, lineHeight: 1 }}>
                       {fmtVal(your)}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-secondary)', borderRadius: 2, padding: '5px 8px' }}>
@@ -308,7 +308,7 @@ const DemoDashboard: React.FC = () => {
                       <DemoBadge priority={rec.priority} />
                       <span className="badge badge-neutral">{rec.type}</span>
                     </div>
-                    <div style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>{rec.title}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--t-h3)', fontWeight: 700, letterSpacing: 'var(--track-h3)', color: 'var(--text-primary)' }}>{rec.title}</div>
                     <p style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{rec.desc}</p>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text)', background: 'var(--rose-gold-light)', padding: '3px 8px', display: 'inline-block' }}>
                       {rec.benchmark}

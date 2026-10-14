@@ -16,6 +16,28 @@
   --tracking-display: -0.045em;
   --tracking-title:   -0.03em;
 
+  /* type scale — clamp only on the two largest steps */
+  --t-display: clamp(44px, 6vw, 72px);
+  --t-h1:      clamp(28px, 3.2vw, 40px);
+  --t-h2:      26px;
+  --t-h3:      18px;
+  --t-metric:  34px;
+  --t-body:    14px;
+  --t-label:   11px;
+  --t-micro:   10px;
+
+  --track-display: -0.045em;
+  --track-h1:      -0.035em;
+  --track-h2:      -0.025em;
+  --track-h3:      -0.015em;
+  --track-metric:  -0.02em;
+  --track-label:    0.14em;
+
+  --lh-display: 0.92;
+  --lh-h1:      1.0;
+  --lh-h2:      1.1;
+  --lh-body:    1.5;
+
   --radius:      3px;
   --radius-sm:   2px;
   --radius-lg:   3px;

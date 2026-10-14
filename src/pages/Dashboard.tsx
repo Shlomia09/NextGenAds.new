@@ -398,7 +398,7 @@ const Dashboard: React.FC = () => {
         <div className="dash-welcome-strip" style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', gap: 20, marginBottom: 20 }}>
           {/* Greeting */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800, color: 'var(--text)', margin: '0 0 4px', letterSpacing: -0.5 }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--t-h1)', fontWeight: 800, color: 'var(--text)', margin: '0 0 4px', letterSpacing: 'var(--track-h1)', lineHeight: 'var(--lh-h1)' }}>
               {greeting()}{user?.email ? `, ${displayName(user.email)}` : ''}
             </h1>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)' }}>

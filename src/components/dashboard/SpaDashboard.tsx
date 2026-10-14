@@ -251,7 +251,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
             <div className="live-dot" />
             Spa &amp; Wellness Intelligence
           </div>
-          <h1 className="section-title">
+          <h1 className="page-title">
             {brand.name} <em>Dashboard</em>
           </h1>
           {brand.services && brand.services.length > 0 && (
