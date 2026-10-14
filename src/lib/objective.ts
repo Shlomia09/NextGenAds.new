@@ -86,8 +86,8 @@ export const GOAL_META: Record<GoalType, GoalMeta> = {
   awareness: {
     label:         'Awareness',
     emoji:         '👁',
-    color:         '#3d2d8a',
-    bg:            '#EEEBFB',
+    get color() { return cssToken('--purple'); },
+    get bg() { return cssToken('--purple-soft'); },
     primaryKpi:    'Reach',
     secondaryKpi:  'Frequency',
     metaActionType:'impression',

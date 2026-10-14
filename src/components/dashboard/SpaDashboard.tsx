@@ -47,7 +47,7 @@ function getSeasonalIndex(month: number): { label: string; color: string; bgColo
   }
   if (month === 4) {
     // May — Mother's Day
-    return { label: "Mother's Day", color: '#7C3AED', bgColor: 'rgba(124,58,237,0.07)' };
+    return { label: "Mother's Day", color: 'var(--purple)', bgColor: 'var(--purple-soft)' };
   }
   if (month >= 5 && month <= 7) {
     // June–August — summer bookings

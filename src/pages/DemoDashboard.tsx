@@ -95,7 +95,7 @@ const DemoBadge: React.FC<{ priority: string }> = ({ priority }) => {
 };
 
 const DemoNavItem: React.FC<{ icon: React.ReactNode; label: string; active?: boolean }> = ({ icon, label, active }) => (
-  <div className={`demo-nav-item ${active ? 'active' : ''}`} style={{ opacity: active ? 1 : 0.5 }}>
+  <div className={`demo-nav-item ${active ? 'active' : ''}`} style={active ? undefined : { color: 'var(--text-3)', cursor: 'not-allowed' }}>
     {icon}
     <span>{label}</span>
   </div>
@@ -469,7 +469,6 @@ const DemoDashboard: React.FC = () => {
           color: var(--text);
           border-left-color: var(--accent);
           background: var(--accent-soft);
-          opacity: 1 !important;
         }
 
         .demo-nav-item:hover { color: var(--text); background: var(--accent-soft); }

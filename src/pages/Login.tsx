@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { Mail, Eye, EyeOff, AlertCircle, Globe, LayoutDashboard } from 'lucide-react';
 import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { RougeLogo } from '../components/brand/RougeLogo';
 
 const Login: React.FC = () => {
   const { user, loading } = useAuth();
@@ -82,7 +83,7 @@ const Login: React.FC = () => {
           </div>
 
           <div className="login-quote">
-            <em>"Feminine intelligence meets hard data."</em>
+            9 years. 847 beauty brands. One number that matters.
           </div>
         </div>
       </div>
@@ -92,7 +93,7 @@ const Login: React.FC = () => {
         <div className="login-form-wrap animate-fade-in">
           {/* Logo */}
           <div className="login-logo">
-            Next<em>Gen</em>Ads
+            <RougeLogo variant="lockup" className="login-rouge-logo" />
           </div>
 
           {/* Tabs */}
@@ -404,9 +405,7 @@ const Login: React.FC = () => {
           margin-bottom: 4px;
         }
 
-        .login-logo em {
-          color: var(--rose-gold);
-        }
+        .login-rouge-logo { height: 24px; display: block; }
 
         .login-tabs {
           display: flex;

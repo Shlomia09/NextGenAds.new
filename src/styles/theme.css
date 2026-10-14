@@ -56,6 +56,8 @@
 
   --amber:          #E0A93F;
   --amber-soft:     rgba(224, 169, 63, 0.14);
+  --purple:         #A78BFA;
+  --purple-soft:    rgba(167, 139, 250, 0.14);
 
   --champagne:      #E0A93F;
   --champagne-soft: rgba(224, 169, 63, 0.12);
@@ -158,6 +160,8 @@
 
   --amber:          #8A5E00;
   --amber-soft:     rgba(138, 94, 0, 0.12);
+  --purple:         #6D28D9;
+  --purple-soft:    #EEEBFB;
 
   --champagne:      #8A5E00;
   --champagne-soft: rgba(138, 94, 0, 0.12);

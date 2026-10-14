@@ -43,7 +43,7 @@ const CONVERSION_OPTIONS: { value: ConversionType; label: string; emoji: string 
 const HOOK_COLORS = {
   problem:      { bg: 'rgba(248,113,113,0.06)', border: 'rgba(248,113,113,0.2)', get badge() { return cssToken('--red'); } },
   result:       { bg: 'rgba(74,222,128,0.06)',  border: 'rgba(74,222,128,0.2)',  get badge() { return cssToken('--green'); } },
-  social_proof: { bg: 'rgba(167,139,250,0.06)', border: 'rgba(167,139,250,0.2)', badge: '#a78bfa' },
+  social_proof: { bg: 'var(--purple-soft)', border: 'var(--purple-soft)', get badge() { return cssToken('--purple'); } },
 };
 
 // ── Helpers ──────────────────────────────────────────────────────
@@ -401,7 +401,7 @@ const CreativeStudio: React.FC = () => {
               <>
                 <img src={preview} alt="Creative preview" style={{ width: '100%', display: 'block', objectFit: 'contain', maxHeight: 260 }} />
                 <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 6 }}>
-                  {isVideo && <div style={{ background: 'rgba(0,0,0,0.7)', borderRadius: 4, padding: '3px 8px', display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-sans)', fontSize: 9, color: '#a78bfa' }}><Video size={9} /> Video</div>}
+                  {isVideo && <div style={{ background: 'rgba(0,0,0,0.7)', borderRadius: 4, padding: '3px 8px', display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--purple)' }}><Video size={9} /> Video</div>}
                   <button onClick={e => { e.stopPropagation(); reset(); }} style={{ background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: 4, width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white' }}><X size={11} /></button>
                 </div>
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.7))', padding: '20px 12px 10px', fontFamily: 'var(--font-sans)', fontSize: 10, color: 'rgba(255,255,255,0.8)' }}>{file?.name}</div>
@@ -479,12 +479,12 @@ const CreativeStudio: React.FC = () => {
             </div>
 
             {/* Benchmark insight */}
-            <div style={{ background: 'rgba(167,139,250,0.05)', border: '0.5px solid rgba(167,139,250,0.2)', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(167,139,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ background: 'var(--purple-soft)', border: '0.5px solid var(--purple-soft)', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--purple-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <span style={{ fontSize: 10 }}>📊</span>
               </div>
               <div>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: '#a78bfa', fontWeight: 500, marginBottom: 3 }}>Benchmark Insight</div>
+                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--purple)', fontWeight: 500, marginBottom: 3 }}>Benchmark Insight</div>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{result.benchmark_reason}</div>
               </div>
             </div>

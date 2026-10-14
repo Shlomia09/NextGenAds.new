@@ -42,8 +42,8 @@ export const CONVERSION_META: Record<ConversionType, ConversionTypeMeta> = {
   app: {
     label:       'App Installs',
     emoji:       '📱',
-    color:       '#A78BFA',
-    bg:          'rgba(167,139,250,0.10)',
+    get color()  { return cssToken('--purple'); },
+    get bg()     { return cssToken('--purple-soft'); },
     description: 'Installs, CPI, CTR',
   },
   awareness: {

@@ -139,7 +139,7 @@ const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ 
  
     const root   = document.documentElement;
     const get    = (v: string) => getComputedStyle(root).getPropertyValue(v).trim();
-    const accent = get('--accent');
+    const spend  = get('--text-2');   // spend is not an alert — red is reserved for decay series
     const green  = get('--green');
     const text3  = get('--text-3');
     const grid   = get('--grid') || 'rgba(255,255,255,0.05)';
@@ -148,7 +148,7 @@ const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ 
  
     const ctx = canvasRef.current.getContext('2d')!;
     const g1 = ctx.createLinearGradient(0, 0, 0, 220);
-    g1.addColorStop(0, accent + '44'); g1.addColorStop(1, accent + '04');
+    g1.addColorStop(0, spend + '44'); g1.addColorStop(1, spend + '04');
     const g2 = ctx.createLinearGradient(0, 0, 0, 220);
     g2.addColorStop(0, green + '33'); g2.addColorStop(1, green + '03');
  
@@ -163,10 +163,10 @@ const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ 
           {
             label: 'Spend',
             data: data.map(d => d.spend),
-            borderColor: accent, backgroundColor: g1,
+            borderColor: spend, backgroundColor: g1,
             fill: true, tension: 0.4, borderWidth: 2,
             pointRadius: 0, pointHoverRadius: 4,
-            pointHoverBackgroundColor: accent,
+            pointHoverBackgroundColor: spend,
             yAxisID: 'y',
           },
           {
@@ -495,7 +495,7 @@ const Dashboard: React.FC = () => {
                 </div>
                 {/* Legend */}
                 <div style={{ display: 'flex', gap: 14, flexShrink: 0 }}>
-                  {[{ label: 'Spend', color: 'var(--accent)' }, { label: convLabel, color: 'var(--green)' }].map(l => (
+                  {[{ label: 'Spend', color: 'var(--text-2)' }, { label: convLabel, color: 'var(--green)' }].map(l => (
                     <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-2)' }}>
                       <div style={{ width: 8, height: 8, borderRadius: 2, background: l.color }} />
                       {l.label}
@@ -526,7 +526,7 @@ const Dashboard: React.FC = () => {
               {!isLoading && campaigns.length > 0 && (
                 <div className="dash-kpi-totals" style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
                   {[
-                    { label: 'Total Spend',          value: formatCurrency(totalSpend),      color: 'var(--accent)' },
+                    { label: 'Total Spend',          value: formatCurrency(totalSpend),      color: 'var(--text)' },
                     { label: `Total ${convLabel}`,    value: totalResults > 0 ? formatNumber(totalResults) : '—', color: 'var(--green)', hide: totalResults === 0 },
                     { label: dashConvSummary.cpaLabel, value: avgCPA > 0 ? formatCurrency(avgCPA) : '—', color: 'var(--text)' },
                     { label: 'Avg CTR',               value: avgCTR > 0 ? `${avgCTR.toFixed(2)}%` : '—', color: 'var(--blue)' },
@@ -602,7 +602,7 @@ const Dashboard: React.FC = () => {
               ) : (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 16 }}>
-                    <div style={{ width: 76, height: 76, borderRadius: '50%', flexShrink: 0, background: `conic-gradient(var(--accent) 0% ${health.score}%, var(--border) ${health.score}% 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 4px var(--surface)', position: 'relative' }}>
+                    <div style={{ width: 76, height: 76, borderRadius: '50%', flexShrink: 0, background: `conic-gradient(${health.score >= 80 ? 'var(--green)' : health.score >= 65 ? 'var(--amber)' : health.score >= 45 ? 'var(--champagne)' : 'var(--accent)'} 0% ${health.score}%, var(--border) ${health.score}% 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 4px var(--surface)', position: 'relative' }}>
                       <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--surface)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                         <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 500, color: 'var(--text)', lineHeight: 1 }}>{health.score}</span>
                         <span style={{ fontFamily: 'var(--font-ui)', fontSize: 8, color: 'var(--text-3)' }}>/100</span>

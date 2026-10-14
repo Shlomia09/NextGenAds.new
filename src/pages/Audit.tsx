@@ -107,7 +107,7 @@ const Audit: React.FC = () => {
       }}>
         <Link to="/" style={{ textDecoration: 'none' }}>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: 'var(--text)' }}>
-            NextAds<em style={{ color: 'var(--accent)' }}>Gen</em>
+            Rouge
           </div>
         </Link>
         <Link to="/pricing" style={{ fontFamily: 'var(--font-ui)', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-2)', textDecoration: 'none' }}>

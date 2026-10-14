@@ -13,7 +13,7 @@ function getPlanBadgeStyle(planId: string): React.CSSProperties {
     free:    { background: 'rgba(74,46,30,0.2)',    color: 'var(--text-2)',  border: '0.5px solid var(--border)' },
     starter: { background: 'var(--accent-soft)', color: 'var(--text)',  border: '0.5px solid var(--accent-soft)' },
     growth:  { background: 'rgba(16,185,129,0.1)',  color: 'var(--green)',  border: '0.5px solid rgba(16,185,129,0.3)' },
-    scale:   { background: 'rgba(139,92,246,0.1)',  color: '#A78BFA',  border: '0.5px solid rgba(139,92,246,0.3)' },
+    scale:   { background: 'var(--purple-soft)',  color: 'var(--purple)',  border: '0.5px solid var(--purple)' },
   };
   return map[planId] ?? map['free'];
 }
