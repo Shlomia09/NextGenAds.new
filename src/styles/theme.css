@@ -7,75 +7,68 @@
 
 /* ── Shared: fonts, radius, motion (theme-independent) ── */
 :root {
-  --font-display: 'Manrope', system-ui, sans-serif;
+  --font-display: 'Archivo', Impact, system-ui, sans-serif;
   --font-ui:      'Inter', -apple-system, sans-serif;
-  --font-mono:    'JetBrains Mono', monospace;
-  /* Manrope display sizing */
-  --tracking-display: -0.02em;   /* tighten large headings */
-  --tracking-title:   -0.01em;   /* tighten section titles */
-  /* Legacy aliases */
-  --font-serif: var(--font-display);
-  --font-sans:  var(--font-ui);
+  --font-mono:    'IBM Plex Mono', monospace;
+  --font-accent:  'Bodoni Moda', Georgia, serif;
+  --font-sans:    var(--font-ui);
 
-  --radius:      9px;
-  --radius-sm:   6px;
-  --radius-lg:   13px;
-  --radius-xl:   16px;
-  --radius-full: 30px;
+  --tracking-display: -0.045em;
+  --tracking-title:   -0.03em;
+
+  --radius:      3px;
+  --radius-sm:   2px;
+  --radius-lg:   3px;
+  --radius-xl:   3px;
+  --radius-full: 999px;
 
   --transition: 0.15s ease;
 }
 
 /* ============================================================
-   DARK THEME (default) — §2.1 + §27 expanded
+   DARK THEME (default) — Ink palette
    ============================================================ */
 :root,
 [data-theme="dark"] {
-  /* Surfaces — §60 neutral gray-black palette */
-  --bg:             #0B0B0D;
-  --bg-sidebar:     #08080A; /* proportionally darker than --bg; adjust if needed */
-  --surface:        #141416;
-  --surface-2:      #1A1A1D;
-  --surface-hover:  #202024;
+  --bg:             #121113;
+  --bg-sidebar:     #0C0B0D;
+  --surface:        #1A191C;
+  --surface-2:      #211F24;
+  --surface-hover:  #2A272E;
 
-  /* Borders */
-  --border:         #27272B;
-  --border-soft:    #1D1D20;
+  --border:         #2E2C31;   /* decorative */
+  --border-soft:    #222025;
+  --border-control: #6B6772;   /* functional — 3.4:1 */
 
-  /* Text */
-  --text:           #EEEEF0;
-  --text-2:         #8B8B93;
-  --text-3:         #626268;
+  --text:           #EDEBE8;
+  --text-2:         #A8A5A0;
+  --text-3:         #78746C;
 
-  /* Accent — Rose Gold (brand color) */
-  --accent:         #E3A88E;
-  --accent-deep:    #C97B5E;
-  --accent-soft:    rgba(227, 168, 142, 0.12);
+  --accent:         #FB2343;
+  --accent-deep:    #D4102E;
+  --accent-soft:    rgba(251, 35, 67, 0.12);
 
-  /* Semantic colors §2.1 + §27 palette */
-  --green:          #6BBF8A;
-  --green-soft:     rgba(107, 191, 138, 0.14);
+  --green:          #4FC98A;
+  --green-soft:     rgba(79, 201, 138, 0.14);
 
-  --blue:           #8FB0D9;
-  --blue-soft:      rgba(143, 176, 217, 0.14);
+  --blue:           #6FA8DC;
+  --blue-soft:      rgba(111, 168, 220, 0.14);
 
-  --amber:          #D9B06A;
-  --amber-soft:     rgba(217, 176, 106, 0.14);
+  --amber:          #E0A93F;
+  --amber-soft:     rgba(224, 169, 63, 0.14);
 
-  --champagne:      #C99A6A;
-  --champagne-soft: rgba(201, 154, 106, 0.12);
+  --champagne:      #E0A93F;
+  --champagne-soft: rgba(224, 169, 63, 0.12);
 
-  --red:            #D9776B;
-  --red-soft:       rgba(217, 119, 107, 0.12);
+  --red:            #FB2343;
+  --red-soft:       rgba(251, 35, 67, 0.12);
 
-  /* Chart & elevation §27 */
-  --shadow:  0 6px 22px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.025) inset;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
-  --grid:    rgba(255, 255, 255, 0.05);
+  --shadow:    0 10px 34px rgba(0,0,0,0.55);   /* modals only */
+  --shadow-sm: none;
+  --shadow-lg: 0 18px 50px rgba(0,0,0,0.7);
+  --grid:      #2E2C31;
 
-  /* Logo gradient — constant */
-  --logo-grad: linear-gradient(135deg, #E3A88E, #C97B5E);
+  --logo-grad: none;
 
   /* ── All legacy aliases ── */
   --rose:                    var(--accent);
@@ -102,9 +95,10 @@
   --bg-secondary:            var(--surface-2);
   --bg-selected:             var(--accent-soft);
   --bg-hover:                var(--surface-hover);
-  --border-strong:           var(--border);
+  --border-strong:           var(--border-control);
   --border-light:            var(--border-soft);
   --border-rose:             var(--accent-deep);
+  --on-accent:               var(--bg);
   --copper:                  var(--accent);
   --rose-gold:               var(--accent);
   --rose-gold-light:         var(--accent-soft);
@@ -130,47 +124,48 @@
 }
 
 /* ============================================================
-   LIGHT THEME — §2.2 + §27 expanded
+   LIGHT THEME — Bone palette
    ============================================================ */
 [data-theme="light"] {
-  --bg:             #F7F3EE;
-  --bg-sidebar:     #FFFFFF;
-  --surface:        #FFFFFF;
-  --surface-2:      #FBF7F2;
-  --surface-hover:  #F4EDE5;
+  --bg:             #F3F0EA;
+  --bg-sidebar:     #EAE6DE;
+  --surface:        #EAE6DE;
+  --surface-2:      #DEDAD1;
+  --surface-hover:  #DCD6CA;
 
-  --border:         #EAE1D6;
-  --border-soft:    #F0E9E0;
+  --border:         #D5CFC3;   /* decorative */
+  --border-soft:    #E2DDD3;
+  --border-control: #8C857A;   /* functional — 3.2:1 */
 
-  --text:           #211C18;
-  --text-2:         #857A6F;
-  --text-3:         #ABA197;
+  --text:           #121113;
+  --text-2:         #4A4842;
+  --text-3:         #78746C;
 
-  --accent:         #BC6A48;
-  --accent-deep:    #9E5436;
-  --accent-soft:    #F6E8DF;
+  --accent:         #E8102F;
+  --accent-deep:    #B80B24;
+  --accent-soft:    rgba(232, 16, 47, 0.10);
 
-  --green:          #3D8A5E;
-  --green-soft:     #E7F1EA;
+  --green:          #1B6E45;
+  --green-soft:     rgba(27, 110, 69, 0.12);
 
-  --blue:           #4E79A8;
-  --blue-soft:      #E9EFF6;
+  --blue:           #2F5F8F;
+  --blue-soft:      rgba(47, 95, 143, 0.12);
 
-  --amber:          #B5852F;
-  --amber-soft:     #F5EEDF;
+  --amber:          #8A5E00;
+  --amber-soft:     rgba(138, 94, 0, 0.12);
 
-  --champagne:      #A9763C;
-  --champagne-soft: #F5EDE1;
+  --champagne:      #8A5E00;
+  --champagne-soft: rgba(138, 94, 0, 0.12);
 
-  --red:            #C0503F;
-  --red-soft:       #F8E9E6;
+  --red:            #E8102F;
+  --red-soft:       rgba(232, 16, 47, 0.10);
 
-  --shadow:  0 8px 24px rgba(120,90,70,0.10), 0 1px 2px rgba(120,90,70,0.05);
-  --shadow-sm: 0 2px 8px rgba(120,90,70,0.06);
-  --shadow-lg: 0 16px 40px rgba(120,90,70,0.16);
-  --grid:    rgba(120, 90, 70, 0.08);
+  --shadow:    0 10px 30px rgba(18,17,19,0.10);   /* modals only */
+  --shadow-sm: none;
+  --shadow-lg: 0 18px 44px rgba(18,17,19,0.16);
+  --grid:      #D5CFC3;
 
-  --logo-grad: linear-gradient(135deg, #E3A88E, #C97B5E);
+  --logo-grad: none;
 
   /* ── All legacy aliases ── */
   --rose:                    var(--accent);
@@ -197,9 +192,10 @@
   --bg-secondary:            var(--surface-2);
   --bg-selected:             var(--accent-soft);
   --bg-hover:                var(--surface-hover);
-  --border-strong:           var(--border);
+  --border-strong:           var(--border-control);
   --border-light:            var(--border-soft);
   --border-rose:             var(--accent-deep);
+  --on-accent:               var(--bg);
   --copper:                  var(--accent);
   --rose-gold:               var(--accent);
   --rose-gold-light:         var(--accent-soft);
