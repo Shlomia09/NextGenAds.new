@@ -465,7 +465,7 @@ const CampaignWorkshop: React.FC = () => {
         .sort((a, b) => ((a.cpl ?? 999) - (b.cpl ?? 999)))
         .slice(0, 5);
 
-      const systemPrompt = `You are an expert digital advertising strategist specializing in beauty and wellness, with 9 years of benchmark data. Respond ONLY with a valid JSON object — no markdown, no explanation outside the JSON.`;
+      const systemPrompt = `You are an expert digital advertising strategist specializing in beauty and wellness, with benchmark data since 2018. Respond ONLY with a valid JSON object — no markdown, no explanation outside the JSON.`;
 
       const userMsg = `Recommend optimal audience targeting for this campaign:
 
@@ -1517,7 +1517,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
           {/* Benchmark hint below preview */}
           {activeBrand && (
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 16px', fontSize: 11.5, color: 'var(--text-3)', fontFamily: 'var(--font-ui)', lineHeight: 1.5 }}>
-              <span style={{ color: 'var(--text-2)', fontWeight: 500 }}>9yr beauty benchmark · {activeBrand.name}</span>
+              <span style={{ color: 'var(--text-2)', fontWeight: 500 }}>beauty benchmark since 2018 · {activeBrand.name}</span>
               <br />
               EST. REACH and CPL estimates are not available without a live campaign. They will show after your first sync.
             </div>

@@ -625,7 +625,7 @@ export default function Landing() {
             <div className="hero-inner">
               <div className="lp-badge">
                 <span className="pulse-dot" />
-                Trained on 9 years of beauty campaign data
+                Trained on beauty campaign data since 2018
               </div>
 
               <h1>Campaign intelligence for <span className="beauty-slant">beauty</span> brands</h1>
@@ -706,7 +706,7 @@ export default function Landing() {
         ───────────────────────────────────────────────────────── */}
         <div className="lp-stats">
           <div className="lp-stats-inner">
-            {/* ✓ REAL — 9 years of beauty data is confirmed factual */}
+            {/* ✓ REAL — 20,000+ beauty campaigns since 2018 is confirmed factual */}
             <div className="lp-stat reveal">
               <div className="num" data-count="9">0</div>
               <div className="lbl">Years of beauty benchmark data</div>
@@ -750,7 +750,7 @@ export default function Landing() {
             </div>
             <div className="feat reveal">
               <div className="feat-ic">◈</div>
-              <h3>9-year benchmark</h3>
+              <h3>Benchmark since 2018</h3>
               <p>Every metric is judged against nearly a decade of real beauty &amp; clinic campaign data, so you always know what "good" is.</p>
             </div>
             <div className="feat reveal d1">
@@ -786,7 +786,7 @@ export default function Landing() {
               <div className="reveal">
                 <div className="step-n">02</div>
                 <h3>Rouge writes the copy</h3>
-                <p>Headlines, primary text, hooks — drafted from your own top performers, the creative they sit with, and nine years of beauty data. Never from thin air, never published without you.</p>
+                <p>Headlines, primary text, hooks — drafted from your own top performers, the creative they sit with, and beauty data since 2018. Never from thin air, never published without you.</p>
               </div>
               <div
                 className="step-visual has-image reveal d1"

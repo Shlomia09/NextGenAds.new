@@ -64,7 +64,7 @@ const comparisonRows = [
   { feature: 'Beauty-specific benchmarks', nextads: true, madgicx: false, revealbot: false },
   { feature: 'AI recommendations',         nextads: true, madgicx: true,  revealbot: false },
   { feature: 'Campaign execution',          nextads: true, madgicx: true,  revealbot: true  },
-  { feature: '9-year data depth',           nextads: true, madgicx: false, revealbot: false },
+  { feature: 'Benchmark data since 2018',           nextads: true, madgicx: false, revealbot: false },
   { feature: 'Klaviyo integration',         nextads: true, madgicx: false, revealbot: false },
   { feature: 'Agency PDF reports',          nextads: true, madgicx: false, revealbot: false },
 ];
@@ -522,7 +522,7 @@ export default function Pricing() {
           </h1>
 
           <p className="pricing-subtitle">
-            Every plan includes our 9-year Beauty &amp; Cosmetics benchmark dataset
+            Every plan includes our Beauty &amp; Cosmetics benchmark dataset (since 2018)
           </p>
 
           {/* ── Billing Toggle ── */}

@@ -95,11 +95,10 @@ const Sidebar: React.FC<SidebarProps> = () => {
             <ThemeToggle />
           </div>
 
-          {/* 9YR BENCH ACTIVE badge */}
+          {/* BENCHMARK ACTIVE badge — the dataset year belongs on Landing, not in product chrome */}
           <div className="sidebar-benchmark-badge">
-            <span>9YR</span>
-            <span>BENCH</span>
-            <span>ACTIVE</span>
+            <span>Benchmark</span>
+            <span>Active</span>
           </div>
         </div>
 

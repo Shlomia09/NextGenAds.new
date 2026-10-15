@@ -71,7 +71,7 @@ const ROAS_TREND = Array.from({ length: 14 }, (_, i) => ({
 }));
 
 const DEMO_CHAT_RESPONSES: Record<string, string> = {
-  default: `Based on your NeoLumo campaign data vs the 9-year Beauty & Cosmetics benchmark:
+  default: `Based on your NeoLumo campaign data vs the Beauty & Cosmetics benchmark (data since 2018):
 
 **Your account is performing ABOVE average** for the €120–180 AOV bracket.
 
@@ -156,7 +156,7 @@ const DemoDashboard: React.FC = () => {
         <div style={{ padding: '14px 12px', borderTop: '0.5px solid var(--border)' }}>
           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, color: 'var(--text-2)', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>
             <div className="live-dot" />
-            9-Year Benchmark Active
+            Benchmark active · since 2018
           </div>
         </div>
       </aside>
@@ -232,7 +232,7 @@ const DemoDashboard: React.FC = () => {
                 </div>
               </div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-hint)', background: 'var(--bg-secondary)', border: '0.5px solid var(--border-light)', borderRadius: 2, padding: '4px 8px' }}>
-                847 Beauty brands · AOV €80–150 · 2015–2024
+                20,000+ beauty campaigns · AOV €80–150 · since 2018
               </div>
               {MOCK_BENCHMARKS.map(({ label, your, bench, unit, better }) => {
                 const diff = ((your - bench) / bench * 100);
@@ -354,7 +354,7 @@ const DemoDashboard: React.FC = () => {
                         <Sparkles size={18} strokeWidth={1.5} />
                       </div>
                       <p style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Ask Rouge</p>
-                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 300, color: 'var(--text-secondary)', maxWidth: 220, lineHeight: 1.5 }}>Full context of NeoLumo + 9 years of benchmark data</p>
+                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 300, color: 'var(--text-secondary)', maxWidth: 220, lineHeight: 1.5 }}>Full context of NeoLumo + benchmark data since 2018</p>
                       {[
                         'Why is my ROAS dropping?',
                         'Should I scale Retargeting?',

@@ -124,7 +124,7 @@ const Intelligence: React.FC = () => {
             Intelligence
           </h1>
           <p className="page-subtitle">
-            9-year Beauty &amp; Cosmetics benchmark knowledge · Context-aware campaign strategist
+            Beauty &amp; Cosmetics benchmark knowledge since 2018 · Context-aware campaign strategist
           </p>
         </div>
 

@@ -154,7 +154,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
 
           {/* Source tag */}
           <div className="bench-source-tag">
-            847 Beauty brands · {bracket.label} · 2015–2024
+            20,000+ beauty campaigns · {bracket.label} · since 2018
           </div>
 
           {/* Metric cards: ROAS / CPM / CAC / CTR / CPC */}

@@ -195,7 +195,7 @@ export const BUSINESS_TYPE_LABELS: Record<string, { icon: string; title: string;
 };
 
 export const LEFT_PANEL_COPY: Record<string, string> = {
-  ecommerce: "Tell us about your store and we'll calibrate 9 years of Beauty & Cosmetics ecommerce benchmark data to your exact AOV and markets.",
+  ecommerce: "Tell us about your store and we'll calibrate Beauty & Cosmetics ecommerce benchmark data since 2018 to your exact AOV and markets.",
   clinic:    "Tell us about your clinic and we'll set up your campaign intelligence for lead generation and booking optimization.",
   spa:       "Tell us about your spa and we'll configure your dashboard for bookings, seasonal campaigns, and gift voucher performance.",
   salon:     "Tell us about your salon and we'll optimize for local reach, new client acquisition, and frequency management.",

@@ -367,7 +367,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 textTransform: 'uppercase',
               }}
             >
-              Active brand context · 9yr Beauty benchmark data
+              Active brand context · Beauty benchmark data since 2018
             </div>
           </div>
 
@@ -492,7 +492,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 margin: 0,
               }}
             >
-              Full context of your brand, campaigns, and 9 years of benchmark data
+              Full context of your brand, campaigns, and benchmark data since 2018
             </p>
 
             {/* Suggested questions chips */}

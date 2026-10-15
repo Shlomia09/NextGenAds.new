@@ -130,7 +130,7 @@ const Audit: React.FC = () => {
             </h1>
             <p style={{ fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.7, marginBottom: 36 }}>
               Get a one-time free benchmark audit comparing your Meta Ads performance<br />
-              against 847 Beauty &amp; Cosmetics brands. No credit card required.
+              against 20,000+ Beauty &amp; Cosmetics campaigns. No credit card required.
             </p>
 
             {/* 3 steps */}
@@ -226,10 +226,10 @@ const Audit: React.FC = () => {
                 <span style={{ display: 'block', width: 16, height: 0.5, background: 'var(--surface)' }} />
               </div>
               <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginBottom: 8, letterSpacing: '-0.02em' }}>
-                Your Meta Ads vs <em style={{ color: 'var(--accent)' }}>847 Beauty brands</em>
+                Your Meta Ads vs <em style={{ color: 'var(--accent)' }}>20,000+ beauty campaigns</em>
               </h1>
               <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: 'var(--text-2)' }}>
-                Based on 9-year anonymized dataset · EU &amp; US markets · 2015–2024
+                Based on an anonymized dataset · EU &amp; US markets · since 2018
               </p>
             </div>
 
@@ -265,7 +265,7 @@ const Audit: React.FC = () => {
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 12 }}>
                 What this audit includes
               </div>
-              {['ROAS vs 847 Beauty brand benchmark', 'CPM efficiency gap', 'CAC vs industry average', 'CTR performance signal'].map(item => (
+              {['ROAS vs 20,000+ beauty campaigns', 'CPM efficiency gap', 'CAC vs industry average', 'CTR performance signal'].map(item => (
                 <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <CheckCircle size={13} color="var(--green)" strokeWidth={1.5} />
                   <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: 'var(--text)' }}>{item}</span>
@@ -288,7 +288,7 @@ const Audit: React.FC = () => {
                 Fix this with <em style={{ color: 'var(--accent)' }}>Rouge Starter</em>
               </h2>
               <p style={{ fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.7, marginBottom: 24, maxWidth: 460, margin: '0 auto 24px' }}>
-                Get AI-powered recommendations, full 9-year benchmark comparison, and monthly audit reports — all tailored to your Beauty brand.
+                Get AI-powered recommendations, full benchmark comparison (data since 2018), and monthly audit reports — all tailored to your Beauty brand.
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', marginBottom: 24 }}>

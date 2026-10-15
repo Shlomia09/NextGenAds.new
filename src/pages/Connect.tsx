@@ -708,7 +708,7 @@ const Connect: React.FC = () => {
       <div className="conn-benchmark-note">
         <div className="conn-bench-eyebrow">Always active</div>
         <p>
-          Benchmark intelligence is powered by 9 years of Beauty & Cosmetics campaign data, even before
+          Benchmark intelligence is powered by Beauty & Cosmetics campaign data since 2018, even before
           you connect any accounts. Connect Meta to layer your real performance on top and get specific AI recommendations.
         </p>
       </div>

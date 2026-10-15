@@ -56,13 +56,13 @@ const Login: React.FC = () => {
             Know if your ROAS<br />is good <em>before</em> you<br />run out of budget
           </h1>
           <p className="login-tagline">
-            9 years of Beauty & Cosmetics benchmark data, layered on top of your ad account.
+            Beauty & Cosmetics benchmark data since 2018, layered on top of your ad account.
           </p>
 
           <div className="login-proof-list">
             {[
-              { stat: '847', label: 'Beauty brands analysed' },
-              { stat: '9yr',  label: 'Benchmark dataset' },
+              { stat: '20K+', label: 'Beauty campaigns analysed' },
+              { stat: '2018', label: 'First campaign in the dataset' },
               { stat: '€100+', label: 'Avg AOV served' },
             ].map(({ stat, label }) => (
               <div key={label} className="login-proof-item">
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
           </div>
 
           <div className="login-quote">
-            9 years. 847 beauty brands. One number that matters.
+            Since 2018. 20,000+ beauty campaigns. One number that matters.
           </div>
         </div>
       </div>

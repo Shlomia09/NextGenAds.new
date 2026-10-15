@@ -39,7 +39,7 @@ const BenchmarkAvailabilityBadge: React.FC<Props> = ({ availability, aovLabel, m
           letterSpacing: '0.04em',
           color: isFull ? 'var(--green)' : 'var(--amber)',
         }}>
-          {isFull ? '9yr Benchmark Active' : 'Partial Benchmark Active'}
+          {isFull ? 'Benchmark active · since 2018' : 'Partial Benchmark Active'}
         </div>
         <div style={{
           fontFamily: 'var(--font-mono)',
@@ -50,7 +50,7 @@ const BenchmarkAvailabilityBadge: React.FC<Props> = ({ availability, aovLabel, m
           color: isFull ? 'rgba(16,185,129,0.7)' : 'rgba(245,158,11,0.6)',
         }}>
           {isFull
-            ? `847 Beauty brands · ${aovLabel ?? 'AOV calibrated'} · ${markets?.join('/') ?? 'EU'} · 2015–2024`
+            ? `20,000+ beauty campaigns · ${aovLabel ?? 'AOV calibrated'} · ${markets?.join('/') ?? 'EU'} · since 2018`
             : 'CPM/CTR data available · Purchase benchmarks: N/A'}
         </div>
       </div>

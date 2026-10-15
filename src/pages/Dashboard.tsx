@@ -299,7 +299,7 @@ const Dashboard: React.FC = () => {
     onError: (err: Error) => alert(`Execution failed: ${err.message}`),
   });
  
-  // Analyzes all campaigns for the active brand against the 9-year benchmark
+  // Analyzes all campaigns for the active brand against the benchmark (data since 2018)
   // and (re)generates the pending recommendations list.
   const generateRecsMutation = useMutation({
     mutationFn: () => generateRecommendations(activeBrand!.id),
@@ -610,7 +610,7 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div>
                       <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 3 }}>{health.grade}</div>
-                      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>Based on {campaigns.length} campaigns vs 9yr benchmark</div>
+                      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>Based on {campaigns.length} campaigns vs benchmark since 2018</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

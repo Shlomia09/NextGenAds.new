@@ -171,7 +171,7 @@ export const BENCHMARK_CONTEXT: Record<ConversionType, string> = {
   ecommerce: `
 ## Benchmark Context: eCommerce / Sales
 You are analyzing a SALES & ROAS optimization account.
-Key benchmarks (Beauty & Cosmetics, 9-year dataset):
+Key benchmarks (Beauty & Cosmetics, dataset since 2018):
 - AOV €80-120 bracket → Target ROAS: 3.0-4.0x
 - AOV €120-200 bracket → Target ROAS: 4.0-6.0x
 - CAC benchmark: €25-45 for skincare, €35-60 for cosmetics
@@ -185,7 +185,7 @@ Primary optimization KPIs: ROAS, CAC, Revenue, Purchase Volume
   leads: `
 ## Benchmark Context: Lead Generation
 You are analyzing a LEAD GENERATION account.
-Key benchmarks (Beauty clinics, spas, salons, 9-year dataset):
+Key benchmarks (Beauty clinics, spas, salons, dataset since 2018):
 - Clinic CPL benchmark: €28-45 (good), <€25 (excellent), >€55 (concerning)
 - Spa CPL benchmark: €20-35 (good), >€50 (concerning)
 - Salon CPL benchmark: €15-28 (good), >€40 (concerning)

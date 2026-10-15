@@ -150,7 +150,7 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
     if (items.length <= 1 && rawEvents.length === 0) {
       items.push({
         id: 'benchmark-active',
-        title: '9-year benchmark active',
+        title: 'Benchmark active · data since 2018',
         body: 'Beauty & Cosmetics benchmark intelligence is running. Connect Meta Ads to layer real campaign data.',
         time: new Date().toISOString(),
         category: 'system',

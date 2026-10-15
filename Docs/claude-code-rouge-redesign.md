@@ -211,7 +211,7 @@ Rouge היא הסמכות המקצועית של ענף הביוטי — לא מ�
 - גבולות אינפוטים וטבעות פוקוס → `var(--border-control)`.
 - **מסך Intelligence:** כשRouge מצטטת מספר בצ'אט, המספר ב-`--font-mono`. ההודעות שלה לא מקבלות בועה מעוגלת — קו שמאלי ב-`--accent` ורקע `--surface`.
 - **CreativeStudio ו-CampaignWorkshop:** הוסף מתחת לכל טיוטת קופי שורת מקור —
-  `"Derived from: <N> top performers in this account · 9-year beauty benchmark"`.
+  `"Derived from: <N> top performers in this account · beauty benchmark since 2018"`.
   אם אין דאטה אמיתית למקור — אל תמציא, הסתר את השורה.
 
 ### צ'ארטים
