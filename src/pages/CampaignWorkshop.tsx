@@ -276,7 +276,7 @@ const Field = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
       ref={ref}
       {...props}
       style={{
-        width: '100%', background: 'var(--field, #13100F)',
+        width: '100%', background: 'var(--field)',
         border: '1px solid var(--border)', borderRadius: 9,
         padding: '11px 13px', color: 'var(--text)',
         fontFamily: 'var(--font-ui)', fontSize: 13.5, outline: 'none',
@@ -293,7 +293,7 @@ const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = (props) 
   <select
     {...props}
     style={{
-      width: '100%', background: 'var(--field, #13100F)',
+      width: '100%', background: 'var(--field)',
       border: '1px solid var(--border)', borderRadius: 9,
       padding: '11px 13px', color: 'var(--text)',
       fontFamily: 'var(--font-ui)', fontSize: 13.5, outline: 'none',
@@ -309,7 +309,7 @@ const Textarea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement>> = (p
   <textarea
     {...props}
     style={{
-      width: '100%', background: 'var(--field, #13100F)',
+      width: '100%', background: 'var(--field)',
       border: '1px solid var(--border)', borderRadius: 9,
       padding: '11px 13px', color: 'var(--text)',
       fontFamily: 'var(--font-ui)', fontSize: 13.5, outline: 'none',
@@ -465,7 +465,7 @@ const CampaignWorkshop: React.FC = () => {
         .sort((a, b) => ((a.cpl ?? 999) - (b.cpl ?? 999)))
         .slice(0, 5);
 
-      const systemPrompt = `You are an expert digital advertising strategist specializing in beauty and wellness, with 9 years of benchmark data. Respond ONLY with a valid JSON object — no markdown, no explanation outside the JSON.`;
+      const systemPrompt = `You are an expert digital advertising strategist specializing in beauty and wellness, with benchmark data since 2018. Respond ONLY with a valid JSON object — no markdown, no explanation outside the JSON.`;
 
       const userMsg = `Recommend optimal audience targeting for this campaign:
 
@@ -719,7 +719,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
           <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--green-soft)', border: '1px solid var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
             <CheckCircle2 size={28} style={{ color: 'var(--green)' }} />
           </div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 500, color: 'var(--text)', margin: '0 0 10px' }}>Campaign submitted!</h2>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 800, color: 'var(--text)', margin: '0 0 10px' }}>Campaign submitted!</h2>
           <p style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-2)', margin: '0 0 24px', lineHeight: 1.6 }}>
             "{form.campaignName}" has been submitted to your {form.platform === 'meta' ? 'Meta Ads' : 'Google Ads'} account in paused state. Review it in Ads Manager before activating.
           </p>
@@ -743,7 +743,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
       <div style={{ marginBottom: 18 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 7 }}>
           <Wand2 size={20} style={{ color: 'var(--accent)' }} strokeWidth={1.5} />
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 500, letterSpacing: -0.4, margin: 0, color: 'var(--text)' }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, letterSpacing: -0.4, margin: 0, color: 'var(--text)' }}>
             Campaign Workshop
           </h1>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 20, padding: '3px 10px', fontSize: 11, fontFamily: 'var(--font-ui)', color: 'var(--text-3)' }}>
@@ -807,7 +807,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             {/* ════ STEP 1 — CREATIVE ═══════════════════════════ */}
             {step === 1 && (
               <>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Creative</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 800, marginBottom: 4, color: 'var(--text)' }}>Creative</div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 20 }}>
                   {form.platform === 'google'
                     ? 'Google Search ads are text-only. Write your headlines and descriptions.'
@@ -923,7 +923,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             {/* ════ STEP 2 — GOAL & PLATFORM ════════════════════ */}
             {step === 2 && (
               <>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Goal &amp; platform</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 800, marginBottom: 4, color: 'var(--text)' }}>Goal &amp; platform</div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 20 }}>What this campaign should achieve, and where it runs.</div>
 
                 <MB>
@@ -937,7 +937,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                   <FL>BRAND</FL>
                   {brands.length === 0 ? (
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)', padding: '11px 13px', background: 'var(--field)', border: '1px solid var(--border)', borderRadius: 9 }}>
-                      No brands found. <a href="/onboarding" style={{ color: 'var(--accent)' }}>Create a brand →</a>
+                      No brands found. <a href="/onboarding" style={{ color: 'var(--text)' }}>Create a brand →</a>
                     </div>
                   ) : (
                     <Select value={form.brandId} onChange={e => upd('brandId', e.target.value)}>
@@ -959,7 +959,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                       opacity: metaConnected ? 1 : 0.55, position: 'relative', transition: '.15s',
                     }}
                   >
-                    {form.platform === 'meta' && <div style={{ position: 'absolute', top: 10, right: 10, color: 'var(--accent)', fontSize: 14 }}>✓</div>}
+                    {form.platform === 'meta' && <div style={{ position: 'absolute', top: 10, right: 10, color: 'var(--text)', fontSize: 14 }}>✓</div>}
                     <div style={{ fontSize: 22, marginBottom: 8, color: form.platform === 'meta' ? 'var(--accent)' : 'var(--text)' }}>𝕄</div>
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13.5, fontWeight: 500, color: 'var(--text)' }}>Meta</div>
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10.5, marginTop: 3, color: metaConnected ? 'var(--green)' : 'var(--text-3)' }}>
@@ -977,7 +977,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                       cursor: 'pointer', opacity: googleConnected ? 1 : 0.7, position: 'relative', transition: '.15s',
                     }}
                   >
-                    {form.platform === 'google' && <div style={{ position: 'absolute', top: 10, right: 10, color: 'var(--accent)', fontSize: 14 }}>✓</div>}
+                    {form.platform === 'google' && <div style={{ position: 'absolute', top: 10, right: 10, color: 'var(--text)', fontSize: 14 }}>✓</div>}
                     <Globe size={22} style={{ color: form.platform === 'google' ? 'var(--accent)' : 'var(--text)', marginBottom: 8, display: 'block' }} />
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13.5, fontWeight: 500, color: 'var(--text)' }}>Google</div>
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10.5, marginTop: 3, color: googleConnected ? 'var(--green)' : 'var(--accent)' }}>
@@ -1006,7 +1006,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             {/* ════ STEP 3 — BUDGET & SCHEDULE ════════════════ */}
             {step === 3 && (
               <>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Budget &amp; schedule</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 800, marginBottom: 4, color: 'var(--text)' }}>Budget &amp; schedule</div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 20 }}>Set your spend and when the campaign runs.</div>
 
                 <MB>
@@ -1040,7 +1040,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             {/* ════ STEP 4 — AUDIENCE (full geo + AI) ══════════ */}
             {step === 4 && (
               <>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Audience</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 800, marginBottom: 4, color: 'var(--text)' }}>Audience</div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 16 }}>Who should see this ad.</div>
 
                 {/* ── AI Build Audience button ── */}
@@ -1077,7 +1077,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                 {aiInsight && (
                   <div style={{ marginBottom: 16, padding: '11px 14px', background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 11, fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6, position: 'relative' }}>
                     <Brain size={12} style={{ color: 'var(--accent)', marginRight: 7, verticalAlign: 'middle' }} />
-                    <strong style={{ color: 'var(--accent)' }}>AI insight: </strong>{aiInsight}
+                    <strong style={{ color: 'var(--text)' }}>AI insight: </strong>{aiInsight}
                     <button onClick={() => setAiInsight(null)} style={{ position: 'absolute', top: 9, right: 10, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)' }}>
                       <X size={13} />
                     </button>
@@ -1104,7 +1104,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                         <button key={r.id} onClick={() => applyRegion(r.id)} style={{
                           border: `1px solid ${allSel ? 'var(--accent)' : someSel ? 'var(--amber)' : 'var(--border)'}`,
                           borderRadius: 8, padding: '5px 11px',
-                          background: allSel ? 'var(--accent-soft)' : someSel ? 'rgba(217,176,106,0.1)' : 'var(--field)',
+                          background: allSel ? 'var(--accent-soft)' : someSel ? 'var(--amber-soft)' : 'var(--field)',
                           color: allSel ? 'var(--accent)' : someSel ? 'var(--amber)' : 'var(--text-2)',
                           fontFamily: 'var(--font-ui)', fontSize: 11.5, fontWeight: 500, cursor: 'pointer', transition: '.12s',
                         }}>
@@ -1125,14 +1125,14 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                             display: 'flex', alignItems: 'center', gap: 6,
                             background: 'var(--accent-soft)', border: '1px solid var(--accent)',
                             borderRadius: 20, padding: '4px 8px 4px 10px',
-                            fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--accent)',
+                            fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text)',
                           }}>
                             <span style={{ fontSize: 15 }}>{flag(loc.flagCode)}</span>
                             <span>{loc.name}</span>
                             {loc.type === 'region' && (
-                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--accent-deep)', opacity: 0.7 }}>{loc.parentCode}</span>
+                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text)', opacity: 0.7 }}>{loc.parentCode}</span>
                             )}
-                            <button onClick={() => upd('countries', form.countries.filter(c => c !== code))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent)', padding: 0, display: 'flex', alignItems: 'center' }}>
+                            <button onClick={() => upd('countries', form.countries.filter(c => c !== code))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text)', padding: 0, display: 'flex', alignItems: 'center' }}>
                               <X size={12} />
                             </button>
                           </div>
@@ -1210,7 +1210,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                                 {loc.type === 'region' ? 'Region' : 'Country'}
                               </span>
                               {/* Check */}
-                              {sel && <span style={{ color: 'var(--accent)', fontWeight: 600, fontSize: 15, flexShrink: 0 }}>✓</span>}
+                              {sel && <span style={{ color: 'var(--text)', fontWeight: 600, fontSize: 15, flexShrink: 0 }}>✓</span>}
                             </div>
                           );
                         });
@@ -1253,7 +1253,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: sel ? 'var(--accent)' : 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
                                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: sel ? 'var(--accent-deep)' : 'var(--text-3)' }}>{c.code}</div>
                               </div>
-                              {sel && <span style={{ color: 'var(--accent)', fontWeight: 600, fontSize: 13, flexShrink: 0 }}>✓</span>}
+                              {sel && <span style={{ color: 'var(--text)', fontWeight: 600, fontSize: 13, flexShrink: 0 }}>✓</span>}
                             </div>
                           );
                         })}
@@ -1350,7 +1350,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             {/* ════ STEP 5 — REVIEW & PUBLISH ═════════════════ */}
             {step === 5 && (
               <>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 500, marginBottom: 4, color: 'var(--text)' }}>Review &amp; publish</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 19, fontWeight: 800, marginBottom: 4, color: 'var(--text)' }}>Review &amp; publish</div>
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12.5, color: 'var(--text-3)', marginBottom: 20 }}>Confirm everything looks right, then publish to your platform.</div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
@@ -1443,9 +1443,9 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, boxShadow: 'var(--shadow)', overflow: 'hidden', marginBottom: 14 }}>
             {/* Preview header */}
             <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 500, color: 'var(--text)' }}>Live preview</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>Live preview</div>
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-2)', display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ color: 'var(--accent)', fontSize: 12 }}>●</span>
+                <span style={{ color: 'var(--text)', fontSize: 12 }}>●</span>
                 {form.platform === 'meta' ? 'Meta feed' : form.platform === 'google' ? 'Google Search' : 'Preview'}
               </div>
             </div>
@@ -1480,7 +1480,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                     </div>
                   )}
                   {/* Creative area */}
-                  <div style={{ aspectRatio: '1/1', background: form.creativeUrl ? 'transparent' : 'linear-gradient(150deg, var(--accent) 0%, var(--accent-deep) 55%, #9E5436 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,.7)', fontSize: 28, overflow: 'hidden' }}>
+                  <div style={{ aspectRatio: '1/1', background: form.creativeUrl ? 'transparent' : 'linear-gradient(150deg, var(--accent) 0%, var(--accent-deep) 55%, var(--accent-deep) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,.7)', fontSize: 28, overflow: 'hidden' }}>
                     {form.creativeUrl
                       ? <img src={form.creativeUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       : '🖼'}
@@ -1491,7 +1491,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                       {form.headline || <span style={{ color: 'var(--text-3)' }}>Your headline…</span>}
                     </div>
                     {/* CTA */}
-                    <div style={{ marginTop: 11, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 7, textAlign: 'center', padding: 8, fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--accent)' }}>
+                    <div style={{ marginTop: 11, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 7, textAlign: 'center', padding: 8, fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)' }}>
                       {form.ctaText || 'Book now'}
                     </div>
                   </div>
@@ -1517,7 +1517,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
           {/* Benchmark hint below preview */}
           {activeBrand && (
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 16px', fontSize: 11.5, color: 'var(--text-3)', fontFamily: 'var(--font-ui)', lineHeight: 1.5 }}>
-              <span style={{ color: 'var(--text-2)', fontWeight: 500 }}>9yr beauty benchmark · {activeBrand.name}</span>
+              <span style={{ color: 'var(--text-2)', fontWeight: 500 }}>beauty benchmark since 2018 · {activeBrand.name}</span>
               <br />
               EST. REACH and CPL estimates are not available without a live campaign. They will show after your first sync.
             </div>
@@ -1530,14 +1530,14 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
       {toast && (
         <div style={{
           position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
-          background: toast.type === 'ok' ? 'var(--surface)' : '#3D1515',
-          border: `1px solid ${toast.type === 'ok' ? 'var(--green)' : '#EF4444'}`,
+          background: toast.type === 'ok' ? 'var(--surface)' : 'var(--red-soft)',
+          border: `1px solid ${toast.type === 'ok' ? 'var(--green)' : 'var(--red)'}`,
           borderRadius: 12, padding: '12px 20px', zIndex: 999,
           display: 'flex', alignItems: 'center', gap: 10,
           boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
           animation: 'wsfade .2s ease',
           fontFamily: 'var(--font-ui)', fontSize: 13.5, fontWeight: 500,
-          color: toast.type === 'ok' ? 'var(--text)' : '#FCA5A5',
+          color: toast.type === 'ok' ? 'var(--text)' : 'var(--red)',
         }}>
           <span style={{ fontSize: 16 }}>{toast.type === 'ok' ? '✓' : '✕'}</span>
           {toast.msg}
@@ -1549,7 +1549,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <div>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, letterSpacing: '1px', color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 4 }}>Workshop</div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 500, color: 'var(--text)', margin: 0 }}>Your campaigns</h2>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: 'var(--text)', margin: 0 }}>Your campaigns</h2>
           </div>
         </div>
 
@@ -1572,7 +1572,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             /* Empty state */
             <div style={{ padding: '48px 24px', textAlign: 'center' }}>
               <div style={{ fontSize: 32, marginBottom: 12 }}>✦</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 500, color: 'var(--text-2)', marginBottom: 8 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 700, color: 'var(--text-2)', marginBottom: 8 }}>
                 No campaigns yet
               </div>
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-3)' }}>
@@ -1635,7 +1635,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                         background: 'var(--surface-2)', border: '1px solid var(--border)',
                         borderRadius: 8, padding: '5px 10px',
                         fontFamily: 'var(--font-ui)', fontSize: 11.5, fontWeight: 500,
-                        color: 'var(--accent)', cursor: 'pointer', transition: '.12s',
+                        color: 'var(--text)', cursor: 'pointer', transition: '.12s',
                       }}
                       onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-soft)'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface-2)'; }}
@@ -1678,7 +1678,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                         background: 'none', border: 'none', cursor: 'pointer', padding: 5,
                         color: 'var(--text-3)', borderRadius: 7, transition: '.12s',
                       }}
-                      onMouseEnter={e => { e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                      onMouseEnter={e => { e.currentTarget.style.color = 'var(--red)'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
                       onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.background = 'none'; }}
                     >
                       <Trash2 size={13} />

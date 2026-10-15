@@ -31,8 +31,8 @@ const eyebrowStyle: React.CSSProperties = {
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '9px 12px',
-  background: '#FFFFFF',
-  border: '0.5px solid #E8E4DF',
+  background: 'var(--surface)',
+  border: '0.5px solid var(--border)',
   borderRadius: 8,
   color: 'var(--text-primary)',
   fontFamily: 'var(--font-sans)',
@@ -51,7 +51,7 @@ const hintStyle: React.CSSProperties = {
 const warningStyle: React.CSSProperties = {
   fontFamily: 'var(--font-sans)',
   fontSize: 11,
-  color: '#d97706',
+  color: 'var(--amber)',
   marginTop: 4,
   display: 'flex',
   alignItems: 'center',
@@ -60,7 +60,7 @@ const warningStyle: React.CSSProperties = {
 
 const dividerStyle: React.CSSProperties = {
   height: '0.5px',
-  background: '#F0ECE8',
+  background: 'var(--surface)',
   margin: '4px 0',
 };
 
@@ -108,8 +108,8 @@ export default function CampaignSetup({ brandId, draft, onUpdate, onPreview }: P
   const toggleButtonStyle = (active: boolean): React.CSSProperties => ({
     padding: '6px 14px',
     borderRadius: 6,
-    border: active ? '1px solid var(--rose-gold)' : '0.5px solid #E8E4DF',
-    background: active ? 'rgba(196,131,106,0.1)' : '#FFFFFF',
+    border: active ? '1px solid var(--rose-gold)' : '0.5px solid var(--border)',
+    background: active ? 'var(--accent-soft)' : 'var(--surface)',
     color: active ? 'var(--rose-gold)' : 'var(--text-secondary)',
     fontFamily: 'var(--font-sans)',
     fontSize: 12,
@@ -121,8 +121,8 @@ export default function CampaignSetup({ brandId, draft, onUpdate, onPreview }: P
   const chipStyle = (active: boolean): React.CSSProperties => ({
     padding: '4px 10px',
     borderRadius: 20,
-    border: active ? '1px solid var(--rose-gold)' : '0.5px solid #E8E4DF',
-    background: active ? 'rgba(196,131,106,0.1)' : '#FFFFFF',
+    border: active ? '1px solid var(--rose-gold)' : '0.5px solid var(--border)',
+    background: active ? 'var(--accent-soft)' : 'var(--surface)',
     color: active ? 'var(--rose-gold)' : 'var(--text-secondary)',
     fontFamily: 'var(--font-sans)',
     fontSize: 11,
@@ -346,8 +346,8 @@ export default function CampaignSetup({ brandId, draft, onUpdate, onPreview }: P
           borderRadius: 10,
           border: 'none',
           background: canPublish
-            ? 'linear-gradient(135deg, var(--rose-gold), #a0554a)'
-            : '#F0ECE8',
+            ? 'var(--accent)'
+            : 'var(--surface)',
           color: canPublish ? '#fff' : 'var(--text-muted)',
           fontFamily: 'var(--font-sans)',
           fontSize: 14,

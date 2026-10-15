@@ -192,7 +192,7 @@ const ResultsCell: React.FC<{ campaign: Campaign; goal: GoalType; isLast: boolea
   if (campaign.conversion_event === 'Multiple') {
     return (
       <td style={cellStyle}>
-        <div style={{ ...numStyle, color: 'var(--accent)', fontSize: 12 }}>Multiple</div>
+        <div style={{ ...numStyle, color: 'var(--text)', fontSize: 12 }}>Multiple</div>
         <div style={subStyle}>conv. goals · open for details</div>
       </td>
     );
@@ -338,7 +338,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ label, value, icon, kcVar, barPct, tr
 
     {/* Value */}
     <div style={{
-      fontFamily: 'var(--font-mono)', fontSize: 25, fontWeight: 500,
+      fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500,
       color: 'var(--text)', lineHeight: 1,
     }}>
       {value}
@@ -401,7 +401,6 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
     if (!canvasRef.current) return;
     if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
 
-    const accent = cssv('--accent');
     const green  = cssv('--green');
     const text2  = cssv('--text-2');
     const text3  = cssv('--text-3');
@@ -412,8 +411,8 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
 
     const ctx = canvasRef.current.getContext('2d')!;
     const g1  = ctx.createLinearGradient(0, 0, 0, 240);
-    g1.addColorStop(0, accent + '55');
-    g1.addColorStop(1, accent + '05');
+    g1.addColorStop(0, text2 + '55');
+    g1.addColorStop(1, text2 + '05');
     const g2  = ctx.createLinearGradient(0, 0, 0, 240);
     g2.addColorStop(0, green + '40');
     g2.addColorStop(1, green + '03');
@@ -426,14 +425,14 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
           {
             label: 'Spend',
             data: spendData,
-            borderColor: accent,
+            borderColor: text2,   // spend is not an alert — red is reserved for decay series
             backgroundColor: g1,
             fill: true,
             tension: 0.4,
             borderWidth: 2,
             pointRadius: 0,
             pointHoverRadius: 4,
-            pointHoverBackgroundColor: accent,
+            pointHoverBackgroundColor: text2,
             yAxisID: 'y',
           },
           {
@@ -471,23 +470,23 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: text3, maxTicksLimit: 7, font: { family: "'JetBrains Mono',monospace", size: 10.5 } },
+            ticks: { color: text3, maxTicksLimit: 7, font: { family: cssv('--font-mono'), size: 10.5 } },
           },
           y: {
             position: 'left',
             grid: { color: grid },
-            ticks: { color: text3, callback: (v) => '€' + v, font: { family: "'JetBrains Mono',monospace", size: 10.5 } },
+            ticks: { color: text3, callback: (v) => '€' + v, font: { family: cssv('--font-mono'), size: 10.5 } },
           },
           y1: {
             position: 'right',
             grid: { display: false },
-            ticks: { color: text3, font: { family: "'JetBrains Mono',monospace", size: 10.5 } },
+            ticks: { color: text3, font: { family: cssv('--font-mono'), size: 10.5 } },
           },
         },
       },
     };
 
-    Chart.defaults.font.family = "'JetBrains Mono','Inter',monospace";
+    Chart.defaults.font.family = cssv('--font-mono');
     Chart.defaults.font.size   = 10.5;
     Chart.defaults.color       = text2;
 
@@ -510,12 +509,12 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
     }}>
       {/* Panel header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 500, letterSpacing: -0.2 }}>
-          Performance · <span style={{ color: 'var(--accent)' }}>{dateLabel}</span>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, letterSpacing: -0.2 }}>
+          Performance · <span style={{ color: 'var(--text)' }}>{dateLabel}</span>
         </div>
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
           {[
-            { color: 'var(--accent)', label: 'Spend' },
+            { color: 'var(--text-2)', label: 'Spend' },
             { color: 'var(--green)', label: conversionLabel },
           ].map(({ color, label }) => (
             <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: 'var(--text-2)', fontFamily: 'var(--font-ui)' }}>
@@ -529,13 +528,13 @@ const TrendPanel: React.FC<TrendPanelProps> = ({ dailyRows, totalSpend, totalCon
       {/* Stat row */}
       <div style={{ display: 'flex', gap: 30, marginBottom: 8 }}>
         {[
-          { label: 'TOTAL SPEND',              value: formatCurrency(totalSpend),   color: 'var(--accent)' },
+          { label: 'TOTAL SPEND',              value: formatCurrency(totalSpend),   color: 'var(--text)' },
           { label: `TOTAL ${conversionLabel.toUpperCase()}`, value: String(totalConversions), color: 'var(--green)'  },
           { label: 'IMPRESSIONS',               value: fmt(totalImpressions),        color: 'var(--blue)'   },
         ].map(({ label, value, color }) => (
           <div key={label}>
             <div style={{ fontSize: 10.5, letterSpacing: 1, color: 'var(--text-2)', marginBottom: 5, fontFamily: 'var(--font-ui)', fontWeight: 500 }}>{label}</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 21, fontWeight: 500, color }}>{value}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color, lineHeight: 1 }}>{value}</div>
           </div>
         ))}
       </div>
@@ -566,7 +565,7 @@ const DonutPanel: React.FC<DonutPanelProps> = ({ campaigns }) => {
   const totalSpend = useMemo(() => campaigns.reduce((s, c) => s + c.spend, 0), [campaigns]);
 
   const SERIES_COLORS = [
-    '--accent', '--champagne', '--blue', '--amber', '--green',
+    '--text-2', '--green', '--blue', '--purple', '--champagne',   // positional only — red is a state layer, never a slot
   ];
 
   const buildChart = useCallback(() => {
@@ -638,7 +637,7 @@ const DonutPanel: React.FC<DonutPanelProps> = ({ campaigns }) => {
       borderRadius: 16, boxShadow: 'var(--shadow)', padding: '20px 22px',
     }}>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 500, letterSpacing: -0.2 }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, letterSpacing: -0.2 }}>
           Spend by campaign
         </div>
       </div>
@@ -653,8 +652,8 @@ const DonutPanel: React.FC<DonutPanelProps> = ({ campaigns }) => {
           pointerEvents: 'none',
         }}>
           <div style={{
-            fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 500,
-            color: 'var(--accent)', lineHeight: 1,
+            fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800,
+            color: 'var(--text)', lineHeight: 1,
           }}>
             {formatCurrency(totalSpend)}
           </div>
@@ -1093,7 +1092,7 @@ const Campaigns: React.FC = () => {
             <span style={{ display: 'inline-block', width: 22, height: 1, background: 'var(--text-3)' }} />
             Campaign Intelligence
           </div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: 32, letterSpacing: -0.5, lineHeight: 1 }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 32, letterSpacing: -0.5, lineHeight: 1 }}>
             Campaigns
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 13, color: 'var(--text-2)', fontSize: 13, marginTop: 9, fontFamily: 'var(--font-ui)', flexWrap: 'wrap' }}>
@@ -1102,7 +1101,7 @@ const Campaigns: React.FC = () => {
             <span>{campaigns.length} total</span>
             <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--text-3)', display: 'inline-block' }} />
             {metaAccounts.length > 0
-              ? <span style={{ color: 'var(--accent)' }}>{metaAccounts.length} Meta account{metaAccounts.length > 1 ? 's' : ''}</span>
+              ? <span style={{ color: 'var(--text)' }}>{metaAccounts.length} Meta account{metaAccounts.length > 1 ? 's' : ''}</span>
               : <span style={{ color: 'var(--red)' }}>No account connected</span>}
           </div>
         </div>
@@ -1279,7 +1278,7 @@ const Campaigns: React.FC = () => {
           label="TOTAL SPEND"
           value={formatCurrency(totalSpend)}
           icon="₠"
-          kcVar="--accent"
+          kcVar="--text"
           barPct={spendPct}
           trendUp={true}
           subText={`${activeCnt} active campaign${activeCnt !== 1 ? 's' : ''}`}
@@ -1341,7 +1340,7 @@ const Campaigns: React.FC = () => {
         {campaigns.length === 0 ? (
           <div style={{ padding: '60px 32px', textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 500, color: 'var(--text)', marginBottom: 8 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: 'var(--text)', marginBottom: 8 }}>
               No campaigns yet
             </div>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 14, color: 'var(--text-2)', marginBottom: 20 }}>

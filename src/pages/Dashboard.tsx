@@ -139,7 +139,7 @@ const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ 
  
     const root   = document.documentElement;
     const get    = (v: string) => getComputedStyle(root).getPropertyValue(v).trim();
-    const accent = get('--accent');
+    const spend  = get('--text-2');   // spend is not an alert — red is reserved for decay series
     const green  = get('--green');
     const text3  = get('--text-3');
     const grid   = get('--grid') || 'rgba(255,255,255,0.05)';
@@ -148,7 +148,7 @@ const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ 
  
     const ctx = canvasRef.current.getContext('2d')!;
     const g1 = ctx.createLinearGradient(0, 0, 0, 220);
-    g1.addColorStop(0, accent + '44'); g1.addColorStop(1, accent + '04');
+    g1.addColorStop(0, spend + '44'); g1.addColorStop(1, spend + '04');
     const g2 = ctx.createLinearGradient(0, 0, 0, 220);
     g2.addColorStop(0, green + '33'); g2.addColorStop(1, green + '03');
  
@@ -163,10 +163,10 @@ const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ 
           {
             label: 'Spend',
             data: data.map(d => d.spend),
-            borderColor: accent, backgroundColor: g1,
+            borderColor: spend, backgroundColor: g1,
             fill: true, tension: 0.4, borderWidth: 2,
             pointRadius: 0, pointHoverRadius: 4,
-            pointHoverBackgroundColor: accent,
+            pointHoverBackgroundColor: spend,
             yAxisID: 'y',
           },
           {
@@ -207,17 +207,17 @@ const TrendChart: React.FC<{ data: DailyStat[]; conversionLabel: string }> = ({ 
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: text3, maxTicksLimit: 7, font: { family: 'JetBrains Mono', size: 10 } },
+            ticks: { color: text3, maxTicksLimit: 7, font: { family: get('--font-mono'), size: 10 } },
           },
           y: {
             position: 'left',
             grid: { color: grid },
-            ticks: { color: text3, font: { family: 'JetBrains Mono', size: 10 }, callback: v => '€' + v },
+            ticks: { color: text3, font: { family: get('--font-mono'), size: 10 }, callback: v => '€' + v },
           },
           y1: {
             position: 'right',
             grid: { display: false },
-            ticks: { color: text3, font: { family: 'JetBrains Mono', size: 10 } },
+            ticks: { color: text3, font: { family: get('--font-mono'), size: 10 } },
           },
         },
       },
@@ -299,7 +299,7 @@ const Dashboard: React.FC = () => {
     onError: (err: Error) => alert(`Execution failed: ${err.message}`),
   });
  
-  // Analyzes all campaigns for the active brand against the 9-year benchmark
+  // Analyzes all campaigns for the active brand against the benchmark (data since 2018)
   // and (re)generates the pending recommendations list.
   const generateRecsMutation = useMutation({
     mutationFn: () => generateRecommendations(activeBrand!.id),
@@ -381,9 +381,9 @@ const Dashboard: React.FC = () => {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 44px)' }}>
       <div style={{ textAlign: 'center', padding: '60px 40px' }}>
         <Sparkles size={32} style={{ color: 'var(--accent)', marginBottom: 16 }} strokeWidth={1.5} />
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 500, color: 'var(--text)', margin: '0 0 8px' }}>No Brand Connected Yet</h2>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: 'var(--text)', margin: '0 0 8px' }}>No Brand Connected Yet</h2>
         <p style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-2)', margin: '0 0 24px' }}>Complete the onboarding to activate your Intelligence Dashboard</p>
-        <a href="/onboarding" style={{ background: 'var(--accent)', color: '#2A1A12', padding: '10px 22px', borderRadius: 10, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 500 }}>Set Up Your Brand</a>
+        <a href="/onboarding" style={{ background: 'var(--accent)', color: 'var(--on-accent)', padding: '10px 22px', borderRadius: 10, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 500 }}>Set Up Your Brand</a>
       </div>
     </div>
   );
@@ -398,7 +398,7 @@ const Dashboard: React.FC = () => {
         <div className="dash-welcome-strip" style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', gap: 20, marginBottom: 20 }}>
           {/* Greeting */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 500, color: 'var(--text)', margin: '0 0 4px', letterSpacing: -0.5 }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--t-h1)', fontWeight: 800, color: 'var(--text)', margin: '0 0 4px', letterSpacing: 'var(--track-h1)', lineHeight: 'var(--lh-h1)' }}>
               {greeting()}{user?.email ? `, ${displayName(user.email)}` : ''}
             </h1>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)' }}>
@@ -440,13 +440,13 @@ const Dashboard: React.FC = () => {
               {adAccounts.length === 0 ? (
                 <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)', padding: '12px 0' }}>
                   No Meta accounts connected.{' '}
-                  <a href="/settings" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Connect now →</a>
+                  <a href="/settings" style={{ color: 'var(--text)', textDecoration: 'none' }}>Connect now →</a>
                 </div>
               ) : accountStats.map(({ account, campaigns: numC, active, spend, results }) => {
                 const initials = (account.display_name || account.account_name).split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
                 return (
                   <div key={account.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '11px 14px', background: 'var(--surface-2)', borderRadius: 12, marginBottom: 8, border: '1px solid var(--border-soft)' }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, var(--accent), var(--accent-deep))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 500, color: '#2A1A12' }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, var(--accent), var(--accent-deep))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 500, color: 'var(--text)' }}>
                       {initials}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -459,7 +459,7 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div style={{ display: 'flex', gap: 16, flexShrink: 0 }}>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(spend)}</div>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>{formatCurrency(spend)}</div>
                         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)' }}>spend</div>
                       </div>
                       {results > 0 && (
@@ -482,12 +482,12 @@ const Dashboard: React.FC = () => {
                   {/* Summary KPIs above the chart */}
                   <div style={{ display: 'flex', gap: 20 }}>
                     <div>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--accent)' }}>{formatCurrency(totalSpend)}</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: 'var(--text)' }}>{formatCurrency(totalSpend)}</span>
                       <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginLeft: 6 }}>spend</span>
                     </div>
                     {totalResults > 0 && (
                       <div>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--green)' }}>{formatNumber(totalResults)}</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: 'var(--green)' }}>{formatNumber(totalResults)}</span>
                         <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', marginLeft: 6 }}>{convLabel.toLowerCase()}</span>
                       </div>
                     )}
@@ -495,7 +495,7 @@ const Dashboard: React.FC = () => {
                 </div>
                 {/* Legend */}
                 <div style={{ display: 'flex', gap: 14, flexShrink: 0 }}>
-                  {[{ label: 'Spend', color: 'var(--accent)' }, { label: convLabel, color: 'var(--green)' }].map(l => (
+                  {[{ label: 'Spend', color: 'var(--text-2)' }, { label: convLabel, color: 'var(--green)' }].map(l => (
                     <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-2)' }}>
                       <div style={{ width: 8, height: 8, borderRadius: 2, background: l.color }} />
                       {l.label}
@@ -526,14 +526,14 @@ const Dashboard: React.FC = () => {
               {!isLoading && campaigns.length > 0 && (
                 <div className="dash-kpi-totals" style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
                   {[
-                    { label: 'Total Spend',          value: formatCurrency(totalSpend),      color: 'var(--accent)' },
+                    { label: 'Total Spend',          value: formatCurrency(totalSpend),      color: 'var(--text)' },
                     { label: `Total ${convLabel}`,    value: totalResults > 0 ? formatNumber(totalResults) : '—', color: 'var(--green)', hide: totalResults === 0 },
                     { label: dashConvSummary.cpaLabel, value: avgCPA > 0 ? formatCurrency(avgCPA) : '—', color: 'var(--text)' },
                     { label: 'Avg CTR',               value: avgCTR > 0 ? `${avgCTR.toFixed(2)}%` : '—', color: 'var(--blue)' },
                   ].filter(m => !m.hide).map(m => (
                     <div key={m.label} style={{ background: 'var(--surface-2)', borderRadius: 10, padding: '10px 12px', border: '1px solid var(--border-soft)' }}>
                       <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>{m.label}</div>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 500, color: m.color }}>{m.value}</div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: m.color, lineHeight: 1 }}>{m.value}</div>
                     </div>
                   ))}
                 </div>
@@ -544,7 +544,7 @@ const Dashboard: React.FC = () => {
             <Card>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <SectionLabel style={{ marginBottom: 0 }}>Recent intelligence</SectionLabel>
-                <button onClick={() => navigate('/intelligence')} style={{ background: 'none', border: 'none', fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--accent)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <button onClick={() => navigate('/intelligence')} style={{ background: 'none', border: 'none', fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                   All sessions <ChevronRight size={11} />
                 </button>
               </div>
@@ -555,9 +555,9 @@ const Dashboard: React.FC = () => {
                   <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--accent-soft)', border: '1px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
                     <Sparkles size={18} style={{ color: 'var(--accent)' }} />
                   </div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 500, color: 'var(--text)', marginBottom: 6 }}>Ask your first question</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>Ask your first question</div>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-3)', marginBottom: 14 }}>Your AI Intelligence sessions will appear here.</div>
-                  <button onClick={() => navigate('/intelligence')} style={{ background: 'var(--accent)', color: '#2A1A12', border: 'none', borderRadius: 9, padding: '8px 16px', fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}>
+                  <button onClick={() => navigate('/intelligence')} style={{ background: 'var(--accent)', color: 'var(--on-accent)', border: 'none', borderRadius: 9, padding: '8px 16px', fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}>
                     Open Intelligence →
                   </button>
                 </div>
@@ -602,15 +602,15 @@ const Dashboard: React.FC = () => {
               ) : (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 16 }}>
-                    <div style={{ width: 76, height: 76, borderRadius: '50%', flexShrink: 0, background: `conic-gradient(var(--accent) 0% ${health.score}%, var(--border) ${health.score}% 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 4px var(--surface)', position: 'relative' }}>
+                    <div style={{ width: 76, height: 76, borderRadius: '50%', flexShrink: 0, background: `conic-gradient(${health.score >= 80 ? 'var(--green)' : health.score >= 65 ? 'var(--amber)' : health.score >= 45 ? 'var(--champagne)' : 'var(--accent)'} 0% ${health.score}%, var(--border) ${health.score}% 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 4px var(--surface)', position: 'relative' }}>
                       <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--surface)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                         <span style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 500, color: 'var(--text)', lineHeight: 1 }}>{health.score}</span>
                         <span style={{ fontFamily: 'var(--font-ui)', fontSize: 8, color: 'var(--text-3)' }}>/100</span>
                       </div>
                     </div>
                     <div>
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 500, color: 'var(--text)', marginBottom: 3 }}>{health.grade}</div>
-                      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>Based on {campaigns.length} campaigns vs 9yr benchmark</div>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 3 }}>{health.grade}</div>
+                      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-3)' }}>Based on {campaigns.length} campaigns vs benchmark since 2018</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -660,9 +660,9 @@ const Dashboard: React.FC = () => {
               ) : pendingRecs.map(rec => {
                 const isHigh = rec.priority === 'critical';
                 return (
-                  <div key={rec.id} style={{ background: isHigh ? 'var(--red-soft, rgba(220,50,50,0.06))' : 'var(--surface-2)', border: `1px solid ${isHigh ? 'var(--red, #e05252)' : 'var(--border-soft)'}`, borderRadius: 11, padding: '11px 13px', marginBottom: 9 }}>
+                  <div key={rec.id} style={{ background: isHigh ? 'var(--red-soft, rgba(220,50,50,0.06))' : 'var(--surface-2)', border: `1px solid ${isHigh ? 'var(--red)' : 'var(--border-soft)'}`, borderRadius: 11, padding: '11px 13px', marginBottom: 9 }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-                      <AlertTriangle size={13} style={{ color: isHigh ? 'var(--red, #e05252)' : 'var(--champagne)', flexShrink: 0, marginTop: 1 }} />
+                      <AlertTriangle size={13} style={{ color: isHigh ? 'var(--red)' : 'var(--champagne)', flexShrink: 0, marginTop: 1 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)', marginBottom: 3 }}>{rec.title}</div>
                         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-2)', lineHeight: 1.4, marginBottom: 8 }}>
@@ -673,7 +673,7 @@ const Dashboard: React.FC = () => {
                             <button
                               onClick={() => executeRecMutation.mutate(rec.id)}
                               disabled={executeRecMutation.isPending}
-                              style={{ padding: '4px 11px', background: 'var(--accent)', color: '#2A1A12', border: 'none', borderRadius: 7, fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500, cursor: executeRecMutation.isPending ? 'default' : 'pointer', opacity: executeRecMutation.isPending ? 0.6 : 1 }}>
+                              style={{ padding: '4px 11px', background: 'var(--accent)', color: 'var(--on-accent)', border: 'none', borderRadius: 7, fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 500, cursor: executeRecMutation.isPending ? 'default' : 'pointer', opacity: executeRecMutation.isPending ? 0.6 : 1 }}>
                               {executeRecMutation.isPending ? 'Executing…' : 'Approve & Execute'}
                             </button>
                           ) : (
@@ -720,7 +720,7 @@ const Dashboard: React.FC = () => {
                   <div key={ad.id}>
                     {/* Winner badge */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                      <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 20, padding: '2px 10px', fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 500, color: 'var(--accent)' }}>
+                      <div style={{ background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 20, padding: '2px 10px', fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 500, color: 'var(--text)' }}>
                         ✦ Winning
                       </div>
                       <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)' }}>top by leads</div>
@@ -747,7 +747,7 @@ const Dashboard: React.FC = () => {
                       {[
                         { label: 'CTR', value: ad.ctr > 0 ? `${ad.ctr.toFixed(2)}%` : '—', color: 'var(--blue)' },
                         { label: 'Leads', value: ad.leads > 0 ? String(ad.leads) : '—', color: 'var(--green)' },
-                        { label: 'CPL', value: ad.cpl > 0 ? formatCurrency(ad.cpl) : '—', color: 'var(--accent)' },
+                        { label: 'CPL', value: ad.cpl > 0 ? formatCurrency(ad.cpl) : '—', color: 'var(--text)' },
                       ].map(m => (
                         <div key={m.label} style={{ background: 'var(--surface-2)', borderRadius: 9, padding: '9px 10px', border: '1px solid var(--border-soft)' }}>
                           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 3 }}>{m.label}</div>
@@ -802,7 +802,7 @@ const Dashboard: React.FC = () => {
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setLearnMoreRec(null)}>
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: 24, maxWidth: 500, width: '92vw', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
             <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8 }}>AI Recommendation</div>
-            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 500, color: 'var(--text)', margin: '0 0 12px' }}>{learnMoreRec.title}</h3>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: 'var(--text)', margin: '0 0 12px' }}>{learnMoreRec.title}</h3>
             <p style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6, margin: '0 0 16px' }}>{learnMoreRec.description}</p>
             <div style={{ borderTop: '1px solid var(--border-soft)', paddingTop: 14, marginBottom: 14 }}>
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Recommended Action</div>

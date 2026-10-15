@@ -128,7 +128,7 @@ const PreflightModal: React.FC<Props> = ({
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               margin: '0 auto 20px',
             }}>
-              <CheckCircle size={26} style={{ color: '#4ade80' }} />
+              <CheckCircle size={26} style={{ color: 'var(--green)' }} />
             </div>
             <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: 18, fontWeight: 400, color: 'var(--text-primary)', marginBottom: 8 }}>
               Campaign Published!
@@ -139,7 +139,7 @@ const PreflightModal: React.FC<Props> = ({
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
               {(['campaign_id', 'adset_id', 'ad_id'] as const).map(key => success[key] && (
-                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 12px', background: '#F8F6F3', borderRadius: 6 }}>
+                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 12px', background: 'var(--surface)', borderRadius: 6 }}>
                   <span style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--text-hint)', textTransform: 'uppercase' }}>{key.replace('_', ' ')}</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-secondary)' }}>{String(success[key])}</span>
                 </div>
@@ -153,7 +153,7 @@ const PreflightModal: React.FC<Props> = ({
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 padding: '12px 20px', borderRadius: 10,
-                background: 'linear-gradient(135deg, var(--rose-gold), #a0554a)',
+                background: 'var(--accent)',
                 fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500, color: 'white',
                 textDecoration: 'none', marginBottom: 12,
               }}
@@ -235,8 +235,8 @@ const PreflightModal: React.FC<Props> = ({
           )}
 
           {/* Copy */}
-          <div style={{ background: 'rgba(196,131,106,0.04)', border: '0.5px solid rgba(196,131,106,0.15)', borderRadius: 10, padding: '14px 16px' }}>
-            <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--rose-gold)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Ad Copy</div>
+          <div style={{ background: 'var(--accent-soft)', border: '0.5px solid var(--accent-soft)', borderRadius: 10, padding: '14px 16px' }}>
+            <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Ad Copy</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
                 { label: 'Primary', value: draft.copy_primary },
@@ -252,7 +252,7 @@ const PreflightModal: React.FC<Props> = ({
           </div>
 
           {/* Campaign details */}
-          <div style={{ background: '#F8F6F3', border: '0.5px solid #E8E4DF', borderRadius: 10, padding: '14px 16px' }}>
+          <div style={{ background: 'var(--surface)', border: '0.5px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
             <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Campaign Settings</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
@@ -277,7 +277,7 @@ const PreflightModal: React.FC<Props> = ({
           {/* Warnings */}
           {lowBudget && (
             <div style={{ background: 'rgba(251,191,36,0.06)', border: '0.5px solid rgba(251,191,36,0.2)', borderRadius: 8, padding: '10px 14px', display: 'flex', gap: 8 }}>
-              <AlertTriangle size={13} style={{ color: '#fbbf24', flexShrink: 0, marginTop: 1 }} />
+              <AlertTriangle size={13} style={{ color: 'var(--amber)', flexShrink: 0, marginTop: 1 }} />
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--text-secondary)' }}>
                 Budget of {formatCurrency(dailyEur)}/day is below the €30 threshold recommended for consistent beauty lead gen results.
               </div>
@@ -286,7 +286,7 @@ const PreflightModal: React.FC<Props> = ({
 
           {!imageBase64 && (
             <div style={{ background: 'rgba(251,191,36,0.06)', border: '0.5px solid rgba(251,191,36,0.2)', borderRadius: 8, padding: '10px 14px', display: 'flex', gap: 8 }}>
-              <AlertTriangle size={13} style={{ color: '#fbbf24', flexShrink: 0, marginTop: 1 }} />
+              <AlertTriangle size={13} style={{ color: 'var(--amber)', flexShrink: 0, marginTop: 1 }} />
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--text-secondary)' }}>
                 No creative image detected. Campaign and ad set will be created, but the ad will need a creative added manually in Meta Ads Manager.
               </div>
@@ -295,8 +295,8 @@ const PreflightModal: React.FC<Props> = ({
 
           {error && (
             <div style={{ background: 'rgba(248,113,113,0.06)', border: '0.5px solid rgba(248,113,113,0.2)', borderRadius: 8, padding: '12px 14px', display: 'flex', gap: 8 }}>
-              <AlertTriangle size={13} style={{ color: '#f87171', flexShrink: 0, marginTop: 1 }} />
-              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: '#f87171', lineHeight: 1.6 }}>{error}</div>
+              <AlertTriangle size={13} style={{ color: 'var(--red)', flexShrink: 0, marginTop: 1 }} />
+              <div style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--red)', lineHeight: 1.6 }}>{error}</div>
             </div>
           )}
         </div>
@@ -304,14 +304,14 @@ const PreflightModal: React.FC<Props> = ({
         {/* Footer */}
         <div style={{ padding: '14px 22px 20px', borderTop: '0.5px solid var(--app-border)', flexShrink: 0, background: 'var(--app-surface)' }}>
           <div style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', marginBottom: 10, textAlign: 'center' }}>
-            Campaign will be created as <strong style={{ color: '#fbbf24' }}>PAUSED</strong>. Activate manually in Meta Ads Manager when ready.
+            Campaign will be created as <strong style={{ color: 'var(--amber)' }}>PAUSED</strong>. Activate manually in Meta Ads Manager when ready.
           </div>
           <button
             onClick={publish}
             disabled={loading}
             style={{
               width: '100%',
-              background: loading ? 'rgba(196,131,106,0.3)' : 'linear-gradient(135deg, var(--rose-gold), #a0554a)',
+              background: loading ? 'var(--accent-soft)' : 'var(--accent)',
               border: 'none', borderRadius: 10, padding: '14px 20px',
               fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500, color: 'white',
               cursor: loading ? 'not-allowed' : 'pointer',

@@ -4,6 +4,8 @@
  * and benchmark context strings per account conversion type.
  */
 
+import { cssToken } from './cssToken';
+
 export type ConversionType = 'ecommerce' | 'leads' | 'bookings' | 'app' | 'awareness';
 
 // ─── Conversion type display metadata ────────────────────────
@@ -19,35 +21,35 @@ export const CONVERSION_META: Record<ConversionType, ConversionTypeMeta> = {
   ecommerce: {
     label:       'eCommerce / Sales',
     emoji:       '🛒',
-    color:       '#10B981',
+    get color() { return cssToken('--green'); },
     bg:          'rgba(16,185,129,0.10)',
     description: 'ROAS, Revenue, Orders, CAC',
   },
   leads: {
     label:       'Lead Generation',
     emoji:       '📋',
-    color:       '#C4836A',
-    bg:          'rgba(196,131,106,0.10)',
+    get color()  { return cssToken('--accent'); },
+    get bg()     { return cssToken('--accent-soft'); },
     description: 'CPL, Leads, Cost per Booking',
   },
   bookings: {
     label:       'Bookings / Appointments',
     emoji:       '📅',
-    color:       '#60A5FA',
+    get color() { return cssToken('--blue'); },
     bg:          'rgba(96,165,250,0.10)',
     description: 'Appointments, CPB, Show Rate',
   },
   app: {
     label:       'App Installs',
     emoji:       '📱',
-    color:       '#A78BFA',
-    bg:          'rgba(167,139,250,0.10)',
+    get color()  { return cssToken('--purple'); },
+    get bg()     { return cssToken('--purple-soft'); },
     description: 'Installs, CPI, CTR',
   },
   awareness: {
     label:       'Brand Awareness',
     emoji:       '👁',
-    color:       '#FBBF24',
+    get color() { return cssToken('--amber'); },
     bg:          'rgba(251,191,36,0.10)',
     description: 'Reach, CPM, Frequency',
   },
@@ -85,7 +87,7 @@ const fmtN = (n: number) => n === 0 ? '—' : n >= 1000 ? `${(n / 1000).toFixed(
 export const KPI_CONFIG: Record<ConversionType, KpiDef[]> = {
   ecommerce: [
     { key: 'spend',    label: 'Total Spend',  compute: cs => fmt(cs.reduce((s,c) => s + c.spend, 0)) },
-    { key: 'revenue',  label: 'Revenue',      color: '#10B981', compute: cs => fmt(cs.reduce((s,c) => s + c.revenue, 0)) },
+    { key: 'revenue',  label: 'Revenue',      get color() { return cssToken('--green'); }, compute: cs => fmt(cs.reduce((s,c) => s + c.revenue, 0)) },
     { key: 'roas',     label: 'Avg ROAS',     suffix: 'x', compute: cs => {
       const sp = cs.reduce((s,c) => s + c.spend, 0);
       const rv = cs.reduce((s,c) => s + c.revenue, 0);
@@ -100,7 +102,7 @@ export const KPI_CONFIG: Record<ConversionType, KpiDef[]> = {
   ],
   leads: [
     { key: 'spend',    label: 'Total Spend',  compute: cs => fmt(cs.reduce((s,c) => s + c.spend, 0)) },
-    { key: 'leads',    label: 'Total Leads',  color: '#C4836A', compute: cs => fmtN(cs.reduce((s,c) => s + c.leads, 0)) },
+    { key: 'leads',    label: 'Total Leads',  get color() { return cssToken('--accent'); }, compute: cs => fmtN(cs.reduce((s,c) => s + c.leads, 0)) },
     { key: 'cpl',      label: 'Avg CPL',      compute: cs => {
       const sp = cs.reduce((s,c) => s + c.spend, 0);
       const le = cs.reduce((s,c) => s + c.leads, 0);
@@ -115,7 +117,7 @@ export const KPI_CONFIG: Record<ConversionType, KpiDef[]> = {
   ],
   bookings: [
     { key: 'spend',       label: 'Total Spend',      compute: cs => fmt(cs.reduce((s,c) => s + c.spend, 0)) },
-    { key: 'bookings',    label: 'Appointments',  color: '#60A5FA', compute: cs => fmtN(cs.reduce((s,c) => s + c.bookings, 0)) },
+    { key: 'bookings',    label: 'Appointments',  get color() { return cssToken('--blue'); }, compute: cs => fmtN(cs.reduce((s,c) => s + c.bookings, 0)) },
     { key: 'cpb',         label: 'Cost / Booking',   compute: cs => {
       const sp = cs.reduce((s,c) => s + c.spend, 0);
       const bk = cs.reduce((s,c) => s + c.bookings, 0);
@@ -130,7 +132,7 @@ export const KPI_CONFIG: Record<ConversionType, KpiDef[]> = {
   ],
   awareness: [
     { key: 'spend',       label: 'Total Spend',   compute: cs => fmt(cs.reduce((s,c) => s + c.spend, 0)) },
-    { key: 'reach',       label: 'Total Reach',   color: '#FBBF24', compute: cs => fmtN(cs.reduce((s,c) => s + c.reach, 0)) },
+    { key: 'reach',       label: 'Total Reach',   get color() { return cssToken('--amber'); }, compute: cs => fmtN(cs.reduce((s,c) => s + c.reach, 0)) },
     { key: 'cpm',         label: 'Avg CPM',       compute: cs => {
       const sp = cs.reduce((s,c) => s + c.spend, 0);
       const im = cs.reduce((s,c) => s + c.impressions, 0);
@@ -169,7 +171,7 @@ export const BENCHMARK_CONTEXT: Record<ConversionType, string> = {
   ecommerce: `
 ## Benchmark Context: eCommerce / Sales
 You are analyzing a SALES & ROAS optimization account.
-Key benchmarks (Beauty & Cosmetics, 9-year dataset):
+Key benchmarks (Beauty & Cosmetics, dataset since 2018):
 - AOV €80-120 bracket → Target ROAS: 3.0-4.0x
 - AOV €120-200 bracket → Target ROAS: 4.0-6.0x
 - CAC benchmark: €25-45 for skincare, €35-60 for cosmetics
@@ -183,7 +185,7 @@ Primary optimization KPIs: ROAS, CAC, Revenue, Purchase Volume
   leads: `
 ## Benchmark Context: Lead Generation
 You are analyzing a LEAD GENERATION account.
-Key benchmarks (Beauty clinics, spas, salons, 9-year dataset):
+Key benchmarks (Beauty clinics, spas, salons, dataset since 2018):
 - Clinic CPL benchmark: €28-45 (good), <€25 (excellent), >€55 (concerning)
 - Spa CPL benchmark: €20-35 (good), >€50 (concerning)
 - Salon CPL benchmark: €15-28 (good), >€40 (concerning)

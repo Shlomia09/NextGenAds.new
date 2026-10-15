@@ -182,11 +182,11 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
               <div className="sd-freq-warning-title">⚠️ Creative Fatigue Warning</div>
               <p className="sd-freq-warning-body">
                 Your frequency is{' '}
-                <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
                   {avgFrequency.toFixed(2)}x
                 </span>{' '}
                 — above the{' '}
-                <span style={{ fontFamily: "'DM Mono', monospace" }}>3.5x</span>{' '}
+                <span style={{ fontFamily: 'var(--font-mono)' }}>3.5x</span>{' '}
                 benchmark. Local audiences burn out fast. Refresh creative or pause.
               </p>
             </div>
@@ -321,7 +321,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         .sd-page-title {
           font-family: var(--font-display);
           font-size: 28px;
-          font-weight: 600;
+          font-weight: 800;
           color: var(--text-primary);
           margin: 4px 0 2px;
           line-height: 1.2;
@@ -329,7 +329,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-page-sub {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -367,7 +367,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         .sd-kpi-item:last-child  { padding-right: 0; }
 
         .sd-kpi-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.16em;
@@ -376,9 +376,10 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-kpi-value {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-weight: 500;
-          font-size: 20px;
+          font-size: var(--t-metric);
+          letter-spacing: var(--track-metric);
           color: var(--text-primary);
           line-height: 1;
         }
@@ -423,7 +424,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
 
         /* ── Frequency Warning Card ────────────────────────────────────── */
         .sd-freq-warning {
-          background: #FEF3C7;
+          background: var(--amber-soft);
           border: 1px solid rgba(245,158,11,0.3);
           border-radius: var(--radius-lg);
           padding: 14px 16px;
@@ -433,18 +434,18 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-freq-warning-title {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 600;
-          color: #92400E;
+          color: var(--amber);
           letter-spacing: 0.01em;
         }
 
         .sd-freq-warning-body {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 300;
-          color: #92400E;
+          color: var(--amber);
           line-height: 1.6;
           margin: 0;
         }
@@ -475,13 +476,13 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         .sd-empty-text {
           font-family: var(--font-display);
           font-size: 15px;
-          font-weight: 600;
+          font-weight: 700;
           color: var(--text-primary);
           margin: 0;
         }
 
         .sd-empty-sub {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -510,7 +511,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
           border: 0.5px solid var(--border-light);
           border-radius: var(--radius);
           padding: 8px 12px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -544,7 +545,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
 
         .sd-table th {
           padding: 10px 16px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.16em;
@@ -569,7 +570,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-td-name {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 400;
           color: var(--text-primary);
@@ -580,7 +581,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         }
 
         .sd-td-mono {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-weight: 500;
           font-size: 13px;
           color: var(--text-primary);
@@ -590,7 +591,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
         .sd-td-empty {
           text-align: center;
           padding: 32px 16px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 300;
           color: var(--text-muted);
@@ -598,7 +599,7 @@ const SalonDashboard: React.FC<SalonDashboardProps> = ({
 
         .badge-active {
           background: rgba(16,185,129,0.08);
-          color: #047857;
+          color: var(--green);
           border: 0.5px solid rgba(16,185,129,0.2);
         }
       `}</style>

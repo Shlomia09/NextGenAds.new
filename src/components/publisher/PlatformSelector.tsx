@@ -79,7 +79,7 @@ export default function PlatformSelector({ brandId, selected, selectedAccountId,
               color: 'var(--text-hint)',
               marginTop: 4,
               display: 'block',
-              background: '#F0ECE8',
+              background: 'var(--surface)',
               borderRadius: 4,
               padding: '1px 5px',
             }}>
@@ -90,7 +90,7 @@ export default function PlatformSelector({ brandId, selected, selectedAccountId,
           subLabel = (
             <span style={{
               fontSize: 9,
-              color: 'var(--rose-gold)',
+              color: 'var(--text)',
               marginTop: 4,
               display: 'block',
             }}>
@@ -105,7 +105,7 @@ export default function PlatformSelector({ brandId, selected, selectedAccountId,
               onClick={e => e.stopPropagation()}
               style={{
                 fontSize: 9,
-                color: 'var(--rose-gold)',
+                color: 'var(--text)',
                 marginTop: 4,
                 display: 'block',
                 textDecoration: 'none',
@@ -129,10 +129,10 @@ export default function PlatformSelector({ brandId, selected, selectedAccountId,
               borderRadius: 10,
               border: isSelected
                 ? '1px solid var(--rose-gold)'
-                : '0.5px solid #E8E4DF',
+                : '0.5px solid var(--border)',
               background: isSelected
-                ? 'rgba(196,131,106,0.08)'
-                : '#FFFFFF',
+                ? 'var(--accent-soft)'
+                : 'var(--text)',
               cursor: isDisabled ? 'not-allowed' : 'pointer',
               opacity: isDisabled ? 0.5 : 1,
               display: 'flex',

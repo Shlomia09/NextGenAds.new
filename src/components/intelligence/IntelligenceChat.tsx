@@ -24,16 +24,16 @@ const QUICK_QUESTIONS = [
 
 // ─── Light token palette (inline-only, no CSS vars) ──────────────────────────
 const T = {
-  bgDeep:      '#F8F6F3',
-  bgContainer: '#FFFFFF',
-  border:      '0.5px solid #E8E4DF',
-  borderColor: '#E8E4DF',
-  accent:      '#C4836A',
-  accentHover: '#A86B52',
-  textPrimary: '#1A1410',
-  textBody:    '#3D2B1F',
-  textMuted:   '#8B6050',
-  textHint:    '#A09890',
+  bgDeep:      'var(--bg)',
+  bgContainer: 'var(--surface)',
+  border:      '0.5px solid var(--border)',
+  borderColor: 'var(--border)',
+  accent:      'var(--accent)',
+  accentHover: 'var(--accent-deep)',
+  textPrimary: 'var(--text)',
+  textBody:    'var(--text-2)',
+  textMuted:   'var(--text-2)',
+  textHint:    'var(--text-3)',
   radius:      '5px',
   transition:  'all 0.18s ease',
 } as const;
@@ -200,7 +200,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
     }
   };
 
-  // ── Execute a Heinrick-proposed action ────────────────────────────────────
+  // ── Execute a Rouge-proposed action ────────────────────────────────────
   const executeAction = async (proposal: ActionProposal, confirmed: boolean) => {
     setPendingAction(null);
     if (!confirmed) {
@@ -278,7 +278,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
   };
 
 
-  // Render AI message content — bolds **…** patterns using DM Mono accent
+  // Render AI message content — bolds **…** patterns using --font-mono accent
   const renderAIContent = (content: string) => {
     const parts = content.split(/(\*\*[^*]+\*\*)/g);
     return parts.map((part, idx) => {
@@ -287,7 +287,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           <strong
             key={idx}
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: 'var(--font-mono)',
               fontWeight: 500,
               color: T.accent,
             }}
@@ -349,7 +349,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 13,
-                fontWeight: 600,
+                fontWeight: 700,
                 color: T.textPrimary,
                 lineHeight: 1.2,
               }}
@@ -358,7 +358,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             </div>
             <div
               style={{
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 8,
                 fontWeight: 300,
                 color: T.textHint,
@@ -367,7 +367,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 textTransform: 'uppercase',
               }}
             >
-              Active brand context · 9yr Beauty benchmark data
+              Active brand context · Beauty benchmark data since 2018
             </div>
           </div>
 
@@ -378,20 +378,20 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
-                background: '#FAEEDA',
-                border: '0.5px solid rgba(196,131,106,0.25)',
+                background: 'var(--amber-soft)',
+                border: '0.5px solid var(--accent-soft)',
                 borderRadius: 4,
                 padding: '3px 8px',
                 marginLeft: 8,
               }}
             >
-              <Database size={9} strokeWidth={1.5} style={{ color: '#633806' }} />
+              <Database size={9} strokeWidth={1.5} style={{ color: 'var(--amber)' }} />
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   fontSize: 8,
                   fontWeight: 400,
-                  color: '#633806',
+                  color: 'var(--amber)',
                   letterSpacing: '0.04em',
                 }}
               >
@@ -412,7 +412,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             border: T.border,
             borderRadius: T.radius,
             padding: '4px 9px',
-            fontFamily: "'Outfit', sans-serif",
+            fontFamily: 'var(--font-ui)',
             fontSize: 9,
             fontWeight: 300,
             color: T.textMuted,
@@ -457,8 +457,8 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               style={{
                 width: 44,
                 height: 44,
-                background: 'rgba(196,131,106,0.1)',
-                border: '0.5px solid rgba(196,131,106,0.2)',
+                background: 'var(--accent-soft)',
+                border: '0.5px solid var(--accent-soft)',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
@@ -474,7 +474,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 13,
-                fontWeight: 600,
+                fontWeight: 700,
                 color: T.textPrimary,
                 margin: 0,
               }}
@@ -483,7 +483,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             </p>
             <p
               style={{
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 9,
                 fontWeight: 300,
                 color: T.textHint,
@@ -492,7 +492,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 margin: 0,
               }}
             >
-              Full context of your brand, campaigns, and 9 years of benchmark data
+              Full context of your brand, campaigns, and benchmark data since 2018
             </p>
 
             {/* Suggested questions chips */}
@@ -513,14 +513,14 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                   onMouseLeave={() => setHoveredQuick(null)}
                   onClick={() => sendMessage(q)}
                   style={{
-                    background: hoveredQuick === q ? 'rgba(196,131,106,0.05)' : '#FDF6F0',
-                    border: hoveredQuick === q ? `0.5px solid ${T.accent}` : '0.5px solid #C4836A',
+                    background: hoveredQuick === q ? 'var(--accent-soft)' : 'var(--surface)',
+                    border: hoveredQuick === q ? `0.5px solid ${T.accent}` : '0.5px solid var(--accent)',
                     borderRadius: T.radius,
                     padding: '7px 12px',
-                    fontFamily: "'Outfit', sans-serif",
+                    fontFamily: 'var(--font-ui)',
                     fontSize: 10,
                     fontWeight: 300,
-                    color: '#C4836A',
+                    color: 'var(--text)',
                     textAlign: 'left',
                     cursor: 'pointer',
                     transition: T.transition,
@@ -556,8 +556,8 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                 justifyContent: 'center',
                 flexShrink: 0,
                 // user avatar stays dark (intentional contrast), AI avatar light
-                background: msg.role === 'user' ? '#1A1410' : T.bgContainer,
-                color: msg.role === 'user' ? '#FFFFFF' : T.accent,
+                background: msg.role === 'user' ? 'var(--bg-sidebar)' : T.bgContainer,
+                color: msg.role === 'user' ? 'var(--text)' : T.accent,
               }}
             >
               {msg.role === 'user'
@@ -581,11 +581,11 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                   msg.role === 'user'
                     ? {
                         // User bubble: dark for intentional contrast
-                        background: '#1A1410',
-                        color: '#FFFFFF',
+                        background: 'var(--bg-sidebar)',
+                        color: 'var(--text)',
                         borderRadius: T.radius,
                         padding: '8px 12px',
-                        fontFamily: "'Outfit', sans-serif",
+                        fontFamily: 'var(--font-ui)',
                         fontSize: 11,
                         fontWeight: 400,
                         lineHeight: 1.5,
@@ -595,12 +595,12 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                       }
                     : {
                         // AI bubble: white with light border
-                        background: '#FFFFFF',
-                        border: '0.5px solid #E8E4DF',
+                        background: 'var(--surface)',
+                        border: '0.5px solid var(--border)',
                         color: T.textBody,
                         borderRadius: T.radius,
                         padding: '9px 13px',
-                        fontFamily: "'Outfit', sans-serif",
+                        fontFamily: 'var(--font-ui)',
                         fontSize: 11,
                         fontWeight: 300,
                         lineHeight: 1.65,
@@ -616,18 +616,18 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                       const [, used, limit] = msg.content.split('__');
                       return (
                         <div style={{
-                          background: 'rgba(196,131,106,0.08)',
-                          border: '0.5px solid rgba(196,131,106,0.3)',
+                          background: 'var(--accent-soft)',
+                          border: '0.5px solid var(--accent-soft)',
                           borderRadius: 4, padding: '12px 14px',
                           marginRight: '10%',
                         }}>
-                          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C4836A', marginBottom: 6 }}>
+                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text)', marginBottom: 6 }}>
                             Monthly limit reached
                           </div>
-                          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 500, color: '#C4836A', marginBottom: 4 }}>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: 'var(--text)', marginBottom: 4 }}>
                             {used} / {limit} queries
                           </div>
-                          <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#8B6050', lineHeight: 1.55, margin: '0 0 12px' }}>
+                          <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.55, margin: '0 0 12px' }}>
                             You've used all {limit} Intelligence Chat queries for this month.
                             Upgrade to Growth for unlimited queries.
                           </p>
@@ -635,9 +635,9 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                             href="/pricing"
                             style={{
                               display: 'inline-block',
-                              background: '#C4836A', color: '#FFFFFF',
+                              background: 'var(--accent)', color: 'var(--on-accent)',
                               borderRadius: 3, padding: '7px 16px',
-                              fontFamily: "'Outfit', sans-serif", fontSize: 9,
+                              fontFamily: 'var(--font-ui)', fontSize: 9,
                               fontWeight: 500, letterSpacing: '0.12em',
                               textTransform: 'uppercase', textDecoration: 'none',
                             }}
@@ -655,7 +655,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               {/* Timestamp */}
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   fontSize: 9,
                   fontWeight: 400,
                   color: T.textHint,
@@ -698,7 +698,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
 
             <div
               style={{
-                background: '#FFFFFF',
+                background: 'var(--surface)',
                 border: T.border,
                 borderRadius: T.radius,
                 padding: '9px 13px',
@@ -723,7 +723,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
               ))}
               <span
                 style={{
-                  fontFamily: "'Outfit', sans-serif",
+                  fontFamily: 'var(--font-ui)',
                   fontSize: 10,
                   fontWeight: 300,
                   color: T.textHint,
@@ -739,13 +739,13 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
         <div ref={bottomRef} />
       </div>
 
-      {/* ── Heinrick Action Proposal Card ── */}
+      {/* ── Rouge Action Proposal Card ── */}
       {pendingAction && (
         <div style={{
           margin: '0 14px 8px',
           padding: '12px 16px',
-          background: 'linear-gradient(135deg, rgba(196,131,106,0.12) 0%, rgba(196,131,106,0.06) 100%)',
-          border: '1px solid rgba(196,131,106,0.35)',
+          background: 'linear-gradient(135deg, var(--accent-soft) 0%, var(--accent-soft) 100%)',
+          border: '1px solid var(--accent-soft)',
           borderRadius: 10,
           backdropFilter: 'blur(8px)',
           flexShrink: 0,
@@ -754,7 +754,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             <Sparkles size={16} style={{ color: T.accent, marginTop: 2, flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: T.accent, marginBottom: 2, letterSpacing: '0.03em', textTransform: 'uppercase' }}>
-                Heinrick Proposes an Action
+                Rouge Proposes an Action
               </div>
               <div style={{ fontSize: 13, fontWeight: 600, color: T.textPrimary, marginBottom: 4 }}>
                 {pendingAction.label}
@@ -820,12 +820,12 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           rows={2}
           style={{
             flex: 1,
-            background: '#FFFFFF',
-            border: inputFocused ? `1px solid ${T.accent}` : '1px solid #E8E4DF',
+            background: 'var(--surface)',
+            border: inputFocused ? `1px solid ${T.accent}` : '1px solid var(--border)',
             borderRadius: T.radius,
             padding: '8px 12px',
             color: T.textPrimary,
-            fontFamily: "'Outfit', sans-serif",
+            fontFamily: 'var(--font-ui)',
             fontSize: 11,
             fontWeight: 300,
             resize: 'none',
@@ -842,13 +842,13 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           style={{
             width: 32,
             height: 32,
-            background: sendHovered && input.trim() && !loading ? T.accentHover : '#C4836A',
+            background: sendHovered && input.trim() && !loading ? T.accentHover : 'var(--accent)',
             border: 'none',
             borderRadius: T.radius,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#FFFFFF',
+            color: 'var(--text)',
             cursor: !input.trim() || loading ? 'not-allowed' : 'pointer',
             opacity: !input.trim() || loading ? 0.35 : 1,
             flexShrink: 0,
@@ -866,7 +866,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
           40%            { transform: translateY(-4px); opacity: 1; }
         }
-        .ic-container textarea::placeholder { color: #A09890; }
+        .ic-container textarea::placeholder { color: var(--text-3); }
       `}</style>
     </div>
   );

@@ -39,7 +39,7 @@ function getSeasonalIndex(month: number): { label: string; color: string; bgColo
   // month is 0-indexed (0 = January)
   if (month === 10 || month === 11) {
     // November / December
-    return { label: 'Peak Season', color: '#C4836A', bgColor: 'var(--rose-gold-light)' };
+    return { label: 'Peak Season', color: 'var(--accent)', bgColor: 'var(--rose-gold-light)' };
   }
   if (month === 0) {
     // January
@@ -47,11 +47,11 @@ function getSeasonalIndex(month: number): { label: string; color: string; bgColo
   }
   if (month === 4) {
     // May — Mother's Day
-    return { label: "Mother's Day", color: '#7C3AED', bgColor: 'rgba(124,58,237,0.07)' };
+    return { label: "Mother's Day", color: 'var(--purple)', bgColor: 'var(--purple-soft)' };
   }
   if (month >= 5 && month <= 7) {
     // June–August — summer bookings
-    return { label: 'Summer Peak', color: '#059669', bgColor: 'rgba(5,150,105,0.07)' };
+    return { label: 'Summer Peak', color: 'var(--green)', bgColor: 'rgba(5,150,105,0.07)' };
   }
   return { label: 'On Track', color: 'var(--success)', bgColor: 'rgba(5,150,105,0.07)' };
 }
@@ -76,7 +76,7 @@ const KpiPill: React.FC<KpiPillProps> = ({ icon, label, value, highlight }) => (
   >
     <div
       style={{
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 9,
         fontWeight: 400,
         letterSpacing: '0.16em',
@@ -93,7 +93,7 @@ const KpiPill: React.FC<KpiPillProps> = ({ icon, label, value, highlight }) => (
     </div>
     <div
       style={{
-        fontFamily: "'DM Mono', monospace",
+        fontFamily: 'var(--font-mono)',
         fontSize: 15,
         fontWeight: 500,
         color: highlight ? 'var(--rose-gold)' : 'var(--text-primary)',
@@ -123,12 +123,12 @@ const SeasonalTip: React.FC = () => (
         display: 'flex',
         alignItems: 'center',
         gap: 7,
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 10,
         fontWeight: 400,
         letterSpacing: '0.16em',
         textTransform: 'uppercase' as const,
-        color: 'var(--rose-gold)',
+        color: 'var(--text)',
       }}
     >
       <Leaf size={11} strokeWidth={1.5} />
@@ -136,7 +136,7 @@ const SeasonalTip: React.FC = () => (
     </div>
     <div
       style={{
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 13,
         fontWeight: 500,
         color: 'var(--text-primary)',
@@ -147,7 +147,7 @@ const SeasonalTip: React.FC = () => (
     </div>
     <p
       style={{
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 12,
         fontWeight: 300,
         color: 'var(--text-secondary)',
@@ -156,16 +156,16 @@ const SeasonalTip: React.FC = () => (
       }}
     >
       Check seasonal campaigns — Gift vouchers perform{' '}
-      <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 500, color: 'var(--rose-gold)' }}>
+      <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 500, color: 'var(--text)' }}>
         3.2×
       </span>{' '}
       better in Oct–Dec. Consider launching a campaign now to capture pre-peak bookings.
     </p>
     <div
       style={{
-        fontFamily: "'DM Mono', monospace",
+        fontFamily: 'var(--font-mono)',
         fontSize: 10,
-        color: 'var(--rose-gold)',
+        color: 'var(--text)',
         background: 'var(--rose-gold-light)',
         padding: '3px 8px',
         borderRadius: 2,
@@ -251,7 +251,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
             <div className="live-dot" />
             Spa &amp; Wellness Intelligence
           </div>
-          <h1 className="section-title">
+          <h1 className="page-title">
             {brand.name} <em>Dashboard</em>
           </h1>
           {brand.services && brand.services.length > 0 && (
@@ -373,7 +373,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 10,
                 fontWeight: 400,
                 letterSpacing: '0.18em',
@@ -386,7 +386,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
             </div>
             <div
               style={{
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: 'var(--font-mono)',
                 fontSize: 22,
                 fontWeight: 500,
                 color: seasonal.color,
@@ -397,7 +397,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
             </div>
             <div
               style={{
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 10,
                 fontWeight: 300,
                 color: 'var(--text-muted)',
@@ -406,7 +406,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
               {now.toLocaleString('default', { month: 'long' })} ·{' '}
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: 'var(--font-mono)',
                   background: seasonal.bgColor,
                   color: seasonal.color,
                   padding: '1px 6px',
@@ -497,7 +497,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
           >
             <div
               style={{
-                fontFamily: "'Outfit', sans-serif",
+                fontFamily: 'var(--font-ui)',
                 fontSize: 9,
                 fontWeight: 400,
                 letterSpacing: '0.16em',
@@ -516,7 +516,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
                   border: '0.5px solid var(--border-light)',
                   borderRadius: 'var(--radius)',
                   padding: '7px 12px',
-                  fontFamily: "'Outfit', sans-serif",
+                  fontFamily: 'var(--font-ui)',
                   fontSize: 11,
                   fontWeight: 300,
                   color: 'var(--text-secondary)',
@@ -567,7 +567,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
                         <div style={{ fontWeight: 400 }}>{c.name}</div>
                         <div
                           style={{
-                            fontFamily: "'DM Mono', monospace",
+                            fontFamily: 'var(--font-mono)',
                             fontSize: 9,
                             color: 'var(--text-hint)',
                             marginTop: 1,
@@ -607,7 +607,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
                     colSpan={7}
                     style={{
                       textAlign: 'center',
-                      fontFamily: "'Outfit', sans-serif",
+                      fontFamily: 'var(--font-ui)',
                       fontSize: 12,
                       fontWeight: 300,
                       color: 'var(--text-muted)',

@@ -178,7 +178,7 @@ Metric values use font-variant-numeric: tabular-nums.
 1. **לוגו** — ריבוע גרדיאנט 38px עם "N" ב-Fraunces, לצדו "NextAdsGen" (Gen ברוז-גולד) ותת-כותרת "CAMPAIGN INTELLIGENCE" 8.5px.
 2. **בורר חשבון** — שדה רוחב מלא, "Select account…", חץ למטה.
 3. **ניווט** — הפריטים. כל פריט: אייקון 18px + טקסט 13.5px/500.
-4. **תחתית** (margin-top:auto) — מתג Dark/Light + תווית "9YR BENCH ACTIVE".
+4. **תחתית** (margin-top:auto) — מתג Dark/Light + תווית "BENCHMARK ACTIVE".
 
 **פריטי הניווט (בסדר):**
 
@@ -623,7 +623,7 @@ your-repo/
 | Today's optimizations | לוג פעולות שהמערכת ביצעה (אם אין לוג — אין אלמנט) |
 | Recent intelligence | היסטוריית שיחות ה-AI מ-DB |
 | Live activity | feed אירועי מערכת (sync/import/optimization) |
-| תגי בנצ'מרק (X% better) | השוואה מול ה-9yr beauty dataset |
+| תגי בנצ'מרק (X% better) | השוואה מול ה-beauty dataset (מאז 2018) |
 
 ## 43. כשאין נתון אמיתי — מה לעשות (סדר עדיפויות)
 1. **אם הנתון קיים אבל צריך חישוב** → לבנות את ה-aggregation/endpoint. לא לקצר עם dummy.
@@ -757,7 +757,7 @@ your-repo/
 
 | מספר | סטטוס | מה לעשות |
 |---|---|---|
-| "9 years of beauty data" | ✅ מאושר — עובדתי | נשאר בכל מסך |
+| "20,000+ beauty campaigns since 2018" | ✅ מאושר — עובדתי | נשאר בכל מסך |
 | "24/7 optimization" | ✅ מאושר — יכולת מערכת | נשאר בכל מסך |
 | "−38% CPL improvement" | ❌ הוסר — לא אומת | **לא להחזיר** בלי נתונים ממערכת חיה + אישור |
 | "×3 faster campaign launches" | ❌ הוסר — לא אומת | **לא להחזיר** בלי נתונים ממערכת חיה + אישור |

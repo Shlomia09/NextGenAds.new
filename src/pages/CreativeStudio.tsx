@@ -15,6 +15,7 @@ import type { Brand } from '../types';
 import type { CampaignDraft } from '../types/campaign';
 import CampaignSetup from '../components/publisher/CampaignSetup';
 import PreflightModal from '../components/publisher/PreflightModal';
+import { cssToken } from '../lib/cssToken';
 
 // ── Types ────────────────────────────────────────────────────────
 interface CopyVariant {
@@ -40,9 +41,9 @@ const CONVERSION_OPTIONS: { value: ConversionType; label: string; emoji: string 
 ];
 
 const HOOK_COLORS = {
-  problem:      { bg: 'rgba(248,113,113,0.06)', border: 'rgba(248,113,113,0.2)', badge: '#f87171' },
-  result:       { bg: 'rgba(74,222,128,0.06)',  border: 'rgba(74,222,128,0.2)',  badge: '#4ade80' },
-  social_proof: { bg: 'rgba(167,139,250,0.06)', border: 'rgba(167,139,250,0.2)', badge: '#a78bfa' },
+  problem:      { bg: 'rgba(248,113,113,0.06)', border: 'rgba(248,113,113,0.2)', get badge() { return cssToken('--red'); } },
+  result:       { bg: 'rgba(74,222,128,0.06)',  border: 'rgba(74,222,128,0.2)',  get badge() { return cssToken('--green'); } },
+  social_proof: { bg: 'var(--purple-soft)', border: 'var(--purple-soft)', get badge() { return cssToken('--purple'); } },
 };
 
 // ── Helpers ──────────────────────────────────────────────────────
@@ -96,10 +97,10 @@ const VariantCard: React.FC<{
 
   return (
     <div style={{
-      background: isSelected ? 'rgba(196,131,106,0.06)' : colors.bg,
-      border: `0.5px solid ${isSelected ? 'var(--rose-gold)' : isRecommended ? 'rgba(196,131,106,0.35)' : colors.border}`,
+      background: isSelected ? 'var(--accent-soft)' : colors.bg,
+      border: `0.5px solid ${isSelected ? 'var(--rose-gold)' : isRecommended ? 'var(--accent-soft)' : colors.border}`,
       borderRadius: 10, padding: '16px 18px', position: 'relative',
-      boxShadow: isSelected ? '0 0 0 1px rgba(196,131,106,0.2)' : 'none',
+      boxShadow: isSelected ? '0 0 0 1px var(--accent-soft)' : 'none',
       transition: 'all 0.2s ease',
     }}>
       {/* Header badges */}
@@ -112,21 +113,21 @@ const VariantCard: React.FC<{
             {variant.hook_label}
           </span>
           {isRecommended && (
-            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 8, background: 'rgba(196,131,106,0.15)', color: 'var(--rose-gold)', borderRadius: 3, padding: '2px 7px', border: '0.5px solid rgba(196,131,106,0.3)' }}>
+            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 8, background: 'var(--accent-soft)', color: 'var(--text)', borderRadius: 3, padding: '2px 7px', border: '0.5px solid var(--accent-soft)' }}>
               ★ Recommended
             </span>
           )}
           {isSelected && (
-            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 8, background: 'rgba(74,222,128,0.15)', color: '#4ade80', borderRadius: 3, padding: '2px 7px', border: '0.5px solid rgba(74,222,128,0.3)', display: 'flex', alignItems: 'center', gap: 3 }}>
+            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 8, background: 'rgba(74,222,128,0.15)', color: 'var(--green)', borderRadius: 3, padding: '2px 7px', border: '0.5px solid rgba(74,222,128,0.3)', display: 'flex', alignItems: 'center', gap: 3 }}>
               <CheckCircle size={8} /> Selected
             </span>
           )}
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button onClick={() => setEditing(e => !e)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 5, background: '#F8F6F3', border: '0.5px solid #E8E4DF', fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-secondary)', cursor: 'pointer' }}>
+          <button onClick={() => setEditing(e => !e)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 5, background: 'var(--surface)', border: '0.5px solid var(--border)', fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-secondary)', cursor: 'pointer' }}>
             <Edit3 size={9} />{editing ? 'Done' : 'Edit'}
           </button>
-          <button onClick={() => copyToClipboard(`${primary}\n\n${body}\n\n${cta}`, 'all')} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 5, background: copied === 'all' ? 'rgba(74,222,128,0.1)' : 'rgba(196,131,106,0.1)', border: `0.5px solid ${copied === 'all' ? 'rgba(74,222,128,0.3)' : 'rgba(196,131,106,0.25)'}`, fontFamily: 'var(--font-sans)', fontSize: 9, color: copied === 'all' ? '#4ade80' : 'var(--rose-gold)', cursor: 'pointer' }}>
+          <button onClick={() => copyToClipboard(`${primary}\n\n${body}\n\n${cta}`, 'all')} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 5, background: copied === 'all' ? 'rgba(74,222,128,0.1)' : 'var(--accent-soft)', border: `0.5px solid ${copied === 'all' ? 'rgba(74,222,128,0.3)' : 'var(--accent-soft)'}`, fontFamily: 'var(--font-sans)', fontSize: 9, color: copied === 'all' ? 'var(--green)' : 'var(--rose-gold)', cursor: 'pointer' }}>
             {copied === 'all' ? <CheckCircle size={9} /> : <Copy size={9} />}
             {copied === 'all' ? 'Copied!' : 'Copy all'}
           </button>
@@ -144,16 +145,16 @@ const VariantCard: React.FC<{
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
               <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{fl}</span>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: value.length > max ? '#f87171' : 'var(--text-hint)' }}>{value.length}/{max}</span>
-                <button onClick={() => copyToClipboard(value, key)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: copied === key ? '#4ade80' : 'var(--text-hint)', display: 'flex', alignItems: 'center' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: value.length > max ? 'var(--red)' : 'var(--text-hint)' }}>{value.length}/{max}</span>
+                <button onClick={() => copyToClipboard(value, key)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: copied === key ? 'var(--green)' : 'var(--text-hint)', display: 'flex', alignItems: 'center' }}>
                   {copied === key ? <CheckCircle size={9} /> : <Copy size={9} />}
                 </button>
               </div>
             </div>
             {editing ? (
               key === 'body'
-                ? <textarea value={value} onChange={e => set(e.target.value)} rows={3} style={{ width: '100%', boxSizing: 'border-box', background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 6, padding: '8px 10px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.6, outline: 'none', resize: 'vertical' }} />
-                : <input value={value} onChange={e => set(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 6, padding: '7px 10px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', outline: 'none' }} />
+                ? <textarea value={value} onChange={e => set(e.target.value)} rows={3} style={{ width: '100%', boxSizing: 'border-box', background: 'var(--surface)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '8px 10px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.6, outline: 'none', resize: 'vertical' }} />
+                : <input value={value} onChange={e => set(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', background: 'var(--surface)', border: '0.5px solid var(--border)', borderRadius: 6, padding: '7px 10px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', outline: 'none' }} />
             ) : (
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: key === 'cta' ? 11 : 12, color: key === 'cta' ? 'var(--rose-gold)' : 'var(--text-secondary)', lineHeight: 1.6, fontWeight: key === 'cta' ? 500 : 400 }}>
                 {value}{key === 'cta' && ' →'}
@@ -164,16 +165,16 @@ const VariantCard: React.FC<{
       </div>
 
       {/* "Use this copy" button */}
-      <div style={{ marginTop: 14, borderTop: '0.5px solid #F0ECE8', paddingTop: 12 }}>
+      <div style={{ marginTop: 14, borderTop: '0.5px solid var(--border)', paddingTop: 12 }}>
         <button
           onClick={() => onUseThis(currentVariant)}
           style={{
             width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
             padding: '10px 16px', borderRadius: 8,
             background: isSelected
-              ? 'linear-gradient(135deg, var(--rose-gold), #a0554a)'
-              : 'rgba(196,131,106,0.08)',
-            border: `0.5px solid ${isSelected ? 'transparent' : 'rgba(196,131,106,0.25)'}`,
+              ? 'var(--accent)'
+              : 'var(--accent-soft)',
+            border: `0.5px solid ${isSelected ? 'transparent' : 'var(--accent-soft)'}`,
             fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 500,
             color: isSelected ? 'white' : 'var(--rose-gold)',
             cursor: 'pointer', transition: 'all 0.2s ease',
@@ -381,7 +382,7 @@ const CreativeStudio: React.FC = () => {
             Creative Studio
           </h1>
           {draftSaving && <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)' }}>Saving draft…</span>}
-          {draft.id && !draftSaving && <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: '#4ade80', display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={9} /> Draft saved</span>}
+          {draft.id && !draftSaving && <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={9} /> Draft saved</span>}
         </div>
         <p style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-secondary)', margin: 0 }}>
           Upload your creative → AI writes high-converting copy → Publish directly to Meta Ads.
@@ -395,12 +396,12 @@ const CreativeStudio: React.FC = () => {
 
           {/* Upload area */}
           <div ref={dropRef} onDrop={onDrop} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onClick={() => !file && fileInputRef.current?.click()}
-            style={{ background: dragging ? '#FDF6F0' : file ? '#FFFFFF' : '#F8F6F3', border: `1.5px dashed ${dragging ? 'rgba(196,131,106,0.5)' : file ? 'rgba(196,131,106,0.3)' : '#C4836A'}`, borderRadius: 12, cursor: file ? 'default' : 'pointer', overflow: 'hidden', transition: 'all 0.2s ease', minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+            style={{ background: dragging ? 'var(--surface)' : file ? 'var(--surface)' : 'var(--surface)', border: `1.5px dashed ${dragging ? 'var(--accent-soft)' : file ? 'var(--accent-soft)' : 'var(--accent)'}`, borderRadius: 12, cursor: file ? 'default' : 'pointer', overflow: 'hidden', transition: 'all 0.2s ease', minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
             {preview ? (
               <>
                 <img src={preview} alt="Creative preview" style={{ width: '100%', display: 'block', objectFit: 'contain', maxHeight: 260 }} />
                 <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 6 }}>
-                  {isVideo && <div style={{ background: 'rgba(0,0,0,0.7)', borderRadius: 4, padding: '3px 8px', display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-sans)', fontSize: 9, color: '#a78bfa' }}><Video size={9} /> Video</div>}
+                  {isVideo && <div style={{ background: 'rgba(0,0,0,0.7)', borderRadius: 4, padding: '3px 8px', display: 'flex', alignItems: 'center', gap: 4, fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--purple)' }}><Video size={9} /> Video</div>}
                   <button onClick={e => { e.stopPropagation(); reset(); }} style={{ background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: 4, width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white' }}><X size={11} /></button>
                 </div>
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.7))', padding: '20px 12px 10px', fontFamily: 'var(--font-sans)', fontSize: 10, color: 'rgba(255,255,255,0.8)' }}>{file?.name}</div>
@@ -420,7 +421,7 @@ const CreativeStudio: React.FC = () => {
             <div>
               <label style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>Conversion Goal</label>
               <div style={{ position: 'relative' }}>
-                <select value={conversionType} onChange={e => setConvType(e.target.value as ConversionType)} style={{ width: '100%', appearance: 'none', background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '9px 32px 9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}>
+                <select value={conversionType} onChange={e => setConvType(e.target.value as ConversionType)} style={{ width: '100%', appearance: 'none', background: 'var(--surface)', border: '0.5px solid var(--border)', borderRadius: 8, padding: '9px 32px 9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}>
                   {CONVERSION_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.emoji} {o.label}</option>)}
                 </select>
                 <ChevronDown size={13} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-hint)', pointerEvents: 'none' }} />
@@ -430,7 +431,7 @@ const CreativeStudio: React.FC = () => {
               <div>
                 <label style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 6 }}>Brand</label>
                 <div style={{ position: 'relative' }}>
-                  <select value={brandId} onChange={e => setBrandId(e.target.value)} style={{ width: '100%', appearance: 'none', background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, padding: '9px 32px 9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}>
+                  <select value={brandId} onChange={e => setBrandId(e.target.value)} style={{ width: '100%', appearance: 'none', background: 'var(--surface)', border: '0.5px solid var(--border)', borderRadius: 8, padding: '9px 32px 9px 12px', fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}>
                     <option value="">No brand selected</option>
                     {brands.map((b: Brand) => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </select>
@@ -441,14 +442,14 @@ const CreativeStudio: React.FC = () => {
           </div>
 
           {/* Analyze button */}
-          <button onClick={analyze} disabled={!file || loading} style={{ background: !file ? '#F8F6F3' : 'linear-gradient(135deg, var(--rose-gold) 0%, #a0554a 100%)', border: !file ? '0.5px solid #E8E4DF' : 'none', borderRadius: 10, padding: '13px 20px', fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500, color: !file ? 'var(--text-hint)' : 'white', cursor: !file || loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s ease' }}>
+          <button onClick={analyze} disabled={!file || loading} style={{ background: !file ? 'var(--surface)' : 'var(--accent)', border: !file ? '0.5px solid var(--border)' : 'none', borderRadius: 10, padding: '13px 20px', fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500, color: !file ? 'var(--text-hint)' : 'white', cursor: !file || loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s ease' }}>
             {loading ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />Analyzing creative…</> : <><Sparkles size={14} />Analyze Creative & Generate Copy</>}
           </button>
 
           {error && (
             <div style={{ background: 'rgba(248,113,113,0.06)', border: '0.5px solid rgba(248,113,113,0.2)', borderRadius: 8, padding: '10px 14px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-              <AlertTriangle size={13} style={{ color: '#f87171', flexShrink: 0, marginTop: 1 }} />
-              <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: '#f87171' }}>{error}</span>
+              <AlertTriangle size={13} style={{ color: 'var(--red)', flexShrink: 0, marginTop: 1 }} />
+              <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--red)' }}>{error}</span>
             </div>
           )}
 
@@ -469,21 +470,21 @@ const CreativeStudio: React.FC = () => {
         {result && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Creative analysis */}
-            <div style={{ background: 'rgba(196,131,106,0.04)', border: '0.5px solid rgba(196,131,106,0.15)', borderRadius: 10, padding: '14px 16px' }}>
+            <div style={{ background: 'var(--accent-soft)', border: '0.5px solid var(--accent-soft)', borderRadius: 10, padding: '14px 16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                 <Sparkles size={11} style={{ color: 'var(--rose-gold)' }} />
-                <span style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--rose-gold)', fontWeight: 500 }}>Creative Analysis</span>
+                <span style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--text)', fontWeight: 500 }}>Creative Analysis</span>
               </div>
               <div style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{result.creative_analysis}</div>
             </div>
 
             {/* Benchmark insight */}
-            <div style={{ background: 'rgba(167,139,250,0.05)', border: '0.5px solid rgba(167,139,250,0.2)', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(167,139,250,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ background: 'var(--purple-soft)', border: '0.5px solid var(--purple-soft)', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--purple-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <span style={{ fontSize: 10 }}>📊</span>
               </div>
               <div>
-                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: '#a78bfa', fontWeight: 500, marginBottom: 3 }}>Benchmark Insight</div>
+                <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--purple)', fontWeight: 500, marginBottom: 3 }}>Benchmark Insight</div>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{result.benchmark_reason}</div>
               </div>
             </div>

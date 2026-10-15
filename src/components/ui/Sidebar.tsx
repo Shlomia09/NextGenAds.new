@@ -6,6 +6,7 @@ import {
 import BrandSwitcher from './BrandSwitcher';
 import ThemeToggle from './ThemeToggle';
 import { useBrand } from '../../contexts/BrandContext';
+import { RougeLogo } from '../brand/RougeLogo';
 
 interface SidebarProps { brand?: import('../../types').Brand | null; }
 
@@ -40,36 +41,16 @@ const Sidebar: React.FC<SidebarProps> = () => {
         {/* ── Logo ── */}
         <div className="sidebar-logo-wrap">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '11px' }}>
-              {/* 38×38 logo box */}
-              <div style={{
-                width: '38px',
-                height: '38px',
-                background: 'var(--logo-grad)',
-                color: '#2A1A12',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontFamily: 'var(--font-display)',
-                fontSize: '20px',
-                fontWeight: 600,
-                flexShrink: 0,
-                lineHeight: 1,
-              }}>
-                R
-              </div>
-              {/* Wordmark */}
-              <div>
-                <div className="sidebar-logo">Rouge</div>
-                <div className="sidebar-tagline">Beauty campaign intelligence</div>
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', color: 'var(--text)' }}>
+              <RougeLogo variant="lockup" className="sidebar-rouge-logo" />
+              <div className="sidebar-tagline">Beauty campaign intelligence</div>
             </div>
             <button className="sb-close-btn" onClick={() => setOpen(false)} aria-label="Close">
               <X size={15} strokeWidth={1.5} />
             </button>
           </div>
         </div>
+
 
         {/* ── Brand Switcher ── */}
         <div style={{ padding: '10px 10px 4px' }}>
@@ -114,11 +95,10 @@ const Sidebar: React.FC<SidebarProps> = () => {
             <ThemeToggle />
           </div>
 
-          {/* 9YR BENCH ACTIVE badge */}
+          {/* BENCHMARK ACTIVE badge — the dataset year belongs on Landing, not in product chrome */}
           <div className="sidebar-benchmark-badge">
-            <span>9YR</span>
-            <span>BENCH</span>
-            <span>ACTIVE</span>
+            <span>Benchmark</span>
+            <span>Active</span>
           </div>
         </div>
 
@@ -180,20 +160,9 @@ const Sidebar: React.FC<SidebarProps> = () => {
           border-bottom: 1px solid var(--border);
           flex-shrink: 0;
         }
-        .sidebar-logo {
-          font-family: 'Inter', sans-serif;
-          font-size: 17px;
-          font-weight: 500;
-          color: var(--text);
-          letter-spacing: 0.2px;
-          line-height: 1.2;
-        }
-        .sidebar-logo em {
-          font-style: normal;
-          color: var(--accent);
-        }
+        .sidebar-rouge-logo { height: 22px; }
         .sidebar-tagline {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-ui);
           font-size: 8.5px;
           letter-spacing: 2.5px;
           text-transform: uppercase;
@@ -211,7 +180,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
           display: flex;
           align-items: center;
           gap: 8px;
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 400;
           color: var(--text-2);
@@ -243,7 +212,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
           gap: 12px;
           padding: 10px 12px;
           border-radius: 9px;
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13.5px;
           font-weight: 500;
           letter-spacing: 0.3px;
@@ -257,7 +226,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
         }
         .sidebar-nav-item.active {
           background: var(--accent-soft);
-          color: var(--accent);
+          color: var(--text);
         }
 
         /* ── Bottom ── */
@@ -279,7 +248,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
           align-items: center;
           text-align: center;
           padding: 6px 0 12px;
-          font-family: 'JetBrains Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 8px;
           letter-spacing: 3px;
           color: var(--text-3);

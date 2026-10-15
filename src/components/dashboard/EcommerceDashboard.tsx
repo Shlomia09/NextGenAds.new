@@ -36,10 +36,10 @@ interface EcommerceDashboardProps {
 
 // ─── Status badge helper ──────────────────────────────────────
 const statusColors: Record<string, { bg: string; color: string }> = {
-  ACTIVE:   { bg: 'rgba(16,185,129,0.08)',  color: '#065F46' },
-  PAUSED:   { bg: 'rgba(245,158,11,0.08)',  color: '#92400E' },
-  ARCHIVED: { bg: 'rgba(100,116,139,0.08)', color: '#475569' },
-  DELETED:  { bg: 'rgba(239,68,68,0.08)',   color: '#991B1B' },
+  ACTIVE:   { bg: 'rgba(16,185,129,0.08)',  color: 'var(--green)' },
+  PAUSED:   { bg: 'rgba(245,158,11,0.08)',  color: 'var(--amber)' },
+  ARCHIVED: { bg: 'rgba(100,116,139,0.08)', color: 'var(--text-2)' },
+  DELETED:  { bg: 'rgba(239,68,68,0.08)',   color: 'var(--red)' },
 };
 
 // ─── Component ────────────────────────────────────────────────
@@ -125,7 +125,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
             <div className="ecom-kpi-label">{icon}{label}</div>
             <div
               className="ecom-kpi-value"
-              style={highlight ? { color: '#C4836A' } : {}}
+              style={highlight ? { color: 'var(--text)' } : {}}
             >
               {value}
             </div>
@@ -154,7 +154,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
 
           {/* Source tag */}
           <div className="bench-source-tag">
-            847 Beauty brands · {bracket.label} · 2015–2024
+            20,000+ beauty campaigns · {bracket.label} · since 2018
           </div>
 
           {/* Metric cards: ROAS / CPM / CAC / CTR / CPC */}
@@ -185,18 +185,18 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
               <AreaChart data={mockRoasTrend}>
                 <defs>
                   <linearGradient id="ecom-rg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="#C4836A" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#C4836A" stopOpacity={0} />
+                    <stop offset="5%"  stopColor="var(--accent)" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
                   dataKey="day"
-                  tick={{ fontSize: 9, fill: 'var(--text-hint)', fontFamily: 'DM Mono' }}
+                  tick={{ fontSize: 9, fill: 'var(--text-hint)', fontFamily: 'var(--font-mono)' }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 9, fill: 'var(--text-hint)', fontFamily: 'DM Mono' }}
+                  tick={{ fontSize: 9, fill: 'var(--text-hint)', fontFamily: 'var(--font-mono)' }}
                   axisLine={false}
                   tickLine={false}
                   width={28}
@@ -207,13 +207,13 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
                     border: '0.5px solid var(--border-light)',
                     borderRadius: 4,
                     fontSize: 11,
-                    fontFamily: 'DM Mono',
+                    fontFamily: 'var(--font-mono)',
                   }}
                 />
                 <Area
                   type="monotone"
                   dataKey="roas"
-                  stroke="#C4836A"
+                  stroke="var(--accent)"
                   fill="url(#ecom-rg)"
                   strokeWidth={1.5}
                   name="Your ROAS"
@@ -411,7 +411,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-kpi-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 9px;
           font-weight: 400;
           letter-spacing: 0.16em;
@@ -423,8 +423,9 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-kpi-value {
-          font-family: 'DM Mono', monospace;
-          font-size: 14px;
+          font-family: var(--font-mono);
+          font-size: var(--t-metric);
+          letter-spacing: var(--track-metric);
           font-weight: 500;
           color: var(--text-primary);
         }
@@ -453,7 +454,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
 
         /* ── Bench source tag ────────────────────────────────── */
         .bench-source-tag {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 9px;
           font-weight: 400;
           color: var(--text-hint);
@@ -479,14 +480,14 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-no-recs p {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 400;
           color: var(--text-secondary);
         }
 
         .ecom-no-recs span {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           font-weight: 300;
           color: var(--text-muted);
@@ -510,7 +511,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-table th {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 9px;
           font-weight: 500;
           letter-spacing: 0.14em;
@@ -523,7 +524,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-table td {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 300;
           color: var(--text-secondary);
@@ -538,7 +539,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         .ecom-table tr:hover td { background: var(--bg-secondary); }
 
         .ecom-td-name {
-          font-family: 'Outfit', sans-serif !important;
+          font-family: var(--font-ui) !important;
           font-weight: 400 !important;
           color: var(--text-primary) !important;
           max-width: 220px;
@@ -547,14 +548,14 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
         }
 
         .ecom-table td.mono {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 12px;
           font-weight: 500;
           color: var(--text-primary);
         }
 
         .ecom-status-chip {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 500;
           letter-spacing: 0.06em;
