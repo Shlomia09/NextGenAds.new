@@ -57,6 +57,8 @@ const MetaCallback: React.FC = () => {
   const [userId,   setUserId]   = useState('');
   // Map of account_id → access_token (read from DB after OAuth)
   const [tokenMap, setTokenMap] = useState<Record<string, string>>({});
+  // Map of account_id → { currency, timezone_name } as reported by Meta in the OAuth response
+  const [accountMeta, setAccountMeta] = useState<Record<string, { currency: string | null; timezone_name: string | null }>>({});
   // Set of account_ids that are ALREADY CONNECTED (active) in the DB
   const [existingConnected, setExistingConnected] = useState<Record<string, { id: string; brand_id: string | null }>>({});
 
@@ -98,7 +100,8 @@ const MetaCallback: React.FC = () => {
         // The edge function returns: { accounts: [{account_id, name}] }
         // We show these in the picker WITHOUT querying the DB.
         // This works regardless of whether the edge function's upsert succeeded.
-        const responseAccounts: { account_id: string; name: string }[] = body.accounts || [];
+        const responseAccounts: { account_id: string; name: string; currency?: string | null; timezone_name?: string | null }[] = body.accounts || [];
+        setAccountMeta(Object.fromEntries(responseAccounts.map(a => [a.account_id, { currency: a.currency ?? null, timezone_name: a.timezone_name ?? null }])));
 
         if (responseAccounts.length === 0) {
           throw new Error('No ad accounts found on this Meta account.');
@@ -280,6 +283,20 @@ const MetaCallback: React.FC = () => {
       setStatus('error');
       setErrorMsg(`Save failed: ${errors.join('; ')}\n\nPlease run the DB migration and try again.`);
       return;
+    }
+
+    // Currency / timezone: separate best-effort write, so a pending migration
+    // (columns not there yet) can never fail the connection itself.
+    for (const cfg of configs) {
+      const meta = accountMeta[cfg.id];
+      if (!meta?.currency) continue;
+      const { error: curErr } = await supabase
+        .from('ad_accounts')
+        .update({ currency: meta.currency, timezone_name: meta.timezone_name })
+        .eq('user_id', userId)
+        .eq('platform', 'meta')
+        .eq('account_id', cfg.id);
+      if (curErr) console.warn('Currency not stored (migration pending?):', curErr.message);
     }
 
     setStatus('success');

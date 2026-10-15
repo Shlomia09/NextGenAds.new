@@ -146,14 +146,31 @@ serve(async (req) => {
       }
     }
 
+    // ── Currency / timezone: best-effort, separate from the token write ──
+    // Kept out of the upserts above so a missing column (migration not yet
+    // applied) can never block the token from being stored.
+    for (const account of adAccounts) {
+      if (!account.currency) continue;
+      const { error: curErr } = await supabase
+        .from('ad_accounts')
+        .update({ currency: account.currency, timezone_name: account.timezone_name ?? null })
+        .eq('user_id', userId)
+        .eq('platform', 'meta')
+        .eq('account_id', account.account_id);
+      if (curErr) console.warn('Currency not stored (migration pending?):', curErr.message);
+    }
+
     return new Response(
       JSON.stringify({
         success:         true,
         accounts_stored: stored.length,
         access_token:    longLivedToken,
-        accounts:        adAccounts.map((a: { account_id: string; name: string }) => ({
-          account_id: a.account_id,
-          name:       a.name,
+        accounts:        adAccounts.map((a: { account_id: string; name: string; account_status?: number; currency?: string; timezone_name?: string }) => ({
+          account_id:     a.account_id,
+          name:           a.name,
+          account_status: a.account_status ?? null,
+          currency:       a.currency ?? null,
+          timezone_name:  a.timezone_name ?? null,
         })),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

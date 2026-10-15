@@ -42,10 +42,20 @@ export const syncMetaCampaigns = async (brandId: string, adAccountId: string) =>
   return data;
 };
 
-export const getMetaAccounts = async () => {
-  const { data, error } = await supabase.functions.invoke('meta-get-accounts', {
-    body: {},
+export interface AccountMarkets {
+  ad_account_id: string;
+  account_id: string;
+  currency: string | null;
+  date_preset: 'last_90d';
+  total_spend: number;
+  countries: { country: string; spend: number; share: number }[];   // sorted by spend, desc
+}
+
+// Country-level spend for one connected ad account (last 90 days). Read-only; no brand needed.
+export const getAccountMarkets = async (adAccountId: string): Promise<AccountMarkets> => {
+  const { data, error } = await supabase.functions.invoke('meta-account-markets', {
+    body: { ad_account_id: adAccountId },
   });
   if (error) throw error;
-  return data;
+  return data as AccountMarkets;
 };

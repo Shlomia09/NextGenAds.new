@@ -6,6 +6,9 @@ verify_jwt = true
 [functions.meta-sync]
 verify_jwt = true
 
+[functions.meta-account-markets]
+verify_jwt = true
+
 [functions.meta-oauth]
 verify_jwt = false
 
