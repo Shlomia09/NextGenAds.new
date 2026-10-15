@@ -11,7 +11,7 @@ const corsHeaders = {
 // ── Benchmark data by vertical (dataset since 2018) ─────────────────────────────────────────
 const VERTICAL_BENCHMARKS: Record<string, string> = {
   clinic: `
-    Industry: Beauty Clinics / Aesthetic Centers (benchmark since 2018, 200+ accounts)
+    Industry: Beauty Clinics / Aesthetic Centers (benchmark since 2018)
     - CPL benchmark: €28–€38 (avg €32)
     - CPM benchmark: €10–€13 (avg €11.2)
     - CTR benchmark: 1.8%–2.4% (avg 2.1%)
@@ -26,7 +26,7 @@ const VERTICAL_BENCHMARKS: Record<string, string> = {
     - Scale triggers: CPL < €25 for 7+ days = ready for 30% budget increase
   `,
   spa: `
-    Industry: Spa & Wellness (benchmark since 2018, 150+ accounts)
+    Industry: Spa & Wellness (benchmark since 2018)
     - CPL benchmark: €22–€35 (avg €28)
     - CPM benchmark: €8–€13 (avg €10.5)
     - CTR benchmark: 1.6%–2.2% (avg 1.9%)
@@ -38,7 +38,7 @@ const VERTICAL_BENCHMARKS: Record<string, string> = {
     - Scale triggers: CPL < €20 for 5+ days
   `,
   salon: `
-    Industry: Hair/Nail/Brow Salons (benchmark since 2018, 300+ accounts)
+    Industry: Hair/Nail/Brow Salons (benchmark since 2018)
     - CPL benchmark: €18–€27 (avg €22)
     - CPM benchmark: €7–€10 (avg €8.5)
     - CTR benchmark: 2.0%–2.8% (avg 2.4%)
@@ -50,7 +50,7 @@ const VERTICAL_BENCHMARKS: Record<string, string> = {
     - Warning: If reach < 8,000 and frequency > 4x → pause and expand radius
   `,
   ecommerce: `
-    Industry: Beauty eCommerce (benchmark since 2018, 500+ accounts)
+    Industry: Beauty eCommerce (benchmark since 2018)
     - ROAS benchmarks by AOV: <€80 AOV → 3.8x | €80-150 → 3.2x | €150-300 → 2.8x | >€300 → 2.2x
     - CPM benchmark: €12–€16 (avg €14)
     - CTR benchmark: 1.5%–2.2% (avg 1.8%)
@@ -62,7 +62,7 @@ const VERTICAL_BENCHMARKS: Record<string, string> = {
     - LTV multiplier for beauty: 2.8x (repurchase rate high)
   `,
   wholesale: `
-    Industry: B2B Beauty / Wholesale (benchmark since 2018, 80+ accounts)
+    Industry: B2B Beauty / Wholesale (benchmark since 2018)
     - CPL benchmark: €45–€65 (avg €55)
     - Lead Quality Rate benchmark: 30-40%
     - CPQ (Cost per Qualified Lead): €130-€190 (avg €160)
@@ -265,7 +265,7 @@ Generate 4-6 recommendations as a JSON array. Each must be SPECIFIC to their act
     "action": "Exact step-by-step action to take",
     "action_type": "pause_campaign|scale_budget|refresh_creative|audit_audience|optimize_bidding|structural_fix",
     "reasoning": "Benchmark comparison: their metric vs industry benchmark",
-    "benchmark_reference": "Specific data point from the benchmark (20,000+ campaigns since 2018)",
+    "benchmark_reference": "Comparative framing only, e.g. 'above the beauty benchmark for this AOV bracket'. Never cite account, brand or campaign counts for a segment",
     "impact": "Expected improvement (e.g., CPL -20% in 7 days)",
     "campaign_name": "Name of specific campaign this applies to (or null if account-level)"
   }

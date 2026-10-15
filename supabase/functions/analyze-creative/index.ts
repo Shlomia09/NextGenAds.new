@@ -9,7 +9,7 @@ const corsHeaders = {
 // ── Benchmark copy data by conversion type (dataset since 2018) ───────────────
 const COPY_BENCHMARKS: Record<string, string> = {
   leads: `
-COPY BENCHMARKS — Beauty Lead Generation (dataset since 2018, 500+ accounts):
+COPY BENCHMARKS — Beauty Lead Generation (dataset since 2018):
 - Problem-first hooks: 67% better CTR than generic headlines
 - Number specificity increases CTR 23%: "Free consultation in 48h" > "Book now"
 - Local social proof outperforms global: "Milan women" > "thousands of women"
@@ -21,7 +21,7 @@ COPY BENCHMARKS — Beauty Lead Generation (dataset since 2018, 500+ accounts):
 - Tone: Confident + empathetic. Avoid medical claims. Focus on transformation.
   `,
   ecommerce: `
-COPY BENCHMARKS — Beauty eCommerce (dataset since 2018, 500+ accounts):
+COPY BENCHMARKS — Beauty eCommerce (dataset since 2018):
 - Benefit-led hooks outperform feature-led by 31% in beauty category
 - AOV mention in copy increases average order: "Free shipping over €60" (+18% AOV)
 - Risk reversal in body text reduces abandonment: "30-day return guarantee"
