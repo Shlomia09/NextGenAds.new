@@ -73,7 +73,7 @@ const BENCHMARK_CONTEXT: Record<string, string> = {
   ecommerce: `
 ## Benchmark Context: eCommerce / Sales
 You are analyzing a SALES & ROAS optimization account.
-Key benchmarks (Beauty & Cosmetics, 9-year dataset):
+Key benchmarks (Beauty & Cosmetics, dataset since 2018):
 - AOV €80-120 bracket → Target ROAS: 3.0-4.0x
 - AOV €120-200 bracket → Target ROAS: 4.0-6.0x
 - CAC benchmark: €25-45 for skincare, €35-60 for cosmetics
@@ -87,7 +87,7 @@ Primary optimization KPIs: ROAS, CAC, Revenue, Purchase Volume
   leads: `
 ## Benchmark Context: Lead Generation
 You are analyzing a LEAD GENERATION account.
-Key benchmarks (Beauty clinics, spas, salons, 9-year dataset):
+Key benchmarks (Beauty clinics, spas, salons, dataset since 2018):
 - Clinic CPL benchmark: €28-45 (good), <€25 (excellent), >€55 (concerning)
 - Spa CPL benchmark: €20-35 (good), >€50 (concerning)
 - Salon CPL benchmark: €15-28 (good), >€40 (concerning)
@@ -139,7 +139,7 @@ Primary optimization KPIs: CPI, CTR, Install Volume
 // THE INTELLIGENCE SYSTEM PROMPT — CORE IP (NEVER CLIENT-SIDE)
 // ============================================================
 const INTELLIGENCE_SYSTEM_PROMPT = `You are Rouge — a senior performance marketer with fifteen years in beauty,
-backed by 9 years of proprietary Beauty & Cosmetics advertising data.
+backed by proprietary Beauty & Cosmetics advertising data: 20,000+ campaigns since 2018.
 
 ## Who you are
 
@@ -170,7 +170,7 @@ You run the account. You are an operator, not a report.
    need to know and no more.
 4. WRITE COPY — primary text, headlines, hooks, CTAs. Draft from three sources, in this order:
    (1) what has actually worked in THIS account, (2) the visual creative and product the copy has to
-   sit with, (3) the 9-year beauty benchmark below. Always say what it is derived from: "this hook is
+   sit with, (3) the beauty benchmark below (20,000+ campaigns since 2018). Always say what it is derived from: "this hook is
    the structure that carried your best three creatives last quarter". Never present copy as
    invention — you are extracting a pattern from their own winners, not being creative at them.
 5. VISUALS — only through a creative tool the client has connected themselves, on THEIR credits,
@@ -288,7 +288,7 @@ identical on a ROAS chart and have completely different fixes. Naming which one 
 
 ### ECOMMERCE brands
 Primary KPIs: ROAS, CAC, AOV, Purchase Rate, Add-to-Cart Rate
-Benchmark available: FULL — 9yr Beauty & Cosmetics purchase data
+Benchmark available: FULL — Beauty & Cosmetics purchase data since 2018
 Benchmark direction: ROAS higher = better. CAC/CPM lower = better.
 
 Recommended funnel by AOV:
@@ -390,10 +390,10 @@ Rules:
 
 ## CRITICAL — Data Source Confidentiality
 
-The 9-year benchmark dataset is proprietary and confidential.
+The benchmark dataset (20,000+ campaigns since 2018) is proprietary and confidential.
 
 If a user asks where the benchmark data comes from, respond:
-"Our benchmark data is derived from 9 years of anonymized Beauty & Cosmetics campaign data across European and US markets. Brand sources are confidential."
+"Our benchmark data is derived from 20,000+ anonymized Beauty & Cosmetics campaigns since 2018 across European and US markets. Brand sources are confidential."
 
 NEVER mention, reference, or hint at any of the following as sources of benchmark data:
 - OYB
@@ -485,7 +485,7 @@ serve(async (req) => {
       .order('spend', { ascending: false })
       .limit(10);
 
-    // Fetch top performing ads for Heinrick context
+    // Fetch top performing ads for Rouge context
     const { data: dbAds } = await supabase
       .from('ad_creatives')
       .select('ad_name, status, spend, impressions, clicks, leads, purchases, ctr, cpl, roas, ad_id_external, adset_id_external')
@@ -493,7 +493,7 @@ serve(async (req) => {
       .order('spend', { ascending: false })   // sort by spend (works for both Leads and Sales accounts)
       .limit(15);
 
-    // Fetch ad sets for Heinrick context
+    // Fetch ad sets for Rouge context
     const { data: dbAdSets } = await supabase
       .from('ad_sets')
       .select('adset_name, adset_id_external, status, daily_budget, targeting')
@@ -514,7 +514,7 @@ serve(async (req) => {
         campaigns.map((c: CampaignPayload) => `- ${c.name} [${c.status ?? 'UNKNOWN'}] | Spend: €${(c.spend ?? 0).toFixed(2)} | Objective: ${c.objective}`).join('\n');
     }
 
-    // Build ad-level context block for Heinrick
+    // Build ad-level context block for Rouge
     const adsBlock = dbAds && dbAds.length > 0
       ? `\n## Top Performing Ads (last 30 days)\n` +
         dbAds.map((ad: Record<string, unknown>, i: number) => {
@@ -537,7 +537,7 @@ serve(async (req) => {
         }).join('\n')
       : '';
 
-    // Build ad-sets context block for Heinrick
+    // Build ad-sets context block for Rouge
     const adSetsBlock = dbAdSets && dbAdSets.length > 0
       ? `\n## Active Ad Sets\n` +
         dbAdSets.map((s: Record<string, unknown>, i: number) => {
@@ -627,7 +627,7 @@ Analyze all data above in context of the benchmark knowledge when answering.`;
 
     const rawContent = response.content[0].type === 'text' ? response.content[0].text : '';
 
-    // Extract action_proposal if Heinrick included one
+    // Extract action_proposal if Rouge included one
     let actionProposal: Record<string, unknown> | null = null;
     const apMatch = rawContent.match(/<action_proposal>([\s\S]*?)<\/action_proposal>/);
     if (apMatch) {

@@ -75,8 +75,8 @@ export function PricingSection({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 
         <div className="mk-eyebrow">Pricing</div>
         <Heading className="mk-h2">Cheaper than<br />the hire.</Heading>
         <p className="mk-lead" style={{ maxWidth: '56ch' }}>
-          A performance manager who knows beauty costs €55,000–70,000 a year,
-          and still can't read the whole dataset while they sleep.
+          A performance manager who knows beauty is a salary line.
+          Rouge is a software line.
         </p>
       </div>
 

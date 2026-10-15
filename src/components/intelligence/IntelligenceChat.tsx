@@ -200,7 +200,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
     }
   };
 
-  // ── Execute a Heinrick-proposed action ────────────────────────────────────
+  // ── Execute a Rouge-proposed action ────────────────────────────────────
   const executeAction = async (proposal: ActionProposal, confirmed: boolean) => {
     setPendingAction(null);
     if (!confirmed) {
@@ -739,7 +739,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
         <div ref={bottomRef} />
       </div>
 
-      {/* ── Heinrick Action Proposal Card ── */}
+      {/* ── Rouge Action Proposal Card ── */}
       {pendingAction && (
         <div style={{
           margin: '0 14px 8px',
@@ -754,7 +754,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
             <Sparkles size={16} style={{ color: T.accent, marginTop: 2, flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: T.accent, marginBottom: 2, letterSpacing: '0.03em', textTransform: 'uppercase' }}>
-                Heinrick Proposes an Action
+                Rouge Proposes an Action
               </div>
               <div style={{ fontSize: 13, fontWeight: 600, color: T.textPrimary, marginBottom: 4 }}>
                 {pendingAction.label}

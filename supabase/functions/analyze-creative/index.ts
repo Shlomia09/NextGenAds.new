@@ -6,10 +6,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// ── 9-year benchmark copy data by conversion type ───────────────
+// ── Benchmark copy data by conversion type (dataset since 2018) ───────────────
 const COPY_BENCHMARKS: Record<string, string> = {
   leads: `
-COPY BENCHMARKS — Beauty Lead Generation (9-year dataset, 500+ accounts):
+COPY BENCHMARKS — Beauty Lead Generation (dataset since 2018, 500+ accounts):
 - Problem-first hooks: 67% better CTR than generic headlines
 - Number specificity increases CTR 23%: "Free consultation in 48h" > "Book now"
 - Local social proof outperforms global: "Milan women" > "thousands of women"
@@ -21,7 +21,7 @@ COPY BENCHMARKS — Beauty Lead Generation (9-year dataset, 500+ accounts):
 - Tone: Confident + empathetic. Avoid medical claims. Focus on transformation.
   `,
   ecommerce: `
-COPY BENCHMARKS — Beauty eCommerce (9-year dataset, 500+ accounts):
+COPY BENCHMARKS — Beauty eCommerce (dataset since 2018, 500+ accounts):
 - Benefit-led hooks outperform feature-led by 31% in beauty category
 - AOV mention in copy increases average order: "Free shipping over €60" (+18% AOV)
 - Risk reversal in body text reduces abandonment: "30-day return guarantee"
@@ -33,7 +33,7 @@ COPY BENCHMARKS — Beauty eCommerce (9-year dataset, 500+ accounts):
 - Results-forward for mass market: "Glowing skin in 14 days"
   `,
   bookings: `
-COPY BENCHMARKS — Beauty Service Bookings (9-year dataset):
+COPY BENCHMARKS — Beauty Service Bookings (dataset since 2018):
 - Outcome + timeline copy: "See results in one session" — 44% better conversion
 - Seasonal/contextual hooks: "Summer body ready?" outperforms in May-July
 - Free consultation offer: reduces CPL by 35% vs direct booking ask
@@ -81,7 +81,7 @@ ${brand.services ? `Services: ${brand.services.join(', ')}` : ''}
       : conversion_type === 'bookings' ? 'Direct Booking'
       : 'Lead Generation';
 
-    const prompt = `You are a direct response copywriter with 9 years of Beauty & Cosmetics advertising data.
+    const prompt = `You are a direct response copywriter with Beauty & Cosmetics advertising data from 20,000+ campaigns since 2018.
 
 ${is_video_thumbnail ? 'You are looking at a thumbnail frame from a video ad.' : 'You are analyzing an image for use as a Meta ad creative.'}
 

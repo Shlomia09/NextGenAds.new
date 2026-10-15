@@ -587,7 +587,7 @@ const CampaignChat: React.FC<{ campaign: Campaign; initialMsg?: string }> = ({ c
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
         <Sparkles size={12} style={{ color: 'var(--accent)' }} />
         <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)' }}>
-          Heinrick · Campaign Analysis
+          Rouge · Campaign Analysis
         </span>
       </div>
 

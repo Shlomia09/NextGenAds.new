@@ -84,6 +84,46 @@
 
 ---
 
+## מודל המוצר
+
+### 8. פער בין המודל המשווק לקוד — **חוסם שיווק**
+
+- **קבצים:** `supabase/functions/claude-chat/index.ts:166, 182, 281, 595-611`;
+  `supabase/functions/execute-recommendation/index.ts:48-53` (`auto_executable`);
+  `src/components/billing/UpgradeModal.tsx:16`; `supabase/functions/generate-recommendations/index.ts:227`
+- **מה קורה בפועל:** `CLAUDE.md` והלנדינג מתארים ניהול אוטונומי בתוך תקרה שהלקוח מגדיר:
+  עצירות, העברות תקציב ובדיקות קהל רצות לבד; רק מה שמוציא יותר מחכה ללקוח.
+  הקוד מיישם אישור לכל פעולה: הפרומט של הצ'אט אומר "Nothing executes on its own",
+  כל פעולה עוברת דרך `action_proposal` רק אחרי אישור מפורש, ו-`execute-recommendation`
+  מריץ רק המלצה מסומנת `auto_executable`. **אין בשום מקום מושג של ceiling.**
+  `UpgradeModal` ("Human-approved campaign execution") ו-`generate-recommendations`
+  ("generate… recommendations") ממסגרים את המוצר כהמלצות.
+- **למה זה חשוב:** הלנדינג מבטיח ללקוח משהו שהמוצר לא עושה. הפרומט של הצ'אט נשאר כמו שהוא
+  בכוונה — הוא מתאר נכון את מה שקורה היום, ולהגיד ל-Rouge שהיא פועלת לבד כשהיא לא יכולה
+  זה לשקר ללקוח. הפער נסגר מצד הקוד, לא מצד הפרומט.
+- **Owner branch:** מסלול אוטונומיה. **חוסם שיווק** — לא לפרסם את הלנדינג לפני שזה נסגר.
+
+### 9. Privacy ו-Terms לא קיימים כמסלולים
+
+- **קבצים:** `src/App.tsx` (אין route); הפוטר ב-`src/components/marketing/MarketingChrome.tsx`
+- **מה קורה בפועל:** אין עמודי Privacy ו-Terms. ה-catch-all מחזיר כל כתובת לא מוכרת לדף הבית,
+  ולכן הם לא קושרו מהפוטר.
+- **למה זה חשוב:** SaaS שגובה תשלום (Stripe checkout כבר מחובר ב-Pricing) צריך אותם —
+  משפטית, ול-Stripe ול-Meta App Review.
+- **Owner branch:** חוב פתוח.
+
+### 10. תוכנית Starter "צופה ומדווחת" — החלטת מוצר פתוחה
+
+- **קבצים:** `supabase/billing_schema.sql:27` (`starter` עם `can_execute = false`);
+  `src/components/marketing/PricingSection.tsx` (הכרטיס אומר "Watches and reports — does not act in the account")
+- **מה קורה בפועל:** Starter לא יכולה לבצע שום פעולה בחשבון. היא מערכת המלצות —
+  בדיוק מה שהמיצוב אומר שאף אחד לא משלם עליו, והיא סותרת את "Rouge runs the account".
+- **האפשרויות:** או ש-Starter מקבלת ביצוע בתקרה נמוכה, או שהיא לא צריכה להתקיים.
+  **לא הוחלט.** דורש החלטה משותפת, כולל שלומי — לא להחליט לבד בקוד.
+- **Owner branch:** החלטת מוצר.
+
+---
+
 ## כלל
 
 **כל מספר שמוצג ללקוח חייב מקור.** אם אין מקור — לנסח בלי מספר.

@@ -192,7 +192,7 @@ Launching a new campaign.
 Scaling past your ceiling.
 Anything that spends more than yesterday.
 
-שורת סיכום מתחת (--t-h3, max-width 48ch):
+שורת סיכום מתחת (--t-h2 — 26px, כדי ש-"more" באדום יעמוד בכלל ה-24px; max-width 48ch):
 Rouge can move your money. It can't spend more of it without you.
 Every action is watched for 48 hours after it runs.
 ```
@@ -238,8 +238,8 @@ Cheaper than
 the hire.
 
 SUB (--t-h3 במשקל 400, --text-2)
-A performance manager who knows beauty costs €55,000–70,000 a year,
-and still can't read the whole dataset while they sleep.
+A performance manager who knows beauty is a salary line.
+Rouge is a software line.
 ```
 
 **המחירים והתוכניות מ-`src/hooks/usePlan.ts` בלבד.** אל תמציא ואל תשנה.
@@ -278,7 +278,7 @@ grep -nE "#[0-9A-Fa-f]{6}" src/pages/Landing.tsx src/pages/Pricing.tsx
 
 # אין מספר שאי אפשר לאמת
 grep -nE "[0-9]+ days?|19|day 4|847|9 years" src/pages/Landing.tsx src/pages/Pricing.tsx
-  → רק 20,000 / 2018 / מחירים / 30-day / 48 hours / €55,000–70,000
+  → רק 20,000 / 2018 / מחירים / 30-day / 48 hours
 
 # CTA ושפה
 grep -n "Start free\|Try free\|free trial" src/pages/Landing.tsx src/pages/Pricing.tsx

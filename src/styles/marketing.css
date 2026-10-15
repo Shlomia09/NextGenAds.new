@@ -147,7 +147,7 @@
 .mk-col + .mk-col { border-left: 1px solid var(--border); }
 .mk-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 .mk-col li { color: var(--text); font-size: 15px; line-height: 1.45; padding-top: 12px; border-top: 1px solid var(--border); }
-.mk-summary { margin-top: 40px; max-width: 48ch; font-family: var(--font-display); font-size: var(--t-h3); font-weight: 700; letter-spacing: var(--track-h3); line-height: 1.35; }
+.mk-summary { margin-top: 40px; max-width: 48ch; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); }
 .mk-summary-sub { margin-top: 10px; color: var(--text-2); }
 @media (max-width: 720px) {
   .mk-cols { grid-template-columns: 1fr; }
