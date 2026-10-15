@@ -4,6 +4,7 @@ import { X, CreditCard, RefreshCw, Sparkles, AlertTriangle, CheckCircle, Bell } 
 import { getUserNotifications } from '../../lib/supabase';
 import { useSubscription } from '../../hooks/useSubscription';
 import { useAuth } from '../../hooks/useAuth';
+import { solid } from '../../lib/cssToken';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface NotifItem {
@@ -243,8 +244,8 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
               width:          30,
               height:         30,
               borderRadius:    8,
-              background:     `${n.accentColor}15`,
-              border:         `0.5px solid ${n.accentColor}30`,
+              background:     `${solid(n.accentColor)}15`,
+              border:         `0.5px solid ${solid(n.accentColor)}30`,
               display:        'flex',
               alignItems:     'center',
               justifyContent: 'center',

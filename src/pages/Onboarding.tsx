@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { getAovBracket, MARKETS, CATEGORIES, BUSINESS_TYPE_LABELS, LEFT_PANEL_COPY } from '../lib/benchmarks';
 import type { BusinessType, BusinessGoal } from '../types';
 import { RougeLogo } from '../components/brand/RougeLogo';
+import { solid } from '../lib/cssToken';
 
 const STEPS = ['Brand Basics', 'Business Type', 'Business Details', 'Stage & Launch'];
 
@@ -525,7 +526,7 @@ const Onboarding: React.FC = () => {
                 ] as const).map(({ value, label, desc, dot }) => (
                   <button key={value}
                     className={`ob-stage-btn ${form.stage === value ? 'selected' : ''}`}
-                    style={form.stage === value ? { borderColor: dot, background: `${dot}0A` } : {}}
+                    style={form.stage === value ? { borderColor: dot, background: `${solid(dot)}0A` } : {}}
                     onClick={() => setForm({ ...form, stage: value })}>
                     <div className="ob-stage-dot" style={{ background: dot }} />
                     <div>

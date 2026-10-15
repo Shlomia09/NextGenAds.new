@@ -1,5 +1,6 @@
 import React from 'react';
 import type { TrueRoasResult } from '../../lib/trueRoas';
+import { solid } from '../../lib/cssToken';
 
 interface TrueRoasCardProps {
   data: TrueRoasResult;
@@ -131,7 +132,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
         <div style={{
           padding: '16px 18px',
           borderRight: '0.5px solid var(--border)',
-          background: data.true_roas > 0 ? `${roasColor}0D` : 'transparent',
+          background: data.true_roas > 0 ? `${solid(roasColor)}0D` : 'transparent',
         }}>
           <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>
             True ROAS
@@ -148,7 +149,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
         {/* Panel 3: Attribution Gap */}
         <div style={{
           padding: '16px 18px',
-          background: data.gap_pct > 0 ? `${gapColor}0D` : 'transparent',
+          background: data.gap_pct > 0 ? `${solid(gapColor)}0D` : 'transparent',
         }}>
           <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>
             Attribution Gap
