@@ -124,6 +124,33 @@
 
 ---
 
+## טענות
+
+### 11. טענות ביצועים ללא מקור בפרומטים, שמגיעות ללקוח דרך המודל — **חוסם שיווק**
+
+- **קבצים:**
+  - `supabase/functions/analyze-creative/index.ts:13, 14, 25, 26, 37, 39, 40` — שבע טענות העלאה באחוזים
+    ("67% better CTR", "increases CTR 23%", "outperform… by 31%", "+18% AOV", "44% better conversion",
+    "reduces CPL by 35%", "28% higher CTR")
+  - `supabase/functions/generate-recommendations/index.ts:49` ("convert 40% better"),
+    `supabase/functions/claude-chat/index.ts:318` ("by ~40%"), `supabase/functions/claude-chat/index.ts:97`
+    ו-`src/lib/conversionConfig.ts:195` ("20-30% lower quality")
+  - `supabase/functions/generate-recommendations/index.ts:269` — שדה `impact`
+  - בממשק: `src/components/dashboard/SpaDashboard.tsx:176` ("Gift voucher CTR peaks +320% in Q4"),
+    `src/components/ui/TrueRoasCard.tsx:166` ("Industry: 25–35%"), `src/pages/DemoDashboard.tsx:61` ("15-25%")
+- **מה קורה בפועל:** הפרומטים מכילים טענות העלאה מספריות בלי מקור. המודל מצטט אותן ללקוח
+  כממצא, וחלקן מוצגות ישירות בממשק.
+  שדה `impact` (`"Expected improvement (e.g., CPL -20% in 7 days)"`) מבקש מהמודל תחזית מספרית
+  בלי בסיס, והיא מוצגת ללקוח כנתון. **זו ההוראה המסוכנת מכולן: היא לא מצטטת מספר שגוי, היא מייצרת אחד.**
+- **הכרעה נדרשת לכל טענה:** ניתנת לחישוב מהדאטהסט → לחשב ולצטט מהמקור.
+  לא ניתנת → להוריד את המספר ולהשאיר ניסוח כיווני.
+  **שדה `impact` יורד ללא קשר** — אסור לבקש מהמודל תחזית מספרית.
+- **לאישור:** הערכים שסווגו כדאטת בנצ'מרק (ממוצעי CTR, שיעורי הגעה 40–60% וכו', ב-`claude-chat`,
+  `generate-recommendations` ו-`conversionConfig.ts`) — שלומי צריך לאשר שהם באמת מהדאטהסט.
+- **Owner branch:** מסלול טענות. **חוסם שיווק.**
+
+---
+
 ## כלל
 
 **כל מספר שמוצג ללקוח חייב מקור.** אם אין מקור — לנסח בלי מספר.
