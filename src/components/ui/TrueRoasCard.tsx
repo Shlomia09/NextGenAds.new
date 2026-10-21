@@ -154,7 +154,7 @@ const TrueRoasCard: React.FC<TrueRoasCardProps> = ({ data, loading }) => {
           <div style={{ fontFamily: font, fontSize: 9, letterSpacing: '0.18em', color: 'var(--text-3)', textTransform: 'uppercase', marginBottom: 6 }}>
             Attribution Gap
           </div>
-          <div style={{ fontFamily: mono, fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 600, color: gapColor, lineHeight: 1.1, marginBottom: 6 }}>
+          <div style={{ fontFamily: mono, fontSize: 'var(--t-metric-sm)', letterSpacing: 'var(--track-metric)', fontWeight: 600, color: data.gap_pct > 0 ? gapColor : 'var(--text-3)', lineHeight: 1.1, marginBottom: 6 }}>
             {data.gap_pct > 0 ? `-${data.gap_pct.toFixed(0)}%` : '—'}
           </div>
           <div style={{ fontFamily: font, fontSize: 10, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.4 }}>

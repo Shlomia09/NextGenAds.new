@@ -188,6 +188,8 @@
 .mk-plan li { font-size: 14px; color: var(--text); padding-left: 18px; position: relative; }
 .mk-plan li::before { content: '—'; position: absolute; left: 0; color: var(--text-3); }
 .mk-plan .btn { justify-content: center; width: 100%; }
+/* Checkout failure: an alert state, so red as a 2px rule — the text itself stays --text (small) */
+.mk-plan-error { margin: 0; padding: 8px 0 8px 12px; border-left: 2px solid var(--accent); color: var(--text); font-size: 13px; line-height: 1.4; }
 .mk-guarantee { margin-top: 32px; max-width: 60ch; color: var(--text-2); }
 .mk-close { margin-top: 32px; }
 @media (max-width: 900px) { .mk-plans { grid-template-columns: 1fr; max-width: 460px; } }

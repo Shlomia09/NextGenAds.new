@@ -436,10 +436,10 @@ const DemoDashboard: React.FC = () => {
                         </td>
                         <td><span className={`badge ${c.status === 'ACTIVE' ? 'badge-success' : 'badge-high'}`}>{c.status}</span></td>
                         <td className="numeric">€{c.spend.toLocaleString()}</td>
-                        <td className="numeric" style={{ color: roasColor }}>{c.roas > 0 ? `${c.roas}x` : '—'}</td>
+                        <td className="numeric" style={{ color: c.roas > 0 ? roasColor : 'var(--text-3)' }}>{c.roas > 0 ? `${c.roas}x` : '—'}</td>
                         <td className="numeric">{c.impressions.toLocaleString()}</td>
                         <td className="numeric">{c.purchases > 0 ? c.purchases : '—'}</td>
-                        <td className="numeric" style={{ color: 'var(--success)' }}>{c.revenue > 0 ? `€${c.revenue.toLocaleString()}` : '—'}</td>
+                        <td className="numeric" style={{ color: c.revenue > 0 ? 'var(--success)' : 'var(--text-3)' }}>{c.revenue > 0 ? `€${c.revenue.toLocaleString()}` : '—'}</td>
                       </tr>
                     );
                   })}

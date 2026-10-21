@@ -560,7 +560,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
                       ? 'var(--warning)'
                       : c.cpl > 45
                       ? 'var(--danger)'
-                      : 'var(--text-secondary)';
+                      : 'var(--text-3)';                       // no CPL yet: absence of data, not a state
                   return (
                     <tr key={c.id}>
                       <td>
@@ -595,7 +595,7 @@ const SpaDashboard: React.FC<SpaDashboardProps> = ({
                         {c.cpl > 0 ? `${currency}${c.cpl.toFixed(2)}` : '—'}
                       </td>
                       <td className="numeric">{c.bookings > 0 ? c.bookings : '—'}</td>
-                      <td className="numeric" style={{ color: 'var(--success)' }}>
+                      <td className="numeric" style={{ color: c.revenue > 0 ? 'var(--success)' : 'var(--text-3)' }}>
                         {c.revenue > 0 ? `${currency}${c.revenue.toLocaleString()}` : '—'}
                       </td>
                     </tr>

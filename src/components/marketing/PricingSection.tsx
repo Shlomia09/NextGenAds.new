@@ -50,6 +50,7 @@ export function PricingSection({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 
   const { user } = useAuth();
   const [cycle, setCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [loading, setLoading] = useState<string | null>(null);
+  const [failed, setFailed] = useState<string | null>(null);   // plan id whose checkout failed
 
   // Annual saving, derived from the prices themselves (not a separate claim)
   const s = PLAN_META.starter;
@@ -58,12 +59,16 @@ export function PricingSection({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 
   const choose = async (id: string) => {
     if (!user) { navigate('/login'); return; }
     setLoading(id);
+    setFailed(null);
     try {
       const { url } = await createCheckoutSession(id, cycle);
       window.location.href = url;
-    } catch {
+    } catch (err) {
       setLoading(null);
-      navigate('/login');
+      // An expired session is still a signed-out user; anything else stays on the page.
+      if (err instanceof Error && err.message === 'Not authenticated') { navigate('/login'); return; }
+      console.error('[pricing] checkout failed', { plan: id, cycle, err });
+      setFailed(id);
     }
   };
 
@@ -109,6 +114,11 @@ export function PricingSection({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 
               >
                 {loading === p.id ? 'Opening checkout…' : 'Get started'}
               </button>
+              {failed === p.id && (
+                <p className="mk-plan-error" role="alert">
+                  Checkout isn't available yet — we'll be in touch.
+                </p>
+              )}
             </div>
           );
         })}
