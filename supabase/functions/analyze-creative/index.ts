@@ -81,7 +81,7 @@ ${brand.services ? `Services: ${brand.services.join(', ')}` : ''}
       : conversion_type === 'bookings' ? 'Direct Booking'
       : 'Lead Generation';
 
-    const prompt = `You are a direct response copywriter with Beauty & Cosmetics advertising data from 20,000+ campaigns since 2018.
+    const prompt = `You are a direct response copywriter with Beauty & Cosmetics advertising data from 25,620 campaigns since 2018.
 
 ${is_video_thumbnail ? 'You are looking at a thumbnail frame from a video ad.' : 'You are analyzing an image for use as a Meta ad creative.'}
 

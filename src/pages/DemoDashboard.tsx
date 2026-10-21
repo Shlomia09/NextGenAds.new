@@ -232,7 +232,7 @@ const DemoDashboard: React.FC = () => {
                 </div>
               </div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-hint)', background: 'var(--bg-secondary)', border: '0.5px solid var(--border-light)', borderRadius: 2, padding: '4px 8px' }}>
-                20,000+ beauty campaigns · AOV €80–150 · since 2018
+                25,620 beauty campaigns · AOV €80–150 · since 2018
               </div>
               {MOCK_BENCHMARKS.map(({ label, your, bench, unit, better }) => {
                 const diff = ((your - bench) / bench * 100);

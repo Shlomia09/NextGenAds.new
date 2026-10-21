@@ -154,7 +154,7 @@ const EcommerceDashboard: React.FC<EcommerceDashboardProps> = ({
 
           {/* Source tag */}
           <div className="bench-source-tag">
-            20,000+ beauty campaigns · {bracket.label} · since 2018
+            25,620 beauty campaigns · {bracket.label} · since 2018
           </div>
 
           {/* Metric cards: ROAS / CPM / CAC / CTR / CPC */}

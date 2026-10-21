@@ -224,7 +224,7 @@ serve(async (req) => {
     }).join('\n');
 
     // ── AI Optimization Prompt ───────────────────────────────────────────
-    const prompt = `You are an expert Meta Ads strategist with beauty industry data from 20,000+ campaigns since 2018. Analyze these campaigns and generate 4-6 specific, actionable optimization recommendations.
+    const prompt = `You are an expert Meta Ads strategist with beauty industry data from 25,620 campaigns since 2018. Analyze these campaigns and generate 4-6 specific, actionable optimization recommendations.
 
 BRAND:
 - Name: ${brand.name}
@@ -251,7 +251,7 @@ ${totalLeads === 0 && totalRevenue === 0 ? (() => {
 CAMPAIGN BREAKDOWN:
 ${campaignDetails || 'No campaign data available yet.'}
 
-INDUSTRY BENCHMARKS (20,000+ campaigns since 2018):
+INDUSTRY BENCHMARKS (25,620 campaigns since 2018):
 ${benchmarkData}
 
 Generate 4-6 recommendations as a JSON array. Each must be SPECIFIC to their actual data above (mention actual numbers). Include the action_type for automated execution:

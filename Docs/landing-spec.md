@@ -28,7 +28,7 @@
 
 | מספר | איפה | מקור |
 |---|---|---|
-| **20,000+** קמפיינים | פס ההוכחה | הדאטהסט |
+| **25,620** קמפיינים | פס ההוכחה | הדאטהסט |
 | **2018** תחילת הדאטה | פס ההוכחה | הדאטהסט |
 | **מחירי התוכניות** | סעיף 7 | `src/hooks/usePlan.ts` בלבד |
 
@@ -98,7 +98,7 @@ CTA משני   See how it works     (מסגרת --border-control, טקסט --tex
 התוויות `--t-label`, ‏`--text-2`. **בלי אדום.**
 
 ```
-20,000+    Beauty campaigns analysed
+25,620    Beauty campaigns analysed
 2018       First campaign in the dataset
 1          Vertical. Nothing else.
 ```
@@ -278,7 +278,7 @@ grep -nE "#[0-9A-Fa-f]{6}" src/pages/Landing.tsx src/pages/Pricing.tsx
 
 # אין מספר שאי אפשר לאמת
 grep -nE "[0-9]+ days?|19|day 4|847|9 years" src/pages/Landing.tsx src/pages/Pricing.tsx
-  → רק 20,000 / 2018 / מחירים / 30-day / 48 hours
+  → רק 25,620 / 2018 / מחירים / 30-day / 48 hours
 
 # CTA ושפה
 grep -n "Start free\|Try free\|free trial" src/pages/Landing.tsx src/pages/Pricing.tsx
@@ -309,7 +309,7 @@ landing(bone): rebuild landing and pricing on the bone ground
   trust mechanism, brand safety, pricing
 - hero asks the half-life question instead of asserting a fixed figure
   that varies per account and invites refutation
-- only verifiable numbers on the page: 20K+ campaigns, since 2018, prices
+- only verifiable numbers on the page: 25,620 campaigns, since 2018, prices
 - removes local .btn-primary overrides in favour of the global fill
 - all colour via tokens; flat throughout
 ```

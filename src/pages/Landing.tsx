@@ -8,7 +8,7 @@ import { PricingSection } from '../components/marketing/PricingSection';
 /* ─────────────────────────────────────────────────────────────
    Rouge — landing. Spec: Docs/landing-spec.md (v2).
    • Always Bone: the root pins data-theme="light".
-   • No number without a source: only 20,000+, 2018 and the plan prices.
+   • No number without a source: only 25,620, 2018 and the plan prices.
    • CTA is always "Get started". 30-day money-back, nothing else.
    ───────────────────────────────────────────────────────────── */
 
@@ -100,7 +100,7 @@ export default function Landing() {
       <div className="mk-proof">
         <div className="mk-wrap mk-proof-inner">
           <div className="mk-proof-item">
-            <span className="mk-proof-num">20,000+</span>
+            <span className="mk-proof-num">25,620</span>
             <span className="mk-proof-lbl">Beauty campaigns analysed</span>
           </div>
           <div className="mk-proof-item">

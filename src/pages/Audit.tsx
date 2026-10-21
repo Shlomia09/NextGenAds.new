@@ -130,7 +130,7 @@ const Audit: React.FC = () => {
             </h1>
             <p style={{ fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.7, marginBottom: 36 }}>
               Get a one-time free benchmark audit comparing your Meta Ads performance<br />
-              against 20,000+ Beauty &amp; Cosmetics campaigns. No credit card required.
+              against 25,620 Beauty &amp; Cosmetics campaigns. No credit card required.
             </p>
 
             {/* 3 steps */}
@@ -226,7 +226,7 @@ const Audit: React.FC = () => {
                 <span style={{ display: 'block', width: 16, height: 0.5, background: 'var(--surface)' }} />
               </div>
               <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, lineHeight: 1.2, marginBottom: 8, letterSpacing: '-0.02em' }}>
-                Your Meta Ads vs <em style={{ color: 'var(--accent)' }}>20,000+ beauty campaigns</em>
+                Your Meta Ads vs <em style={{ color: 'var(--accent)' }}>25,620 beauty campaigns</em>
               </h1>
               <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: 'var(--text-2)' }}>
                 Based on an anonymized dataset · EU &amp; US markets · since 2018
@@ -265,7 +265,7 @@ const Audit: React.FC = () => {
               <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 12 }}>
                 What this audit includes
               </div>
-              {['ROAS vs 20,000+ beauty campaigns', 'CPM efficiency gap', 'CAC vs industry average', 'CTR performance signal'].map(item => (
+              {['ROAS vs 25,620 beauty campaigns', 'CPM efficiency gap', 'CAC vs industry average', 'CTR performance signal'].map(item => (
                 <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <CheckCircle size={13} color="var(--green)" strokeWidth={1.5} />
                   <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: 'var(--text)' }}>{item}</span>

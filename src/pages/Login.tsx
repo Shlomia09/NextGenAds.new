@@ -61,7 +61,7 @@ const Login: React.FC = () => {
 
           <div className="login-proof-list">
             {[
-              { stat: '20K+', label: 'Beauty campaigns analysed' },
+              { stat: '25,620', label: 'Beauty campaigns analysed' },
               { stat: '2018', label: 'First campaign in the dataset' },
               { stat: '€100+', label: 'Avg AOV served' },
             ].map(({ stat, label }) => (
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
           </div>
 
           <div className="login-quote">
-            Since 2018. 20,000+ beauty campaigns. One number that matters.
+            Since 2018. 25,620 beauty campaigns. One number that matters.
           </div>
         </div>
       </div>

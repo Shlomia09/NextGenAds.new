@@ -50,7 +50,7 @@ const BenchmarkAvailabilityBadge: React.FC<Props> = ({ availability, aovLabel, m
           color: isFull ? 'rgba(16,185,129,0.7)' : 'rgba(245,158,11,0.6)',
         }}>
           {isFull
-            ? `20,000+ beauty campaigns · ${aovLabel ?? 'AOV calibrated'} · ${markets?.join('/') ?? 'EU'} · since 2018`
+            ? `25,620 beauty campaigns · ${aovLabel ?? 'AOV calibrated'} · ${markets?.join('/') ?? 'EU'} · since 2018`
             : 'CPM/CTR data available · Purchase benchmarks: N/A'}
         </div>
       </div>
