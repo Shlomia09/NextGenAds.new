@@ -533,7 +533,7 @@ const Dashboard: React.FC = () => {
                   ].filter(m => !m.hide).map(m => (
                     <div key={m.label} style={{ background: 'var(--surface-2)', borderRadius: 10, padding: '10px 12px', border: '1px solid var(--border-soft)' }}>
                       <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>{m.label}</div>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: m.color, lineHeight: 1 }}>{m.value}</div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--t-metric)', letterSpacing: 'var(--track-metric)', fontWeight: 500, color: m.value === '—' ? 'var(--text-3)' : m.color, lineHeight: 1 }}>{m.value}</div>
                     </div>
                   ))}
                 </div>
@@ -751,7 +751,7 @@ const Dashboard: React.FC = () => {
                       ].map(m => (
                         <div key={m.label} style={{ background: 'var(--surface-2)', borderRadius: 9, padding: '9px 10px', border: '1px solid var(--border-soft)' }}>
                           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 3 }}>{m.label}</div>
-                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 500, color: m.color }}>{m.value}</div>
+                          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 500, color: m.value === '—' ? 'var(--text-3)' : m.color }}>{m.value}</div>
                         </div>
                       ))}
                     </div>

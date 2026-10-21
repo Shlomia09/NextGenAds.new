@@ -904,6 +904,7 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
                   );
                   // Color: green for leads/purchases, blue for reach/traffic, champagne for ATC
                   const valueColor = (() => {
+                    if (!(m.value > 0)) return 'var(--text-3)';   // missing value: absence, not a state
                     if (m.key === 'leads' || m.key === 'purchases') return m.value > 0 ? 'var(--green)' : 'var(--text-3)';
                     if (m.key === 'reach' || m.key === 'page_views' || m.key === 'clicks') return 'var(--blue)';
                     if (m.key === 'atc') return 'var(--champagne)';

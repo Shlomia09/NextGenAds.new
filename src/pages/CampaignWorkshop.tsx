@@ -1508,7 +1508,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
               ].map(m => (
                 <div key={m.l}>
                   <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.6px', color: 'var(--text-3)' }}>{m.l}</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 500, color: m.accent ? 'var(--accent)' : 'var(--text)', marginTop: 2 }}>{m.v}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 500, color: m.v === '—' ? 'var(--text-3)' : m.accent ? 'var(--accent)' : 'var(--text)', marginTop: 2 }}>{m.v}</div>
                 </div>
               ))}
             </div>
