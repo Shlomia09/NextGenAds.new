@@ -15,6 +15,7 @@ const ThemeContext = createContext<ThemeContextValue>({
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => {
     try {
+      /* legacy key name from NextAdsGen; renaming would reset user prefs */
       const saved = localStorage.getItem('nag-theme') as Theme | null;
       return saved === 'light' ? 'light' : 'dark'; // default: dark
     } catch {

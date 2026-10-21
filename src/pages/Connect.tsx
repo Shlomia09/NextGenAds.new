@@ -7,10 +7,10 @@ class ConnectErrorBoundary extends Component<{ children: React.ReactNode }, { er
   render() {
     if (this.state.error) {
       return (
-        <div style={{ minHeight: '100vh', background: '#0F0A07', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
           <div style={{ background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: 24, maxWidth: 600, width: '100%' }}>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#EF4444', marginBottom: 8 }}>RENDER ERROR</div>
-            <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 13, color: '#F5E6D8', wordBreak: 'break-all' }}>{this.state.error}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--red)', marginBottom: 8 }}>RENDER ERROR</div>
+            <div style={{ fontFamily: 'var(--font-ui)', fontSize: 13, color: 'var(--text)', wordBreak: 'break-all' }}>{this.state.error}</div>
           </div>
         </div>
       );
@@ -35,7 +35,7 @@ const MetaLogo = () => (
 );
 
 const GoogleAdsLogo = () => (
-  <div style={{ width: 40, height: 40, background: '#FFFFFF', border: '0.5px solid #E8E4DF', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+  <div style={{ width: 40, height: 40, background: 'var(--surface)', border: '0.5px solid var(--border)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
     <svg width="22" height="22" viewBox="0 0 48 48">
       <path fill="#4285F4" d="M45 20H25v8h11.3C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-8 20-20 0-1.3-.2-2.7-.5-4z"/>
       <path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3.1 0 5.9 1.1 8.1 2.9l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/>
@@ -256,7 +256,7 @@ const Connect: React.FC = () => {
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
         }}>
           <div style={{
-            background: '#1C1208', border: '0.5px solid #2a1a0e',
+            background: 'var(--surface)', border: '0.5px solid var(--border)',
             borderRadius: 8, padding: '32px 36px',
             maxWidth: 440, width: '100%',
             display: 'flex', flexDirection: 'column', gap: 20,
@@ -268,13 +268,13 @@ const Connect: React.FC = () => {
                 border: '0.5px solid rgba(239,68,68,0.25)', borderRadius: '50%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <Link2Off size={18} color="#EF4444" strokeWidth={1.5} />
+                <Link2Off size={18} color="var(--red)" strokeWidth={1.5} />
               </div>
               <div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 600, color: '#F5E6D8', marginBottom: 3 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 3 }}>
                   Disconnect account?
                 </div>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#4a2e1e' }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-3)' }}>
                   {disconnectTarget.name}
                 </div>
               </div>
@@ -288,14 +288,14 @@ const Connect: React.FC = () => {
                 display: 'flex', alignItems: 'flex-start', gap: 10,
               }}>
                 <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
-                <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 11, fontWeight: 300, color: '#F59E0B', lineHeight: 1.6, margin: 0 }}>
+                <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--amber)', lineHeight: 1.6, margin: 0 }}>
                   <strong style={{ fontWeight: 600 }}>{disconnectTarget.brandName}</strong> will be left with no
                   ad account after this. You can re-link an account later from the Brands page.
                 </p>
               </div>
             )}
 
-            <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: '#8B6050', lineHeight: 1.65, margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: 'var(--text-2)', lineHeight: 1.65, margin: 0 }}>
               Do you want to keep the campaign data already synced to Rouge, or delete everything?
             </p>
 
@@ -307,17 +307,17 @@ const Connect: React.FC = () => {
                 disabled={disconnecting}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10,
-                  background: 'rgba(196,131,106,0.08)', border: '0.5px solid rgba(196,131,106,0.3)',
+                  background: 'var(--accent-soft)', border: '0.5px solid var(--accent-soft)',
                   borderRadius: 5, padding: '13px 16px', cursor: 'pointer',
                   textAlign: 'left', width: '100%', transition: 'background 0.15s',
                 }}
               >
-                <Link2Off size={16} color="#C4836A" strokeWidth={1.5} style={{ flexShrink: 0 }} />
+                <Link2Off size={16} color="var(--accent)" strokeWidth={1.5} style={{ flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 500, color: '#C4836A', marginBottom: 2 }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>
                     Disconnect only
                   </div>
-                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, fontWeight: 300, color: '#8B6050' }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 300, color: 'var(--text-2)' }}>
                     Keep all campaign data — just remove the connection
                   </div>
                 </div>
@@ -334,12 +334,12 @@ const Connect: React.FC = () => {
                   textAlign: 'left', width: '100%', transition: 'background 0.15s',
                 }}
               >
-                <Trash2 size={16} color="#EF4444" strokeWidth={1.5} style={{ flexShrink: 0 }} />
+                <Trash2 size={16} color="var(--red)" strokeWidth={1.5} style={{ flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 500, color: '#EF4444', marginBottom: 2 }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--red)', marginBottom: 2 }}>
                     Delete all data
                   </div>
-                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, fontWeight: 300, color: '#8B6050' }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 300, color: 'var(--text-2)' }}>
                     Remove connection + delete all synced campaigns
                   </div>
                 </div>
@@ -351,8 +351,8 @@ const Connect: React.FC = () => {
               onClick={() => setDisconnectTarget(null)}
               disabled={disconnecting}
               style={{
-                background: 'none', border: 'none', fontFamily: "'Outfit', sans-serif",
-                fontSize: 10, color: '#4a2e1e', cursor: 'pointer', alignSelf: 'center',
+                background: 'none', border: 'none', fontFamily: 'var(--font-ui)',
+                fontSize: 10, color: 'var(--text-3)', cursor: 'pointer', alignSelf: 'center',
                 letterSpacing: '0.06em',
               }}
             >
@@ -376,7 +376,7 @@ const Connect: React.FC = () => {
           background: 'rgba(16,185,129,0.08)', border: '0.5px solid rgba(16,185,129,0.3)',
           borderRadius: 6, padding: '12px 16px', marginBottom: 16,
           display: 'flex', alignItems: 'center', gap: 10,
-          fontFamily: "'Outfit', sans-serif", fontSize: 12, color: '#10B981',
+          fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--green)',
         }}>
           <CheckCircle size={14} strokeWidth={1.5} />
           Meta Ads connected successfully. Click <strong style={{ margin: '0 4px' }}>Sync Now</strong> to pull your campaigns.
@@ -387,7 +387,7 @@ const Connect: React.FC = () => {
           background: 'rgba(16,185,129,0.08)', border: '0.5px solid rgba(16,185,129,0.3)',
           borderRadius: 6, padding: '12px 16px', marginBottom: 16,
           display: 'flex', alignItems: 'center', gap: 10,
-          fontFamily: "'Outfit', sans-serif", fontSize: 12, color: '#10B981',
+          fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--green)',
         }}>
           <CheckCircle size={14} strokeWidth={1.5} />
           🛍️ Shopify connected successfully! Click <strong style={{ margin: '0 4px' }}>Sync Now</strong> to import your orders.
@@ -398,7 +398,7 @@ const Connect: React.FC = () => {
           background: 'rgba(239,68,68,0.08)', border: '0.5px solid rgba(239,68,68,0.3)',
           borderRadius: 6, padding: '12px 16px', marginBottom: 16,
           display: 'flex', alignItems: 'center', gap: 10,
-          fontFamily: "'Outfit', sans-serif", fontSize: 12, color: '#EF4444',
+          fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--red)',
         }}>
           <AlertCircle size={14} strokeWidth={1.5} />
           Connection error: {errorParam.replace(/_/g, ' ')}. Please try again.
@@ -430,8 +430,8 @@ const Connect: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {metaAccounts.map(account => (
                   <div key={account.id} style={{
-                    background: 'var(--app-bg, #0F0A07)',
-                    border: '0.5px solid var(--app-border, #2a1a0e)',
+                    background: 'var(--app-bg)',
+                    border: '0.5px solid var(--app-border)',
                     borderRadius: 5, padding: '12px 14px',
                     display: 'flex', flexDirection: 'column', gap: 10,
                   }}>
@@ -442,7 +442,7 @@ const Connect: React.FC = () => {
                         <div className="conn-account-id">ID: {account.account_id}</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
                           <div className="live-dot" />
-                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--success, #10B981)' }}>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--success)' }}>
                             Connected {new Date(account.connected_at).toLocaleDateString()}
                           </span>
                         </div>
@@ -452,10 +452,10 @@ const Connect: React.FC = () => {
                         onClick={() => buildDisconnectTarget(account)}
                         title="Disconnect this account"
                         style={{
-                          background: 'none', border: '0.5px solid #2a1a0e',
+                          background: 'none', border: '0.5px solid var(--border)',
                           borderRadius: 3, padding: '3px 8px',
-                          fontFamily: "'Outfit', sans-serif", fontSize: 9,
-                          color: '#8B6050', cursor: 'pointer', flexShrink: 0,
+                          fontFamily: 'var(--font-ui)', fontSize: 9,
+                          color: 'var(--text-2)', cursor: 'pointer', flexShrink: 0,
                           letterSpacing: '0.06em',
                         }}
                       >
@@ -465,8 +465,8 @@ const Connect: React.FC = () => {
 
                     {/* ── Brand assignment row ── */}
                     <div style={{
-                      background: 'rgba(196,131,106,0.04)',
-                      border: '0.5px solid rgba(196,131,106,0.15)',
+                      background: 'var(--accent-soft)',
+                      border: '0.5px solid var(--accent-soft)',
                       borderRadius: 4, padding: '8px 10px',
                       display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
                     }}>
@@ -511,18 +511,18 @@ const Connect: React.FC = () => {
                               {brands.find(b => b.id === (account as any).brand_id)?.name ?? 'Unknown brand'}
                             </span>
                           ) : (
-                            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: '#F59E0B', flex: 1, display: 'flex', alignItems: 'center', gap: 5 }}>
+                            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 12, color: 'var(--amber)', flex: 1, display: 'flex', alignItems: 'center', gap: 5 }}>
                               ⚠ Not linked to a brand
                             </span>
                           )}
                           <button
                             onClick={() => setRelinkingId(account.id)}
                             style={{
-                              background: 'rgba(196,131,106,0.1)',
-                              border: '0.5px solid rgba(196,131,106,0.3)',
+                              background: 'var(--accent-soft)',
+                              border: '0.5px solid var(--accent-soft)',
                               borderRadius: 3, padding: '3px 8px',
                               fontFamily: 'var(--font-sans)', fontSize: 10,
-                              color: 'var(--accent)', cursor: 'pointer', flexShrink: 0,
+                              color: 'var(--text)', cursor: 'pointer', flexShrink: 0,
                             }}
                           >
                             Change brand
@@ -532,19 +532,19 @@ const Connect: React.FC = () => {
 
                       {/* Success flash */}
                       {relinkSuccess === account.id && (
-                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: '#10B981', marginLeft: 4 }}>✓ Saved</span>
+                        <span style={{ fontFamily: 'var(--font-sans)', fontSize: 10, color: 'var(--green)', marginLeft: 4 }}>✓ Saved</span>
                       )}
                     </div>
 
                     {/* Sync result / error for this account */}
                     {syncResults[account.id] && (
-                      <div style={{ background: 'rgba(16,185,129,0.06)', border: '0.5px solid rgba(16,185,129,0.2)', borderRadius: 4, padding: '7px 11px', fontFamily: "'Outfit', sans-serif", fontSize: 11, color: '#10B981', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ background: 'rgba(16,185,129,0.06)', border: '0.5px solid rgba(16,185,129,0.2)', borderRadius: 4, padding: '7px 11px', fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 6 }}>
                         <CheckCircle size={11} strokeWidth={1.5} />
                         Synced {syncResults[account.id].synced} / {syncResults[account.id].total} campaigns
                       </div>
                     )}
                     {syncErrors[account.id] && (
-                      <div style={{ background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.2)', borderRadius: 4, padding: '7px 11px', fontFamily: "'Outfit', sans-serif", fontSize: 11, color: '#EF4444', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ background: 'rgba(239,68,68,0.06)', border: '0.5px solid rgba(239,68,68,0.2)', borderRadius: 4, padding: '7px 11px', fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--red)', display: 'flex', alignItems: 'center', gap: 6 }}>
                         <AlertCircle size={11} strokeWidth={1.5} />{syncErrors[account.id]}
                       </div>
                     )}
@@ -589,7 +589,7 @@ const Connect: React.FC = () => {
               </ul>
               <button
                 onClick={initiateMetaOAuth}
-                style={{ background: 'var(--copper)', color: '#FFFFFF', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', fontSize: 13 }}
+                style={{ background: 'var(--copper)', color: 'var(--text)', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', fontSize: 13 }}
               >
                 Connect Meta Ads
                 <ArrowRight size={13} strokeWidth={1.5} />
@@ -645,7 +645,7 @@ const Connect: React.FC = () => {
           fontFamily: 'var(--font-sans)',
           fontSize: 9,
           letterSpacing: '0.2em',
-          color: 'var(--rose-gold, #C4836A)',
+          color: 'var(--rose-gold, var(--accent))',
           textTransform: 'uppercase',
           marginBottom: 16,
         }}
@@ -665,7 +665,7 @@ const Connect: React.FC = () => {
               <div
                 key={account.id}
                 style={{
-                  background: 'var(--app-surface, #1C1208)',
+                  background: 'var(--app-surface)',
                   border: '0.5px solid rgba(16,185,129,0.3)',
                   borderRadius: 6,
                   padding: '12px 16px',
@@ -678,10 +678,10 @@ const Connect: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{ fontSize: 18 }}>{account.platform === 'shopify' ? '🛍️' : '🛒'}</span>
                   <div>
-                    <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 500, color: '#F5E6D8' }}>
+                    <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)' }}>
                       {account.store_url}
                     </div>
-                    <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: '#4a2e1e', marginTop: 2 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-3)', marginTop: 2 }}>
                       {account.platform.toUpperCase()} · Last synced:{' '}
                       {account.last_synced_at
                         ? new Date(account.last_synced_at).toLocaleDateString()
@@ -708,7 +708,7 @@ const Connect: React.FC = () => {
       <div className="conn-benchmark-note">
         <div className="conn-bench-eyebrow">Always active</div>
         <p>
-          Benchmark intelligence is powered by 9 years of Beauty & Cosmetics campaign data, even before
+          Benchmark intelligence is powered by Beauty & Cosmetics campaign data since 2018, even before
           you connect any accounts. Connect Meta to layer your real performance on top and get specific AI recommendations.
         </p>
       </div>
@@ -717,8 +717,8 @@ const Connect: React.FC = () => {
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .conn-card {
-          background: var(--app-surface, #1C1208);
-          border: 0.5px solid var(--app-border, #2a1a0e);
+          background: var(--app-surface);
+          border: 0.5px solid var(--app-border);
           border-radius: 6px;
           padding: 22px;
           display: flex;
@@ -726,7 +726,7 @@ const Connect: React.FC = () => {
           gap: 14px;
           transition: border-color 0.15s, box-shadow 0.15s;
         }
-        .conn-card:hover { border-color: rgba(196,131,106,0.3); box-shadow: 0 4px 20px rgba(196,131,106,0.05); }
+        .conn-card:hover { border-color: var(--accent-soft); box-shadow: 0 4px 20px var(--accent-soft); }
         .conn-soon { opacity: 0.65; }
 
         .conn-header { display: flex; align-items: center; gap: 12px; }
@@ -738,29 +738,29 @@ const Connect: React.FC = () => {
           color: white; flex-shrink: 0;
         }
 
-        .conn-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary, #F5E6D8); }
-        .conn-desc { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 300; color: var(--text-muted, #8B6050); margin-top: 2px; }
+        .conn-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        .conn-desc { font-family: var(--font-ui); font-size: 11px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }
 
         .conn-account-info {
-          background: var(--app-bg, #0F0A07);
-          border: 0.5px solid var(--app-border, #2a1a0e);
+          background: var(--app-bg);
+          border: 0.5px solid var(--app-border);
           border-radius: 4px; padding: 10px 12px;
           display: flex; flex-direction: column; gap: 3px;
         }
-        .conn-account-name { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; color: var(--text-primary, #F5E6D8); }
-        .conn-account-id  { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-hint, #4a2e1e); }
+        .conn-account-name { font-family: var(--font-ui); font-size: 12px; font-weight: 500; color: var(--text-primary); }
+        .conn-account-id  { font-family: var(--font-mono); font-size: 10px; color: var(--text-hint); }
 
         .conn-features { list-style: none; display: flex; flex-direction: column; gap: 6px; padding: 0; }
         .conn-features li {
-          font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 300;
-          color: var(--text-secondary, #8B6050);
+          font-family: var(--font-ui); font-size: 12px; font-weight: 300;
+          color: var(--text-secondary);
           padding-left: 14px; position: relative;
         }
-        .conn-features li::before { content: '·'; position: absolute; left: 0; color: #C4836A; font-size: 10px; }
+        .conn-features li::before { content: '·'; position: absolute; left: 0; color: var(--text); font-size: 10px; }
 
         .live-dot {
           width: 6px; height: 6px; border-radius: 50%;
-          background: #10B981;
+          background: var(--green);
           animation: pulse-subtle 2.5s ease-in-out infinite;
         }
         @keyframes pulse-subtle {
@@ -769,18 +769,18 @@ const Connect: React.FC = () => {
 
         .conn-benchmark-note {
           margin-top: 24px;
-          background: rgba(196,131,106,0.05);
-          border: 0.5px solid rgba(196,131,106,0.15);
+          background: var(--accent-soft);
+          border: 0.5px solid var(--accent-soft);
           border-radius: 6px; padding: 16px 20px;
         }
         .conn-bench-eyebrow {
-          font-family: 'Outfit', sans-serif; font-size: 9px;
+          font-family: var(--font-ui); font-size: 9px;
           font-weight: 400; letter-spacing: 0.22em; text-transform: uppercase;
-          color: #C4836A; margin-bottom: 6px;
+          color: var(--text); margin-bottom: 6px;
         }
         .conn-benchmark-note p {
-          font-family: 'Outfit', sans-serif; font-size: 13px;
-          font-weight: 300; color: var(--text-secondary, #8B6050); line-height: 1.6;
+          font-family: var(--font-ui); font-size: 13px;
+          font-weight: 300; color: var(--text-secondary); line-height: 1.6;
         }
       `}</style>
     </div>

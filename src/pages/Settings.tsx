@@ -42,12 +42,12 @@ const Settings: React.FC = () => {
         <div className="card">
           <div className="settings-section-title"><Key size={13} strokeWidth={1.5} />Environment Variables</div>
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: 12, fontWeight: 300, color: 'var(--text-secondary)', marginTop: 8, lineHeight: 1.5 }}>
-            Configure these in your <code style={{ fontFamily: 'var(--font-mono)', color: 'var(--rose-gold)', background: 'var(--rose-gold-light)', padding: '1px 5px', borderRadius: 2, fontSize: 11 }}>.env</code> file at the project root.
+            Configure these in your <code style={{ fontFamily: 'var(--font-mono)', color: 'var(--text)', background: 'var(--rose-gold-light)', padding: '1px 5px', borderRadius: 2, fontSize: 11 }}>.env</code> file at the project root.
           </p>
           <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
             {envVars.map(({ key, desc }) => (
               <div key={key} style={{ background: 'var(--bg-secondary)', border: '0.5px solid var(--border-light)', borderRadius: 'var(--radius)', padding: '10px 12px' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--rose-gold)', marginBottom: 2 }}>{key}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text)', marginBottom: 2 }}>{key}</div>
                 <div style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 300, color: 'var(--text-muted)' }}>{desc}</div>
               </div>
             ))}
@@ -78,7 +78,7 @@ const Settings: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 7px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 500;
           color: var(--text-primary);

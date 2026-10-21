@@ -4,6 +4,7 @@ import { X, CreditCard, RefreshCw, Sparkles, AlertTriangle, CheckCircle, Bell } 
 import { getUserNotifications } from '../../lib/supabase';
 import { useSubscription } from '../../hooks/useSubscription';
 import { useAuth } from '../../hooks/useAuth';
+import { solid } from '../../lib/cssToken';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface NotifItem {
@@ -43,14 +44,14 @@ function mapEvent(e: { id: string; type: string; label: string; metadata: Record
         id: e.id, title: 'Sync complete', body: e.label || 'Meta campaigns updated successfully.',
         time: e.created_at, category: 'sync', unread,
         icon: <RefreshCw size={14} strokeWidth={1.5} />,
-        accentColor: '#10B981',
+        accentColor: 'var(--green)',
       };
     case 'recommendation_generated':
       return {
         id: e.id, title: 'New AI recommendations', body: e.label || 'Your AI strategist has new insights.',
         time: e.created_at, category: 'ai', unread,
         icon: <Sparkles size={14} strokeWidth={1.5} />,
-        accentColor: '#C4836A',
+        accentColor: 'var(--accent)',
       };
     case 'roas_alert':
     case 'budget_alert':
@@ -58,14 +59,14 @@ function mapEvent(e: { id: string; type: string; label: string; metadata: Record
         id: e.id, title: 'Performance alert', body: e.label || 'A campaign needs attention.',
         time: e.created_at, category: 'alert', unread,
         icon: <AlertTriangle size={14} strokeWidth={1.5} />,
-        accentColor: '#F59E0B',
+        accentColor: 'var(--amber)',
       };
     default:
       return {
         id: e.id, title: e.label || 'System event', body: String(e.metadata?.summary ?? ''),
         time: e.created_at, category: 'system', unread,
         icon: <CheckCircle size={14} strokeWidth={1.5} />,
-        accentColor: '#6B7280',
+        accentColor: 'var(--text-2)',
       };
   }
 }
@@ -125,7 +126,7 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
         time:     periodStart,
         category: 'billing',
         icon:     <CreditCard size={14} strokeWidth={1.5} />,
-        accentColor: '#10B981',
+        accentColor: 'var(--green)',
         unread: new Date(periodStart).getTime() > seenAt,
       });
     } else if (!subLoading && !subscription) {
@@ -137,7 +138,7 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
         time:     new Date().toISOString(),
         category: 'billing',
         icon:     <CreditCard size={14} strokeWidth={1.5} />,
-        accentColor: '#C4836A',
+        accentColor: 'var(--accent)',
         unread:   false,
       });
     }
@@ -149,12 +150,12 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
     if (items.length <= 1 && rawEvents.length === 0) {
       items.push({
         id: 'benchmark-active',
-        title: '9-year benchmark active',
+        title: 'Benchmark active · data since 2018',
         body: 'Beauty & Cosmetics benchmark intelligence is running. Connect Meta Ads to layer real campaign data.',
         time: new Date().toISOString(),
         category: 'system',
         icon: <Bell size={14} strokeWidth={1.5} />,
-        accentColor: '#C4836A',
+        accentColor: 'var(--accent)',
         unread: false,
       });
     }
@@ -202,7 +203,7 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
           {unreadCount > 0 && (
             <span style={{
               background:   'var(--accent)',
-              color:        '#2A1A12',
+              color:        'var(--on-accent)',
               borderRadius:  10,
               fontFamily:   'var(--font-mono)',
               fontSize:       9,
@@ -234,7 +235,7 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
               borderBottom: i < notifications.length - 1 ? '0.5px solid var(--border-light)' : 'none',
               display:      'flex',
               gap:           12,
-              background:   n.unread ? 'rgba(196,131,106,0.04)' : 'transparent',
+              background:   n.unread ? 'var(--accent-soft)' : 'transparent',
               transition:   'background 0.15s',
             }}
           >
@@ -243,8 +244,8 @@ const NotificationsPanel: React.FC<Props> = ({ onClose }) => {
               width:          30,
               height:         30,
               borderRadius:    8,
-              background:     `${n.accentColor}15`,
-              border:         `0.5px solid ${n.accentColor}30`,
+              background:     `${solid(n.accentColor)}15`,
+              border:         `0.5px solid ${solid(n.accentColor)}30`,
               display:        'flex',
               alignItems:     'center',
               justifyContent: 'center',

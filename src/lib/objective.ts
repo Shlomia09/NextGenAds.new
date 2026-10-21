@@ -1,3 +1,4 @@
+import { cssToken } from './cssToken';
 /**
  * Rouge — Campaign Objective Intelligence
  *
@@ -38,8 +39,8 @@ export const GOAL_META: Record<GoalType, GoalMeta> = {
   sales: {
     label:         'Sales',
     emoji:         '🛒',
-    color:         '#0C447C',
-    bg:            '#E6F1FB',
+    get color() { return cssToken('--blue'); },
+    get bg() { return cssToken('--blue-soft'); },
     primaryKpi:    'ROAS',
     secondaryKpi:  'Purchases',
     metaActionType:'purchase',
@@ -53,8 +54,8 @@ export const GOAL_META: Record<GoalType, GoalMeta> = {
   leads: {
     label:         'Leads',
     emoji:         '📋',
-    color:         '#633806',
-    bg:            '#FAEEDA',
+    get color() { return cssToken('--amber'); },
+    get bg() { return cssToken('--amber-soft'); },
     primaryKpi:    'CPL',
     secondaryKpi:  'Leads',
     metaActionType:'lead',
@@ -69,8 +70,8 @@ export const GOAL_META: Record<GoalType, GoalMeta> = {
   traffic: {
     label:         'Traffic',
     emoji:         '🚀',
-    color:         '#0C447C',
-    bg:            '#E6F1FB',
+    get color() { return cssToken('--blue'); },
+    get bg() { return cssToken('--blue-soft'); },
     primaryKpi:    'CPC',
     secondaryKpi:  'CTR',
     metaActionType:'link_click',
@@ -85,8 +86,8 @@ export const GOAL_META: Record<GoalType, GoalMeta> = {
   awareness: {
     label:         'Awareness',
     emoji:         '👁',
-    color:         '#3d2d8a',
-    bg:            '#EEEBFB',
+    get color() { return cssToken('--purple'); },
+    get bg() { return cssToken('--purple-soft'); },
     primaryKpi:    'Reach',
     secondaryKpi:  'Frequency',
     metaActionType:'impression',
@@ -101,8 +102,8 @@ export const GOAL_META: Record<GoalType, GoalMeta> = {
   engagement: {
     label:         'Engagement',
     emoji:         '💬',
-    color:         '#633806',
-    bg:            '#FAEEDA',
+    get color() { return cssToken('--amber'); },
+    get bg() { return cssToken('--amber-soft'); },
     primaryKpi:    'Engagements',
     secondaryKpi:  'CTR',
     metaActionType:'post_engagement',
@@ -117,8 +118,8 @@ export const GOAL_META: Record<GoalType, GoalMeta> = {
   unknown: {
     label:         'Other',
     emoji:         '📊',
-    color:         '#5F5E5A',
-    bg:            '#F1EFE8',
+    get color() { return cssToken('--text-2'); },
+    get bg() { return cssToken('--surface'); },
     primaryKpi:    'Clicks',
     secondaryKpi:  'Impressions',
     metaActionType:'link_click',

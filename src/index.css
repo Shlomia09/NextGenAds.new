@@ -33,11 +33,11 @@ body {
 #root { min-height: 100vh; }
 
 a {
-  color: var(--rose);
+  color: var(--text);
   text-decoration: none;
   transition: color var(--transition);
 }
-a:hover { color: var(--rose-dark); }
+a:hover { color: var(--text); }
 
 button {
   cursor: pointer;
@@ -109,14 +109,6 @@ input, textarea, select {
   flex-shrink: 0;
 }
 
-.sidebar-logo {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1;
-}
-.sidebar-logo em { color: var(--accent); }
 
 .sidebar-tagline {
   font-family: var(--font-ui);
@@ -152,7 +144,7 @@ input, textarea, select {
 .sidebar-nav-item:hover,
 .sidebar-nav-item.active {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--text);
 }
 .sidebar-nav-item.active { font-weight: 500; }
 
@@ -246,12 +238,13 @@ input, textarea, select {
 
 .page-title {
   font-family: var(--font-display);
-  font-size: 34px;
-  font-weight: 500;
+  font-size: var(--t-h1);
+  font-weight: 800;
   color: var(--text);
-  line-height: 1;
-  letter-spacing: -0.5px;
+  line-height: var(--lh-h1);
+  letter-spacing: var(--track-h1);
 }
+.page-title em { color: var(--accent); }
 
 .page-subtitle {
   font-family: var(--font-ui);
@@ -286,9 +279,9 @@ input, textarea, select {
 }
 
 .section-title {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 800;
   color: var(--color-text-primary);
   line-height: 1.2;
   letter-spacing: var(--tracking-title);
@@ -296,15 +289,15 @@ input, textarea, select {
 .section-title em { color: var(--rose); }
 
 /* Typography utilities */
-.font-serif        { font-family: var(--font-serif); }
-.font-serif-italic { font-family: var(--font-serif); }
+.font-serif        { font-family: var(--font-display); }
+.font-serif-italic { font-family: var(--font-accent); font-style: italic; }
 .font-mono         { font-family: var(--font-mono); }
 .font-sans         { font-family: var(--font-sans); }
 
 .text-primary   { color: var(--color-text-primary); }
 .text-secondary { color: var(--color-text-secondary); }
 .text-muted     { color: var(--color-text-tertiary); }
-.text-rose      { color: var(--rose); }
+.text-rose      { color: var(--text); }
 .text-success   { color: var(--color-positive); }
 .text-warning   { color: var(--warning); }
 .text-danger    { color: var(--color-negative); }
@@ -378,13 +371,13 @@ input, textarea, select {
   border: 1px solid transparent;
 }
 
-/* Primary: border + text accent (per design system — NOT filled) */
+/* Primary: red as fill, never as text (CLAUDE.md red rule) */
 .btn-primary {
-  background: transparent;
-  color: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: transparent;
 }
-.btn-primary:hover { background: var(--accent-soft); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-deep); }
 
 .btn-secondary {
   background: transparent;
@@ -398,7 +391,7 @@ input, textarea, select {
   color: var(--text-2);
   border-color: var(--border);
 }
-.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-outline:hover { border-color: var(--accent); color: var(--text); }
 
 .btn-ghost {
   background: transparent;
@@ -417,7 +410,7 @@ input, textarea, select {
 
 .btn-success {
   background: var(--green);
-  color: #FFFFFF;
+  color: var(--on-accent);
   border-color: transparent;
 }
 .btn-success:hover { opacity: 0.9; }
@@ -428,7 +421,7 @@ input, textarea, select {
 
 .btn-execute {
   background: var(--rose);
-  color: #FFFFFF;
+  color: var(--text);
   border: none;
   padding: 6px 14px;
   font-family: var(--font-sans);
@@ -474,18 +467,18 @@ input, textarea, select {
   text-transform: uppercase;
 }
 
-.badge-critical { background: #FCEBEB; color: #791F1F; border: 0.5px solid rgba(226,75,74,0.3); }
-.badge-high     { background: #FAEEDA; color: #633806; border: 0.5px solid rgba(245,158,11,0.3); }
-.badge-medium   { background: #FDF6F0; color: #C4836A; border: 0.5px solid rgba(196,131,106,0.3); }
-.badge-success  { background: #EAF3DE; color: #27500A; border: 0.5px solid rgba(59,109,17,0.25); }
+.badge-critical { background: var(--red-soft); color: var(--red); border: 0.5px solid var(--red-soft); }
+.badge-high     { background: var(--amber-soft); color: var(--amber); border: 0.5px solid rgba(245,158,11,0.3); }
+.badge-medium   { background: var(--surface); color: var(--text); border: 0.5px solid var(--accent-soft); }
+.badge-success  { background: var(--green-soft); color: var(--green); border: 0.5px solid rgba(59,109,17,0.25); }
 .badge-neutral  { background: var(--color-surface-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-default); }
 
 .tag { font-family: var(--font-sans); font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; padding: 3px 8px; display: inline-block; border-radius: var(--radius-sm); }
-.tag-rose    { background: #FDF6F0; color: var(--rose); }
-.tag-dark    { background: var(--color-surface-secondary); color: var(--rose); }
-.tag-success { background: #EAF3DE; color: #27500A; }
-.tag-warning { background: #FAEEDA; color: #633806; }
-.tag-danger  { background: #FCEBEB; color: #791F1F; }
+.tag-rose    { background: var(--surface); color: var(--text); }
+.tag-dark    { background: var(--color-surface-secondary); color: var(--text); }
+.tag-success { background: var(--green-soft); color: var(--green); }
+.tag-warning { background: var(--amber-soft); color: var(--amber); }
+.tag-danger  { background: var(--red-soft); color: var(--red); }
 
 /* ── Status chips v2.0: dot + pill (border-radius 30px) ── */
 .status-active {
@@ -566,8 +559,8 @@ input, textarea, select {
 }
 
 /* ── Objective tags ── */
-.tag-leads    { background: #FAEEDA; color: #633806; }
-.tag-ecommerce{ background: #E6F1FB; color: #0C447C; }
+.tag-leads    { background: var(--amber-soft); color: var(--amber); }
+.tag-ecommerce{ background: var(--blue-soft); color: var(--blue); }
 
 /* ============================================================
    KPI BAR
@@ -600,7 +593,7 @@ input, textarea, select {
   color: var(--color-text-primary);
   line-height: 1;
 }
-.kpi-value.primary { color: var(--rose); }
+.kpi-value.primary { color: var(--text); }
 
 /* ============================================================
    METRIC CARDS
@@ -633,19 +626,19 @@ input, textarea, select {
 }
 
 .metric-value {
-  font-family: var(--font-serif);
-  font-size: 24px;
+  font-family: var(--font-mono);
+  font-size: var(--t-metric);
   font-weight: 500;
   color: var(--color-text-primary);
   line-height: 1;
   margin-bottom: 8px;
-  letter-spacing: var(--tracking-title);
+  letter-spacing: var(--track-metric);
 }
 .metric-value.good    { color: var(--color-positive); }
 .metric-value.bad     { color: var(--color-negative); }
-.metric-value.warning { color: #633806; }
+.metric-value.warning { color: var(--amber); }
 .metric-value.gold    { color: var(--gold); }
-.metric-value.rose    { color: var(--rose); }
+.metric-value.rose    { color: var(--text); }
 
 .metric-delta {
   font-family: var(--font-mono);
@@ -668,7 +661,7 @@ input, textarea, select {
 }
 .metric-benchmark.above   { color: var(--color-positive); }
 .metric-benchmark.below   { color: var(--color-negative); }
-.metric-benchmark.neutral { color: var(--rose); }
+.metric-benchmark.neutral { color: var(--text); }
 
 /* ============================================================
    BENCHMARK ROWS
@@ -710,9 +703,9 @@ input, textarea, select {
 }
 
 .benchmark-badge-full {
-  background: #EAF3DE;
+  background: var(--green-soft);
   border: 0.5px solid rgba(59,109,17,0.25);
-  color: #27500A;
+  color: var(--green);
   font-family: var(--font-sans);
   font-size: 8px;
   letter-spacing: 0.1em;
@@ -724,9 +717,9 @@ input, textarea, select {
   border-radius: var(--radius-sm);
 }
 .benchmark-badge-partial {
-  background: #FAEEDA;
+  background: var(--amber-soft);
   border: 0.5px solid rgba(99,56,6,0.2);
-  color: #633806;
+  color: var(--amber);
   font-family: var(--font-sans);
   font-size: 8px;
   letter-spacing: 0.1em;
@@ -741,14 +734,16 @@ input, textarea, select {
 /* ============================================================
    LIVE DOT
    ============================================================ */
+/* live = data is flowing; --demo = a caveat, the data is not real. Never red. */
 .live-dot {
   width: 5px; height: 5px;
-  background: var(--rose);
+  background: var(--green);
   border-radius: 50%;
   animation: pulse-subtle 2.5s ease-in-out infinite;
   display: inline-block;
   flex-shrink: 0;
 }
+.live-dot--demo { background: var(--amber); }
 
 /* ============================================================
    RECOMMENDATION CARDS
@@ -762,14 +757,15 @@ input, textarea, select {
   transition: box-shadow var(--transition);
 }
 .rec-card:hover { box-shadow: var(--shadow-sm); }
-.rec-card.critical { border-left: 2.5px solid #E24B4A; }
-.rec-card.high     { border-left: 2.5px solid #633806; }
-.rec-card.medium   { border-left: 2.5px solid #C4836A; }
+.rec-card.critical { border-left: 2.5px solid var(--red); }
+.rec-card.high     { border-left: 2.5px solid var(--amber); }
+.rec-card.medium   { border-left: 2.5px solid var(--accent); }
 
 .rec-title {
-  font-family: var(--font-serif);
-  font-size: 13px;
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: var(--t-h3);
+  font-weight: 700;
+  letter-spacing: var(--track-h3);
   color: var(--color-text-primary);
   margin-bottom: 5px;
   line-height: 1.3;
@@ -785,9 +781,9 @@ input, textarea, select {
 }
 
 .rec-benchmark-ref {
-  background: #FDF6F0;
-  border: 0.5px solid rgba(196,131,106,0.25);
-  color: var(--rose);
+  background: var(--surface);
+  border: 0.5px solid var(--accent-soft);
+  color: var(--text);
   font-family: var(--font-mono);
   font-size: 8px;
   padding: 3px 8px;
@@ -831,7 +827,7 @@ input, textarea, select {
   box-sizing: border-box;
 }
 .form-input::placeholder { color: var(--color-text-tertiary); }
-.form-input:focus { border-color: var(--rose); box-shadow: 0 0 0 2px rgba(196,131,106,0.1); }
+.form-input:focus { border-color: var(--rose); box-shadow: 0 0 0 2px var(--accent-soft); }
 
 .form-select {
   width: 100%;
@@ -902,7 +898,7 @@ input, textarea, select {
 .table-cell-mono  { font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--color-text-primary); }
 .table-cell-good  { font-family: var(--font-mono); font-size: 11px; color: var(--color-positive); }
 .table-cell-bad   { font-family: var(--font-mono); font-size: 11px; color: var(--color-negative); }
-.table-cell-rose  { font-family: var(--font-mono); font-size: 11px; color: var(--rose); }
+.table-cell-rose  { font-family: var(--font-mono); font-size: 11px; color: var(--text); }
 
 /* ============================================================
    LOADING SKELETON
@@ -971,11 +967,11 @@ input, textarea, select {
   box-shadow: var(--shadow-lg);
 }
 .modal-title {
-  font-family: var(--font-serif);
-  font-size: 18px;
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: var(--t-h3);
+  font-weight: 700;
   color: var(--color-text-primary);
-  letter-spacing: var(--tracking-title);
+  letter-spacing: var(--track-h3);
 }
 
 /* ============================================================
@@ -1026,7 +1022,7 @@ input, textarea, select {
    ============================================================ */
 .demo-banner {
   background: var(--rose);
-  color: #FFFFFF;
+  color: var(--text);
   font-family: var(--font-sans);
   font-size: 10px;
   font-weight: 500;
@@ -1052,13 +1048,13 @@ input, textarea, select {
    PUBLIC PAGES (cream — landing, login, onboarding)
    ============================================================ */
 .cream-page {
-  background: #FDF6F0;
-  color: #2C1810;
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
 }
 .cream-card {
-  background: #FFFFFF;
-  border: 0.5px solid #E8D5C4;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
 }
 
 /* ============================================================

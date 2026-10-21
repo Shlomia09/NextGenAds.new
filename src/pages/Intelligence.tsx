@@ -121,10 +121,10 @@ const Intelligence: React.FC = () => {
             AI Strategist
           </div>
           <h1 className="page-title">
-            Intelligence <em style={{ color: 'var(--rose-gold)' }}>Engine</em>
+            Intelligence
           </h1>
           <p className="page-subtitle">
-            9-year Beauty &amp; Cosmetics benchmark knowledge · Context-aware campaign strategist
+            Beauty &amp; Cosmetics benchmark knowledge since 2018 · Context-aware campaign strategist
           </p>
         </div>
 
@@ -177,7 +177,7 @@ const Intelligence: React.FC = () => {
                 lineHeight: 1.5,
               }}>
                 No sessions yet.<br />
-                <span style={{ color: 'var(--rose-gold)' }}>Ask your first question</span> to start.
+                <span style={{ color: 'var(--text)' }}>Ask your first question</span> to start.
               </div>
             )}
 
@@ -228,7 +228,7 @@ const Intelligence: React.FC = () => {
           {!activeBrand ? (
             <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', gap: 14 }}>
               <Sparkles size={28} strokeWidth={1.5} style={{ color: 'var(--rose-gold)' }} />
-              <p style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 400, color: 'var(--text-primary)' }}>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>
                 Set up a brand to start
               </p>
               <a href="/onboarding" className="btn btn-primary">Get Started</a>
@@ -271,7 +271,7 @@ const Intelligence: React.FC = () => {
         }
         .int-session-item.active {
           background: var(--rose-gold-light);
-          color: var(--rose-gold-dark);
+          color: var(--text);
           border: 0.5px solid var(--border-rose);
         }
       `}</style>

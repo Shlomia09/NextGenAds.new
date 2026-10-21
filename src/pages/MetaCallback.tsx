@@ -28,13 +28,13 @@ type AccountConfig = {
 };
 
 const T = {
-  bg:      '#0F0A07',
-  surface: '#1C1208',
-  border:  '0.5px solid #2a1a0e',
-  accent:  '#C4836A',
-  text:    '#F5E6D8',
-  muted:   '#8B6050',
-  hint:    '#4a2e1e',
+  bg:      'var(--bg)',
+  surface: 'var(--surface)',
+  border:  '0.5px solid var(--border)',
+  accent:  'var(--accent)',
+  text:    'var(--text)',
+  muted:   'var(--text-2)',
+  hint:    'var(--text-3)',
 };
 
 const CONVERSION_OPTIONS: { type: ConversionType; label: string; emoji: string }[] = [
@@ -315,8 +315,8 @@ const MetaCallback: React.FC = () => {
   if (status === 'loading') return (
     <Card>
       <div style={{ width: 48, height: 48, border: `1.5px solid ${T.hint}`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: T.text }}>Connecting Meta Ads…</div>
-      <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.6, margin: 0 }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: T.text }}>Connecting Meta Ads…</div>
+      <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.6, margin: 0 }}>
         Fetching your ad accounts. This takes a moment.
       </p>
     </Card>
@@ -331,15 +331,15 @@ const MetaCallback: React.FC = () => {
       }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.accent, marginBottom: 8 }}>
+          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.accent, marginBottom: 8 }}>
             Meta Ads · {accounts.length} account{accounts.length !== 1 ? 's' : ''} found
           </div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 600, color: T.text, marginBottom: 8 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: T.text, marginBottom: 8 }}>
             Select accounts to connect
           </div>
-          <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.55, margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.55, margin: 0 }}>
             Choose which ad accounts to add. Accounts marked{' '}
-            <span style={{ color: '#10B981', fontWeight: 500 }}>Already connected</span>{' '}
+            <span style={{ color: 'var(--green)', fontWeight: 500 }}>Already connected</span>{' '}
             will have their token refreshed without losing brand settings.
           </p>
         </div>
@@ -347,11 +347,11 @@ const MetaCallback: React.FC = () => {
         {/* Select all / none */}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
           <button onClick={() => setSelected(new Set(accounts.map(a => a.id)))}
-            style={{ background: 'none', border: 'none', fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.accent, cursor: 'pointer', padding: 0 }}>
+            style={{ background: 'none', border: 'none', fontFamily: 'var(--font-ui)', fontSize: 10, color: T.accent, cursor: 'pointer', padding: 0 }}>
             Select all
           </button>
           <button onClick={() => setSelected(new Set())}
-            style={{ background: 'none', border: 'none', fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.muted, cursor: 'pointer', padding: 0 }}>
+            style={{ background: 'none', border: 'none', fontFamily: 'var(--font-ui)', fontSize: 10, color: T.muted, cursor: 'pointer', padding: 0 }}>
             Clear all
           </button>
         </div>
@@ -367,9 +367,9 @@ const MetaCallback: React.FC = () => {
                 onClick={() => toggleAccount(account.id)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  background: isSelected ? 'rgba(196,131,106,0.07)' : isConnected ? 'rgba(16,185,129,0.04)' : T.bg,
+                  background: isSelected ? 'var(--accent-soft)' : isConnected ? 'rgba(16,185,129,0.04)' : T.bg,
                   border: isSelected
-                    ? `0.5px solid rgba(196,131,106,0.4)`
+                    ? `0.5px solid var(--accent-soft)`
                     : isConnected
                     ? '0.5px solid rgba(16,185,129,0.25)'
                     : T.border,
@@ -384,32 +384,32 @@ const MetaCallback: React.FC = () => {
                   border: isSelected ? 'none' : `0.5px solid ${T.hint}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  {isSelected && <Check size={11} color="#0F0A07" strokeWidth={2.5} />}
+                  {isSelected && <Check size={11} color="var(--text)" strokeWidth={2.5} />}
                 </div>
 
                 {/* Account info */}
                 <div style={{ flex: 1, textAlign: 'left' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: 13, fontWeight: 400, color: T.text }}>
+                    <span style={{ fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 400, color: T.text }}>
                       {account.account_name}
                     </span>
                     {isConnected && (
                       <span style={{
-                        fontFamily: "'DM Mono', monospace", fontSize: 8,
+                        fontFamily: 'var(--font-mono)', fontSize: 8,
                         letterSpacing: '0.1em', textTransform: 'uppercase',
-                        color: '#10B981', background: 'rgba(16,185,129,0.1)',
+                        color: 'var(--green)', background: 'rgba(16,185,129,0.1)',
                         border: '0.5px solid rgba(16,185,129,0.3)',
                         borderRadius: 3, padding: '1px 5px', flexShrink: 0,
                       }}>Already connected</span>
                     )}
                   </div>
-                  <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: T.hint, marginTop: 2 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: T.hint, marginTop: 2 }}>
                     ID: {account.account_id}
                   </div>
                 </div>
 
                 {/* Status dot */}
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: isConnected ? '#10B981' : '#F59E0B', flexShrink: 0 }} />
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: isConnected ? 'var(--green)' : 'var(--amber)', flexShrink: 0 }} />
               </div>
             );
           })}
@@ -421,8 +421,8 @@ const MetaCallback: React.FC = () => {
           disabled={selected.size === 0}
           style={{
             width: '100%', background: selected.size > 0 ? T.accent : T.hint,
-            color: '#0F0A07', border: 'none', borderRadius: 5,
-            padding: '13px 0', fontFamily: "'Outfit', sans-serif",
+            color: 'var(--text)', border: 'none', borderRadius: 5,
+            padding: '13px 0', fontFamily: 'var(--font-ui)',
             fontSize: 11, fontWeight: 500, letterSpacing: '0.12em',
             textTransform: 'uppercase', cursor: selected.size > 0 ? 'pointer' : 'not-allowed',
             transition: 'background 0.15s',
@@ -432,7 +432,7 @@ const MetaCallback: React.FC = () => {
         </button>
 
         <button onClick={() => navigate('/connect')}
-          style={{ background: 'none', border: 'none', fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.hint, cursor: 'pointer', marginTop: 4 }}>
+          style={{ background: 'none', border: 'none', fontFamily: 'var(--font-ui)', fontSize: 10, color: T.hint, cursor: 'pointer', marginTop: 4 }}>
           Cancel
         </button>
       </div>
@@ -446,13 +446,13 @@ const MetaCallback: React.FC = () => {
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.accent, marginBottom: 8 }}>
+          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.accent, marginBottom: 8 }}>
             Step 2 of 2 · Configure Accounts
           </div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, color: T.text, marginBottom: 8 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: T.text, marginBottom: 8 }}>
             Set up each account
           </div>
-          <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.55, margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.55, margin: 0 }}>
             Assign a brand and conversion objective to each ad account.
           </p>
         </div>
@@ -460,17 +460,17 @@ const MetaCallback: React.FC = () => {
         {/* No brands notice */}
         {!brandsLoading && brands.length === 0 && (
           <div style={{
-            background: 'rgba(196,131,106,0.08)', border: T.border, borderRadius: 8,
+            background: 'var(--accent-soft)', border: T.border, borderRadius: 8,
             padding: '16px 20px', marginBottom: 20, textAlign: 'center',
           }}>
-            <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, color: T.muted, margin: '0 0 12px' }}>
+            <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: T.muted, margin: '0 0 12px' }}>
               No brands yet — create one first before linking ad accounts.
             </p>
             <button
               onClick={() => navigate('/brands')}
               style={{
-                background: T.accent, color: '#0F0A07', border: 'none', borderRadius: 4,
-                padding: '9px 20px', fontFamily: "'Outfit', sans-serif",
+                background: T.accent, color: 'var(--text)', border: 'none', borderRadius: 4,
+                padding: '9px 20px', fontFamily: 'var(--font-ui)',
                 fontSize: 10, fontWeight: 500, letterSpacing: '0.12em',
                 textTransform: 'uppercase', cursor: 'pointer',
               }}
@@ -489,17 +489,17 @@ const MetaCallback: React.FC = () => {
             }}>
               {/* Card header */}
               <div style={{ marginBottom: 20 }}>
-                <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 8, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.muted, marginBottom: 4 }}>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 8, letterSpacing: '0.2em', textTransform: 'uppercase', color: T.muted, marginBottom: 4 }}>
                   Account {idx + 1}
                 </div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 600, color: T.text }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, color: T.text }}>
                   {cfg.account_name}
                 </div>
               </div>
 
               {/* Display Name */}
               <div style={{ marginBottom: 16 }}>
-                <label style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.muted, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
+                <label style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: T.muted, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
                   Display Name
                 </label>
                 <input
@@ -510,7 +510,7 @@ const MetaCallback: React.FC = () => {
                   style={{
                     width: '100%', boxSizing: 'border-box',
                     background: T.bg, border: T.border, borderRadius: 5,
-                    padding: '10px 12px', fontFamily: "'Outfit', sans-serif",
+                    padding: '10px 12px', fontFamily: 'var(--font-ui)',
                     fontSize: 13, color: T.text, outline: 'none',
                   }}
                 />
@@ -518,7 +518,7 @@ const MetaCallback: React.FC = () => {
 
               {/* Brand selector */}
               <div style={{ marginBottom: 20 }}>
-                <label style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.muted, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
+                <label style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: T.muted, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
                   Brand
                 </label>
                 {brands.length > 0 ? (
@@ -527,7 +527,7 @@ const MetaCallback: React.FC = () => {
                     onChange={e => updateConfig(cfg.id, { brand_id: e.target.value })}
                     style={{
                       width: '100%', background: T.bg, border: T.border, borderRadius: 5,
-                      padding: '10px 12px', fontFamily: "'Outfit', sans-serif",
+                      padding: '10px 12px', fontFamily: 'var(--font-ui)',
                       fontSize: 13, color: cfg.brand_id ? T.text : T.muted, outline: 'none',
                       cursor: 'pointer',
                     }}
@@ -538,7 +538,7 @@ const MetaCallback: React.FC = () => {
                     ))}
                   </select>
                 ) : (
-                  <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, color: T.hint, fontStyle: 'italic' }}>
+                  <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: T.hint, fontStyle: 'italic' }}>
                     No brands available
                   </div>
                 )}
@@ -546,7 +546,7 @@ const MetaCallback: React.FC = () => {
 
               {/* Conversion type */}
               <div>
-                <label style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.muted, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>
+                <label style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: T.muted, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>
                   Conversion Objective
                 </label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -574,10 +574,10 @@ const MetaCallback: React.FC = () => {
                         }} />
                         <span style={{ fontSize: 16 }}>{opt.emoji}</span>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, color: isActive ? T.text : T.muted, fontWeight: isActive ? 500 : 400 }}>
+                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: isActive ? T.text : T.muted, fontWeight: isActive ? 500 : 400 }}>
                             {opt.label}
                           </div>
-                          <div style={{ fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.hint, marginTop: 1 }}>
+                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: T.hint, marginTop: 1 }}>
                             {meta.description}
                           </div>
                         </div>
@@ -599,7 +599,7 @@ const MetaCallback: React.FC = () => {
             onClick={() => setStatus('selecting')}
             style={{
               flex: 1, background: 'transparent', border: T.border, borderRadius: 5,
-              padding: '13px 0', fontFamily: "'Outfit', sans-serif",
+              padding: '13px 0', fontFamily: 'var(--font-ui)',
               fontSize: 11, fontWeight: 500, letterSpacing: '0.12em',
               textTransform: 'uppercase', cursor: 'pointer', color: T.muted,
             }}
@@ -612,8 +612,8 @@ const MetaCallback: React.FC = () => {
             style={{
               flex: 3,
               background: (brands.length === 0 || configs.some(c => !c.brand_id)) ? T.hint : T.accent,
-              color: '#0F0A07', border: 'none', borderRadius: 5,
-              padding: '13px 0', fontFamily: "'Outfit', sans-serif",
+              color: 'var(--text)', border: 'none', borderRadius: 5,
+              padding: '13px 0', fontFamily: 'var(--font-ui)',
               fontSize: 11, fontWeight: 500, letterSpacing: '0.12em',
               textTransform: 'uppercase',
               cursor: (brands.length === 0 || configs.some(c => !c.brand_id)) ? 'not-allowed' : 'pointer',
@@ -626,7 +626,7 @@ const MetaCallback: React.FC = () => {
 
         <div style={{ textAlign: 'center', marginTop: 12 }}>
           <button onClick={() => navigate('/connect')}
-            style={{ background: 'none', border: 'none', fontFamily: "'Outfit', sans-serif", fontSize: 10, color: T.hint, cursor: 'pointer' }}>
+            style={{ background: 'none', border: 'none', fontFamily: 'var(--font-ui)', fontSize: 10, color: T.hint, cursor: 'pointer' }}>
             Cancel
           </button>
         </div>
@@ -639,7 +639,7 @@ const MetaCallback: React.FC = () => {
   if (status === 'saving') return (
     <Card>
       <div style={{ width: 48, height: 48, border: `1.5px solid ${T.hint}`, borderTopColor: T.accent, borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: T.text }}>Saving selection…</div>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: T.text }}>Saving selection…</div>
     </Card>
   );
 
@@ -647,10 +647,10 @@ const MetaCallback: React.FC = () => {
   if (status === 'success') return (
     <Card>
       <div style={{ width: 52, height: 52, background: 'rgba(16,185,129,0.1)', border: '0.5px solid rgba(16,185,129,0.3)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <CheckCircle size={24} color="#10B981" strokeWidth={1.5} />
+        <CheckCircle size={24} color="var(--green)" strokeWidth={1.5} />
       </div>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: T.text }}>Connected!</div>
-      <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, margin: 0 }}>Redirecting…</p>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: T.text }}>Connected!</div>
+      <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: T.muted, margin: 0 }}>Redirecting…</p>
     </Card>
   );
 
@@ -658,12 +658,12 @@ const MetaCallback: React.FC = () => {
   return (
     <Card>
       <div style={{ width: 52, height: 52, background: 'rgba(239,68,68,0.1)', border: '0.5px solid rgba(239,68,68,0.3)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <XCircle size={24} color="#EF4444" strokeWidth={1.5} />
+        <XCircle size={24} color="var(--red)" strokeWidth={1.5} />
       </div>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600, color: T.text }}>Connection Failed</div>
-      <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.6, margin: 0 }}>{errorMsg}</p>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: T.text }}>Connection Failed</div>
+      <p style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 300, color: T.muted, lineHeight: 1.6, margin: 0 }}>{errorMsg}</p>
       <button onClick={() => navigate('/connect')}
-        style={{ background: T.accent, color: '#0F0A07', border: 'none', borderRadius: 4, padding: '10px 24px', fontFamily: "'Outfit', sans-serif", fontSize: 10, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer' }}>
+        style={{ background: T.accent, color: 'var(--text)', border: 'none', borderRadius: 4, padding: '10px 24px', fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer' }}>
         Back to Connect
       </button>
     </Card>

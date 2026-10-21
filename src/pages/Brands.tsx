@@ -6,6 +6,7 @@ import { getBrands, relinkAdAccount, getAdAccounts } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { getAovBracket, MARKETS } from '../lib/benchmarks';
 import type { Brand } from '../types';
+import { cssToken } from '../lib/cssToken';
 
 // ── Brand Card ────────────────────────────────────────────────────────────────
 interface BrandCardProps {
@@ -22,9 +23,9 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, linkedAccounts, allAccount
   const [saving, setSaving] = useState(false);
 
   const stageDot: Record<string, string> = {
-    new:     '#F59E0B',
-    scaling: '#C4836A',
-    mature:  '#10B981',
+    new:     cssToken('--amber'),
+    scaling: cssToken('--accent'),
+    mature:  cssToken('--green'),
   };
 
   const handleLink = async (adAccountId: string) => {
@@ -91,7 +92,7 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, linkedAccounts, allAccount
 
         {linkedAccounts.length === 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ fontFamily: 'var(--font-sans)', fontSize: 11, color: 'var(--amber)', display: 'flex', alignItems: 'center', gap: 5 }}>
               ⚠ No Meta account linked
             </span>
             {/* Link button */}
@@ -130,11 +131,11 @@ const BrandCard: React.FC<BrandCardProps> = ({ brand, linkedAccounts, allAccount
                   onClick={() => setLinkingOpen(true)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 5,
-                    background: 'rgba(196,131,106,0.08)',
-                    border: '0.5px solid rgba(196,131,106,0.25)',
+                    background: 'var(--accent-soft)',
+                    border: '0.5px solid var(--accent-soft)',
                     borderRadius: 4, padding: '5px 10px',
                     fontFamily: 'var(--font-sans)', fontSize: 11,
-                    color: 'var(--accent)', cursor: 'pointer', alignSelf: 'flex-start',
+                    color: 'var(--text)', cursor: 'pointer', alignSelf: 'flex-start',
                   }}
                 >
                   <Link size={10} strokeWidth={1.5} /> Link account
@@ -271,7 +272,7 @@ const Brands: React.FC = () => {
         : brands.length === 0
         ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <p style={{ fontFamily: 'var(--font-serif)', fontSize: 20, color: 'var(--text-primary)', marginBottom: 12 }}>No brands yet</p>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12 }}>No brands yet</p>
             <p style={{ fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 300, color: 'var(--text-secondary)', marginBottom: 20 }}>Create your first brand to activate benchmark intelligence</p>
             <button className="btn btn-primary" onClick={() => navigate('/onboarding')}>
               <Plus size={13} strokeWidth={1.5} />
@@ -314,30 +315,30 @@ const Brands: React.FC = () => {
         .brand-card-top { display: flex; align-items: center; gap: 12px; }
         .brand-avatar {
           width: 38px; height: 38px;
-          background: #2C1810; border-radius: 4px;
+          background: var(--bg); border-radius: 4px;
           display: flex; align-items: center; justify-content: center;
           font-family: var(--font-display); font-size: 16px;
-          font-weight: 600; color: #C4836A; flex-shrink: 0;
+          font-weight: 700; color: var(--text); flex-shrink: 0;
         }
-        .brand-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary); }
-        .brand-cat { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }
+        .brand-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        .brand-cat { font-family: var(--font-ui); font-size: 11px; font-weight: 300; color: var(--text-muted); margin-top: 2px; }
         .brand-stage-pill {
           margin-left: auto; padding: 3px 8px; border-radius: 2px;
-          font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 400;
+          font-family: var(--font-ui); font-size: 9px; font-weight: 400;
           letter-spacing: 0.12em; text-transform: uppercase;
         }
         .brand-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         .brand-metric { background: var(--bg-secondary); border-radius: 2px; padding: 8px; }
         .brand-metric-label {
           display: flex; align-items: center; gap: 3px;
-          font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 400;
+          font-family: var(--font-ui); font-size: 9px; font-weight: 400;
           letter-spacing: 0.12em; text-transform: uppercase;
           color: var(--text-hint); margin-bottom: 4px;
         }
-        .brand-metric-value { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: var(--text-primary); }
+        .brand-metric-value { font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--text-primary); }
         .brand-funnel-pill {
-          font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 300;
-          color: var(--rose-gold-dark); background: var(--rose-gold-light);
+          font-family: var(--font-ui); font-size: 11px; font-weight: 300;
+          color: var(--text); background: var(--rose-gold-light);
           border: 0.5px solid var(--border-rose); border-radius: 2px;
           padding: 5px 10px; line-height: 1.4;
         }

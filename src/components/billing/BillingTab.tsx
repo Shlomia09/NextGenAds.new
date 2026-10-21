@@ -10,21 +10,21 @@ interface BillingTabProps {
 // Helper: color the plan badge
 function getPlanBadgeStyle(planId: string): React.CSSProperties {
   const map: Record<string, { background: string; color: string; border: string }> = {
-    free:    { background: 'rgba(74,46,30,0.2)',    color: '#8B6050',  border: '0.5px solid #4a2e1e' },
-    starter: { background: 'rgba(196,131,106,0.1)', color: '#C4836A',  border: '0.5px solid rgba(196,131,106,0.3)' },
-    growth:  { background: 'rgba(16,185,129,0.1)',  color: '#10B981',  border: '0.5px solid rgba(16,185,129,0.3)' },
-    scale:   { background: 'rgba(139,92,246,0.1)',  color: '#A78BFA',  border: '0.5px solid rgba(139,92,246,0.3)' },
+    free:    { background: 'rgba(74,46,30,0.2)',    color: 'var(--text-2)',  border: '0.5px solid var(--border)' },
+    starter: { background: 'var(--accent-soft)', color: 'var(--text)',  border: '0.5px solid var(--accent-soft)' },
+    growth:  { background: 'rgba(16,185,129,0.1)',  color: 'var(--green)',  border: '0.5px solid rgba(16,185,129,0.3)' },
+    scale:   { background: 'var(--purple-soft)',  color: 'var(--purple)',  border: '0.5px solid var(--purple)' },
   };
   return map[planId] ?? map['free'];
 }
 
 // Helper: progress bar fill color based on usage %
 function getUsageColor(used: number, limit: number): string {
-  if (limit === -1) return '#10B981'; // unlimited
+  if (limit === -1) return 'var(--green)'; // unlimited
   const pct = limit > 0 ? (used / limit) * 100 : 0;
-  if (pct > 90) return '#EF4444';
-  if (pct > 70) return '#F59E0B';
-  return '#10B981';
+  if (pct > 90) return 'var(--red)';
+  if (pct > 70) return 'var(--amber)';
+  return 'var(--green)';
 }
 
 // Helper: format renewal date
@@ -90,12 +90,12 @@ const BillingTab: React.FC<BillingTabProps> = () => {
   // Status badge
   const statusBadge = (() => {
     if (statusRaw === 'active' && !cancelAtPeriodEnd)
-      return { label: 'Active', color: '#10B981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)' };
+      return { label: 'Active', color: 'var(--green)', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.3)' };
     if (statusRaw === 'past_due')
-      return { label: 'Past Due', color: '#EF4444', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.3)' };
+      return { label: 'Past Due', color: 'var(--red)', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.3)' };
     if (cancelAtPeriodEnd)
-      return { label: 'Canceling', color: '#F59E0B', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' };
-    return { label: 'Canceled', color: '#8B6050', bg: 'rgba(139,96,80,0.1)', border: 'rgba(139,96,80,0.3)' };
+      return { label: 'Canceling', color: 'var(--amber)', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.3)' };
+    return { label: 'Canceled', color: 'var(--text-2)', bg: 'rgba(139,96,80,0.1)', border: 'rgba(139,96,80,0.3)' };
   })();
 
   const planPrice: number = subscription?.billing_cycle === 'yearly'
@@ -112,8 +112,8 @@ const BillingTab: React.FC<BillingTabProps> = () => {
           alignItems: 'center',
           justifyContent: 'center',
           height: '200px',
-          color: '#4a2e1e',
-          fontFamily: 'Outfit, sans-serif',
+          color: 'var(--text-3)',
+          fontFamily: 'var(--font-ui)',
           fontSize: '13px',
         }}
       >
@@ -134,8 +134,8 @@ const BillingTab: React.FC<BillingTabProps> = () => {
         {/* ─── Section 1: Current Plan Card ─── */}
         <div
           style={{
-            background: '#1C1208',
-            border: '0.5px solid #2a1a0e',
+            background: 'var(--surface)',
+            border: '0.5px solid var(--border)',
             borderRadius: '8px',
             padding: '20px',
           }}
@@ -153,7 +153,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
             <span
               style={{
                 ...planBadgeStyle,
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '9px',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
@@ -169,7 +169,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                 background: statusBadge.bg,
                 border: `0.5px solid ${statusBadge.border}`,
                 color: statusBadge.color,
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '9px',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
@@ -186,9 +186,9 @@ const BillingTab: React.FC<BillingTabProps> = () => {
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '8px' }}>
             <span
               style={{
-                fontFamily: '"DM Mono", monospace',
+                fontFamily: 'var(--font-mono)',
                 fontSize: '28px',
-                color: '#F5E6D8',
+                color: 'var(--text)',
                 fontWeight: 400,
               }}
             >
@@ -196,9 +196,9 @@ const BillingTab: React.FC<BillingTabProps> = () => {
             </span>
             <span
               style={{
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '12px',
-                color: '#4a2e1e',
+                color: 'var(--text-3)',
               }}
             >
               / month
@@ -212,9 +212,9 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '11px',
-                color: '#F59E0B',
+                color: 'var(--amber)',
                 marginBottom: '16px',
                 background: 'rgba(245,158,11,0.07)',
                 border: '0.5px solid rgba(245,158,11,0.2)',
@@ -231,13 +231,13 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                fontFamily: 'Outfit, sans-serif',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '11px',
-                color: '#8B6050',
+                color: 'var(--text-2)',
                 marginBottom: '16px',
               }}
             >
-              <Calendar size={12} color="#4a2e1e" />
+              <Calendar size={12} color="var(--text-3)" />
               Renews on {formatDate(renewalDate)}
             </div>
           )}
@@ -252,10 +252,10 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: 'rgba(196,131,106,0.08)',
-                border: '0.5px solid rgba(196,131,106,0.25)',
-                color: '#C4836A',
-                fontFamily: 'Outfit, sans-serif',
+                background: 'var(--accent-soft)',
+                border: '0.5px solid var(--accent-soft)',
+                color: 'var(--text)',
+                fontFamily: 'var(--font-ui)',
                 fontSize: '12px',
                 fontWeight: 500,
                 padding: '8px 14px',
@@ -284,10 +284,10 @@ const BillingTab: React.FC<BillingTabProps> = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  background: '#C4836A',
+                  background: 'var(--accent)',
                   border: 'none',
-                  color: '#0F0A07',
-                  fontFamily: 'Outfit, sans-serif',
+                  color: 'var(--on-accent)',
+                  fontFamily: 'var(--font-ui)',
                   fontSize: '12px',
                   fontWeight: 600,
                   padding: '8px 14px',
@@ -308,19 +308,19 @@ const BillingTab: React.FC<BillingTabProps> = () => {
         {/* ─── Section 2: Usage This Month ─── */}
         <div
           style={{
-            background: '#1C1208',
-            border: '0.5px solid #2a1a0e',
+            background: 'var(--surface)',
+            border: '0.5px solid var(--border)',
             borderRadius: '8px',
             padding: '20px',
           }}
         >
           <div
             style={{
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'var(--font-ui)',
               fontSize: '9px',
               textTransform: 'uppercase',
               letterSpacing: '0.09em',
-              color: '#4a2e1e',
+              color: 'var(--text-3)',
               marginBottom: '16px',
               fontWeight: 600,
             }}
@@ -332,7 +332,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
 
             {/* Intelligence Chat */}
             <UsageMeter
-              icon={<Zap size={12} color="#C4836A" />}
+              icon={<Zap size={12} color="var(--accent)" />}
               label="Intelligence Chat"
               used={chatUsed}
               limit={chatLimit}
@@ -340,7 +340,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
 
             {/* Brands */}
             <UsageMeter
-              icon={<Users size={12} color="#C4836A" />}
+              icon={<Users size={12} color="var(--accent)" />}
               label="Brands"
               used={brandsUsed}
               limit={brandsLimit}
@@ -348,7 +348,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
 
             {/* Ad Accounts */}
             <UsageMeter
-              icon={<CreditCard size={12} color="#C4836A" />}
+              icon={<CreditCard size={12} color="var(--accent)" />}
               label="Ad Accounts"
               used={adAccountsUsed}
               limit={adAccountsLimit}
@@ -359,7 +359,7 @@ const BillingTab: React.FC<BillingTabProps> = () => {
         {/* ─── Section 3: Danger Zone ─── */}
         <div
           style={{
-            background: '#0F0A07',
+            background: 'var(--bg-sidebar)',
             border: '0.5px solid rgba(239,68,68,0.2)',
             borderRadius: '8px',
             padding: '16px',
@@ -367,11 +367,11 @@ const BillingTab: React.FC<BillingTabProps> = () => {
         >
           <div
             style={{
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'var(--font-ui)',
               fontSize: '10px',
               textTransform: 'uppercase',
               letterSpacing: '0.09em',
-              color: '#EF4444',
+              color: 'var(--red)',
               marginBottom: '8px',
               fontWeight: 600,
             }}
@@ -380,9 +380,9 @@ const BillingTab: React.FC<BillingTabProps> = () => {
           </div>
           <p
             style={{
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'var(--font-ui)',
               fontSize: '12px',
-              color: '#8B6050',
+              color: 'var(--text-2)',
               margin: '0 0 12px 0',
               lineHeight: 1.5,
             }}
@@ -398,8 +398,8 @@ const BillingTab: React.FC<BillingTabProps> = () => {
               gap: '6px',
               background: 'rgba(239,68,68,0.07)',
               border: '0.5px solid rgba(239,68,68,0.3)',
-              color: '#EF4444',
-              fontFamily: 'Outfit, sans-serif',
+              color: 'var(--red)',
+              fontFamily: 'var(--font-ui)',
               fontSize: '12px',
               fontWeight: 500,
               padding: '8px 14px',
@@ -450,11 +450,11 @@ const UsageMeter: React.FC<UsageMeterProps> = ({ icon, label, used, limit }) => 
           {icon}
           <span
             style={{
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'var(--font-ui)',
               fontSize: '9px',
               textTransform: 'uppercase',
               letterSpacing: '0.07em',
-              color: '#8B6050',
+              color: 'var(--text-2)',
               fontWeight: 500,
             }}
           >
@@ -463,14 +463,14 @@ const UsageMeter: React.FC<UsageMeterProps> = ({ icon, label, used, limit }) => 
         </div>
         <span
           style={{
-            fontFamily: '"DM Mono", monospace',
+            fontFamily: 'var(--font-mono)',
             fontSize: '14px',
-            color: '#F5E6D8',
+            color: 'var(--text)',
             fontWeight: 400,
           }}
         >
           {isUnlimited
-            ? <span style={{ color: '#10B981', fontSize: '11px', fontFamily: 'Outfit, sans-serif' }}>Unlimited</span>
+            ? <span style={{ color: 'var(--green)', fontSize: '11px', fontFamily: 'var(--font-ui)' }}>Unlimited</span>
             : `${used} / ${limit}`}
         </span>
       </div>
@@ -480,7 +480,7 @@ const UsageMeter: React.FC<UsageMeterProps> = ({ icon, label, used, limit }) => 
         <div
           style={{
             height: '3px',
-            background: '#0F0A07',
+            background: 'var(--bg-sidebar)',
             borderRadius: '2px',
             overflow: 'hidden',
           }}

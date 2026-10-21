@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { Mail, Eye, EyeOff, AlertCircle, Globe, LayoutDashboard } from 'lucide-react';
 import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { RougeLogo } from '../components/brand/RougeLogo';
 
 const Login: React.FC = () => {
   const { user, loading } = useAuth();
@@ -55,13 +56,13 @@ const Login: React.FC = () => {
             Know if your ROAS<br />is good <em>before</em> you<br />run out of budget
           </h1>
           <p className="login-tagline">
-            9 years of Beauty & Cosmetics benchmark data, layered on top of your ad account.
+            Beauty & Cosmetics benchmark data since 2018, layered on top of your ad account.
           </p>
 
           <div className="login-proof-list">
             {[
-              { stat: '847', label: 'Beauty brands analysed' },
-              { stat: '9yr',  label: 'Benchmark dataset' },
+              { stat: '20K+', label: 'Beauty campaigns analysed' },
+              { stat: '2018', label: 'First campaign in the dataset' },
               { stat: '€100+', label: 'Avg AOV served' },
             ].map(({ stat, label }) => (
               <div key={label} className="login-proof-item">
@@ -82,7 +83,7 @@ const Login: React.FC = () => {
           </div>
 
           <div className="login-quote">
-            <em>"Feminine intelligence meets hard data."</em>
+            Since 2018. 20,000+ beauty campaigns. One number that matters.
           </div>
         </div>
       </div>
@@ -92,7 +93,7 @@ const Login: React.FC = () => {
         <div className="login-form-wrap animate-fade-in">
           {/* Logo */}
           <div className="login-logo">
-            Next<em>Gen</em>Ads
+            <RougeLogo variant="lockup" className="login-rouge-logo" />
           </div>
 
           {/* Tabs */}
@@ -217,23 +218,12 @@ const Login: React.FC = () => {
         /* ——— Left dark panel ——— */
         .login-left {
           width: 52%;
-          background: #2C1810;
+          background: var(--bg);
           display: flex;
           align-items: center;
           padding: 60px 64px;
           position: relative;
           overflow: hidden;
-        }
-
-        .login-left::before {
-          content: '';
-          position: absolute;
-          top: -120px;
-          right: -120px;
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(circle, rgba(196,131,106,0.08) 0%, transparent 70%);
-          pointer-events: none;
         }
 
         .login-left-content {
@@ -246,12 +236,12 @@ const Login: React.FC = () => {
         }
 
         .login-eyebrow {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.28em;
           text-transform: uppercase;
-          color: var(--rose-gold);
+          color: var(--text);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -263,15 +253,15 @@ const Login: React.FC = () => {
           display: block;
           width: 24px;
           height: 0.5px;
-          background: var(--rose-gold);
+          background: var(--border);
         }
 
         .login-headline {
           font-family: var(--font-display);
           font-size: 42px;
-          font-weight: 600;
+          font-weight: 800;
           line-height: 1.15;
-          color: #F5E6D8;
+          color: var(--text);
           letter-spacing: -0.02em;
           margin-bottom: 20px;
         }
@@ -281,10 +271,10 @@ const Login: React.FC = () => {
         }
 
         .login-tagline {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 14px;
           font-weight: 300;
-          color: #C4A090;
+          color: var(--text);
           line-height: 1.6;
           margin-bottom: 32px;
           max-width: 360px;
@@ -303,26 +293,26 @@ const Login: React.FC = () => {
         }
 
         .login-proof-stat {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 22px;
           font-weight: 500;
-          color: #F5E6D8;
+          color: var(--text);
           line-height: 1;
         }
 
         .login-proof-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 300;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #7A5A48;
+          color: var(--text-2);
         }
 
         /* ——— Demo CTA box on dark panel ——— */
         .login-demo-cta {
-          background: rgba(196,131,106,0.08);
-          border: 0.5px solid rgba(196,131,106,0.25);
+          background: var(--surface-2);
+          border: 1px solid var(--border);
           border-radius: 6px;
           padding: 16px 18px;
           margin-bottom: 28px;
@@ -332,47 +322,47 @@ const Login: React.FC = () => {
         }
 
         .login-demo-label {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           font-weight: 300;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #8B6050;
+          color: var(--text-2);
         }
 
         .login-demo-btn {
           display: flex;
           align-items: center;
           gap: 9px;
-          background: #C4836A;
-          border: none;
+          background: transparent;
+          border: 1px solid var(--border-control);
           border-radius: 4px;
           padding: 11px 16px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 13px;
           font-weight: 500;
           letter-spacing: 0.06em;
-          color: #FDF6F0;
+          color: var(--text);
           cursor: pointer;
           transition: background 0.2s;
           width: fit-content;
         }
 
-        .login-demo-btn:hover { background: #B06E55; }
+        .login-demo-btn:hover { background: var(--surface-2); }
 
         .login-demo-sub {
-          font-family: 'DM Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 9px;
-          color: #6B4A38;
+          color: var(--text-2);
           letter-spacing: 0.06em;
         }
 
         .login-quote {
           font-family: var(--font-display);
-          font-weight: 600;
+          font-weight: 700;
           font-size: 14px;
-          color: #8B6050;
-          border-left: 1px solid #3d2a1e;
+          color: var(--text-2);
+          border-left: 1px solid var(--border);
           padding-left: 16px;
           line-height: 1.6;
         }
@@ -398,15 +388,13 @@ const Login: React.FC = () => {
         .login-logo {
           font-family: var(--font-display);
           font-size: 20px;
-          font-weight: 600;
+          font-weight: 800;
           color: var(--text-primary);
           letter-spacing: -0.01em;
           margin-bottom: 4px;
         }
 
-        .login-logo em {
-          color: var(--rose-gold);
-        }
+        .login-rouge-logo { height: 24px; display: block; }
 
         .login-tabs {
           display: flex;
@@ -421,21 +409,22 @@ const Login: React.FC = () => {
           flex: 1;
           padding: 8px;
           border-radius: calc(var(--radius) - 1px);
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 400;
           letter-spacing: 0.04em;
-          color: var(--text-muted);
+          color: var(--text-2);
           background: transparent;
           border: none;
+          border-bottom: 2px solid transparent;
+          border-radius: 0;
           cursor: pointer;
           transition: all var(--transition);
         }
 
         .login-tab.active {
-          background: var(--bg-card);
-          color: var(--text-primary);
-          box-shadow: var(--shadow-sm);
+          color: var(--text);
+          border-bottom-color: var(--text);
         }
 
         .login-google-btn {
@@ -449,7 +438,7 @@ const Login: React.FC = () => {
           border: 0.5px solid var(--border-light);
           border-radius: var(--radius);
           color: var(--text-primary);
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 400;
           letter-spacing: 0.06em;
@@ -466,7 +455,7 @@ const Login: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 12px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 11px;
           color: var(--text-hint);
         }
@@ -515,14 +504,14 @@ const Login: React.FC = () => {
           display: flex;
           align-items: flex-start;
           gap: 7px;
-          background: #FEE2E2;
+          background: var(--red-soft);
           border: 0.5px solid rgba(239,68,68,0.2);
           border-radius: var(--radius);
           padding: 10px 12px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 12px;
           font-weight: 300;
-          color: #991B1B;
+          color: var(--red);
           line-height: 1.5;
         }
 
@@ -531,7 +520,7 @@ const Login: React.FC = () => {
         .login-error-hint {
           margin-top: 4px;
           font-size: 11px;
-          color: #7f1d1d;
+          color: var(--red);
         }
 
         .login-error-demo {
@@ -539,7 +528,7 @@ const Login: React.FC = () => {
           border: none;
           font-family: inherit;
           font-size: inherit;
-          color: #B45309;
+          color: var(--amber);
           cursor: pointer;
           text-decoration: underline;
           padding: 0;
@@ -557,7 +546,7 @@ const Login: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 10px;
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 300;
           letter-spacing: 0.1em;
@@ -574,7 +563,7 @@ const Login: React.FC = () => {
         }
 
         .login-footer {
-          font-family: 'Outfit', sans-serif;
+          font-family: var(--font-ui);
           font-size: 10px;
           font-weight: 300;
           color: var(--text-hint);

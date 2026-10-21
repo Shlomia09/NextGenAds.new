@@ -22,22 +22,22 @@ const ShopifyCallback: React.FC = () => {
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: '100vh',
-      background: '#0F0A07',
+      background: 'var(--bg)',
       gap: 16,
     }}>
       <div style={{
         width: 20,
         height: 20,
-        border: '1.5px solid #2a1a0e',
-        borderTopColor: '#C4836A',
+        border: '1.5px solid var(--border)',
+        borderTopColor: 'var(--accent)',
         borderRadius: '50%',
         animation: 'spin 1s linear infinite',
       }} />
       <p style={{
-        fontFamily: "'Outfit', sans-serif",
+        fontFamily: 'var(--font-ui)',
         fontSize: 13,
         fontWeight: 300,
-        color: '#8B6050',
+        color: 'var(--text-2)',
         letterSpacing: '0.08em',
       }}>
         Connecting Shopify…
