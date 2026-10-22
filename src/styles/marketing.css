@@ -187,6 +187,13 @@
 .mk-band { border-top: 1px solid var(--border); display: flex; justify-content: center; }
 .mk-band .mk-material { width: 100%; }
 .mk-band img { max-height: 420px; width: 100%; object-fit: contain; object-position: center; }
+.mk-band-tall img { max-height: 520px; }
+
+/* Final CTA */
+.mk-final { padding: 72px 0 112px; }
+.mk-final .mk-h2 { max-width: 26ch; line-height: var(--lh-h2); }
+.mk-final .mk-final-sub { margin-top: 28px; max-width: 52ch; }
+@media (max-width: 640px) { .mk-final { padding: 48px 0 72px; } }
 
 /* Pricing */
 .mk-toggle { display: inline-flex; border: 1px solid var(--border-control); border-radius: var(--radius); margin-bottom: 28px; }
@@ -219,12 +226,13 @@
 .mk-plan-sub { font-family: var(--font-mono); font-size: 12px; color: var(--text-3); margin-top: 6px; }
 .mk-plan-for { color: var(--text-2); font-size: 14px; }
 .mk-plan ul { list-style: none; margin: 0; padding: 18px 0 0; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; flex: 1; }
-.mk-plan li { font-size: 14px; color: var(--text); padding-left: 18px; position: relative; }
-.mk-plan li::before { content: '—'; position: absolute; left: 0; color: var(--text-3); }
+.mk-plan li { font-size: 14px; color: var(--text); padding-left: 16px; position: relative; }
+/* 4px square, not an em dash: "—" now means a missing value across the system */
+.mk-plan li::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 4px; height: 4px; background: var(--text-3); }
 .mk-plan .btn { justify-content: center; width: 100%; }
 /* Checkout failure: an alert state, so red as a 2px rule — the text itself stays --text (small) */
 .mk-plan-error { margin: 0; padding: 8px 0 8px 12px; border-left: 2px solid var(--accent); color: var(--text); font-size: 13px; line-height: 1.4; }
-.mk-guarantee { margin-top: 32px; max-width: 60ch; color: var(--text-2); }
+.mk-guarantee { margin-top: 32px; max-width: 60ch; color: var(--text-2); font-size: 15px; }
 .mk-close { margin-top: 32px; }
 @media (max-width: 900px) { .mk-plans { grid-template-columns: 1fr; max-width: 460px; } }
 

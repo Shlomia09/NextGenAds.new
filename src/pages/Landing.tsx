@@ -228,8 +228,24 @@ export default function Landing() {
       <section className="mk-section" id="pricing">
         <div className="mk-wrap">
           <PricingSection />
-          <div className="mk-close">
+        </div>
+      </section>
+
+      {/* ── 8 · Final CTA ──────────────────────────────────── */}
+      <div className="mk-band mk-band-tall" aria-hidden="true">
+        <Material name="pipette-drop" />
+      </div>
+      <section className="mk-final">
+        <div className="mk-wrap">
+          <h2 className="mk-h2 mk-reveal">
+            Connect the account.<br />Read tomorrow's <span className="mk-accent">obituary</span>.
+          </h2>
+          <p className="mk-lead mk-final-sub">
+            Thirty days. If Rouge doesn't find what your reporting missed, you don't pay for the month.
+          </p>
+          <div className="mk-actions">
             <button className="btn btn-primary btn-lg" onClick={getStarted}>Get started</button>
+            <button className="btn btn-secondary btn-lg" onClick={howItWorks}>See how it works</button>
           </div>
         </div>
       </section>
