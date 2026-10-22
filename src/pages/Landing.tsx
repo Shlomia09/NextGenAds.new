@@ -36,20 +36,16 @@ const CAPABILITIES = [
   },
 ];
 
-// Every action goes through approval today (known-issues #8): the left column is what Rouge
-// proposes and executes once approved, not what runs unattended.
-const PROPOSES = [
-  'Pausing creatives below break-even.',
-  'Moving budget between ads inside a campaign.',
-  'Audience tests inside the current budget.',
-  "Pulling what's dying before it drains the week.",
-];
-
-const ASKS_YOU_FIRST = [
-  'Raising the budget.',
-  'Launching a new campaign.',
-  'Anything that increases spend.',
-  'Anything that spends more than yesterday.',
+// One list, not "runs alone / asks first": today every change goes through approval
+// (known-issues #8), so a two-column split would claim a distinction the code does not make.
+// The two-column table comes back when #8 ships (Docs/landing-spec-v3.md, section 5).
+const STEPS = [
+  { verb: 'Reads',     body: 'Your Meta account, every morning.' },
+  { verb: 'Diagnoses', body: "Names the creative that's dying and the cause: frequency, hook-rate, CPM or landing page." },
+  { verb: 'Proposes',  body: 'The change — a pause, pacing, reallocation, an audience test — with the reason and what it should change.' },
+  { verb: 'Drafts',    body: 'Copy from the ads that already won in your account.' },
+  { verb: 'Builds',    body: 'New campaigns with you: structure, objective, audience, budget.' },
+  { verb: 'Publishes', body: 'What you approved, and nothing else. Then watches it for 48 hours.' },
 ];
 
 function Card({ n, title, body }: { n: number; title: string; body: string }) {
@@ -184,17 +180,16 @@ export default function Landing() {
             <div className="mk-eyebrow">How it works</div>
             <h2 className="mk-h2">It does the work.<br />You approve the spend.</h2>
           </div>
-          <div className="mk-cols">
-            <div className="mk-col">
-              <div className="mk-eyebrow">Proposes, then executes on your yes</div>
-              <ul>{PROPOSES.map(t => <li key={t}>{t}</li>)}</ul>
-            </div>
-            <div className="mk-col">
-              <div className="mk-eyebrow">Asks you first</div>
-              <ul>{ASKS_YOU_FIRST.map(t => <li key={t}>{t}</li>)}</ul>
-            </div>
-          </div>
-          <p className="mk-summary-sub">Every action is watched for 48 hours after it runs.</p>
+          <ol className="mk-steps">
+            {STEPS.map((s, i) => (
+              <li key={s.verb}>
+                <span className="mk-step-n">{String(i + 1).padStart(2, '0')}</span>
+                <span className="mk-step-verb">{s.verb}</span>
+                <span className="mk-step-body">{s.body}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="mk-summary">Every change waits for you. Nothing moves in your account until you say yes.</p>
         </div>
       </section>
 

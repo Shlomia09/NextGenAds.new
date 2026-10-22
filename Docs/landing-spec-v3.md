@@ -207,12 +207,22 @@ fight the screenshots.
 known-issue #8 blocks: the ceiling is marketed and not built. The new heading is true of the
 approval flow as built and needs no change when the ceiling ships.
 
-The two-column table stays, but its left column is no longer "runs on its own": every action goes
-through approval today, so it reads "Proposes, then executes on your yes". The closing line "Rouge
-can move your money. It can't spend *more* of it without you." is deleted — same claim. Card 02, the
-Growth plan feature and the "Scaling past your ceiling" row were rewritten in approval-flow language.
+**The two-column "runs on its own / asks you first" table is removed for now.** Today every change
+goes through approval, so two columns that both mean "approved" dramatise a distinction the code does
+not make. It is replaced by one ordered list of what Rouge does — Reads, Diagnoses, Proposes, Drafts,
+Builds, Publishes (the last carries the 48-hour watch, which the code schedules) — and one line beneath:
+"Every change waits for you. Nothing moves in your account until you say yes."
 
-Add `shot-workshop.png` to the right of the table at ≥1024px.
+**When the ceiling ships (known-issue #8), the two-column table comes back** — then the split is real.
+Its last content, for reference: left "Pausing creatives below break-even / Moving budget between ads
+inside a campaign / Audience tests inside the current budget / Pulling what's dying before it drains
+the week"; right "Raising the budget / Launching a new campaign / Anything that increases spend".
+
+The closing line "Rouge can move your money. It can't spend *more* of it without you." is deleted —
+same claim. Card 02, the Growth plan feature and the "Scaling past your ceiling" row were rewritten in
+approval-flow language.
+
+Add `shot-workshop.png` beside the list at ≥1024px once #12 makes it capturable.
 
 ### Brand safety
 

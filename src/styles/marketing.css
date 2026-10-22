@@ -169,17 +169,16 @@
 @media (max-width: 600px) { .mk-cards { grid-template-columns: 1fr; } }
 
 /* How it works: two columns */
-.mk-cols { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: var(--radius); }
-.mk-col { padding: 32px 28px; display: flex; flex-direction: column; gap: 16px; }
-.mk-col + .mk-col { border-left: 1px solid var(--border); }
-.mk-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-.mk-col li { color: var(--text); font-size: 15px; line-height: 1.45; padding-top: 12px; border-top: 1px solid var(--border); }
+.mk-steps { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--border); }
+.mk-steps li { display: grid; grid-template-columns: 48px 160px 1fr; align-items: baseline; gap: 16px; padding: 18px 0; border-top: 1px solid var(--border); }
+.mk-step-n { font-family: var(--font-mono); font-size: var(--t-label); color: var(--text-3); }
+.mk-step-verb { font-family: var(--font-display); font-size: var(--t-h3); font-weight: 800; color: var(--text); }
+.mk-step-body { color: var(--text-2); font-size: 15px; line-height: 1.45; max-width: 60ch; }
 .mk-statement { max-width: 24ch; margin-bottom: 32px; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); color: var(--text); }
-.mk-summary { margin-top: 40px; max-width: 48ch; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); }
-.mk-summary-sub { margin-top: 28px; color: var(--text-2); font-size: 15px; }
+.mk-steps + .mk-summary { margin-top: 40px; max-width: 48ch; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); }
 @media (max-width: 720px) {
-  .mk-cols { grid-template-columns: 1fr; }
-  .mk-col + .mk-col { border-left: 0; border-top: 1px solid var(--border); }
+  .mk-steps li { grid-template-columns: 36px 1fr; row-gap: 6px; }
+  .mk-step-body { grid-column: 2; }
 }
 
 /* Material bands — the whole still, centred; its background is the page, so it reads full-bleed
