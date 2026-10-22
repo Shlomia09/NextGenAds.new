@@ -40,7 +40,6 @@ import Connect from './pages/Connect';
 import Settings from './pages/Settings';
 import DemoDashboard from './pages/DemoDashboard';
 import Pricing from './pages/Pricing';
-import Audit from './pages/Audit';
 import MetaCallback from './pages/MetaCallback';
 import ShopifyCallback from './pages/ShopifyCallback';
 import CampaignWorkshop from './pages/CampaignWorkshop';
@@ -84,7 +83,7 @@ const AppRoutes: React.FC = () => (
     <Route path="/login"   element={<Login />} />
     <Route path="/demo"    element={<DemoDashboard />} />
     <Route path="/pricing" element={<Pricing />} />
-    <Route path="/audit"   element={<Audit />} />
+    {/* /audit is unrouted: it shows hardcoded 'your account' results after sign-up (known-issues #5) */}
 
     {/* ── OAuth Callbacks (public, no sidebar) ── */}
     <Route path="/connect/meta/callback"    element={<MetaCallback />} />

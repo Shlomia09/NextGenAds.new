@@ -207,8 +207,10 @@ fight the screenshots.
 known-issue #8 blocks: the ceiling is marketed and not built. The new heading is true of the
 approval flow as built and needs no change when the ceiling ships.
 
-The two-column "runs on its own / asks you first" table stays. The closing line "Rouge can move
-your money. It can't spend *more* of it without you." is deleted — same claim.
+The two-column table stays, but its left column is no longer "runs on its own": every action goes
+through approval today, so it reads "Proposes, then executes on your yes". The closing line "Rouge
+can move your money. It can't spend *more* of it without you." is deleted — same claim. Card 02, the
+Growth plan feature and the "Scaling past your ceiling" row were rewritten in approval-flow language.
 
 Add `shot-workshop.png` to the right of the table at ≥1024px.
 
@@ -288,8 +290,9 @@ rg -n '<img ' src/components/marketing src/pages/Landing.tsx | rg -v 'width=' &&
 # 4 · No shadows on the landing
 rg -n 'box-shadow|drop-shadow|filter:' src/styles/marketing.css && echo FAIL || echo OK
 
-# 5 · The blocked sentence is gone
-rg -n "can't spend|set the ceiling" src && echo FAIL || echo OK
+# 5 · No ceiling language anywhere in src/ until known-issue #8 ships.
+#     Measures the concept, not a list of sentences (same lesson as the hex gate).
+rg -n -i 'ceiling' src && echo FAIL || echo OK
 ```
 
 Then by eye, at 390px, 768px and 1440px:

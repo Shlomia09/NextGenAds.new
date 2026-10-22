@@ -11,12 +11,9 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 const MOCK_BRAND = {
   name: 'NeoLumo Spain',
   category: 'Skincare',
-  aov_min: 120,
-  aov_max: 180,
-  currency: 'EUR',
   markets: ['ES', 'IT'],
   stage: 'scaling',
-  bracket: 'AOV €80–150',
+  bracket: 'AOV €80–150',   // a real bracket in src/lib/benchmarks.ts; holds the derived €130 AOV
   funnel: 'Hybrid 70% Conversions + 30% Traffic → Retargeting → Klaviyo',
 };
 
@@ -29,12 +26,26 @@ const MOCK_CAMPAIGNS = [
   { name: 'Testing — UGC Creative v3',      status: 'ACTIVE',   objective: 'CONVERSIONS', spend: 150,  roas: 2.1,  impressions: 12800,  purchases: 6,   revenue: 315   },
 ];
 
+// Account totals — every account-level figure on the page is derived from these rows.
+const TOTAL_SPEND   = MOCK_CAMPAIGNS.reduce((s, c) => s + c.spend, 0);
+const TOTAL_REVENUE = MOCK_CAMPAIGNS.reduce((s, c) => s + c.revenue, 0);
+const TOTAL_PURCH   = MOCK_CAMPAIGNS.reduce((s, c) => s + c.purchases, 0);
+const TOTAL_IMPR    = MOCK_CAMPAIGNS.reduce((s, c) => s + c.impressions, 0);
+const ACCOUNT = {
+  roas: TOTAL_REVENUE / TOTAL_SPEND,
+  cac:  TOTAL_SPEND / TOTAL_PURCH,
+  cpm:  TOTAL_SPEND / TOTAL_IMPR * 1000,
+  aov:  TOTAL_REVENUE / TOTAL_PURCH,
+  purchaseRate: TOTAL_PURCH / TOTAL_IMPR * 100,
+};
+
+const ROAS_BENCH = 3.2, CAC_BENCH = 45;
 const MOCK_BENCHMARKS = [
-  { label: 'ROAS',           your: 4.2,   bench: 3.2,  unit: 'x',  better: true },
-  { label: 'CAC',            your: 32.6,  bench: 45,   unit: '€',  better: false },
-  { label: 'CPM',            your: 15.4,  bench: 18.2, unit: '€',  better: false },
-  { label: 'CTR',            your: 2.14,  bench: 1.8,  unit: '%',  better: true  },
-  { label: 'Purchase Rate',  your: 0.047, bench: 0.038, unit: '%', better: true  },
+  { label: 'ROAS',           your: ACCOUNT.roas,         bench: ROAS_BENCH, unit: 'x', better: true  },
+  { label: 'CAC',            your: ACCOUNT.cac,          bench: CAC_BENCH,  unit: '€', better: false },
+  { label: 'CPM',            your: ACCOUNT.cpm,          bench: 18.2,  unit: '€', better: false },
+  { label: 'CTR',            your: 2.14,                 bench: 1.8,   unit: '%', better: true  },
+  { label: 'Purchase Rate',  your: ACCOUNT.purchaseRate, bench: 0.038, unit: '%', better: true  },
 ];
 
 const MOCK_RECS = [
@@ -67,17 +78,17 @@ const MOCK_RECS = [
 const ROAS_TREND = Array.from({ length: 14 }, (_, i) => ({
   day: `D${i + 1}`,
   roas: parseFloat((3.2 + Math.sin(i * 0.7) * 0.8 + i * 0.08).toFixed(2)),
-  bench: 3.2,
+  bench: ROAS_BENCH,
 }));
 
 const DEMO_CHAT_RESPONSES: Record<string, string> = {
   default: `Based on your NeoLumo campaign data vs the Beauty & Cosmetics benchmark (data since 2018):
 
-**Your account is performing ABOVE average** for the €120–180 AOV bracket.
+**Your account is performing ABOVE average** for the ${MOCK_BRAND.bracket.replace('AOV ', '')} AOV bracket.
 
 Key observations:
-• ROAS 4.2x vs benchmark 3.2x → beating by 31%
-• CAC €32.60 vs benchmark €45 → 28% more efficient
+• ROAS ${ACCOUNT.roas.toFixed(2)}x vs benchmark ${ROAS_BENCH.toFixed(1)}x → beating by ${Math.round((ACCOUNT.roas / ROAS_BENCH - 1) * 100)}%
+• CAC €${ACCOUNT.cac.toFixed(2)} vs benchmark €${CAC_BENCH} → ${Math.round((1 - ACCOUNT.cac / CAC_BENCH) * 100)}% more efficient
 • Your Retargeting campaign at 6.1x is exceptional — scale it now
 
 The weak point: UGC Creative v3 at 2.1x is below your break-even (2.4x). Pause and test a Before/After creative format instead — it is the format the ES skincare benchmark favours over UGC.`,
@@ -107,11 +118,11 @@ const DemoDashboard: React.FC = () => {
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
 
-  const totalSpend   = MOCK_CAMPAIGNS.reduce((s, c) => s + c.spend, 0);
-  const totalRevenue = MOCK_CAMPAIGNS.reduce((s, c) => s + c.revenue, 0);
-  const totalPurch   = MOCK_CAMPAIGNS.reduce((s, c) => s + c.purchases, 0);
-  const avgRoas      = totalSpend > 0 ? totalRevenue / totalSpend : 0;
-  const roasBench    = MOCK_BENCHMARKS.find(b => b.label === 'ROAS')?.bench ?? 0;
+  const totalSpend   = TOTAL_SPEND;
+  const totalRevenue = TOTAL_REVENUE;
+  const totalPurch   = TOTAL_PURCH;
+  const avgRoas      = ACCOUNT.roas;
+  const roasBench    = ROAS_BENCH;
   const roasColor    = avgRoas >= roasBench ? 'var(--green)' : 'var(--accent)';
 
   const sendChat = async () => {
@@ -196,7 +207,6 @@ const DemoDashboard: React.FC = () => {
                 {MOCK_BRAND.name} <em>Dashboard</em>
               </h1>
               <p className="page-subtitle">
-                AOV {MOCK_BRAND.currency}{MOCK_BRAND.aov_min}–{MOCK_BRAND.aov_max} ·{' '}
                 <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text)' }}>{MOCK_BRAND.bracket}</span> ·{' '}
                 {MOCK_BRAND.funnel}
               </p>
@@ -232,7 +242,7 @@ const DemoDashboard: React.FC = () => {
                 </div>
               </div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-hint)', background: 'var(--bg-secondary)', border: '0.5px solid var(--border-light)', borderRadius: 2, padding: '4px 8px' }}>
-                25,620 beauty campaigns · AOV €80–150 · since 2018
+                25,620 beauty campaigns · {MOCK_BRAND.bracket} · since 2018
               </div>
               {MOCK_BENCHMARKS.map(({ label, your, bench, unit, better }) => {
                 const diff = ((your - bench) / bench * 100);
@@ -254,8 +264,9 @@ const DemoDashboard: React.FC = () => {
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>{fmtVal(bench)}</span>
                     </div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: statusColor, display: 'flex', alignItems: 'center', gap: 4 }}>
-                      {beating
-                        ? <><TrendingUp size={10} strokeWidth={1.5} />+{Math.abs(diff).toFixed(1)}% above</>
+                      {/* the word follows the sign; the colour (statusColor) follows whether it beats the benchmark */}
+                      {diff >= 0
+                        ? <><TrendingUp size={10} strokeWidth={1.5} />{Math.abs(diff).toFixed(1)}% above</>
                         : <><TrendingDown size={10} strokeWidth={1.5} />{Math.abs(diff).toFixed(1)}% below</>}
                     </div>
                   </div>
@@ -341,7 +352,7 @@ const DemoDashboard: React.FC = () => {
                   <div>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Rouge</div>
                     <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, fontWeight: 300, color: 'var(--text-muted)', marginTop: 1 }}>
-                      NeoLumo · €150 AOV avg · <span style={{ fontFamily: 'var(--font-mono)' }}>4.20x</span> ROAS
+                      NeoLumo · €{Math.round(ACCOUNT.aov)} AOV avg · <span style={{ fontFamily: 'var(--font-mono)' }}>{ACCOUNT.roas.toFixed(2)}x</span> ROAS
                     </div>
                   </div>
                 </div>

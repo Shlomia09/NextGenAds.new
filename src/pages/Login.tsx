@@ -63,7 +63,6 @@ const Login: React.FC = () => {
             {[
               { stat: '25,620', label: 'Beauty campaigns analysed' },
               { stat: '2018', label: 'First campaign in the dataset' },
-              { stat: '€100+', label: 'Avg AOV served' },
             ].map(({ stat, label }) => (
               <div key={label} className="login-proof-item">
                 <div className="login-proof-stat">{stat}</div>

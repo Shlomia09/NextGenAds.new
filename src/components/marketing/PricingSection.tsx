@@ -25,8 +25,7 @@ const PAID: { id: Exclude<PlanId, 'free'>; for: string; includes: string[]; reco
     includes: [
       '2 brands · 2 ad accounts',
       'Everything in Starter',
-      'Runs the account inside the ceiling you set',
-      'Asks first before anything that spends more',
+      'Proposes every change with its reason, and executes the ones you approve',
       'Rouge in chat · unlimited',
     ],
   },

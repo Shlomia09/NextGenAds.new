@@ -20,7 +20,7 @@ const CAPABILITIES = [
   },
   {
     title: 'Runs it',
-    body: 'Pausing, pacing, reallocation and audience tests run on their own, inside the ceiling you set. Anything that spends more waits for you.',
+    body: 'Pausing, pacing, reallocation and audience tests, each proposed with the reason it is proposed and what it should change. You approve; Rouge executes.',
   },
   {
     title: 'Builds',
@@ -36,17 +36,19 @@ const CAPABILITIES = [
   },
 ];
 
-const RUNS_ON_ITS_OWN = [
-  'Pauses creatives below break-even.',
-  'Moves budget between ads inside a campaign.',
-  'Tests audiences within the budget you set.',
-  "Kills what's dying before it drains the week.",
+// Every action goes through approval today (known-issues #8): the left column is what Rouge
+// proposes and executes once approved, not what runs unattended.
+const PROPOSES = [
+  'Pausing creatives below break-even.',
+  'Moving budget between ads inside a campaign.',
+  'Audience tests inside the current budget.',
+  "Pulling what's dying before it drains the week.",
 ];
 
 const ASKS_YOU_FIRST = [
   'Raising the budget.',
   'Launching a new campaign.',
-  'Scaling past your ceiling.',
+  'Anything that increases spend.',
   'Anything that spends more than yesterday.',
 ];
 
@@ -184,8 +186,8 @@ export default function Landing() {
           </div>
           <div className="mk-cols">
             <div className="mk-col">
-              <div className="mk-eyebrow">Runs on its own</div>
-              <ul>{RUNS_ON_ITS_OWN.map(t => <li key={t}>{t}</li>)}</ul>
+              <div className="mk-eyebrow">Proposes, then executes on your yes</div>
+              <ul>{PROPOSES.map(t => <li key={t}>{t}</li>)}</ul>
             </div>
             <div className="mk-col">
               <div className="mk-eyebrow">Asks you first</div>
