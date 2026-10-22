@@ -186,7 +186,7 @@ const DemoDashboard: React.FC = () => {
         {/* Page content */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px' }}>
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
+          <div data-shot="dash-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
             <div>
               <div className="section-eyebrow">
                 <div className="live-dot" />
@@ -221,7 +221,7 @@ const DemoDashboard: React.FC = () => {
           </div>
 
           {/* 3-column grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, alignItems: 'start' }}>
+          <div data-shot="dash-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, alignItems: 'start' }}>
 
             {/* ── Col 1: Benchmarks ── */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -303,7 +303,7 @@ const DemoDashboard: React.FC = () => {
               {MOCK_RECS.map((rec, i) => {
                 const borderColor = rec.priority === 'critical' ? 'var(--danger)' : rec.priority === 'high' ? 'var(--warning)' : 'var(--rose-gold)';
                 return (
-                  <div key={i} style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-light)', borderLeft: `2.5px solid ${borderColor}`, borderRadius: 6, padding: '14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div key={i} data-shot={i === 0 ? 'obituary' : undefined} style={{ background: 'var(--bg-card)', border: '0.5px solid var(--border-light)', borderLeft: `2.5px solid ${borderColor}`, borderRadius: 6, padding: '14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <DemoBadge priority={rec.priority} />
                       <span className="badge badge-neutral">{rec.type}</span>
