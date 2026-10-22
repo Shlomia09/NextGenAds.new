@@ -58,7 +58,7 @@ const MOCK_RECS = [
     priority: 'medium',
     type: 'Audience',
     title: 'Add Interest Stack: Skincare + Anti-aging',
-    desc: 'Your Prospecting campaign uses broad targeting only. Adding a stacked interest audience can improve cold traffic quality by 15-25%.',
+    desc: 'Your Prospecting campaign uses broad targeting only. A stacked interest audience is the next test for cold traffic quality.',
     benchmark: 'Skincare + Natural Beauty + Anti-aging outperforms generic Beauty interests in ES market',
     action: 'Duplicate Prospecting ad set → add interest stack: Skincare, Natural Beauty, Anti-aging',
   },
@@ -80,7 +80,7 @@ Key observations:
 • CAC €32.60 vs benchmark €45 → 28% more efficient
 • Your Retargeting campaign at 6.1x is exceptional — scale it now
 
-The weak point: UGC Creative v3 at 2.1x is below your break-even (2.4x). Pause and test Before/After creative format instead — it converts 2.3x better than UGC in the ES skincare market per benchmark data.`,
+The weak point: UGC Creative v3 at 2.1x is below your break-even (2.4x). Pause and test a Before/After creative format instead — it is the format the ES skincare benchmark favours over UGC.`,
 };
 
 /* ── Components ── */
