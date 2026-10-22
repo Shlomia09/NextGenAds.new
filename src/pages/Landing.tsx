@@ -4,9 +4,10 @@ import '../styles/marketing.css';
 import { MarketingNav, MarketingFooter } from '../components/marketing/MarketingChrome';
 import { DecayLines } from '../components/marketing/DecayLines';
 import { PricingSection } from '../components/marketing/PricingSection';
+import { ProductShot, Material } from '../components/marketing/Figures';
 
 /* ─────────────────────────────────────────────────────────────
-   Rouge — landing. Spec: Docs/landing-spec.md (v2).
+   Rouge — landing. Spec: Docs/landing-spec.md (v2) + Docs/landing-spec-v3.md (visual layer).
    • Always Bone: the root pins data-theme="light".
    • No number without a source: only 25,620, 2018 and the plan prices.
    • CTA is always "Get started". 30-day money-back, nothing else.
@@ -72,7 +73,8 @@ export default function Landing() {
 
       {/* ── 1 · Hero ───────────────────────────────────────── */}
       <header className="mk-hero">
-        <div className="mk-wrap">
+        <div className="mk-wrap mk-hero-grid">
+          <div className="mk-hero-copy">
           <div className="mk-eyebrow">Beauty campaign intelligence</div>
           <h1 className="mk-h1">
             How many good days does this ad have <span className="mk-accent">left</span>?
@@ -88,10 +90,9 @@ export default function Landing() {
             <button className="btn btn-secondary btn-lg" onClick={howItWorks}>See how it works</button>
           </div>
           <p className="mk-fineprint">30-day money-back guarantee · No setup fee</p>
-
-          <div className="mk-hero-visual">
-            <DecayLines />
-            <p className="mk-caption">Four creatives. One account. Four different lifespans.</p>
+          </div>
+          <div className="mk-hero-shot">
+            <ProductShot name="shot-obituary" lazy={false} />
           </div>
         </div>
       </header>
@@ -121,7 +122,8 @@ export default function Landing() {
             <div className="mk-eyebrow">The problem</div>
             <h2 className="mk-h2">There is no<br />calendar for this.</h2>
           </div>
-          <div className="mk-body mk-lead mk-reveal">
+          <div className="mk-split">
+          <div className="mk-body mk-lead">
             <p>
               A creative stops being profitable long before the ROAS chart admits it.
               Frequency climbs, hook-rate drops, CPM drifts, the landing page stalls —
@@ -134,8 +136,11 @@ export default function Landing() {
             </p>
             <p>By the time the number moves, the budget is already spent.</p>
           </div>
-          <div className="mk-problem-visual mk-reveal">
-            <DecayLines withAxis />
+          <Material name="lipstick-section" className="mk-split-img" />
+          </div>
+          <div className="mk-problem-visual">
+            <DecayLines />
+            <p className="mk-caption">Four creatives. One account. Four different lifespans.</p>
           </div>
         </div>
       </section>
@@ -149,7 +154,7 @@ export default function Landing() {
           </div>
           <div className="mk-cards">
             {CAPABILITIES.map((c, i) => (
-              <div key={c.title} className="mk-card mk-reveal">
+              <div key={c.title} className="mk-card">
                 <span className="mk-card-num">{String(i + 1).padStart(2, '0')}</span>
                 <h3 className="mk-h3">{c.title}</h3>
                 <p>{c.body}</p>
@@ -166,7 +171,7 @@ export default function Landing() {
             <div className="mk-eyebrow">How it works</div>
             <h2 className="mk-h2">It runs the account.<br />You set the ceiling.</h2>
           </div>
-          <div className="mk-cols mk-reveal">
+          <div className="mk-cols">
             <div className="mk-col">
               <div className="mk-eyebrow">Runs on its own</div>
               <ul>{RUNS_ON_ITS_OWN.map(t => <li key={t}>{t}</li>)}</ul>
@@ -176,7 +181,7 @@ export default function Landing() {
               <ul>{ASKS_YOU_FIRST.map(t => <li key={t}>{t}</li>)}</ul>
             </div>
           </div>
-          <p className="mk-summary mk-reveal">
+          <p className="mk-summary">
             Rouge can move your money. It can't spend <span className="mk-accent">more</span> of it without you.
           </p>
           <p className="mk-summary-sub">Every action is watched for 48 hours after it runs.</p>
@@ -190,7 +195,7 @@ export default function Landing() {
             <div className="mk-eyebrow">Brand safety</div>
             <h2 className="mk-h2">Your brand book<br />stays yours.</h2>
           </div>
-          <div className="mk-body mk-lead mk-reveal">
+          <div className="mk-body mk-lead">
             <p>
               Rouge doesn't generate your creative and doesn't make art-direction
               calls. Your visuals are your brand's — built by the people you pay

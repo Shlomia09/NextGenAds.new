@@ -97,25 +97,46 @@
 .mk-hero .mk-lead { margin-top: 28px; max-width: 54ch; }
 .mk-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
 .mk-fineprint { margin-top: 18px; font-size: var(--t-label); color: var(--text-3); }
-.mk-hero-visual { margin-top: 64px; }
+/* ≥1024: copy 5 / shot 7; the shot bleeds 48px past the container so it reads as a window */
+.mk-hero-grid { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; }
+.mk-hero-shot { min-width: 0; }
+@media (min-width: 1024px) {
+  .mk-hero-grid { grid-template-columns: 5fr 7fr; gap: 56px; }
+  .mk-hero-shot { margin-right: -48px; }
+  .mk-hero .mk-h1 { font-size: clamp(44px, 4.6vw, 64px); }
+}
 .mk-caption { margin-top: 14px; font-size: var(--t-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--text-3); }
 @media (max-width: 640px) { .mk-hero { padding: 56px 0 48px; } .mk-actions .btn { flex: 1 1 100%; justify-content: center; } }
 
-/* Decay lines */
-.mk-decay { width: 100%; height: auto; display: block; overflow: visible; }
-.mk-decay .line { fill: none; stroke: var(--text-3); stroke-width: 2.5; }
-.mk-decay .line.flagged { stroke: var(--accent); }
-.mk-decay .dot { fill: var(--text-3); }
+/* Product shots — evidence: flat, 1px border, 3px radius, no chrome, no tilt */
+.mk-shot { display: block; }
+.mk-shot img { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--text); }
+/* Material stills — air: their background already equals the page, so no border */
+.mk-material { display: block; }
+.mk-material img { display: block; width: 100%; height: auto; }
+
+/* Decay lines — drawn in real pixels (see DecayLines.tsx) */
+.mk-decay-wrap { width: 100%; }
+.mk-decay { display: block; overflow: visible; }
+.mk-decay .line { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; }
+.mk-decay .line.flagged { stroke: var(--accent); stroke-width: 2; }
 .mk-decay .dot.flagged { fill: var(--accent); }
+.mk-decay .flag-label { fill: var(--text-2); font-family: var(--font-mono); font-size: var(--t-label); }
 .mk-decay .axis { stroke: var(--border); stroke-width: 1; }
-.mk-decay .tick { fill: var(--text-3); font-family: var(--font-ui); font-size: 11px; letter-spacing: 0.14em; }
+.mk-decay .tick { fill: var(--text-3); font-family: var(--font-mono); font-size: var(--t-label); letter-spacing: var(--track-label); }
+@media (prefers-reduced-motion: no-preference) {
+  .mk-decay .line { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 900ms ease-out; }
+  .mk-decay .dot, .mk-decay .flag-label { opacity: 0; transition: opacity 200ms ease-out 900ms; }
+  .mk-decay.drawn .line { stroke-dashoffset: 0; }
+  .mk-decay.drawn .dot, .mk-decay.drawn .flag-label { opacity: 1; }
+}
 
 /* Proof strip */
 .mk-proof { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .mk-proof-inner { display: grid; grid-template-columns: repeat(3, 1fr); }
 .mk-proof-item { padding: 32px 24px; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
 .mk-proof-item:first-child { border-left: 0; padding-left: 0; }
-.mk-proof-num { font-family: var(--font-mono); font-size: var(--t-metric); letter-spacing: var(--track-metric); line-height: 1; color: var(--text); }
+.mk-proof-num { font-family: var(--font-mono); font-size: calc(var(--t-label) * 3); letter-spacing: var(--track-metric); line-height: 1; color: var(--text); }
 .mk-proof-lbl { font-size: var(--t-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--text-2); }
 @media (max-width: 720px) {
   .mk-proof-inner { grid-template-columns: 1fr; }
@@ -125,7 +146,10 @@
 
 /* Problem */
 .mk-body { display: flex; flex-direction: column; gap: 20px; max-width: 56ch; }
-.mk-problem-visual { margin-top: 56px; }
+.mk-problem-visual { margin-top: 64px; }
+/* Copy beside a still: two columns from 900px, stacked below */
+.mk-split { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; }
+@media (min-width: 900px) { .mk-split { grid-template-columns: 1fr 1fr; gap: 56px; } }
 
 /* Capability cards */
 .mk-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -202,8 +226,9 @@
 .mk-footer-links a { color: var(--text-2); text-decoration: none; font-size: 13px; }
 .mk-footer-links a:hover { color: var(--text); }
 
-/* Reveal on scroll — position only, no fades */
+/* Motion budget: section headlines fade up 12px over 400ms on first view, and the decay chart
+   draws once. Nothing else moves. Reduced motion disables both. */
 @media (prefers-reduced-motion: no-preference) {
-  .mk-reveal { transform: translateY(14px); transition: transform 0.6s ease; }
-  .mk-reveal.in { transform: none; }
+  .mk-reveal { opacity: 0; transform: translateY(12px); transition: opacity 400ms ease-out, transform 400ms ease-out; }
+  .mk-reveal.in { opacity: 1; transform: none; }
 }
