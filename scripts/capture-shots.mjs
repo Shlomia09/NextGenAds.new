@@ -41,6 +41,10 @@ await save('shot-obituary', await page.locator('[data-shot="obituary"]').screens
 
 // 2 · Dashboard — page header with the KPI strip, plus the top of the three-column grid
 //     (benchmarks, recommendations, chat). No health donut: it does not exist in /demo.
+//     Captured at a 1280 viewport so the content is ~1000 CSS px wide and renders near 1:1
+//     on the landing (≈1070px slot) — every label stays legible instead of shrinking.
+await page.setViewportSize({ width: 1280, height: 1050 });
+await page.waitForTimeout(800);
 const header = await page.locator('[data-shot="dash-header"]').boundingBox();
 const grid = await page.locator('[data-shot="dash-grid"]').boundingBox();
 const pad = 24;

@@ -9,7 +9,7 @@ type MaterialName = 'lipstick-section' | 'powder-arc' | 'pipette-drop';
 // Intrinsic pixel sizes of the committed files (shots are captured at 2×).
 const SHOTS: Record<ShotName, { w: number; h: number; alt: string }> = {
   'shot-obituary': { w: 912, h: 450, alt: 'Rouge flags a critical recommendation: scale the retargeting budget, with the ROAS figure and the rule behind it' },
-  'shot-dashboard': { w: 2888, h: 1182, alt: 'The Rouge dashboard: KPI strip, benchmark comparison, recommendations and the chat panel' },
+  'shot-dashboard': { w: 2088, h: 1362, alt: 'The Rouge dashboard: KPI strip, benchmark comparison, recommendations and the chat panel' },
 };
 const MATERIAL: Record<MaterialName, { alt: string }> = {
   'lipstick-section': { alt: 'A lipstick bullet cut across at an angle' },

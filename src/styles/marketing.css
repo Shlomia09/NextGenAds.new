@@ -154,7 +154,7 @@
 /* Capability cards */
 .mk-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .mk-card {
-  background: var(--surface);
+  background: transparent;           /* no grey fill: it fought the screenshots */
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 26px 24px;
@@ -162,6 +162,9 @@
 }
 .mk-card-num { font-family: var(--font-mono); font-size: var(--t-label); color: var(--text-3); }
 .mk-card p { color: var(--text-2); font-size: var(--t-body); line-height: var(--lh-body); }
+.mk-cards-2 { grid-template-columns: repeat(2, 1fr); }
+.mk-figure { margin: 24px 0; }
+.mk-figcaption { margin-top: 12px; font-family: var(--font-mono); font-size: var(--t-label); color: var(--text-3); }
 @media (max-width: 900px) { .mk-cards { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .mk-cards { grid-template-columns: 1fr; } }
 
@@ -171,12 +174,19 @@
 .mk-col + .mk-col { border-left: 1px solid var(--border); }
 .mk-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 .mk-col li { color: var(--text); font-size: 15px; line-height: 1.45; padding-top: 12px; border-top: 1px solid var(--border); }
+.mk-statement { max-width: 24ch; margin-bottom: 32px; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); color: var(--text); }
 .mk-summary { margin-top: 40px; max-width: 48ch; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); }
-.mk-summary-sub { margin-top: 10px; color: var(--text-2); }
+.mk-summary-sub { margin-top: 28px; color: var(--text-2); font-size: 15px; }
 @media (max-width: 720px) {
   .mk-cols { grid-template-columns: 1fr; }
   .mk-col + .mk-col { border-left: 0; border-top: 1px solid var(--border); }
 }
+
+/* Material bands — the whole still, centred; its background is the page, so it reads full-bleed
+   without cropping through the subject */
+.mk-band { border-top: 1px solid var(--border); display: flex; justify-content: center; }
+.mk-band .mk-material { width: 100%; }
+.mk-band img { max-height: 420px; width: 100%; object-fit: contain; object-position: center; }
 
 /* Pricing */
 .mk-toggle { display: inline-flex; border: 1px solid var(--border-control); border-radius: var(--radius); margin-bottom: 28px; }

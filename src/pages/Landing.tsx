@@ -50,6 +50,16 @@ const ASKS_YOU_FIRST = [
   'Anything that spends more than yesterday.',
 ];
 
+function Card({ n, title, body }: { n: number; title: string; body: string }) {
+  return (
+    <div className="mk-card">
+      <span className="mk-card-num">{String(n).padStart(2, '0')}</span>
+      <h3 className="mk-h3">{title}</h3>
+      <p>{body}</p>
+    </div>
+  );
+}
+
 export default function Landing() {
   const navigate = useNavigate();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -153,13 +163,14 @@ export default function Landing() {
             <h2 className="mk-h2">An operator,<br />not an advisor.</h2>
           </div>
           <div className="mk-cards">
-            {CAPABILITIES.map((c, i) => (
-              <div key={c.title} className="mk-card">
-                <span className="mk-card-num">{String(i + 1).padStart(2, '0')}</span>
-                <h3 className="mk-h3">{c.title}</h3>
-                <p>{c.body}</p>
-              </div>
-            ))}
+            {CAPABILITIES.slice(0, 3).map((c, i) => <Card key={c.title} n={i + 1} title={c.title} body={c.body} />)}
+          </div>
+          <figure className="mk-figure">
+            <ProductShot name="shot-dashboard" />
+            <figcaption className="mk-figcaption">Live account. Demo data.</figcaption>
+          </figure>
+          <div className="mk-cards mk-cards-2">
+            {CAPABILITIES.slice(3).map((c, i) => <Card key={c.title} n={i + 4} title={c.title} body={c.body} />)}
           </div>
         </div>
       </section>
@@ -169,7 +180,7 @@ export default function Landing() {
         <div className="mk-wrap">
           <div className="mk-section-head mk-reveal">
             <div className="mk-eyebrow">How it works</div>
-            <h2 className="mk-h2">It runs the account.<br />You set the ceiling.</h2>
+            <h2 className="mk-h2">It does the work.<br />You approve the spend.</h2>
           </div>
           <div className="mk-cols">
             <div className="mk-col">
@@ -181,9 +192,6 @@ export default function Landing() {
               <ul>{ASKS_YOU_FIRST.map(t => <li key={t}>{t}</li>)}</ul>
             </div>
           </div>
-          <p className="mk-summary">
-            Rouge can move your money. It can't spend <span className="mk-accent">more</span> of it without you.
-          </p>
           <p className="mk-summary-sub">Every action is watched for 48 hours after it runs.</p>
         </div>
       </section>
@@ -195,11 +203,10 @@ export default function Landing() {
             <div className="mk-eyebrow">Brand safety</div>
             <h2 className="mk-h2">Your brand book<br />stays yours.</h2>
           </div>
+          <p className="mk-statement">Your visuals are your brand's — built by the people you pay to build them.</p>
           <div className="mk-body mk-lead">
             <p>
-              Rouge doesn't generate your creative and doesn't make art-direction
-              calls. Your visuals are your brand's — built by the people you pay
-              to build them.
+              Rouge doesn't generate your creative and doesn't make art-direction calls.
             </p>
             <p>
               What Rouge does is make them perform: it tells you which one is dying
@@ -211,6 +218,11 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* ── Band before pricing — no text ─────────────────── */}
+      <div className="mk-band" aria-hidden="true">
+        <Material name="powder-arc" />
+      </div>
 
       {/* ── 7 · Pricing and CTA ────────────────────────────── */}
       <section className="mk-section" id="pricing">
