@@ -193,6 +193,12 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ── Band after How it works — the one face on the page, bleeding off the right edge.
+             Kept out of Brand safety on purpose: that section says Rouge doesn't generate creative. */}
+      <div className="mk-band mk-band-bleed" aria-hidden="true">
+        <Material name="lips-profile" />
+      </div>
+
       {/* ── 6 · Brand safety ───────────────────────────────── */}
       <section className="mk-section">
         <div className="mk-wrap">

@@ -16,7 +16,11 @@ const RAW = process.argv[2];
 if (!RAW) throw new Error('usage: node scripts/match-bone.mjs <raw dir>');
 const OUT = 'public/img/material';
 const BONE = [0xF3, 0xF0, 0xEA];
-const NAMES = ['powder-arc', 'lipstick-section', 'pipette-drop'];
+const NAMES = ['powder-arc', 'lipstick-section', 'pipette-drop', 'lips-profile'];
+// Subjects that run off the frame on purpose (a cropped face): only their background fades at the
+// edges, the subject keeps a clean cut. Objects that merely reach an edge (the pipette stem, the
+// lipstick tube) fade with it, as before.
+const FULL_BLEED = new Set(['lips-profile']);
 await mkdir(OUT, { recursive: true });
 
 const rgb = async (img) => {
@@ -62,7 +66,11 @@ const flatField = ({ data, info }) => {
     S = S2; N = N2;
   }
   const grid = new Float64Array(gw * gh * 3);
-  for (let k = 0; k < gw * gh; k++) for (let c = 0; c < 3; c++) grid[k * 3 + c] = N[k] ? S[k * 3 + c] / N[k] : BONE[c];
+  // Cells far from any background (inside a subject that fills the frame) fall back to bone, i.e. no
+  // correction. PRIOR blends that fallback in by sample count, so the gain eases off smoothly instead
+  // of switching at a hard line that would show on skin.
+  const PRIOR = CELL * CELL * 4;
+  for (let k = 0; k < gw * gh; k++) for (let c = 0; c < 3; c++) grid[k * 3 + c] = (S[k * 3 + c] + BONE[c] * PRIOR) / (N[k] + PRIOR);
   // bilinear upsample to a per-pixel gain that maps the local background to bone
   const out = Buffer.alloc(data.length);
   for (let y = 0; y < H; y++) {
@@ -110,11 +118,14 @@ for (const name of NAMES) {
     // The generated backgrounds vignette slightly, so the other edges can sit off bone even when
     // the sampled corner is exact. Bake a 96px fade to bone into the image edges: the photo then
     // meets the page with no seam, and the page CSS stays flat (no overlay, no blend).
+    const flat = (await rgb(sharp(await matched.png().toBuffer()))).data;
     const FEATHER = 96;
     const frame = Buffer.alloc(width * height * 4);
     for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
       const d = Math.min(x, y, width - 1 - x, height - 1 - y);
-      const a = d >= FEATHER ? 0 : Math.round(255 * Math.pow(1 - d / FEATHER, 2));
+      const j = (y * width + x) * 3;
+      const bg = !FULL_BLEED.has(name) || isBg(flat[j], flat[j + 1], flat[j + 2]);
+      const a = !bg || d >= FEATHER ? 0 : Math.round(255 * Math.pow(1 - d / FEATHER, 2));
       const i = (y * width + x) * 4;
       frame[i] = BONE[0]; frame[i + 1] = BONE[1]; frame[i + 2] = BONE[2]; frame[i + 3] = a;
     }

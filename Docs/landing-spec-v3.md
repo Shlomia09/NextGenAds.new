@@ -98,6 +98,22 @@ abstract glass object rather than as serum, and carries a heavy dark reflection.
 section therefore gets no image and stays a two-column text block. Do not substitute a stock
 photo for it.
 
+**Added after review — the one face.** Shlomi asked for a face: a beauty-tech page with no person
+on it read as missing something. `lips-profile.png` (2016×1344, 3:2) is a generated image, not a
+real person and not stock: Higgsfield Soul 2.0, 2k, on the account's own credits. Prompt:
+"Editorial beauty macro photograph, cropped partial face in profile: only the lower half of a woman's
+face, lips, chin and jawline, turned three-quarters away. Lips in a flat matte true red lipstick, clean
+sharp edge. Real skin with visible natural texture and fine pores, no retouching gloss. Single soft side
+light from the left, gentle falloff, minimal shadow. Seamless plain warm off-white bone background,
+evenly lit, no gradient, no vignette. Subject occupies the right third of the frame, wide empty negative
+space on the left. No jewelry, no hair in frame, no text, no props. Minimal, quiet, high-end trade-press
+still life aesthetic, like a macro product photograph. Shot on medium format, 100mm macro, f/8, neutral
+colour." Of two variants, the other was rejected for a vertical seam through the face.
+It sits in its own band between How it works and Brand safety, bleeding off the right edge
+(`.mk-band-bleed`). **Never inside Brand safety**: that section says Rouge doesn't generate creative.
+The face runs off the frame, so `match-bone.mjs` lists it in `FULL_BLEED`: only its background fades
+at the edges, and the skin keeps a clean cut.
+
 ### Colour match — required before committing the files
 
 The generated backgrounds are warm cream, close to but not exactly `--bg` `#F3F0EA`. Dropped

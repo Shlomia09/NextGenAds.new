@@ -187,6 +187,11 @@
 .mk-band .mk-material { width: 100%; }
 .mk-band img { max-height: 420px; width: 100%; object-fit: contain; object-position: center; }
 .mk-band-tall img { max-height: 520px; }
+/* The face runs off the right edge of the screen; its left background is already bone. */
+.mk-band-bleed { justify-content: flex-end; }
+.mk-band-bleed .mk-material { width: min(1040px, 78%); }
+.mk-band-bleed img { max-height: none; height: auto; display: block; }
+@media (max-width: 640px) { .mk-band-bleed .mk-material { width: 100%; } }
 
 /* Final CTA */
 .mk-final { padding: 72px 0 112px; }
