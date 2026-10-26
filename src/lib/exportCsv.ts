@@ -5,7 +5,7 @@
  * No dependencies — uses native browser APIs only.
  *
  * Usage:
- *   exportCampaignsCsv(campaigns, { dateLabel: 'Last 30 days', brandName: 'NeoLumo' })
+ *   exportCampaignsCsv(campaigns, { dateLabel: 'Last 30 days', brandName: 'Demo brand' })
  */
 
 import type { Campaign } from '../types';

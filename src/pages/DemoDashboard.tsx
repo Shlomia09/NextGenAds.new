@@ -9,7 +9,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 
 /* ── Mock data ── */
 const MOCK_BRAND = {
-  name: 'NeoLumo Spain',
+  name: 'Demo brand',   // never a real brand: several are confidential benchmark sources
   category: 'Skincare',
   markets: ['ES', 'IT'],
   stage: 'scaling',
@@ -82,7 +82,7 @@ const ROAS_TREND = Array.from({ length: 14 }, (_, i) => ({
 }));
 
 const DEMO_CHAT_RESPONSES: Record<string, string> = {
-  default: `Based on your NeoLumo campaign data vs the Beauty & Cosmetics benchmark (data since 2018):
+  default: `Based on your campaign data vs the Beauty & Cosmetics benchmark (data since 2018):
 
 **Your account is performing ABOVE average** for the ${MOCK_BRAND.bracket.replace('AOV ', '')} AOV bracket.
 
@@ -179,7 +179,7 @@ const DemoDashboard: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Sparkles size={12} strokeWidth={1.5} style={{ color: 'var(--text-3)' }} />
             <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--text)', letterSpacing: '0.04em' }}>
-              Demo Mode — NeoLumo Spain · Mock data · No auth required
+              Demo Mode — {MOCK_BRAND.name} · Mock data · No auth required
             </span>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -352,7 +352,7 @@ const DemoDashboard: React.FC = () => {
                   <div>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Rouge</div>
                     <div style={{ fontFamily: 'var(--font-sans)', fontSize: 10, fontWeight: 300, color: 'var(--text-muted)', marginTop: 1 }}>
-                      NeoLumo · €{Math.round(ACCOUNT.aov)} AOV avg · <span style={{ fontFamily: 'var(--font-mono)' }}>{ACCOUNT.roas.toFixed(2)}x</span> ROAS
+                      {MOCK_BRAND.name} · €{Math.round(ACCOUNT.aov)} AOV avg · <span style={{ fontFamily: 'var(--font-mono)' }}>{ACCOUNT.roas.toFixed(2)}x</span> ROAS
                     </div>
                   </div>
                 </div>
@@ -365,7 +365,7 @@ const DemoDashboard: React.FC = () => {
                         <Sparkles size={18} strokeWidth={1.5} />
                       </div>
                       <p style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Ask Rouge</p>
-                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 300, color: 'var(--text-secondary)', maxWidth: 220, lineHeight: 1.5 }}>Full context of NeoLumo + benchmark data since 2018</p>
+                      <p style={{ fontFamily: 'var(--font-sans)', fontSize: 11, fontWeight: 300, color: 'var(--text-secondary)', maxWidth: 220, lineHeight: 1.5 }}>Full context of your account + benchmark data since 2018</p>
                       {[
                         'Why is my ROAS dropping?',
                         'Should I scale Retargeting?',

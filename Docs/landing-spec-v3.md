@@ -303,6 +303,11 @@ rg -n 'box-shadow|drop-shadow|filter:' src/styles/marketing.css && echo FAIL || 
 # 5 · No ceiling language anywhere in src/ until known-issue #8 ships.
 #     Measures the concept, not a list of sentences (same lesson as the hex gate).
 rg -n -i 'ceiling' src && echo FAIL || echo OK
+
+# 6 · No real brand name on any visible surface or screenshot source. The demo brand is "Demo brand".
+#     These are confidential benchmark sources (supabase/functions/claude-chat/index.ts); extend the
+#     list whenever that list grows.
+rg -n -i 'neolumo|oyb|obey your body|neobeauty|renovo' src public index.html scripts && echo FAIL || echo OK
 ```
 
 Then by eye, at 390px, 768px and 1440px:
