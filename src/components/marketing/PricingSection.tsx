@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PLAN_META, type PlanId } from '../../hooks/usePlan';
 import { createCheckoutSession } from '../../hooks/useSubscription';
@@ -44,7 +44,8 @@ const PAID: { id: Exclude<PlanId, 'free'>; for: string; includes: string[]; reco
 
 const eur = (n: number) => `€${n.toLocaleString('en-US')}`;
 
-export function PricingSection({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }) {
+// aside: an optional image beside the heading (the landing passes the powder still; /pricing does not)
+export function PricingSection({ headingLevel = 'h2', aside }: { headingLevel?: 'h1' | 'h2'; aside?: ReactNode }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [cycle, setCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -75,13 +76,16 @@ export function PricingSection({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 
 
   return (
     <>
-      <div className="mk-section-head">
-        <div className="mk-eyebrow">Pricing</div>
-        <Heading className="mk-h2">Cheaper than<br />the hire.</Heading>
-        <p className="mk-lead" style={{ maxWidth: '56ch' }}>
-          A performance manager who knows beauty is a salary line.
-          Rouge is a software line.
-        </p>
+      <div className={aside ? 'mk-split mk-split-pricing' : undefined}>
+        <div className="mk-section-head">
+          <div className="mk-eyebrow">Pricing</div>
+          <Heading className="mk-h2">Cheaper than<br />the hire.</Heading>
+          <p className="mk-lead" style={{ maxWidth: '56ch' }}>
+            A performance manager who knows beauty is a salary line.
+            Rouge is a software line.
+          </p>
+        </div>
+        {aside}
       </div>
 
       <div className="mk-toggle" role="group" aria-label="Billing cycle">

@@ -62,7 +62,7 @@ export default function Landing() {
   const navigate = useNavigate();
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Reveal on scroll — movement only, no fade (flat, no transparency)
+  // Reveal on scroll — section heads and the photos fade and rise in once
   useEffect(() => {
     const io = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
@@ -144,7 +144,7 @@ export default function Landing() {
             </p>
             <p>By the time the number moves, the budget is already spent.</p>
           </div>
-          <Material name="lipstick-section" className="mk-split-img" />
+          <Material name="lipstick-section" className="mk-split-img mk-reveal" />
           </div>
           <div className="mk-problem-visual">
             <DecayLines />
@@ -193,15 +193,10 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── Band after How it works — the one face on the page, bleeding off the right edge.
-             Kept out of Brand safety on purpose: that section says Rouge doesn't generate creative. */}
-      <div className="mk-band mk-band-bleed" aria-hidden="true">
-        <Material name="lips-profile" />
-      </div>
-
-      {/* ── 6 · Brand safety ───────────────────────────────── */}
+      {/* ── 6 · Brand safety — text opposite the one face on the page ── */}
       <section className="mk-section">
-        <div className="mk-wrap">
+        <div className="mk-wrap mk-split mk-split-face">
+          <div>
           <div className="mk-section-head mk-reveal">
             <div className="mk-eyebrow">Brand safety</div>
             <h2 className="mk-h2">Your brand book<br />stays yours.</h2>
@@ -219,27 +214,22 @@ export default function Landing() {
             </p>
             <p>Inside beauty accounts since 2018. Your brand book untouched.</p>
           </div>
+          </div>
+          <Material name="lips-profile" className="mk-reveal" />
         </div>
       </section>
 
-      {/* ── Band before pricing — no text ─────────────────── */}
-      <div className="mk-band" aria-hidden="true">
-        <Material name="powder-arc" />
-      </div>
-
-      {/* ── 7 · Pricing and CTA ────────────────────────────── */}
+      {/* ── 7 · Pricing and CTA — the powder sits beside the heading ── */}
       <section className="mk-section" id="pricing">
         <div className="mk-wrap">
-          <PricingSection />
+          <PricingSection aside={<Material name="powder-arc" className="mk-reveal" />} />
         </div>
       </section>
 
-      {/* ── 8 · Final CTA ──────────────────────────────────── */}
-      <div className="mk-band mk-band-tall" aria-hidden="true">
-        <Material name="pipette-drop" />
-      </div>
+      {/* ── 8 · Final CTA — the pipette's drop beside the last line ── */}
       <section className="mk-final">
-        <div className="mk-wrap">
+        <div className="mk-wrap mk-split mk-split-final">
+          <div>
           <h2 className="mk-h2 mk-reveal">
             Connect the account.<br />Read tomorrow's <span className="mk-accent">obituary</span>.
           </h2>
@@ -250,6 +240,8 @@ export default function Landing() {
             <button className="btn btn-primary btn-lg" onClick={getStarted}>Get started</button>
             <button className="btn btn-secondary btn-lg" onClick={howItWorks}>See how it works</button>
           </div>
+          </div>
+          <Material name="pipette-drop" className="mk-reveal" />
         </div>
       </section>
 

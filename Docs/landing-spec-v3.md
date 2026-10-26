@@ -109,10 +109,13 @@ evenly lit, no gradient, no vignette. Subject occupies the right third of the fr
 space on the left. No jewelry, no hair in frame, no text, no props. Minimal, quiet, high-end trade-press
 still life aesthetic, like a macro product photograph. Shot on medium format, 100mm macro, f/8, neutral
 colour." Of two variants, the other was rejected for a vertical seam through the face.
-It sits in its own band between How it works and Brand safety, bleeding off the right edge
-(`.mk-band-bleed`). **Never inside Brand safety**: that section says Rouge doesn't generate creative.
-The face runs off the frame, so `match-bone.mjs` lists it in `FULL_BLEED`: only its background fades
-at the edges, and the skin keeps a clean cut.
+**Layout after review: no image bands.** Every still sits inside its section, beside its text, and
+fades into the page; nothing stands in a separate block between sections. Lipstick: problem section
+(unchanged). Face: Brand safety, opposite "Your brand book stays yours." (Shlomi's call; it is our own
+marketing image, not client creative). Powder: beside the pricing heading (`PricingSection aside`,
+landing only). Pipette: beside the final headline. Each still fades and rises in once on scroll
+(`mk-reveal`). The face is cropped to 1496×1344 and gets a 240px separable fade on every edge
+(`OPTIONS` in `match-bone.mjs`), so the skin dissolves into the page instead of ending in a cut.
 
 ### Colour match — required before committing the files
 

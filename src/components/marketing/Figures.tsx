@@ -15,7 +15,7 @@ const MATERIAL: Record<MaterialName, { alt: string; w: number; h: number }> = {
   'lipstick-section': { alt: 'A lipstick bullet cut across at an angle', w: 2000, h: 1300 },
   'powder-arc': { alt: 'Ivory powder swept in one arc', w: 2000, h: 1300 },
   'pipette-drop': { alt: 'A glass pipette holding one red drop', w: 2000, h: 1300 },
-  'lips-profile': { alt: 'A face in profile, cropped to the lips and jaw, in matte red lipstick', w: 2016, h: 1344 },
+  'lips-profile': { alt: 'A face in profile, cropped to the lips and jaw, in matte red lipstick', w: 1496, h: 1344 },
 };
 
 export function ProductShot({ name, lazy = true, className = '' }: { name: ShotName; lazy?: boolean; className?: string }) {

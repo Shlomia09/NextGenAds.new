@@ -17,10 +17,11 @@ if (!RAW) throw new Error('usage: node scripts/match-bone.mjs <raw dir>');
 const OUT = 'public/img/material';
 const BONE = [0xF3, 0xF0, 0xEA];
 const NAMES = ['powder-arc', 'lipstick-section', 'pipette-drop', 'lips-profile'];
-// Subjects that run off the frame on purpose (a cropped face): only their background fades at the
-// edges, the subject keeps a clean cut. Objects that merely reach an edge (the pipette stem, the
-// lipstick tube) fade with it, as before.
-const FULL_BLEED = new Set(['lips-profile']);
+// Per-image overrides. The face fills its frame, so it is cropped to sit in a text column and gets
+// a wide edge fade: skin dissolves into the page on every side instead of ending in a cut.
+const OPTIONS = {
+  'lips-profile': { crop: { left: 520, top: 0, width: 1496, height: 1344 }, feather: 240 },
+};
 await mkdir(OUT, { recursive: true });
 
 const rgb = async (img) => {
@@ -106,7 +107,9 @@ const files = await readdir(RAW);
 for (const name of NAMES) {
   const file = files.find(f => path.parse(f).name === name);
   if (!file) throw new Error(`missing ${name} in ${RAW}`);
-  const src = sharp(path.join(RAW, file)).removeAlpha();
+  const opt = OPTIONS[name] ?? {};
+  const loaded = sharp(path.join(RAW, file)).removeAlpha();
+  const src = opt.crop ? sharp(await loaded.extract(opt.crop).png().toBuffer()) : loaded;
   const before = await rgb(src);
   const { width, height } = before.info;
   const matched = sharp(flatField(before), { raw: { width, height, channels: 3 } });
@@ -116,16 +119,18 @@ for (const name of NAMES) {
 
   if (hueOk) {
     // The generated backgrounds vignette slightly, so the other edges can sit off bone even when
-    // the sampled corner is exact. Bake a 96px fade to bone into the image edges: the photo then
+    // the sampled corner is exact. Bake a fade (96px unless overridden) to bone into the image edges: the photo then
     // meets the page with no seam, and the page CSS stays flat (no overlay, no blend).
-    const flat = (await rgb(sharp(await matched.png().toBuffer()))).data;
-    const FEATHER = 96;
+    const FEATHER = opt.feather ?? 96;
     const frame = Buffer.alloc(width * height * 4);
     for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
       const d = Math.min(x, y, width - 1 - x, height - 1 - y);
-      const j = (y * width + x) * 3;
-      const bg = !FULL_BLEED.has(name) || isBg(flat[j], flat[j + 1], flat[j + 2]);
-      const a = !bg || d >= FEATHER ? 0 : Math.round(255 * Math.pow(1 - d / FEATHER, 2));
+      // Wide fades use a separable smoothstep (x × y): distance-to-nearest-edge leaves mitred
+      // diagonal seams in the corners once the fade is wide enough to cross skin.
+      const ss = (t) => { const u = Math.min(1, Math.max(0, t)); return u * u * (3 - 2 * u); };
+      const a = opt.feather
+        ? Math.round(255 * (1 - ss(Math.min(x, width - 1 - x) / FEATHER) * ss(Math.min(y, height - 1 - y) / FEATHER)))
+        : d >= FEATHER ? 0 : Math.round(255 * Math.pow(1 - d / FEATHER, 2));
       const i = (y * width + x) * 4;
       frame[i] = BONE[0]; frame[i + 1] = BONE[1]; frame[i + 2] = BONE[2]; frame[i + 3] = a;
     }

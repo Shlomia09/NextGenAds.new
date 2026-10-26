@@ -174,24 +174,28 @@
 .mk-step-n { font-family: var(--font-mono); font-size: var(--t-label); color: var(--text-3); }
 .mk-step-verb { font-family: var(--font-display); font-size: var(--t-h3); font-weight: 800; color: var(--text); }
 .mk-step-body { color: var(--text-2); font-size: 15px; line-height: 1.45; max-width: 60ch; }
-.mk-statement { max-width: 24ch; margin-bottom: 32px; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); color: var(--text); }
+.mk-section .mk-statement { max-width: 24ch; margin-bottom: 32px; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); color: var(--text); }
 .mk-steps + .mk-summary { margin-top: 40px; max-width: 48ch; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); }
 @media (max-width: 720px) {
   .mk-steps li { grid-template-columns: 36px 1fr; row-gap: 6px; }
   .mk-step-body { grid-column: 2; }
 }
 
-/* Material bands — the whole still, centred; its background is the page, so it reads full-bleed
-   without cropping through the subject */
-.mk-band { border-top: 1px solid var(--border); display: flex; justify-content: center; }
-.mk-band .mk-material { width: 100%; }
-.mk-band img { max-height: 420px; width: 100%; object-fit: contain; object-position: center; }
-.mk-band-tall img { max-height: 520px; }
-/* The face runs off the right edge of the screen; its left background is already bone. */
-.mk-band-bleed { justify-content: flex-end; }
-.mk-band-bleed .mk-material { width: min(1040px, 78%); }
-.mk-band-bleed img { max-height: none; height: auto; display: block; }
-@media (max-width: 640px) { .mk-band-bleed .mk-material { width: 100%; } }
+/* Stills set beside their text. Every still's edges are baked to the page colour, so it dissolves
+   into the section instead of sitting in a box. */
+@media (min-width: 900px) {
+  /* Brand safety: the face takes the larger column and sits a little past the text block's edge */
+  .mk-split-face { grid-template-columns: 5fr 6fr; gap: 24px; }
+  .mk-split-face .mk-material { margin-right: -48px; }
+  /* Pricing: the powder beside the heading, kept low so the plans stay the subject */
+  .mk-split-pricing { grid-template-columns: 1fr 1fr; align-items: end; margin-bottom: 8px; }
+  .mk-split-pricing .mk-material img { max-height: 300px; object-fit: contain; }
+  /* Final CTA: the drop sits level with the headline */
+  .mk-split-final { grid-template-columns: 1fr 1fr; gap: 32px; }
+}
+@media (max-width: 899px) {
+  .mk-split-pricing .mk-material { margin: -8px 0 24px; }
+}
 
 /* Final CTA */
 .mk-final { padding: 72px 0 112px; }
