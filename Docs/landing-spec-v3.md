@@ -99,23 +99,31 @@ section therefore gets no image and stays a two-column text block. Do not substi
 photo for it.
 
 **Added after review — the one face.** Shlomi asked for a face: a beauty-tech page with no person
-on it read as missing something. `lips-profile.png` (2016×1344, 3:2) is a generated image, not a
-real person and not stock: Higgsfield Soul 2.0, 2k, on the account's own credits. Prompt:
-"Editorial beauty macro photograph, cropped partial face in profile: only the lower half of a woman's
-face, lips, chin and jawline, turned three-quarters away. Lips in a flat matte true red lipstick, clean
-sharp edge. Real skin with visible natural texture and fine pores, no retouching gloss. Single soft side
-light from the left, gentle falloff, minimal shadow. Seamless plain warm off-white bone background,
-evenly lit, no gradient, no vignette. Subject occupies the right third of the frame, wide empty negative
-space on the left. No jewelry, no hair in frame, no text, no props. Minimal, quiet, high-end trade-press
-still life aesthetic, like a macro product photograph. Shot on medium format, 100mm macro, f/8, neutral
-colour." Of two variants, the other was rejected for a vertical seam through the face.
+on it read as missing something. `face-profile.png` (1792×2240, 4:5) is a generated image, not a
+real person and not stock: GPT Image 2.5 via Higgsfield, high quality, 2k, on the account's own
+credits. Prompt: "Photorealistic editorial beauty photograph. A woman's head and neck in clean side
+profile, facing left, centered horizontally. The whole head is inside the frame: generous plain
+background above the top of the head, in front of the face, and behind the back of the head. Only the
+neck and the top of the shoulders continue off the bottom edge of the frame; nothing touches the top,
+left or right edges. Hair slicked back into a tight low bun, sleek. Lips in a flat matte true red
+lipstick, crisp edge. Natural real skin with fine texture, no airbrushing. Soft even studio light from
+the front-left, gentle shadow under the jaw. Seamless plain warm off-white background, colour #F3F0EA,
+perfectly uniform, no gradient, no vignette, no shadow cast on the background. No jewelry, no clothing,
+no text, no props. Quiet, minimal, high-end trade-press beauty still. Medium format camera, 100mm lens,
+f/8, neutral colour."
+
+Rejected on the way: a cropped lips-and-jaw close-up (the frame cut the face on three sides; an
+edge fade made it read as a blurred box), and four Soul 2.0 profiles (paper-cut artifacts, an
+illustrated look, or the head cut by the frame). **The rule that came out of it:** a face must leave
+the frame on one edge only, and that edge stands on a section rule.
 **Layout after review: no image bands.** Every still sits inside its section, beside its text, and
 fades into the page; nothing stands in a separate block between sections. Lipstick: problem section
 (unchanged). Face: Brand safety, opposite "Your brand book stays yours." (Shlomi's call; it is our own
 marketing image, not client creative). Powder: beside the pricing heading (`PricingSection aside`,
 landing only). Pipette: beside the final headline. Each still fades and rises in once on scroll
-(`mk-reveal`). The face is cropped to 1496×1344 and gets a 240px separable fade on every edge
-(`OPTIONS` in `match-bone.mjs`), so the skin dissolves into the page instead of ending in a cut.
+(`mk-reveal`). The face looks toward the text and stands on the section's bottom rule
+(`.mk-face`, a negative bottom margin equal to the section padding); `match-bone.mjs` gives it
+`bgOnlyFade`, so its background fades at the edges and the neck keeps a clean cut on the rule.
 
 ### Colour match — required before committing the files
 

@@ -215,7 +215,7 @@ export default function Landing() {
             <p>Inside beauty accounts since 2018. Your brand book untouched.</p>
           </div>
           </div>
-          <Material name="lips-profile" className="mk-reveal" />
+          <Material name="face-profile" className="mk-face mk-reveal" />
         </div>
       </section>
 

@@ -184,9 +184,9 @@
 /* Stills set beside their text. Every still's edges are baked to the page colour, so it dissolves
    into the section instead of sitting in a box. */
 @media (min-width: 900px) {
-  /* Brand safety: the face takes the larger column and sits a little past the text block's edge */
-  .mk-split-face { grid-template-columns: 5fr 6fr; gap: 24px; }
-  .mk-split-face .mk-material { margin-right: -48px; }
+  /* Brand safety: the face stands on the section's bottom rule — its neck leaves the frame there */
+  .mk-split-face { grid-template-columns: 6fr 5fr; gap: 56px; align-items: center; }
+  .mk-split-face .mk-face { align-self: end; justify-self: center; width: min(100%, 480px); margin-bottom: -112px; }
   /* Pricing: the powder beside the heading, kept low so the plans stay the subject */
   .mk-split-pricing { grid-template-columns: 1fr 1fr; align-items: end; margin-bottom: 8px; }
   .mk-split-pricing .mk-material img { max-height: 300px; object-fit: contain; }
@@ -195,7 +195,11 @@
 }
 @media (max-width: 899px) {
   .mk-split-pricing .mk-material { margin: -8px 0 24px; }
+  /* stacked: the face closes the section, standing on its bottom rule */
+  .mk-split-face .mk-face { width: min(100%, 360px); justify-self: center; margin-bottom: -112px; }
 }
+/* matches .mk-section padding at this width */
+@media (max-width: 640px) { .mk-split-face .mk-face { margin-bottom: -72px; } }
 
 /* Final CTA */
 .mk-final { padding: 72px 0 112px; }

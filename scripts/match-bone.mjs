@@ -16,11 +16,12 @@ const RAW = process.argv[2];
 if (!RAW) throw new Error('usage: node scripts/match-bone.mjs <raw dir>');
 const OUT = 'public/img/material';
 const BONE = [0xF3, 0xF0, 0xEA];
-const NAMES = ['powder-arc', 'lipstick-section', 'pipette-drop', 'lips-profile'];
-// Per-image overrides. The face fills its frame, so it is cropped to sit in a text column and gets
-// a wide edge fade: skin dissolves into the page on every side instead of ending in a cut.
+const NAMES = ['powder-arc', 'lipstick-section', 'pipette-drop', 'face-profile'];
+// Per-image overrides. The face leaves the frame at the bottom edge only (neck and shoulders) and
+// stands on the section's bottom rule on the page, so only its background fades at the edges: the
+// skin keeps its clean cut where it meets the rule.
 const OPTIONS = {
-  'lips-profile': { crop: { left: 520, top: 0, width: 1496, height: 1344 }, feather: 240 },
+  'face-profile': { bgOnlyFade: true },
 };
 await mkdir(OUT, { recursive: true });
 
@@ -121,6 +122,7 @@ for (const name of NAMES) {
     // The generated backgrounds vignette slightly, so the other edges can sit off bone even when
     // the sampled corner is exact. Bake a fade (96px unless overridden) to bone into the image edges: the photo then
     // meets the page with no seam, and the page CSS stays flat (no overlay, no blend).
+    const flat = opt.bgOnlyFade ? (await rgb(sharp(await matched.png().toBuffer()))).data : null;
     const FEATHER = opt.feather ?? 96;
     const frame = Buffer.alloc(width * height * 4);
     for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
@@ -128,7 +130,9 @@ for (const name of NAMES) {
       // Wide fades use a separable smoothstep (x × y): distance-to-nearest-edge leaves mitred
       // diagonal seams in the corners once the fade is wide enough to cross skin.
       const ss = (t) => { const u = Math.min(1, Math.max(0, t)); return u * u * (3 - 2 * u); };
-      const a = opt.feather
+      const j = (y * width + x) * 3;
+      const keep = opt.bgOnlyFade && !isBg(flat[j], flat[j + 1], flat[j + 2]);
+      const a = keep ? 0 : opt.feather
         ? Math.round(255 * (1 - ss(Math.min(x, width - 1 - x) / FEATHER) * ss(Math.min(y, height - 1 - y) / FEATHER)))
         : d >= FEATHER ? 0 : Math.round(255 * Math.pow(1 - d / FEATHER, 2));
       const i = (y * width + x) * 4;
