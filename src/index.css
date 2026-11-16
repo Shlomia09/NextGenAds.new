@@ -187,7 +187,7 @@ input, textarea, select {
    ============================================================ */
 @media (max-width: 900px) {
   /* Shell */
-  .main-content  { margin-left: 0; padding-top: 56px; }
+  .main-content  { margin-left: 0; padding-top: 0; }   /* the hamburger sits inside the top bar row */
   .page-container { padding: 16px 14px; }
 
   /* Sidebar: slide in from left, hidden by default */
@@ -204,18 +204,21 @@ input, textarea, select {
   .sb-hamburger { display: flex; align-items: center; justify-content: center; }
   .sb-overlay   { display: block; }
 
-  /* Dashboard: bento grid → single column */
-  .dash-bento-grid    { grid-template-columns: 1fr !important; }
+  /* Dashboard: bento grid → single column. minmax(0, 1fr), not 1fr: a 1fr track can't shrink
+     below its widest child, which pushed the cards past the screen on a phone. */
+  .dash-bento-grid    { grid-template-columns: minmax(0, 1fr) !important; }
+  .dash-bento-grid > * { min-width: 0; }
   /* Dashboard: welcome strip → stack vertically */
   .dash-welcome-strip { flex-direction: column !important; align-items: flex-start !important; }
   .dash-welcome-strip .dash-pulse-card { min-width: 0 !important; width: 100% !important; }
   /* Dashboard: KPI totals row → 2 columns */
-  .dash-kpi-totals    { grid-template-columns: repeat(2,1fr) !important; }
+  .dash-kpi-totals    { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
   /* Campaigns: KPI row → 2 columns */
-  .camp-kpi-grid      { grid-template-columns: repeat(2,1fr) !important; }
+  .camp-kpi-grid      { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   /* Campaigns: chart + donut → stack */
-  .camp-chart-grid    { grid-template-columns: 1fr !important; }
+  .camp-chart-grid    { grid-template-columns: minmax(0, 1fr) !important; }
+  .camp-chart-grid > * { min-width: 0; }
 
   /* Campaign table: hide non-essential columns */
   .camp-col-impressions,
@@ -227,8 +230,8 @@ input, textarea, select {
 @media (max-width: 480px) {
   .page-container { padding: 12px 10px; }
   /* KPI grids → single column on very small */
-  .camp-kpi-grid   { grid-template-columns: repeat(2,1fr) !important; }
-  .dash-kpi-totals { grid-template-columns: repeat(2,1fr) !important; }
+  .camp-kpi-grid   { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .dash-kpi-totals { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 }
 
 /* ============================================================
