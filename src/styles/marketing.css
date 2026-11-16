@@ -97,25 +97,46 @@
 .mk-hero .mk-lead { margin-top: 28px; max-width: 54ch; }
 .mk-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
 .mk-fineprint { margin-top: 18px; font-size: var(--t-label); color: var(--text-3); }
-.mk-hero-visual { margin-top: 64px; }
+/* ≥1024: copy 5 / shot 7; the shot bleeds 48px past the container so it reads as a window */
+.mk-hero-grid { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; }
+.mk-hero-shot { min-width: 0; }
+@media (min-width: 1024px) {
+  .mk-hero-grid { grid-template-columns: 5fr 7fr; gap: 56px; }
+  .mk-hero-shot { margin-right: -48px; }
+  .mk-hero .mk-h1 { font-size: clamp(44px, 4.6vw, 64px); }
+}
 .mk-caption { margin-top: 14px; font-size: var(--t-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--text-3); }
 @media (max-width: 640px) { .mk-hero { padding: 56px 0 48px; } .mk-actions .btn { flex: 1 1 100%; justify-content: center; } }
 
-/* Decay lines */
-.mk-decay { width: 100%; height: auto; display: block; overflow: visible; }
-.mk-decay .line { fill: none; stroke: var(--text-3); stroke-width: 2.5; }
-.mk-decay .line.flagged { stroke: var(--accent); }
-.mk-decay .dot { fill: var(--text-3); }
+/* Product shots — evidence: flat, 1px border, 3px radius, no chrome, no tilt */
+.mk-shot { display: block; }
+.mk-shot img { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--text); }
+/* Material stills — air: their background already equals the page, so no border */
+.mk-material { display: block; }
+.mk-material img { display: block; width: 100%; height: auto; }
+
+/* Decay lines — drawn in real pixels (see DecayLines.tsx) */
+.mk-decay-wrap { width: 100%; }
+.mk-decay { display: block; overflow: visible; }
+.mk-decay .line { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linecap: round; }
+.mk-decay .line.flagged { stroke: var(--accent); stroke-width: 2; }
 .mk-decay .dot.flagged { fill: var(--accent); }
+.mk-decay .flag-label { fill: var(--text-2); font-family: var(--font-mono); font-size: var(--t-label); }
 .mk-decay .axis { stroke: var(--border); stroke-width: 1; }
-.mk-decay .tick { fill: var(--text-3); font-family: var(--font-ui); font-size: 11px; letter-spacing: 0.14em; }
+.mk-decay .tick { fill: var(--text-3); font-family: var(--font-mono); font-size: var(--t-label); letter-spacing: var(--track-label); }
+@media (prefers-reduced-motion: no-preference) {
+  .mk-decay .line { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 900ms ease-out; }
+  .mk-decay .dot, .mk-decay .flag-label { opacity: 0; transition: opacity 200ms ease-out 900ms; }
+  .mk-decay.drawn .line { stroke-dashoffset: 0; }
+  .mk-decay.drawn .dot, .mk-decay.drawn .flag-label { opacity: 1; }
+}
 
 /* Proof strip */
 .mk-proof { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .mk-proof-inner { display: grid; grid-template-columns: repeat(3, 1fr); }
 .mk-proof-item { padding: 32px 24px; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
 .mk-proof-item:first-child { border-left: 0; padding-left: 0; }
-.mk-proof-num { font-family: var(--font-mono); font-size: var(--t-metric); letter-spacing: var(--track-metric); line-height: 1; color: var(--text); }
+.mk-proof-num { font-family: var(--font-mono); font-size: calc(var(--t-label) * 3); letter-spacing: var(--track-metric); line-height: 1; color: var(--text); }
 .mk-proof-lbl { font-size: var(--t-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--text-2); }
 @media (max-width: 720px) {
   .mk-proof-inner { grid-template-columns: 1fr; }
@@ -125,12 +146,15 @@
 
 /* Problem */
 .mk-body { display: flex; flex-direction: column; gap: 20px; max-width: 56ch; }
-.mk-problem-visual { margin-top: 56px; }
+.mk-problem-visual { margin-top: 64px; }
+/* Copy beside a still: two columns from 900px, stacked below */
+.mk-split { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; }
+@media (min-width: 900px) { .mk-split { grid-template-columns: 1fr 1fr; gap: 56px; } }
 
 /* Capability cards */
 .mk-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .mk-card {
-  background: var(--surface);
+  background: transparent;           /* no grey fill: it fought the screenshots */
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 26px 24px;
@@ -138,21 +162,50 @@
 }
 .mk-card-num { font-family: var(--font-mono); font-size: var(--t-label); color: var(--text-3); }
 .mk-card p { color: var(--text-2); font-size: var(--t-body); line-height: var(--lh-body); }
+.mk-cards-2 { grid-template-columns: repeat(2, 1fr); }
+.mk-figure { margin: 24px 0; }
+.mk-figcaption { margin-top: 12px; font-family: var(--font-mono); font-size: var(--t-label); color: var(--text-3); }
 @media (max-width: 900px) { .mk-cards { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .mk-cards { grid-template-columns: 1fr; } }
 
 /* How it works: two columns */
-.mk-cols { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: var(--radius); }
-.mk-col { padding: 32px 28px; display: flex; flex-direction: column; gap: 16px; }
-.mk-col + .mk-col { border-left: 1px solid var(--border); }
-.mk-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
-.mk-col li { color: var(--text); font-size: 15px; line-height: 1.45; padding-top: 12px; border-top: 1px solid var(--border); }
-.mk-summary { margin-top: 40px; max-width: 48ch; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); }
-.mk-summary-sub { margin-top: 10px; color: var(--text-2); }
+.mk-steps { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--border); }
+.mk-steps li { display: grid; grid-template-columns: 48px 160px 1fr; align-items: baseline; gap: 16px; padding: 18px 0; border-top: 1px solid var(--border); }
+.mk-step-n { font-family: var(--font-mono); font-size: var(--t-label); color: var(--text-3); }
+.mk-step-verb { font-family: var(--font-display); font-size: var(--t-h3); font-weight: 800; color: var(--text); }
+.mk-step-body { color: var(--text-2); font-size: 15px; line-height: 1.45; max-width: 60ch; }
+.mk-section .mk-statement { max-width: 24ch; margin-bottom: 32px; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); color: var(--text); }
+.mk-steps + .mk-summary { margin-top: 40px; max-width: 48ch; font-family: var(--font-display); font-size: var(--t-h2); font-weight: 800; letter-spacing: var(--track-h2); line-height: var(--lh-h2); }
 @media (max-width: 720px) {
-  .mk-cols { grid-template-columns: 1fr; }
-  .mk-col + .mk-col { border-left: 0; border-top: 1px solid var(--border); }
+  .mk-steps li { grid-template-columns: 36px 1fr; row-gap: 6px; }
+  .mk-step-body { grid-column: 2; }
 }
+
+/* Stills set beside their text. Every still's edges are baked to the page colour, so it dissolves
+   into the section instead of sitting in a box. */
+@media (min-width: 900px) {
+  /* Brand safety: the face stands on the section's bottom rule — its neck leaves the frame there */
+  .mk-split-face { grid-template-columns: 6fr 5fr; gap: 56px; align-items: center; }
+  .mk-split-face .mk-face { align-self: end; justify-self: center; width: min(100%, 480px); margin-bottom: -112px; }
+  /* Pricing: the powder beside the heading, kept low so the plans stay the subject */
+  .mk-split-pricing { grid-template-columns: 1fr 1fr; align-items: end; margin-bottom: 8px; }
+  .mk-split-pricing .mk-material img { max-height: 300px; object-fit: contain; }
+  /* Final CTA: the drop sits level with the headline */
+  .mk-split-final { grid-template-columns: 1fr 1fr; gap: 32px; }
+}
+@media (max-width: 899px) {
+  .mk-split-pricing .mk-material { margin: -8px 0 24px; }
+  /* stacked: the face closes the section, standing on its bottom rule */
+  .mk-split-face .mk-face { width: min(100%, 360px); justify-self: center; margin-bottom: -112px; }
+}
+/* matches .mk-section padding at this width */
+@media (max-width: 640px) { .mk-split-face .mk-face { margin-bottom: -72px; } }
+
+/* Final CTA */
+.mk-final { padding: 72px 0 112px; }
+.mk-final .mk-h2 { max-width: 26ch; line-height: var(--lh-h2); }
+.mk-final .mk-final-sub { margin-top: 28px; max-width: 52ch; }
+@media (max-width: 640px) { .mk-final { padding: 48px 0 72px; } }
 
 /* Pricing */
 .mk-toggle { display: inline-flex; border: 1px solid var(--border-control); border-radius: var(--radius); margin-bottom: 28px; }
@@ -185,12 +238,13 @@
 .mk-plan-sub { font-family: var(--font-mono); font-size: 12px; color: var(--text-3); margin-top: 6px; }
 .mk-plan-for { color: var(--text-2); font-size: 14px; }
 .mk-plan ul { list-style: none; margin: 0; padding: 18px 0 0; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; flex: 1; }
-.mk-plan li { font-size: 14px; color: var(--text); padding-left: 18px; position: relative; }
-.mk-plan li::before { content: '—'; position: absolute; left: 0; color: var(--text-3); }
+.mk-plan li { font-size: 14px; color: var(--text); padding-left: 16px; position: relative; }
+/* 4px square, not an em dash: "—" now means a missing value across the system */
+.mk-plan li::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 4px; height: 4px; background: var(--text-3); }
 .mk-plan .btn { justify-content: center; width: 100%; }
 /* Checkout failure: an alert state, so red as a 2px rule — the text itself stays --text (small) */
 .mk-plan-error { margin: 0; padding: 8px 0 8px 12px; border-left: 2px solid var(--accent); color: var(--text); font-size: 13px; line-height: 1.4; }
-.mk-guarantee { margin-top: 32px; max-width: 60ch; color: var(--text-2); }
+.mk-guarantee { margin-top: 32px; max-width: 60ch; color: var(--text-2); font-size: 15px; }
 .mk-close { margin-top: 32px; }
 @media (max-width: 900px) { .mk-plans { grid-template-columns: 1fr; max-width: 460px; } }
 
@@ -202,8 +256,9 @@
 .mk-footer-links a { color: var(--text-2); text-decoration: none; font-size: 13px; }
 .mk-footer-links a:hover { color: var(--text); }
 
-/* Reveal on scroll — position only, no fades */
+/* Motion budget: section headlines fade up 12px over 400ms on first view, and the decay chart
+   draws once. Nothing else moves. Reduced motion disables both. */
 @media (prefers-reduced-motion: no-preference) {
-  .mk-reveal { transform: translateY(14px); transition: transform 0.6s ease; }
-  .mk-reveal.in { transform: none; }
+  .mk-reveal { opacity: 0; transform: translateY(12px); transition: opacity 400ms ease-out, transform 400ms ease-out; }
+  .mk-reveal.in { opacity: 1; transform: none; }
 }

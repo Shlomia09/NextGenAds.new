@@ -63,7 +63,6 @@ const Login: React.FC = () => {
             {[
               { stat: '25,620', label: 'Beauty campaigns analysed' },
               { stat: '2018', label: 'First campaign in the dataset' },
-              { stat: '€100+', label: 'Avg AOV served' },
             ].map(({ stat, label }) => (
               <div key={label} className="login-proof-item">
                 <div className="login-proof-stat">{stat}</div>
@@ -74,12 +73,12 @@ const Login: React.FC = () => {
 
           {/* Demo access CTA — prominent on the dark panel */}
           <div className="login-demo-cta">
-            <p className="login-demo-label">No Supabase account yet?</p>
+            <p className="login-demo-label">Want to look around first?</p>
             <button className="login-demo-btn" onClick={() => navigate('/demo')}>
               <LayoutDashboard size={14} strokeWidth={1.5} />
-              Enter Full Demo Dashboard
+              Open the demo
             </button>
-            <p className="login-demo-sub">All features · Mock data · No setup required</p>
+            <p className="login-demo-sub">Demo account · mock data</p>
           </div>
 
           <div className="login-quote">
@@ -165,7 +164,7 @@ const Login: React.FC = () => {
                   <div>{error}</div>
                   {error.toLowerCase().includes('fetch') && (
                     <div className="login-error-hint">
-                      Supabase is not configured yet.{' '}
+                      Sign-in isn't available right now.{' '}
                       <button type="button" className="login-error-demo" onClick={() => navigate('/demo')}>
                         Try the Demo Dashboard instead →
                       </button>

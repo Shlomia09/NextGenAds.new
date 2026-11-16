@@ -4,9 +4,10 @@ import '../styles/marketing.css';
 import { MarketingNav, MarketingFooter } from '../components/marketing/MarketingChrome';
 import { DecayLines } from '../components/marketing/DecayLines';
 import { PricingSection } from '../components/marketing/PricingSection';
+import { ProductShot, Material } from '../components/marketing/Figures';
 
 /* ─────────────────────────────────────────────────────────────
-   Rouge — landing. Spec: Docs/landing-spec.md (v2).
+   Rouge — landing. Spec: Docs/landing-spec.md (v2) + Docs/landing-spec-v3.md (visual layer).
    • Always Bone: the root pins data-theme="light".
    • No number without a source: only 25,620, 2018 and the plan prices.
    • CTA is always "Get started". 30-day money-back, nothing else.
@@ -19,7 +20,7 @@ const CAPABILITIES = [
   },
   {
     title: 'Runs it',
-    body: 'Pausing, pacing, reallocation and audience tests run on their own, inside the ceiling you set. Anything that spends more waits for you.',
+    body: 'Pausing, pacing, reallocation and audience tests, each proposed with the reason it is proposed and what it should change. You approve; Rouge executes.',
   },
   {
     title: 'Builds',
@@ -35,25 +36,33 @@ const CAPABILITIES = [
   },
 ];
 
-const RUNS_ON_ITS_OWN = [
-  'Pauses creatives below break-even.',
-  'Moves budget between ads inside a campaign.',
-  'Tests audiences within the budget you set.',
-  "Kills what's dying before it drains the week.",
+// One list, not "runs alone / asks first": today every change goes through approval
+// (known-issues #8), so a two-column split would claim a distinction the code does not make.
+// The two-column table comes back when #8 ships (Docs/landing-spec-v3.md, section 5).
+const STEPS = [
+  { verb: 'Reads',     body: 'Your Meta account, every morning.' },
+  { verb: 'Diagnoses', body: "Names the creative that's dying and the cause: frequency, hook-rate, CPM or landing page." },
+  { verb: 'Proposes',  body: 'The change — a pause, pacing, reallocation, an audience test — with the reason and what it should change.' },
+  { verb: 'Drafts',    body: 'Copy from the ads that already won in your account.' },
+  { verb: 'Builds',    body: 'New campaigns with you: structure, objective, audience, budget.' },
+  { verb: 'Publishes', body: 'What you approved, and nothing else. Then watches it for 48 hours.' },
 ];
 
-const ASKS_YOU_FIRST = [
-  'Raising the budget.',
-  'Launching a new campaign.',
-  'Scaling past your ceiling.',
-  'Anything that spends more than yesterday.',
-];
+function Card({ n, title, body }: { n: number; title: string; body: string }) {
+  return (
+    <div className="mk-card">
+      <span className="mk-card-num">{String(n).padStart(2, '0')}</span>
+      <h3 className="mk-h3">{title}</h3>
+      <p>{body}</p>
+    </div>
+  );
+}
 
 export default function Landing() {
   const navigate = useNavigate();
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Reveal on scroll — movement only, no fade (flat, no transparency)
+  // Reveal on scroll — section heads and the photos fade and rise in once
   useEffect(() => {
     const io = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
@@ -72,7 +81,8 @@ export default function Landing() {
 
       {/* ── 1 · Hero ───────────────────────────────────────── */}
       <header className="mk-hero">
-        <div className="mk-wrap">
+        <div className="mk-wrap mk-hero-grid">
+          <div className="mk-hero-copy">
           <div className="mk-eyebrow">Beauty campaign intelligence</div>
           <h1 className="mk-h1">
             How many good days does this ad have <span className="mk-accent">left</span>?
@@ -88,10 +98,9 @@ export default function Landing() {
             <button className="btn btn-secondary btn-lg" onClick={howItWorks}>See how it works</button>
           </div>
           <p className="mk-fineprint">30-day money-back guarantee · No setup fee</p>
-
-          <div className="mk-hero-visual">
-            <DecayLines />
-            <p className="mk-caption">Four creatives. One account. Four different lifespans.</p>
+          </div>
+          <div className="mk-hero-shot">
+            <ProductShot name="shot-obituary" lazy={false} />
           </div>
         </div>
       </header>
@@ -121,7 +130,8 @@ export default function Landing() {
             <div className="mk-eyebrow">The problem</div>
             <h2 className="mk-h2">There is no<br />calendar for this.</h2>
           </div>
-          <div className="mk-body mk-lead mk-reveal">
+          <div className="mk-split">
+          <div className="mk-body mk-lead">
             <p>
               A creative stops being profitable long before the ROAS chart admits it.
               Frequency climbs, hook-rate drops, CPM drifts, the landing page stalls —
@@ -134,8 +144,11 @@ export default function Landing() {
             </p>
             <p>By the time the number moves, the budget is already spent.</p>
           </div>
-          <div className="mk-problem-visual mk-reveal">
-            <DecayLines withAxis />
+          <Material name="lipstick-section" className="mk-split-img mk-reveal" />
+          </div>
+          <div className="mk-problem-visual">
+            <DecayLines />
+            <p className="mk-caption">Four creatives. One account. Four different lifespans.</p>
           </div>
         </div>
       </section>
@@ -148,13 +161,14 @@ export default function Landing() {
             <h2 className="mk-h2">An operator,<br />not an advisor.</h2>
           </div>
           <div className="mk-cards">
-            {CAPABILITIES.map((c, i) => (
-              <div key={c.title} className="mk-card mk-reveal">
-                <span className="mk-card-num">{String(i + 1).padStart(2, '0')}</span>
-                <h3 className="mk-h3">{c.title}</h3>
-                <p>{c.body}</p>
-              </div>
-            ))}
+            {CAPABILITIES.slice(0, 3).map((c, i) => <Card key={c.title} n={i + 1} title={c.title} body={c.body} />)}
+          </div>
+          <figure className="mk-figure">
+            <ProductShot name="shot-dashboard" />
+            <figcaption className="mk-figcaption">Live account. Demo data.</figcaption>
+          </figure>
+          <div className="mk-cards mk-cards-2">
+            {CAPABILITIES.slice(3).map((c, i) => <Card key={c.title} n={i + 4} title={c.title} body={c.body} />)}
           </div>
         </div>
       </section>
@@ -164,37 +178,33 @@ export default function Landing() {
         <div className="mk-wrap">
           <div className="mk-section-head mk-reveal">
             <div className="mk-eyebrow">How it works</div>
-            <h2 className="mk-h2">It runs the account.<br />You set the ceiling.</h2>
+            <h2 className="mk-h2">It does the work.<br />You approve the spend.</h2>
           </div>
-          <div className="mk-cols mk-reveal">
-            <div className="mk-col">
-              <div className="mk-eyebrow">Runs on its own</div>
-              <ul>{RUNS_ON_ITS_OWN.map(t => <li key={t}>{t}</li>)}</ul>
-            </div>
-            <div className="mk-col">
-              <div className="mk-eyebrow">Asks you first</div>
-              <ul>{ASKS_YOU_FIRST.map(t => <li key={t}>{t}</li>)}</ul>
-            </div>
-          </div>
-          <p className="mk-summary mk-reveal">
-            Rouge can move your money. It can't spend <span className="mk-accent">more</span> of it without you.
-          </p>
-          <p className="mk-summary-sub">Every action is watched for 48 hours after it runs.</p>
+          <ol className="mk-steps">
+            {STEPS.map((s, i) => (
+              <li key={s.verb}>
+                <span className="mk-step-n">{String(i + 1).padStart(2, '0')}</span>
+                <span className="mk-step-verb">{s.verb}</span>
+                <span className="mk-step-body">{s.body}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="mk-summary">Every change waits for you. Nothing moves in your account until you say yes.</p>
         </div>
       </section>
 
-      {/* ── 6 · Brand safety ───────────────────────────────── */}
+      {/* ── 6 · Brand safety — text opposite the one face on the page ── */}
       <section className="mk-section">
-        <div className="mk-wrap">
+        <div className="mk-wrap mk-split mk-split-face">
+          <div>
           <div className="mk-section-head mk-reveal">
             <div className="mk-eyebrow">Brand safety</div>
             <h2 className="mk-h2">Your brand book<br />stays yours.</h2>
           </div>
-          <div className="mk-body mk-lead mk-reveal">
+          <p className="mk-statement">Your visuals are your brand's — built by the people you pay to build them.</p>
+          <div className="mk-body mk-lead">
             <p>
-              Rouge doesn't generate your creative and doesn't make art-direction
-              calls. Your visuals are your brand's — built by the people you pay
-              to build them.
+              Rouge doesn't generate your creative and doesn't make art-direction calls.
             </p>
             <p>
               What Rouge does is make them perform: it tells you which one is dying
@@ -204,16 +214,34 @@ export default function Landing() {
             </p>
             <p>Inside beauty accounts since 2018. Your brand book untouched.</p>
           </div>
+          </div>
+          <Material name="face-profile" className="mk-face mk-reveal" />
         </div>
       </section>
 
-      {/* ── 7 · Pricing and CTA ────────────────────────────── */}
+      {/* ── 7 · Pricing and CTA — the powder sits beside the heading ── */}
       <section className="mk-section" id="pricing">
         <div className="mk-wrap">
-          <PricingSection />
-          <div className="mk-close">
+          <PricingSection aside={<Material name="powder-arc" className="mk-reveal" />} />
+        </div>
+      </section>
+
+      {/* ── 8 · Final CTA — the pipette's drop beside the last line ── */}
+      <section className="mk-final">
+        <div className="mk-wrap mk-split mk-split-final">
+          <div>
+          <h2 className="mk-h2 mk-reveal">
+            Connect the account.<br />Read tomorrow's <span className="mk-accent">obituary</span>.
+          </h2>
+          <p className="mk-lead mk-final-sub">
+            Thirty days. If Rouge doesn't find what your reporting missed, you don't pay for the month.
+          </p>
+          <div className="mk-actions">
             <button className="btn btn-primary btn-lg" onClick={getStarted}>Get started</button>
+            <button className="btn btn-secondary btn-lg" onClick={howItWorks}>See how it works</button>
           </div>
+          </div>
+          <Material name="pipette-drop" className="mk-reveal" />
         </div>
       </section>
 
