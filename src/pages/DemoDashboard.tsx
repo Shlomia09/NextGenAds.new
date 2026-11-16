@@ -137,10 +137,10 @@ const DemoDashboard: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+    <div className="demo-shell">
       {/* ── Sidebar ── */}
-      <aside style={{ width: 220, background: 'var(--bg-sidebar)', borderRight: '0.5px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-        <div style={{ padding: '22px 20px 16px', borderBottom: '0.5px solid var(--border)' }}>
+      <aside className="demo-sidebar">
+        <div className="demo-brand">
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em' }}>
             Rouge
           </div>
@@ -150,12 +150,12 @@ const DemoDashboard: React.FC = () => {
         </div>
 
         {/* Demo pill */}
-        <div style={{ margin: '10px 12px', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 3, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 7 }}>
+        <div className="demo-pill">
           <div className="live-dot live-dot--demo" />
           <span style={{ fontFamily: 'var(--font-ui)', fontSize: 10, fontWeight: 300, color: 'var(--text)' }}>Demo Mode</span>
         </div>
 
-        <nav style={{ flex: 1, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <nav className="demo-nav">
           <DemoNavItem icon={<LayoutDashboard size={14} strokeWidth={1.5} />} label="Dashboard" active />
           <DemoNavItem icon={<Sparkles size={14} strokeWidth={1.5} />} label="Intelligence" />
           <DemoNavItem icon={<BarChart3 size={14} strokeWidth={1.5} />} label="Campaigns" />
@@ -164,7 +164,7 @@ const DemoDashboard: React.FC = () => {
           <DemoNavItem icon={<Settings size={14} strokeWidth={1.5} />} label="Settings" />
         </nav>
 
-        <div style={{ padding: '14px 12px', borderTop: '0.5px solid var(--border)' }}>
+        <div className="demo-sidebar-foot">
           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 9, fontWeight: 300, color: 'var(--text-2)', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 6 }}>
             <div className="live-dot" />
             Benchmark active · since 2018
@@ -173,16 +173,16 @@ const DemoDashboard: React.FC = () => {
       </aside>
 
       {/* ── Main ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="demo-main">
         {/* Demo banner */}
-        <div style={{ background: 'var(--bg)', borderBottom: '0.5px solid var(--border)', padding: '9px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div className="demo-banner">
+          <div className="demo-banner-note">
             <Sparkles size={12} strokeWidth={1.5} style={{ color: 'var(--text-3)' }} />
             <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 300, color: 'var(--text)', letterSpacing: '0.04em' }}>
               Demo Mode — {MOCK_BRAND.name} · Mock data · No auth required
             </span>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div className="demo-banner-actions">
             <button className="btn btn-primary btn-sm" onClick={() => navigate('/login')}>
               Create Real Account
               <ChevronRight size={11} strokeWidth={1.5} />
@@ -195,7 +195,7 @@ const DemoDashboard: React.FC = () => {
         </div>
 
         {/* Page content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px' }}>
+        <div className="demo-content">
           {/* Header */}
           <div data-shot="dash-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
             <div>
@@ -213,7 +213,7 @@ const DemoDashboard: React.FC = () => {
             </div>
 
             {/* KPI strip */}
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div className="demo-kpis">
               {[
                 { icon: <DollarSign size={10} strokeWidth={1.5} />, label: 'Spend',     value: `€${totalSpend.toLocaleString()}` },
                 { icon: <TrendingUp size={10} strokeWidth={1.5} />, label: 'Revenue',   value: `€${totalRevenue.toLocaleString()}` },
@@ -231,7 +231,7 @@ const DemoDashboard: React.FC = () => {
           </div>
 
           {/* 3-column grid */}
-          <div data-shot="dash-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, alignItems: 'start' }}>
+          <div data-shot="dash-grid" className="demo-grid">
 
             {/* ── Col 1: Benchmarks ── */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -334,7 +334,7 @@ const DemoDashboard: React.FC = () => {
             </div>
 
             {/* ── Col 3: Intelligence Chat ── */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0 }}>
+            <div className="demo-chat-col">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div className="section-eyebrow" style={{ marginBottom: 0 }}>
                   <Sparkles size={10} strokeWidth={1.5} />
@@ -343,7 +343,7 @@ const DemoDashboard: React.FC = () => {
                 <span style={{ fontFamily: 'var(--font-sans)', fontSize: 9, color: 'var(--text-hint)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Demo</span>
               </div>
 
-              <div style={{ background: 'var(--bg-primary)', border: '0.5px solid var(--border-light)', borderRadius: 6, display: 'flex', flexDirection: 'column', minHeight: 520 }}>
+              <div className="demo-chat">
                 {/* Chat header */}
                 <div style={{ padding: '12px 16px', borderBottom: '0.5px solid var(--border-light)', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', gap: 10, borderRadius: '6px 6px 0 0' }}>
                   <div style={{ width: 28, height: 28, background: 'var(--bg)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)' }}>
@@ -462,6 +462,53 @@ const DemoDashboard: React.FC = () => {
       </div>
 
       <style>{`
+        .demo-shell { display: flex; min-height: 100vh; background: var(--bg-primary); }
+        .demo-sidebar { width: 220px; background: var(--bg-sidebar); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+        .demo-brand { padding: 22px 20px 16px; border-bottom: 0.5px solid var(--border); }
+        .demo-pill { margin: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 3px; padding: 6px 10px; display: flex; align-items: center; gap: 7px; }
+        .demo-nav { flex: 1; padding: 8px 10px; display: flex; flex-direction: column; gap: 1px; }
+        .demo-sidebar-foot { padding: 14px 12px; border-top: 0.5px solid var(--border); }
+        /* min-width: 0 lets the main column shrink instead of pushing past the screen */
+        .demo-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .demo-banner { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 9px 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .demo-banner-note { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .demo-banner-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+        .demo-content { flex: 1; padding: 28px 32px; }
+        .demo-content .page-subtitle { flex-wrap: wrap; }
+        .demo-kpis { display: flex; gap: 8px; flex-wrap: wrap; }
+        .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+        .demo-chat-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+        .demo-chat { background: var(--bg-primary); border: 0.5px solid var(--border-light); border-radius: 6px; display: flex; flex-direction: column; min-height: 520px; }
+
+        /* Tablet: benchmarks and recommendations side by side, the chat full width below */
+        @media (max-width: 1180px) {
+          .demo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .demo-chat-col { grid-column: 1 / -1; }
+          .demo-chat { min-height: 440px; }
+        }
+        /* Below 900px the sidebar becomes a top bar: brand and demo pill only (the other nav items are disabled in the demo) */
+        @media (max-width: 900px) {
+          .demo-shell { flex-direction: column; }
+          .demo-sidebar { width: auto; flex-direction: row; align-items: center; justify-content: space-between; border-right: 0; border-bottom: 0.5px solid var(--border); }
+          .demo-brand { padding: 12px 16px; border-bottom: 0; }
+          .demo-brand > div + div { display: none; }
+          .demo-pill { margin: 0 16px 0 0; }
+          .demo-nav, .demo-sidebar-foot { display: none; }
+        }
+        /* Phone: one column, the KPI strip as a 2x2 grid, tighter gutters */
+        @media (max-width: 760px) {
+          .demo-grid { grid-template-columns: minmax(0, 1fr); }
+          .demo-banner { padding: 10px 16px; flex-wrap: wrap; }
+          .demo-banner-actions { width: 100%; }
+          .demo-banner-actions .btn-primary { flex: 1; justify-content: center; }
+          .demo-content { padding: 20px 16px 32px; }
+          .demo-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+          .demo-chat { min-height: 400px; }
+          /* the table scrolls sideways inside its frame; names stay readable, numbers stay on one line */
+          .demo-content .data-table td:first-child { min-width: 190px; }
+          .demo-content .data-table th, .demo-content .data-table td.numeric { white-space: nowrap; }
+        }
+
         .demo-nav-item {
           display: flex;
           align-items: center;
