@@ -14,7 +14,8 @@ insert into brands (id, user_id, name, currency) values
   ('00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-0000000000b1', 'Test B', 'EUR'),
   ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-0000000000c1', 'Test C', 'EUR');
 
-insert into reference_sources (source_key, platform, real_account_ref) values ('ref_test_01', 'meta', 'test');
+insert into reference_sources (source_key, platform, real_account_ref, purchase_tracking_complete)
+  values ('ref_test_01', 'meta', 'test', true), ('ref_test_02', 'meta', 'test-untracked', false);
 insert into reference_campaign_stats (source_key, platform, campaign_key, objective_normalized, period_start, period_end,
   granularity, currency_original, spend_original, spend_eur, impressions, clicks, purchases, purchase_value_eur)
 select 'ref_test_01', 'meta', 'k' || g, 'sales', d, d, 'day', 'EUR', 10, 10, 1000, 20, 1, 30
@@ -69,6 +70,23 @@ begin
     raise exception 'FAIL: live data leaked into the benchmark (cpm %, ctr %, roas %)', r.cpm, r.ctr, r.roas;
   end if;
 end $$;
+
+-- ── 3b · a source without complete purchase tracking never contributes to ROAS ──
+reset role;
+insert into reference_campaign_stats (source_key, platform, campaign_key, objective_normalized, period_start, period_end,
+  granularity, currency_original, spend_original, spend_eur, impressions, clicks, purchases, purchase_value_eur)
+select 'ref_test_02', 'meta', 'u' || g, 'traffic', d, d, 'day', 'EUR', 10, 10, 1000, 20, 1, 5
+from generate_series(1, 40) g, generate_series(date '2025-01-01', date '2025-01-03', interval '1 day') d;
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
+do $
+declare r record;
+begin
+  select * into r from rouge_benchmark('00000000-0000-0000-0000-00000000000a', 'meta', 'traffic');
+  if r is null then raise exception 'FAIL: traffic cohort returned nothing'; end if;
+  if r.roas is not null then raise exception 'FAIL: ROAS came from an untracked source (%)', r.roas; end if;
+  if r.cpm <> 10 then raise exception 'FAIL: other metrics should still come from the untracked source'; end if;
+end $;
 
 -- ── 4 · below the sample threshold there is no row at all ──
 do $$ begin

@@ -62,6 +62,9 @@ create table if not exists public.reference_sources (
   owner_entity     text,
   relationship     text check (relationship in ('own', 'client_contract', 'pilot')),
   usage_basis      text,                           -- which agreement or consent allows this use
+  -- ROAS comes only from sources whose purchase values are fully tracked. Off by default:
+  -- the Meta reference export's purchase values are incomplete (ROAS ≈ 0.12 on its own totals).
+  purchase_tracking_complete boolean not null default false,
   notes            text,
   created_at       timestamptz not null default now()
 );
@@ -127,6 +130,7 @@ create table if not exists public.data_sources (
   usage_basis       text,
   benchmark_consent boolean not null default false,
   consent_date      date,
+  purchase_tracking_complete boolean not null default false,   -- see reference_sources
   notes             text,
   updated_at        timestamptz not null default now()
 );
@@ -184,8 +188,10 @@ select
   case r.granularity when 'day' then 1 when 'month' then 30 else 365 end as coverage_days,
   r.spend_eur, r.impressions, r.clicks, r.add_to_cart,
   coalesce(r.purchases, 0)                  as conversions,
-  coalesce(r.purchase_value_eur, 0)         as revenue_eur
+  coalesce(r.purchase_value_eur, 0)         as revenue_eur,
+  rs.purchase_tracking_complete             as tracks_purchases
 from public.reference_campaign_stats r
+join public.reference_sources rs on rs.source_key = r.source_key
 union all
 select
   'live',
@@ -203,7 +209,8 @@ select
   round(d.spend * coalesce(case when coalesce(b.currency, 'EUR') = 'EUR' then 1 end, fx.eur_per_unit, 1), 2),
   d.impressions, d.clicks, coalesce(d.atc, 0),
   case when public.rouge_goal(coalesce(c.platform, 'meta'), c.objective) = 'leads' then d.leads else d.purchases end,
-  round(coalesce(d.revenue, 0) * coalesce(case when coalesce(b.currency, 'EUR') = 'EUR' then 1 end, fx.eur_per_unit, 1), 2)
+  round(coalesce(d.revenue, 0) * coalesce(case when coalesce(b.currency, 'EUR') = 'EUR' then 1 end, fx.eur_per_unit, 1), 2),
+  ds.purchase_tracking_complete
 from public.campaign_daily_stats d
 join public.campaigns    c  on c.id = d.campaign_id
 join public.brands       b  on b.id = d.brand_id
@@ -279,7 +286,10 @@ begin
     agg as (
       select count(distinct campaign_ref) as campaigns, sum(coverage_days) as days,
              sum(spend_eur) spend, sum(impressions) impr, sum(clicks) clicks,
-             sum(add_to_cart) atc, sum(conversions) conv, sum(revenue_eur) revenue
+             sum(add_to_cart) atc, sum(conversions) conv,
+             -- ROAS only from fully tracked sources; null when no tracked source is in the pool
+             sum(revenue_eur) filter (where tracks_purchases) revenue_tracked,
+             sum(spend_eur)   filter (where tracks_purchases) spend_tracked
       from pool
     )
     select v_level,
@@ -287,7 +297,7 @@ begin
            round(clicks::numeric / nullif(impr, 0) * 100, 2),
            round(spend / nullif(clicks, 0), 2),
            round(spend / nullif(conv, 0), 2),
-           round(revenue / nullif(spend, 0), 2),
+           round(revenue_tracked / nullif(spend_tracked, 0), 2),
            round(conv / nullif(clicks, 0) * 100, 2),
            round(atc::numeric / nullif(clicks, 0) * 100, 2)
     from agg

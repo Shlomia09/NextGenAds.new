@@ -100,6 +100,9 @@ async function main() {
       const { error } = await db.from('reference_sources').upsert({
         source_key: spec.sourceKey, platform: spec.platform, real_account_ref: spec.realAccount,
         relationship: 'own', usage_basis: '[FILL IN: agreement or consent covering benchmark use]',
+        // Neither export has complete purchase values (Meta's are partial, Google's have none),
+        // so neither contributes to ROAS. Flip only after verifying tracking for that source.
+        purchase_tracking_complete: false,
       });
       if (error) throw new Error(`reference_sources: ${error.message}`);
     }
