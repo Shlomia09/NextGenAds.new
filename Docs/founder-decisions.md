@@ -40,13 +40,15 @@ enforced. If code changes one of these, the legal draft that cites it changes in
    and returns no ROAS otherwise. Both current reference sources are `false` (Meta purchase values are
    partial; Google has none).
 
-7. **Test database:** a Supabase branch, cost shown before creation ($0.01344/hour, quoted 2026-11-18).
+7. **Test database:** a Supabase branch was quoted at $0.01344/hour on 2026-11-18 and **not created**
+   ("not now"). The migration and `supabase/tests/reference_dataset.test.sql` are untested against a
+   database until one is approved.
 
 8. **Push and the reference load** are run or approved by the founder.
 
 9. **A live client is never compared with its own reference history.** The Meta reference account also
    ran house brands that are clients today. Reference campaigns are tied to the client's brand in
-    (service_role only) and excluded from that client's benchmark; other
+   `reference_campaign_owners` (service_role only) and excluded from that client's benchmark; other
    clients still see them. The matching rules name brands, so they live in the git-ignored
-   , not in code. Current load: 6 Google campaigns (≈€12,857) tied to one
+   `data/reference/owners.json`, not in code. Current load: 6 Google campaigns (≈€12,857) tied to one
    live client; 0 in the Meta export (that client's Meta campaigns predate its October 2023 start).
