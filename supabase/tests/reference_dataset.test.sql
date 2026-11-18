@@ -1,0 +1,94 @@
+-- Database tests for 20261118120000_reference_dataset. Runs in one transaction and rolls back.
+-- Run against a branch or clean database that has the migration applied, never production:
+--   psql "$BRANCH_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/reference_dataset.test.sql
+-- Each block raises an exception on failure; reaching the final NOTICE means every test passed.
+begin;
+
+-- ── fixtures: three users, three brands; the reference layer gets 40 campaigns × 3 days ──
+insert into auth.users (id, email) values
+  ('00000000-0000-0000-0000-0000000000a1', 't-a@test.invalid'),
+  ('00000000-0000-0000-0000-0000000000b1', 't-b@test.invalid'),
+  ('00000000-0000-0000-0000-0000000000c1', 't-c@test.invalid');
+insert into brands (id, user_id, name, currency) values
+  ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-0000000000a1', 'Test A', 'EUR'),
+  ('00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-0000000000b1', 'Test B', 'EUR'),
+  ('00000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-0000000000c1', 'Test C', 'EUR');
+
+insert into reference_sources (source_key, platform, real_account_ref) values ('ref_test_01', 'meta', 'test');
+insert into reference_campaign_stats (source_key, platform, campaign_key, objective_normalized, period_start, period_end,
+  granularity, currency_original, spend_original, spend_eur, impressions, clicks, purchases, purchase_value_eur)
+select 'ref_test_01', 'meta', 'k' || g, 'sales', d, d, 'day', 'EUR', 10, 10, 1000, 20, 1, 30
+from generate_series(1, 40) g, generate_series(date '2025-01-01', date '2025-01-03', interval '1 day') d;
+
+-- two live clients (A, B) with consent; their numbers differ sharply from the reference layer
+do $$
+declare b uuid; acct uuid; camp uuid; i int;
+begin
+  foreach b in array array['00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b']::uuid[] loop
+    insert into ad_accounts (user_id, platform, account_id, account_name, brand_id, status)
+      select user_id, 'meta', 'act_' || left(b::text, 4), 'test', b, 'active' from brands where id = b
+      returning id into acct;
+    insert into data_sources (ad_account_id, benchmark_consent) values (acct, true);
+    for i in 1..40 loop
+      insert into campaigns (brand_id, ad_account_id, platform, campaign_id_external, name, objective)
+        values (b, acct, 'meta', b::text || '-' || i, 'live', 'OUTCOME_SALES') returning id into camp;
+      insert into campaign_daily_stats (campaign_id, brand_id, date, spend, impressions, clicks, purchases, revenue)
+        select camp, b, d, 1000, 1000, 500, 50, 9000 from generate_series(date '2025-01-01', date '2025-01-03', interval '1 day') d;
+    end loop;
+  end loop;
+end $$;
+
+-- ── 1 · a signed-in user can't read the reference layer or its provenance ──
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000c1","role":"authenticated"}', true);
+do $$ begin
+  begin perform 1 from reference_campaign_stats limit 1; raise exception 'FAIL: authenticated read reference_campaign_stats';
+  exception when insufficient_privilege then null; end;
+  begin perform 1 from reference_sources limit 1; raise exception 'FAIL: authenticated read reference_sources';
+  exception when insufficient_privilege then null; end;
+  begin perform 1 from benchmark_pool limit 1; raise exception 'FAIL: authenticated read benchmark_pool';
+  exception when insufficient_privilege then null; end;
+end $$;
+
+-- ── 2 · nobody can ask for another brand's benchmark (differencing attack) ──
+do $$ begin
+  begin perform * from rouge_benchmark('00000000-0000-0000-0000-00000000000a', 'meta', 'sales');
+    raise exception 'FAIL: user C got brand A''s benchmark';
+  exception when insufficient_privilege then null; end;
+end $$;
+
+-- ── 3 · with only 2 live clients, A's benchmark is the reference layer alone ──
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
+do $$
+declare r record;
+begin
+  select * into r from rouge_benchmark('00000000-0000-0000-0000-00000000000a', 'meta', 'sales');
+  if r is null then raise exception 'FAIL: no benchmark returned'; end if;
+  -- reference only: CPM 10/1000*1000 = 10, CTR 2%, ROAS 3. B's live data (CPM 1000, ROAS 9) must not move it.
+  if r.cpm <> 10 or r.ctr <> 2 or r.roas <> 3 then
+    raise exception 'FAIL: live data leaked into the benchmark (cpm %, ctr %, roas %)', r.cpm, r.ctr, r.roas;
+  end if;
+end $$;
+
+-- ── 4 · below the sample threshold there is no row at all ──
+do $$ begin
+  if exists (select 1 from rouge_benchmark('00000000-0000-0000-0000-00000000000a', 'meta', 'leads')) then
+    raise exception 'FAIL: a cohort under the threshold returned a row';
+  end if;
+end $$;
+
+-- ── 5 · anon can't run the benchmark or read the old view ──
+reset role;
+set local role anon;
+do $$ begin
+  begin perform * from rouge_benchmark('00000000-0000-0000-0000-00000000000a', 'meta', 'sales');
+    raise exception 'FAIL: anon ran rouge_benchmark';
+  exception when insufficient_privilege then null; end;
+  if to_regclass('public.vertical_benchmarks_computed') is not null then
+    raise exception 'FAIL: vertical_benchmarks_computed still exists';
+  end if;
+end $$;
+
+reset role;
+do $$ begin raise notice 'reference_dataset: all tests passed'; end $$;
+rollback;
