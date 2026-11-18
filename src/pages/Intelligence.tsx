@@ -113,8 +113,8 @@ const Intelligence: React.FC = () => {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="page-container" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 48px)' }}>
-      <div className="page-header flex items-center justify-between">
+    <div className="page-container int-page" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 48px)' }}>
+      <div className="page-header int-header flex items-center justify-between">
         <div>
           <div className="section-eyebrow">
             <Sparkles size={10} strokeWidth={1.5} />
@@ -142,10 +142,10 @@ const Intelligence: React.FC = () => {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '210px 1fr', gap: 14, flex: 1, minHeight: 0 }}>
+      <div className="int-layout" style={{ display: 'grid', gridTemplateColumns: '210px minmax(0, 1fr)', gap: 14, flex: 1, minHeight: 0 }}>
 
         {/* ── Sessions sidebar ─────────────────────────────────────────────── */}
-        <div className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <div className="card int-sessions" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <div style={{
             padding: '10px 14px',
             borderBottom: '0.5px solid var(--border-light)',
@@ -224,7 +224,7 @@ const Intelligence: React.FC = () => {
         </div>
 
         {/* ── Chat panel ───────────────────────────────────────────────────── */}
-        <div style={{ minHeight: 0 }}>
+        <div className="int-chat" style={{ minHeight: 0, minWidth: 0 }}>
           {!activeBrand ? (
             <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', gap: 14 }}>
               <Sparkles size={28} strokeWidth={1.5} style={{ color: 'var(--rose-gold)' }} />
@@ -250,6 +250,15 @@ const Intelligence: React.FC = () => {
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Mobile: sessions become a short list above the chat; the page scrolls instead of being locked to 100vh */
+        @media (max-width: 900px) {
+          .int-page { height: auto !important; }
+          .int-header { flex-wrap: wrap; gap: 12px; }
+          .int-layout { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: auto; }
+          .int-sessions { max-height: 168px; }
+          .int-chat { height: 72vh; min-height: 460px; }
+        }
 
         .int-session-item {
           display: flex;

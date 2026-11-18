@@ -136,6 +136,9 @@ const WooCommerceConnect: React.FC<WooCommerceConnectProps> = ({ userId, brands 
           placeholder="ck_xxxxxxxxxxxx"
           style={inputStyle}
           id="woo-consumer-key"
+          autoComplete="off"
+          data-1p-ignore
+          data-lpignore="true"
         />
       </div>
 
@@ -149,6 +152,10 @@ const WooCommerceConnect: React.FC<WooCommerceConnectProps> = ({ userId, brands 
           placeholder="cs_xxxxxxxxxxxx"
           style={inputStyle}
           id="woo-consumer-secret"
+          // an API secret, not the user's login: "new-password" stops the browser autofilling saved credentials here
+          autoComplete="new-password"
+          data-1p-ignore
+          data-lpignore="true"
         />
       </div>
 

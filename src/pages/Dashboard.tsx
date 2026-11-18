@@ -476,7 +476,7 @@ const Dashboard: React.FC = () => {
  
             {/* ── 2. Performance · 30 days ── */}
             <Card style={{ padding: '18px 20px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
                 <div>
                   <SectionLabel style={{ marginBottom: 4 }}>Performance · last 30 days</SectionLabel>
                   {/* Summary KPIs above the chart */}
