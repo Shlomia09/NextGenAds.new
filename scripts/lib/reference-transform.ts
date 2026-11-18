@@ -168,6 +168,22 @@ export function transform(records: Record<string, string>[], spec: SourceSpec, f
   });
 }
 
+// Reference campaigns that belong to a live client, by rule: { match (regex), columns, brand_id }.
+// Returns campaign_key → brand_id. Only keys and ids leave this function, never the matched text.
+export interface OwnerRule { match: string; columns: string[]; brand_id: string }
+export function ownedCampaigns(records: Record<string, string>[], spec: SourceSpec, rules: OwnerRule[]): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const rule of rules) {
+    const re = new RegExp(rule.match, 'i');
+    for (const r of records) {
+      if (!rule.columns.some(c => re.test(r[c] || ''))) continue;
+      const raw = spec.platform === 'meta' ? r.campaign_id : `${r.campaign_name}|${r.campaign_type}`;
+      out.set(campaignKey(spec.platform, r.ad_account_id, raw), rule.brand_id);
+    }
+  }
+  return out;
+}
+
 // Every identifying string from the export, used to prove none of them reaches the output.
 // Google's default campaign names are just the campaign type ("Smart", "Shopping",
 // "Performance Max"); those identify nothing and are kept out of the set.

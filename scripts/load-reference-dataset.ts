@@ -10,7 +10,7 @@
 // so a second run updates rows instead of duplicating them. On failure, every row written by the
 // batch is deleted and the batch is marked failed.
 import { readFileSync, existsSync } from 'node:fs';
-import { parseCsv, transform, identifyingValues, type FxTable, type ReferenceRow, type SourceSpec } from './lib/reference-transform';
+import { parseCsv, transform, identifyingValues, ownedCampaigns, type FxTable, type OwnerRule, type ReferenceRow, type SourceSpec } from './lib/reference-transform';
 
 const DIR = 'data/reference/';
 const SOURCES: (SourceSpec & { realAccount: string; expectedTotal: number; expectedCurrency: string; note: string })[] = [
@@ -28,6 +28,13 @@ const SOURCES: (SourceSpec & { realAccount: string; expectedTotal: number; expec
   },
 ];
 const MAX_GAP = 0.01;
+
+// Owner rules name client brands, so they live in the git-ignored data/reference/owners.json.
+function loadOwnerRules(): OwnerRule[] {
+  const path = DIR + 'owners.json';
+  if (!existsSync(path)) { console.warn('No data/reference/owners.json: no reference campaign is tied to a live client.'); return []; }
+  return JSON.parse(readFileSync(path, 'utf8')).rules as OwnerRule[];
+}
 
 function loadFx(): FxTable {
   const sql = readFileSync('supabase/seed/fx_rates_monthly.sql', 'utf8');
@@ -61,7 +68,8 @@ function report(spec: (typeof SOURCES)[number], rows: ReferenceRow[]) {
 async function main() {
   const commit = process.argv.includes('--commit');
   const fx = loadFx();
-  const all: { spec: (typeof SOURCES)[number]; rows: ReferenceRow[] }[] = [];
+  const ownerRules = loadOwnerRules();
+  const all: { spec: (typeof SOURCES)[number]; rows: ReferenceRow[]; owners: Map<string, string> }[] = [];
 
   for (const spec of SOURCES) {
     if (!existsSync(DIR + spec.file)) throw new Error(`Missing ${DIR}${spec.file}`);
@@ -75,10 +83,10 @@ async function main() {
     const secrets = identifyingValues(records);
     const leaked = rows.flatMap(r => Object.values(r)).filter(v => typeof v === 'string' && secrets.has(v));
     if (leaked.length) throw new Error(`${spec.file}: ${leaked.length} identifying values reached the output`);
-    all.push({ spec, rows });
+    all.push({ spec, rows, owners: ownedCampaigns(records, spec, ownerRules) });
   }
 
-  const summary = all.map(({ spec, rows }) => report(spec, rows));
+  const summary = all.map(({ spec, rows, owners }) => ({ ...report(spec, rows), owned_by_live_clients: owners.size }));
   console.table(summary);
   if (summary.some(s => !s.ok)) {
     console.error('Stopped: a source is more than 1% off its expected total, or has duplicate keys. Nothing was written.');
@@ -113,6 +121,12 @@ async function main() {
           .upsert(chunk, { onConflict: 'source_key,campaign_key,period_start,granularity' });
         if (error) throw new Error(`reference_campaign_stats: ${error.message}`);
       }
+    }
+    for (const { spec, owners } of all) {
+      const ownerRows = [...owners].map(([campaign_key, brand_id]) => ({ source_key: spec.sourceKey, campaign_key, brand_id }));
+      if (!ownerRows.length) continue;
+      const { error } = await db.from('reference_campaign_owners').upsert(ownerRows, { onConflict: 'source_key,campaign_key' });
+      if (error) throw new Error(`reference_campaign_owners: ${error.message}`);
     }
     // The Meta reference account is also connected as a live account; flag it so it is never
     // counted twice and its brand is hidden from everyone but admins.

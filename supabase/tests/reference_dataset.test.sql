@@ -95,6 +95,31 @@ do $$ begin
   end if;
 end $$;
 
+-- ── 4b · a reference campaign owned by brand A is excluded from A's benchmark only ──
+reset role;
+-- 40 awareness campaigns with CPM 100 owned by A, 40 more with CPM 10 owned by nobody
+insert into reference_campaign_stats (source_key, platform, campaign_key, objective_normalized, period_start, period_end,
+  granularity, currency_original, spend_original, spend_eur, impressions, clicks)
+select 'ref_test_01', 'meta', 'own' || g, 'awareness', d, d, 'day', 'EUR', 100, 100, 1000, 20
+from generate_series(1, 40) g, generate_series(date '2025-01-01', date '2025-01-03', interval '1 day') d;
+insert into reference_campaign_stats (source_key, platform, campaign_key, objective_normalized, period_start, period_end,
+  granularity, currency_original, spend_original, spend_eur, impressions, clicks)
+select 'ref_test_01', 'meta', 'free' || g, 'awareness', d, d, 'day', 'EUR', 10, 10, 1000, 20
+from generate_series(1, 40) g, generate_series(date '2025-01-01', date '2025-01-03', interval '1 day') d;
+insert into reference_campaign_owners (source_key, campaign_key, brand_id)
+select 'ref_test_01', 'own' || g, '00000000-0000-0000-0000-00000000000a' from generate_series(1, 40) g;
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
+do $ declare r record; begin
+  select * into r from rouge_benchmark('00000000-0000-0000-0000-00000000000a', 'meta', 'awareness');
+  if r.cpm <> 10 then raise exception 'FAIL: brand A was compared with its own reference history (cpm %)', r.cpm; end if;
+end $;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b1","role":"authenticated"}', true);
+do $ declare r record; begin
+  select * into r from rouge_benchmark('00000000-0000-0000-0000-00000000000b', 'meta', 'awareness');
+  if r.cpm <> 55 then raise exception 'FAIL: brand B should see both owned and unowned reference rows (cpm %)', r.cpm; end if;
+end $;
+
 -- ── 5 · anon can't run the benchmark or read the old view ──
 reset role;
 set local role anon;

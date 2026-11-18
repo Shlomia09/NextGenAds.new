@@ -108,6 +108,18 @@ create index if not exists reference_campaign_stats_cohort
 alter table public.reference_campaign_stats enable row level security;
 revoke all on public.reference_campaign_stats from anon, authenticated;
 
+-- Reference campaigns that belong to a live client (the reference account also ran house brands that
+-- are clients today). Tying them to the client's brand lets the pool exclude them from that client's
+-- own benchmark, the same way its live data is excluded. service_role only.
+create table if not exists public.reference_campaign_owners (
+  source_key   text not null,
+  campaign_key text not null,
+  brand_id     uuid not null references public.brands(id) on delete cascade,
+  primary key (source_key, campaign_key)
+);
+alter table public.reference_campaign_owners enable row level security;
+revoke all on public.reference_campaign_owners from anon, authenticated;
+
 -- ── 5 · Currency ─────────────────────────────────────────────────────────────
 create table if not exists public.fx_rates_monthly (
   month        date not null,                      -- first day of the month
@@ -179,7 +191,7 @@ $$;
 create or replace view public.benchmark_pool with (security_invoker = true) as
 select
   'reference'::text                         as layer,
-  null::uuid                                as contributor_brand_id,
+  o.brand_id                                as contributor_brand_id,   -- null unless owned by a live client
   r.platform, r.vertical, r.category, r.market,
   null::text                                as spend_band,
   r.objective_normalized                    as objective,
@@ -192,6 +204,7 @@ select
   rs.purchase_tracking_complete             as tracks_purchases
 from public.reference_campaign_stats r
 join public.reference_sources rs on rs.source_key = r.source_key
+left join public.reference_campaign_owners o on o.source_key = r.source_key and o.campaign_key = r.campaign_key
 union all
 select
   'live',

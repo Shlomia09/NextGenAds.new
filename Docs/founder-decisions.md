@@ -44,9 +44,9 @@ enforced. If code changes one of these, the legal draft that cites it changes in
 
 8. **Push and the reference load** are run or approved by the founder.
 
-## Open — needs a decision
-
-- **The Meta reference account is not one brand.** Its ad sets include NeoLumo (a live client) as
-  well as other house brands. Unless NeoLumo's historical campaigns in the reference layer are tied to
-  NeoLumo (in a service-role-only table) and excluded from NeoLumo's own benchmark, NeoLumo is compared
-  with itself.
+9. **A live client is never compared with its own reference history.** The Meta reference account also
+   ran house brands that are clients today. Reference campaigns are tied to the client's brand in
+    (service_role only) and excluded from that client's benchmark; other
+   clients still see them. The matching rules name brands, so they live in the git-ignored
+   , not in code. Current load: 6 Google campaigns (≈€12,857) tied to one
+   live client; 0 in the Meta export (that client's Meta campaigns predate its October 2023 start).
