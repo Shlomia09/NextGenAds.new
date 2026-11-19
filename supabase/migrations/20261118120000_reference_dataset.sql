@@ -185,6 +185,25 @@ returns text language sql immutable as $$
   end
 $$;
 
+-- ── 7b · Feature flags ───────────────────────────────────────────────────────
+-- benchmark_live_pool: whether live clients' data may enter anyone else's benchmark. OFF until legal
+-- sign-off on Meta's platform terms for cross-client use of advertiser data. While off, every
+-- benchmark is the reference layer only, whatever the consent settings say.
+create table if not exists public.feature_flags (
+  key        text primary key,
+  enabled    boolean not null default false,
+  note       text,
+  updated_at timestamptz not null default now()
+);
+alter table public.feature_flags enable row level security;
+drop policy if exists feature_flags_admin_all on public.feature_flags;
+create policy feature_flags_admin_all on public.feature_flags
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+revoke all on public.feature_flags from anon;
+insert into public.feature_flags (key, enabled, note) values
+  ('benchmark_live_pool', false, 'Off until legal sign-off on Meta platform terms (founder, 2026-11-19).')
+on conflict (key) do nothing;
+
 -- ── 8 · The pool (internal: no grants; read only through rouge_benchmark) ────
 -- coverage_days: one unit per campaign-day, so the sample threshold means the same thing across
 -- daily, monthly and yearly rows (a campaign-month counts as 30 campaign-days).
@@ -258,6 +277,7 @@ declare
   c_min_campaigns constant int := 30;
   c_min_days      constant int := 90;
   c_min_live      constant int := 3;
+  v_live_pool     boolean := coalesce((select enabled from feature_flags where key = 'benchmark_live_pool'), false);
 begin
   -- A brand can only ask for its own benchmark: asking for another brand's would let the
   -- difference between two answers reveal that brand's numbers.
@@ -294,7 +314,7 @@ begin
     ),
     pool as (
       select c.* from cohort c, live_ok
-      where c.layer = 'reference' or live_ok.ok
+      where c.layer = 'reference' or (v_live_pool and live_ok.ok)
     ),
     agg as (
       select count(distinct campaign_ref) as campaigns, sum(coverage_days) as days,

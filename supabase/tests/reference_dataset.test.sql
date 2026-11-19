@@ -120,6 +120,45 @@ do $ declare r record; begin
   if r.cpm <> 55 then raise exception 'FAIL: brand B should see both owned and unowned reference rows (cpm %)', r.cpm; end if;
 end $;
 
+-- ── 4c · the live pool flag: off by default, so live data never enters, even with 3 clients ──
+reset role;
+do $
+declare acct uuid; camp uuid; i int;
+begin
+  -- a third consenting live client (C), so the 3-client rule alone would let live data in
+  insert into ad_accounts (user_id, platform, account_id, account_name, brand_id, status)
+    values ('00000000-0000-0000-0000-0000000000c1', 'meta', 'act_c', 'test', '00000000-0000-0000-0000-00000000000c', 'active')
+    returning id into acct;
+  insert into data_sources (ad_account_id, benchmark_consent) values (acct, true);
+  for i in 1..40 loop
+    insert into campaigns (brand_id, ad_account_id, platform, campaign_id_external, name, objective)
+      values ('00000000-0000-0000-0000-00000000000c', acct, 'meta', 'c-' || i, 'live', 'OUTCOME_SALES') returning id into camp;
+    insert into campaign_daily_stats (campaign_id, brand_id, date, spend, impressions, clicks, purchases, revenue)
+      select camp, '00000000-0000-0000-0000-00000000000c', d, 1000, 1000, 500, 50, 9000
+      from generate_series(date '2025-01-01', date '2025-01-03', interval '1 day') d;
+  end loop;
+  if (select enabled from feature_flags where key = 'benchmark_live_pool') then
+    raise exception 'FAIL: benchmark_live_pool must default to off';
+  end if;
+end $;
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
+do $ declare r record; begin
+  select * into r from rouge_benchmark('00000000-0000-0000-0000-00000000000a', 'meta', 'sales');
+  if r.cpm <> 10 then raise exception 'FAIL: live data entered with the flag off (cpm %)', r.cpm; end if;
+end $;
+-- turning the flag on lets B and C in for A (3 consenting live clients in the cohort)
+reset role;
+update feature_flags set enabled = true where key = 'benchmark_live_pool';
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
+do $ declare r record; begin
+  select * into r from rouge_benchmark('00000000-0000-0000-0000-00000000000a', 'meta', 'sales');
+  if r.cpm = 10 then raise exception 'FAIL: with the flag on and 3 clients, live data should enter'; end if;
+end $;
+reset role;
+update feature_flags set enabled = false where key = 'benchmark_live_pool';
+
 -- ── 5 · anon can't run the benchmark or read the old view ──
 reset role;
 set local role anon;
