@@ -5,6 +5,7 @@ DRAFT — for review by Israeli counsel before use. Not legal advice.
 `[ROUGE LTD. — Israeli company in formation, company no. TBD]` ("Rouge", "we"). Governing law: Israel.
 Courts: Tel Aviv-Yafo. `[CONFIRM WITH COUNSEL]` — both.
 
+<!-- internal -->
 > **Status of this draft:** the clauses below match the code as of 2026-11-19, except where a row in the
 > table is marked **BLOCKED** — that clause is what the product must become, and it may not be published
 > until the code enforces it. The full set of clauses (approvers, guardrails mode, 72-hour expiry, ceilings,
@@ -21,6 +22,8 @@ Courts: Tel Aviv-Yafo. `[CONFIRM WITH COUNSEL]` — both.
 | Live client pool | off until legal sign-off | same migration, `feature_flags.benchmark_live_pool = false` | true once applied |
 | Post-action check | 48 hours | `supabase/functions/_shared/actionLogging.ts` | true today |
 | Money-back | 30 days | `src/components/marketing/PricingSection.tsx` | condition: `[CONFIRM WITH FOUNDER]` |
+
+<!-- /internal -->
 
 ## 1 · What Rouge does
 

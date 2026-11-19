@@ -33,6 +33,8 @@ export function MarketingFooter() {
         <div className="mk-footer-links">
           <Link to="/pricing">Pricing</Link>
           <Link to="/login">Log in</Link>
+          <Link to="/terms">Terms</Link>
+          <Link to="/privacy">Privacy</Link>
         </div>
       </div>
     </footer>
