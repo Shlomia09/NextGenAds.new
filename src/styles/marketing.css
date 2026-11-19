@@ -276,3 +276,5 @@
 .legal-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .legal-table th, .legal-table td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text-2); }
 .legal-table th { color: var(--text); font-weight: 600; }
+/* "Roadmap" next to a claim that isn't running for clients yet (src/config/capabilities.ts) */
+.mk-roadmap { display: inline-block; vertical-align: middle; font-family: var(--font-mono); font-size: var(--t-micro, 10px); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; line-height: 1.4; }

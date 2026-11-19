@@ -16,6 +16,7 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2.107.0';
+import { syncAdDaily } from '../_shared/adDailySync.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -164,6 +165,9 @@ async function syncAccount(
     if (upsertErr) throw new Error(`DB upsert: ${upsertErr.message}`);
 
     result.synced = campaignRows.length;
+
+    // Ad-level daily data for Half-Life (_shared/adDailySync.ts)
+    await syncAdDaily(supabase, { brand_id, adAccountId, externalAccountId, accessToken });
 
     // ── Step 3: Log system event ───────────────────────────────────────────
     await supabase.from('system_events').insert({

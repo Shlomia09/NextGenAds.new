@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { RoadmapTag } from '../components/marketing/RoadmapTag';
 import { useNavigate } from 'react-router-dom';
 import '../styles/marketing.css';
 import { MarketingNav, MarketingFooter } from '../components/marketing/MarketingChrome';
@@ -52,7 +53,7 @@ function Card({ n, title, body }: { n: number; title: string; body: string }) {
   return (
     <div className="mk-card">
       <span className="mk-card-num">{String(n).padStart(2, '0')}</span>
-      <h3 className="mk-h3">{title}</h3>
+      <h3 className="mk-h3">{title}{title === 'Watches' && <> <RoadmapTag capability="half_life" /></>}</h3>
       <p>{body}</p>
     </div>
   );
@@ -184,7 +185,7 @@ export default function Landing() {
             {STEPS.map((s, i) => (
               <li key={s.verb}>
                 <span className="mk-step-n">{String(i + 1).padStart(2, '0')}</span>
-                <span className="mk-step-verb">{s.verb}</span>
+                <span className="mk-step-verb">{s.verb}{s.verb === 'Diagnoses' && <> <RoadmapTag capability="half_life" /></>}</span>
                 <span className="mk-step-body">{s.body}</span>
               </li>
             ))}

@@ -10,6 +10,7 @@ import { formatCurrency, formatNumber } from '../../lib/benchmarks';
 import { classifyObjective, GOAL_META } from '../../lib/objective';
 import { getPrimaryConversionMetric } from '../../lib/conversions';
 import type { Campaign } from '../../types';
+import { AdHalfLife } from './AdHalfLife';
 
 // ─── Benchmark data per objective ─────────────────────────────
 const BENCHMARKS: Record<string, { cpl?: number; cpm?: number; ctr?: number; roas?: number }> = {
@@ -1096,6 +1097,7 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
 
             {/* Quick Actions */}
             <QuickActions campaign={displayCampaign} onAction={msg => setActionMsg(msg)} />
+            <AdHalfLife campaignId={displayCampaign.id} />
 
             {/* Campaign Chat */}
             <CampaignChat campaign={displayCampaign} initialMsg={actionMsg} />
