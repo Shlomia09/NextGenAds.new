@@ -5,6 +5,7 @@ import type { ChatMessage, Brand, Campaign } from '../../types';
 import { sendChatMessage, ChatLimitError, type CampaignContext, type ActionProposal } from '../../lib/claude-api';
 import { useActiveAccount } from '../../contexts/ActiveAccountContext';
 import { supabase } from '../../lib/supabase';
+import { AiLabel } from '../ui/AiLabel';
 
 interface IntelligenceChatProps {
   brand: Brand;
@@ -652,19 +653,22 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                     : msg.content}
               </div>
 
-              {/* Timestamp */}
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 9,
-                  fontWeight: 400,
-                  color: T.textHint,
-                }}
-              >
-                {new Date(msg.timestamp).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+              {/* Timestamp — and the AI label on model answers */}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                {msg.role === 'assistant' && !msg.content.startsWith('__LIMIT__') && <AiLabel />}
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 9,
+                    fontWeight: 400,
+                    color: T.textHint,
+                  }}
+                >
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
               </span>
             </div>
           </div>

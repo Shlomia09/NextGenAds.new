@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { AiLabel } from '../components/ui/AiLabel';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import {
@@ -106,6 +107,7 @@ const VariantCard: React.FC<{
       {/* Header badges */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <AiLabel edited={primary !== variant.primary || body !== variant.body || cta !== variant.cta} />
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500, color: 'var(--text-primary)' }}>
             Variant {label}
           </span>

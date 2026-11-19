@@ -15,6 +15,7 @@ import { getAdAccounts, getCampaigns, getBrands, saveDraft, getDrafts, publishDr
 import type { CampaignDraftRow } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useBrand } from '../contexts/BrandContext';
+import { AiLabel } from '../components/ui/AiLabel';
 
 // ─── Types ─────────────────────────────────────────────────────
 interface FormState {
@@ -1078,6 +1079,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                   <div style={{ marginBottom: 16, padding: '11px 14px', background: 'var(--accent-soft)', border: '1px solid var(--accent)', borderRadius: 11, fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6, position: 'relative' }}>
                     <Brain size={12} style={{ color: 'var(--accent)', marginRight: 7, verticalAlign: 'middle' }} />
                     <strong style={{ color: 'var(--text)' }}>AI insight: </strong>{aiInsight}
+                    <div style={{ marginTop: 6 }}><AiLabel /></div>
                     <button onClick={() => setAiInsight(null)} style={{ position: 'absolute', top: 9, right: 10, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)' }}>
                       <X size={13} />
                     </button>
