@@ -16,6 +16,7 @@ import type { CampaignDraftRow } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useBrand } from '../contexts/BrandContext';
 import { AiLabel } from '../components/ui/AiLabel';
+import { analyzeCreative, type ConversionType } from '../lib/creativeAnalysis';
 
 // ─── Types ─────────────────────────────────────────────────────
 interface FormState {
@@ -399,6 +400,33 @@ const CampaignWorkshop: React.FC = () => {
     countries: [], ageMin: '25', ageMax: '55', gender: 'all', interests: [],
     destinationUrl: '',
   });
+
+  // Copy from the uploaded creative — the same analyze-creative call Creative Studio makes.
+  const [copyLoading, setCopyLoading] = useState(false);
+  const [copyError, setCopyError]     = useState('');
+  const [copyFromAi, setCopyFromAi]   = useState<{ headline: string; primaryText: string } | null>(null);
+  const generateCopy = async () => {
+    if (copyLoading) return;
+    if (!form.creativeFile) { setCopyError('Upload the creative first (a saved draft keeps only its preview).'); return; }
+    setCopyLoading(true); setCopyError('');
+    try {
+      const conversion: ConversionType = form.goal === 'leads' ? 'leads' : 'ecommerce';
+      const brand = brands.find(b => b.id === form.brandId) ?? null;
+      const result = await analyzeCreative(form.creativeFile, conversion, brand);
+      const v = result.variants?.[0];
+      if (!v) throw new Error('No copy came back for this creative.');
+      const headline = v.primary.slice(0, 40), primaryText = v.body.slice(0, 125);
+      setForm(prev => ({
+        ...prev,
+        headline, primaryText,
+        googleHeadlines: [v.primary.slice(0, 30), prev.googleHeadlines[1], prev.googleHeadlines[2]],
+        googleDescs: [v.body.slice(0, 90), prev.googleDescs[1]],
+      }));
+      setCopyFromAi({ headline, primaryText });
+    } catch (err) {
+      setCopyError(err instanceof Error ? err.message : 'Could not generate copy.');
+    } finally { setCopyLoading(false); }
+  };
 
   const upd = useCallback(<K extends keyof FormState>(key: K, val: FormState[K]) =>
     setForm(prev => ({ ...prev, [key]: val })), []);
@@ -864,14 +892,21 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                       </Select>
                     </MB>
 
+                    {copyFromAi && (
+                      <div style={{ marginBottom: 8 }}>
+                        <AiLabel edited={form.headline !== copyFromAi.headline || form.primaryText !== copyFromAi.primaryText} />
+                      </div>
+                    )}
+                    {copyError && <div role="alert" style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--text)', borderLeft: '2px solid var(--accent)', padding: '4px 0 4px 10px', marginBottom: 8 }}>{copyError}</div>}
                     <button
-                      onClick={() => {/* AI copy generation — calls claude-chat or analyze-creative */}}
+                      onClick={generateCopy}
+                      disabled={copyLoading}
                       style={{ width: '100%', background: 'var(--accent)', color: 'var(--ink)', border: 'none', fontFamily: 'var(--font-ui)', fontSize: 13.5, fontWeight: 500, padding: 13, borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4 }}
                       onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent-deep)')}
                       onMouseLeave={e => (e.currentTarget.style.background = 'var(--accent)')}
                     >
                       <Sparkles size={16} />
-                      Analyze creative &amp; generate copy
+                      {copyLoading ? 'Reading your creative…' : <>Analyze creative &amp; generate copy</>}
                     </button>
                     <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11.5, color: 'var(--text-3)', marginTop: 7 }}>
                       AI reads your creative and writes headline + copy tuned to your beauty audience.

@@ -8,7 +8,6 @@ import {
   RefreshCw, ArrowRight,
 } from 'lucide-react';
 
-import { supabase } from '../lib/supabase';
 import { getBrands } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { saveDraft, loadLatestDraft } from '../lib/drafts';
@@ -17,23 +16,8 @@ import type { CampaignDraft } from '../types/campaign';
 import CampaignSetup from '../components/publisher/CampaignSetup';
 import PreflightModal from '../components/publisher/PreflightModal';
 import { cssToken } from '../lib/cssToken';
+import { analyzeCreative, extractVideoThumbnail, type AnalysisResult, type ConversionType, type CopyVariant } from '../lib/creativeAnalysis';
 
-// ── Types ────────────────────────────────────────────────────────
-interface CopyVariant {
-  hook_type: 'problem' | 'result' | 'social_proof';
-  hook_label: string;
-  primary: string;
-  body: string;
-  cta: string;
-}
-interface AnalysisResult {
-  creative_analysis: string;
-  creative_type: string;
-  variants: CopyVariant[];
-  benchmark_recommendation: string;
-  benchmark_reason: string;
-}
-type ConversionType = 'leads' | 'ecommerce' | 'bookings';
 
 const CONVERSION_OPTIONS: { value: ConversionType; label: string; emoji: string }[] = [
   { value: 'leads',     label: 'Lead Generation',   emoji: '📋' },
@@ -47,31 +31,6 @@ const HOOK_COLORS = {
   social_proof: { bg: 'var(--purple-soft)', border: 'var(--purple-soft)', get badge() { return cssToken('--purple'); } },
 };
 
-// ── Helpers ──────────────────────────────────────────────────────
-const fileToBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve((reader.result as string).split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-
-const extractVideoThumbnail = (file: File): Promise<{ base64: string; dataUrl: string }> =>
-  new Promise((resolve, reject) => {
-    const video = document.createElement('video');
-    const url   = URL.createObjectURL(file);
-    video.src = url; video.muted = true; video.playsInline = true;
-    video.onloadeddata = () => { video.currentTime = 1; };
-    video.onseeked = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-      canvas.getContext('2d')!.drawImage(video, 0, 0);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      URL.revokeObjectURL(url);
-      resolve({ base64: dataUrl.split(',')[1], dataUrl });
-    };
-    video.onerror = reject;
-  });
 
 // ── Variant Card ────────────────────────────────────────────────
 const VariantCard: React.FC<{
@@ -292,26 +251,7 @@ const CreativeStudio: React.FC = () => {
     if (!file || loading) return;
     setLoading(true); setError('');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
-      let base64: string; let mediaType: string;
-      if (isVideo) {
-        const { base64: thumb } = await extractVideoThumbnail(file);
-        base64 = thumb; mediaType = 'image/jpeg';
-      } else {
-        base64 = await fileToBase64(file);
-        mediaType = file.type.startsWith('image/') ? file.type : 'image/jpeg';
-      }
-
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-creative`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}`, apikey: import.meta.env.VITE_SUPABASE_ANON_KEY },
-        body: JSON.stringify({ image_base64: base64, media_type: mediaType, conversion_type: conversionType, brand: selectedBrand || null, is_video_thumbnail: isVideo }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Analysis failed');
-      setResult(data);
+      setResult(await analyzeCreative(file, conversionType, selectedBrand || null));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to analyze creative');
     } finally { setLoading(false); }
