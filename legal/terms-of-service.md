@@ -16,7 +16,7 @@ Courts: Tel Aviv-Yafo. `[CONFIRM WITH COUNSEL]` — both.
 |---|---|---|---|
 | Funds | Rouge never receives, holds or transfers advertising funds | no payment flow to or from ad accounts exists in the code; Stripe is used only for Rouge's own subscription (`create-checkout-session`, `stripe-webhook`) | true today |
 | Approval | every change needs a person's explicit approval | `supabase/functions/execute-recommendation/index.ts` (runs only on a user's action) | true today |
-| "It cannot add money" | Rouge cannot raise a budget or create a campaign | **`supabase/functions/meta-action/index.ts:73` `scale_budget` multiplies ad-set budgets; line ~203 duplicates a campaign with a "[Scale]" prefix** | **BLOCKED** — remove or block server-side in stage 3 |
+| Adding budget | needs the user's explicit approval; never takes the account's total active daily budget above the ceiling; one step ≤ 20% by default; refused while no ceiling is set | `supabase/functions/meta-action/index.ts` (spend guard: `NEEDS_APPROVAL`, `activeDailyBudgetCents`, `requireCeiling`); `supabase/migrations/20261119120000_account_limits.sql` | true once deployed |
 | Benchmark | ≥30 campaigns and ≥90 campaign-days per cohort; own data excluded; no source brand identified | `supabase/migrations/20261118120000_reference_dataset.sql`, `rouge_benchmark()` | true once applied |
 | Live client pool | off until legal sign-off | same migration, `feature_flags.benchmark_live_pool = false` | true once applied |
 | Post-action check | 48 hours | `supabase/functions/_shared/actionLogging.ts` | true today |
@@ -34,11 +34,15 @@ stated in the product `[stage 4: src/config/capabilities.ts]`.
 **Rouge never receives, holds or transfers advertising funds.** You pay Meta and Google directly, under your
 own agreements with them. Rouge's subscription is the only payment you make to Rouge.
 
-**Rouge can move budget between ads. It cannot add money.** `[BLOCKED — see the table: the code can still
-scale a budget; this sentence is published only after stage 3 removes that.]`
+**Rouge never adds budget without your explicit approval, and never beyond the ceiling you set.**
 
-*Why this protects you:* your total spend is set by you in your ad accounts. Rouge can only redistribute
-inside what you already chose to spend.
+You set a daily spend ceiling for each ad account in Settings. An action that would raise a budget or switch
+on a paused campaign runs only after you (or someone you authorised) approve it, and only if the account's
+total active daily budget stays at or under that ceiling. A single change can raise a budget by at most 20%,
+unless you set a different step. While no ceiling is set, Rouge does not raise any budget.
+
+*Why this protects you:* the ceiling is checked by our servers at the moment of the change, against the
+budgets live in your ad account — not by a setting in the screen you happen to be looking at.
 
 ## 3 · Nothing happens without your approval
 

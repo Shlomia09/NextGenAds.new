@@ -25,7 +25,7 @@
  *   { success, action_log_id, baseline_snapshot, monitor_at, meta_result }
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'npm:@supabase/supabase-js';
+import { createClient } from 'npm:@supabase/supabase-js@2.107.0';
 import { logAndExecuteAction, type ActionSource } from '../_shared/actionLogging.ts';
 
 const corsHeaders = {
@@ -65,6 +65,8 @@ serve(async (req) => {
       brand_id,
       source,
       new_budget,
+      value,
+      approved,
     } = body;
 
     // ── Validate inputs ────────────────────────────────────────────────────
@@ -109,7 +111,12 @@ serve(async (req) => {
       campaign_id_external,
       ad_account_id,
       action_type:          action as 'pause_campaign' | 'activate_campaign' | 'scale_budget',
-      action_params:        new_budget !== undefined ? { new_budget } : undefined,
+      // meta-action reads the multiplier as `value` (callers have sent it as new_budget), and only acts on
+      // spend-adding actions when the user explicitly approved them.
+      action_params: {
+        ...((value ?? new_budget) !== undefined ? { value: value ?? new_budget } : {}),
+        ...(approved === true ? { approved: true } : {}),
+      },
       source:               source as ActionSource,
       recommendation_id:    null,
       baseline: {

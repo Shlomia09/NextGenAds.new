@@ -1,5 +1,43 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'npm:@supabase/supabase-js';
+import { createClient } from 'npm:@supabase/supabase-js@2.107.0';
+
+// ── Spend guard ──────────────────────────────────────────────────────────────
+// Every path to Meta comes through here with a user's JWT, so this is where the promise in the terms is
+// kept: "Rouge never adds budget without your explicit approval, and never beyond the ceiling you set."
+//   • actions that can add spend need { approved: true } from a user's explicit confirmation;
+//   • scale_budget and activate_campaign must keep the account's total active daily budget ≤ the ceiling
+//     (account_limits.max_daily_spend), and scale_budget may not exceed max_change_pct_per_action;
+//   • with no ceiling set, they are refused.
+// create_campaign and duplicate_adset create objects PAUSED (no spend until activated, which is checked),
+// but still need explicit approval.
+const NEEDS_APPROVAL = new Set(['scale_budget', 'activate_campaign', 'create_campaign', 'duplicate_adset']);
+
+class SpendGuardError extends Error {}
+
+type MetaPage<T> = { data?: T[]; paging?: { next?: string }; error?: { message: string } };
+async function pageAll<T>(url: string): Promise<T[]> {
+  const out: T[] = [];
+  let next: string | undefined = url;
+  while (next) {
+    const page: MetaPage<T> = await (await fetch(next)).json();
+    if (page.error) throw new Error(`Meta API: ${page.error.message}`);
+    out.push(...(page.data ?? []));
+    next = page.paging?.next;
+  }
+  return out;
+}
+
+// Total daily budget currently able to spend in the account, in minor units (cents): active campaigns with
+// a campaign budget, plus active ad sets with their own daily budget.
+async function activeDailyBudgetCents(api: string, actId: string, token: string): Promise<number> {
+  const filter = encodeURIComponent(JSON.stringify(['ACTIVE']));
+  const camps = await pageAll<{ daily_budget?: string }>(
+    `${api}/act_${actId}/campaigns?fields=daily_budget&effective_status=${filter}&limit=200&access_token=${token}`);
+  const sets = await pageAll<{ daily_budget?: string }>(
+    `${api}/act_${actId}/adsets?fields=daily_budget&effective_status=${filter}&limit=200&access_token=${token}`);
+  const sum = (xs: { daily_budget?: string }[]) => xs.reduce((s, x) => s + (parseInt(x.daily_budget ?? '0') || 0), 0);
+  return sum(camps) + sum(sets);
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -26,12 +64,12 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
     if (authError || !user) throw new Error('Unauthorized');
 
-    const { action, campaign_id_external, ad_account_id, ad_id_external, value, params } = await req.json();
+    const { action, campaign_id_external, ad_account_id, ad_id_external, value, params, approved } = await req.json();
 
     // ── Verify user owns the ad account & fetch token ──────────────────
     const { data: adAccount, error: accErr } = await supabase
       .from('ad_accounts')
-      .select('access_token, account_id, account_name')
+      .select('id, access_token, account_id, account_name')
       .eq('user_id', user.id)
       .eq('account_id', ad_account_id)
       .eq('platform', 'meta')
@@ -42,6 +80,24 @@ serve(async (req) => {
 
     const token = adAccount.access_token;
     const META_API = 'https://graph.facebook.com/v19.0';
+
+    // ── Spend guard: approval first, then the ceiling ────────────────────
+    if (NEEDS_APPROVAL.has(action) && approved !== true) {
+      throw new SpendGuardError('This action can add spend, so it needs your explicit approval. Nothing was changed.');
+    }
+    const { data: limits } = await supabase
+      .from('account_limits')
+      .select('max_daily_spend, max_change_pct_per_action')
+      .eq('ad_account_id', adAccount.id)
+      .maybeSingle();
+    const ceilingCents = limits ? Math.round(Number(limits.max_daily_spend) * 100) : null;
+    const requireCeiling = () => {
+      if (ceilingCents === null) {
+        throw new SpendGuardError('Set a daily spend ceiling for this ad account in Settings before Rouge can add budget. Nothing was changed.');
+      }
+      return ceilingCents;
+    };
+    const approval = NEEDS_APPROVAL.has(action) ? { approved_by: user.id, approved_at: new Date().toISOString() } : {};
 
     let result: Record<string, unknown> = {};
 
@@ -59,6 +115,26 @@ serve(async (req) => {
       }
 
       case 'activate_campaign': {
+        const ceiling = requireCeiling();
+        const camp = await (await fetch(
+          `${META_API}/${campaign_id_external}?fields=daily_budget,lifetime_budget,effective_status&access_token=${token}`)).json();
+        if (camp.error) throw new Error(`Meta API: ${camp.error.message}`);
+        if (camp.effective_status !== 'ACTIVE') {
+          let campaignDaily = parseInt(camp.daily_budget ?? '0') || 0;
+          if (!campaignDaily) {
+            const sets = await pageAll<{ daily_budget?: string; lifetime_budget?: string }>(
+              `${META_API}/${campaign_id_external}/adsets?fields=daily_budget,lifetime_budget&limit=200&access_token=${token}`);
+            if (camp.lifetime_budget || sets.some(s => s.lifetime_budget && !s.daily_budget)) {
+              throw new SpendGuardError('This campaign uses a lifetime budget, which a daily ceiling can\'t bound. Activate it in Ads Manager. Nothing was changed.');
+            }
+            campaignDaily = sets.reduce((s, x) => s + (parseInt(x.daily_budget ?? '0') || 0), 0);
+          }
+          const current = await activeDailyBudgetCents(META_API, adAccount.account_id, token);
+          if (current + campaignDaily > ceiling) {
+            throw new SpendGuardError(
+              `Activating this campaign would take the account's daily budget to ${((current + campaignDaily) / 100).toFixed(2)}, above your ceiling of ${(ceiling / 100).toFixed(2)}. Nothing was changed.`);
+          }
+        }
         const res = await fetch(`${META_API}/${campaign_id_external}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -66,7 +142,7 @@ serve(async (req) => {
         });
         const data = await res.json();
         if (data.error) throw new Error(`Meta API: ${data.error.message}`);
-        result = { success: true, message: 'Campaign activated successfully' };
+        result = { success: true, message: 'Campaign activated successfully', ...approval };
         break;
       }
 
@@ -79,8 +155,23 @@ serve(async (req) => {
         if (setsData.error) throw new Error(`Meta API: ${setsData.error.message}`);
 
         const adSets: Array<{ id: string; name: string; daily_budget?: string; lifetime_budget?: string }> = setsData.data || [];
-        const multiplier = value ?? 1.2; // default +20%
+        const multiplier = Number(value ?? 1.2); // default +20%
+        if (!(multiplier > 0)) throw new SpendGuardError('Invalid budget multiplier. Nothing was changed.');
         const updated: string[] = [];
+
+        if (multiplier > 1) {
+          const ceiling = requireCeiling();
+          const maxStep = Number(limits!.max_change_pct_per_action);
+          if ((multiplier - 1) * 100 > maxStep + 1e-9) {
+            throw new SpendGuardError(`A single change can raise a budget by at most ${maxStep}%. Nothing was changed.`);
+          }
+          const added = adSets.reduce((s, a) => s + (a.daily_budget ? Math.round(parseInt(a.daily_budget) * multiplier) - parseInt(a.daily_budget) : 0), 0);
+          const current = await activeDailyBudgetCents(META_API, adAccount.account_id, token);
+          if (current + added > ceiling) {
+            throw new SpendGuardError(
+              `This would take the account's daily budget to ${((current + added) / 100).toFixed(2)}, above your ceiling of ${(ceiling / 100).toFixed(2)}. Nothing was changed.`);
+          }
+        }
 
         for (const adSet of adSets) {
           if (adSet.daily_budget) {
@@ -98,6 +189,7 @@ serve(async (req) => {
         result = {
           success: true,
           message: `Budget scaled +${Math.round((multiplier - 1) * 100)}% on ${updated.length} ad set(s): ${updated.join(', ')}`,
+          ...approval,
         };
         break;
       }
@@ -214,6 +306,7 @@ serve(async (req) => {
           new_campaign_id: newCampaignId,
           new_adset_id:    newAdsetId,
           new_ad_id:       newAdId,
+          ...approval,
         };
         break;
       }
@@ -232,7 +325,7 @@ serve(async (req) => {
         });
         const data = await res.json();
         if (data.error) throw new Error(`Meta API: ${data.error.message}`);
-        result = { success: true, message: `✅ AdSet duplicated (PAUSED). ID: ${data.id}`, new_adset_id: data.id };
+        result = { success: true, message: `✅ AdSet duplicated (PAUSED). ID: ${data.id}`, new_adset_id: data.id, ...approval };
         break;
       }
 
@@ -264,8 +357,8 @@ serve(async (req) => {
 
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: error instanceof Error ? error.message : String(error), refused: error instanceof SpendGuardError }),
+      { status: error instanceof SpendGuardError ? 403 : 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

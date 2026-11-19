@@ -30,10 +30,10 @@ edge functions' imports. Regenerate after any dependency change. Not legal advic
 
 | Package | Version | License | Used in | Flag |
 |---|---|---|---|---|
-| @anthropic-ai/sdk | latest | Apache-2.0 | analyze-creative, claude-chat, generate-recommendations, publish-campaign |  |
-| @supabase/supabase-js | latest | MIT | _shared, analyze-creative, auto-sync-all, check-recommendation-outcomes, claude-chat, create-checkout-session, create-portal-session, ecommerce-sync, execute-recommendation, generate-recommendations, get-subscription, log-direct-action, meta-action, meta-history-backfill, meta-oauth, meta-sync, publish-campaign, shopify-oauth, stripe-webhook, woo-connect |  |
+| @anthropic-ai/sdk | 0.126.0 | Apache-2.0 | analyze-creative, claude-chat, generate-recommendations, publish-campaign |  |
+| @supabase/supabase-js | 2.107.0 | MIT | _shared, analyze-creative, auto-sync-all, check-recommendation-outcomes, claude-chat, create-checkout-session, create-portal-session, ecommerce-sync, execute-recommendation, generate-recommendations, get-subscription, log-direct-action, meta-action, meta-history-backfill, meta-oauth, meta-sync, publish-campaign, shopify-oauth, stripe-webhook, woo-connect |  |
 | deno std (std) | 0.168.0 | MIT | auto-sync-all, check-recommendation-outcomes, claude-chat, create-checkout-session, create-portal-session, ecommerce-sync, execute-recommendation, generate-recommendations, get-subscription, log-direct-action, meta-action, meta-history-backfill, meta-oauth, meta-sync, shopify-oauth, stripe-webhook, woo-connect |  |
-| stripe | latest | MIT | create-checkout-session, create-portal-session, stripe-webhook |  |
+| stripe | 16.12.0 | MIT | create-checkout-session, create-portal-session, stripe-webhook |  |
 
 ## Web app (npm)
 

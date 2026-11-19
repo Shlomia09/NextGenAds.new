@@ -240,6 +240,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           brand_id:             brand.id,
           source:               'ai_chat',
           ...((proposal.params as Record<string, unknown> | undefined) ?? {}),
+          approved:             true,   // the user pressed Confirm on this proposal
         };
         const res = await supabase.functions.invoke('log-direct-action', { body });
         data  = res.data;
@@ -252,6 +253,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           ad_id_external:       proposal.ad_id_external,
           params:               proposal.params,
           value:                (proposal.params as Record<string, unknown> | undefined)?.value,
+          approved:             true,   // the user pressed Confirm on this proposal
         };
         const res = await supabase.functions.invoke('meta-action', { body });
         data  = res.data;

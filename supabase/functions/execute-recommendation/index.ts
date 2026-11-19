@@ -9,7 +9,7 @@
  * Source of truth for monitoring logic: supabase/functions/_shared/actionLogging.ts
  */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'npm:@supabase/supabase-js';
+import { createClient } from 'npm:@supabase/supabase-js@2.107.0';
 import { logAndExecuteAction } from '../_shared/actionLogging.ts';
 
 const corsHeaders = {
@@ -88,6 +88,8 @@ serve(async (req) => {
       campaign_id_external: campaign.campaign_id_external,
       ad_account_id:        adAccount.account_id,
       action_type:          rec.action_type as 'pause_campaign' | 'activate_campaign' | 'scale_budget',
+      // This function runs only when the user presses "Approve & Execute" on the recommendation.
+      action_params:        { approved: true },
       source:               'recommendation',
       recommendation_id:    rec.id,
       baseline: {
