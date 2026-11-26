@@ -33,6 +33,7 @@ import {
   formatCurrency, formatNumber,
 } from '../lib/benchmarks';
 import type { Campaign, Recommendation, BusinessType, AdAccount, BenchmarkMetric } from '../types';
+import { AiLabel } from '../components/ui/AiLabel';
  
 // ─── Helpers ───────────────────────────────────────────────────
  
@@ -664,7 +665,10 @@ const Dashboard: React.FC = () => {
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
                       <AlertTriangle size={13} style={{ color: isHigh ? 'var(--red)' : 'var(--champagne)', flexShrink: 0, marginTop: 1 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)', marginBottom: 3 }}>{rec.title}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                          <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 500, color: 'var(--text)', minWidth: 0 }}>{rec.title}</div>
+                          <AiLabel style={{ flexShrink: 0 }} />
+                        </div>
                         <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, color: 'var(--text-2)', lineHeight: 1.4, marginBottom: 8 }}>
                           {rec.description.slice(0, 90)}{rec.description.length > 90 ? '…' : ''}
                         </div>

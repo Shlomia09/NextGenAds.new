@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle, XCircle, ChevronDown, ChevronUp, AlertTriangle, Zap, Info } from 'lucide-react';
 import type { Recommendation } from '../../types';
+import { AiLabel } from '../ui/AiLabel';
 
 interface RecommendationCardProps {
   rec: Recommendation;
@@ -104,6 +105,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           }}>
             {typeLabel[rec.type] || rec.type}
           </span>
+          <AiLabel />
         </div>
         <button
           onClick={() => setExpanded(!expanded)}

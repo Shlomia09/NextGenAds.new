@@ -10,6 +10,7 @@ import { formatCurrency, formatNumber } from '../../lib/benchmarks';
 import { classifyObjective, GOAL_META } from '../../lib/objective';
 import { getPrimaryConversionMetric } from '../../lib/conversions';
 import type { Campaign } from '../../types';
+import { AdHalfLife } from './AdHalfLife';
 
 // ─── Benchmark data per objective ─────────────────────────────
 const BENCHMARKS: Record<string, { cpl?: number; cpm?: number; ctr?: number; roas?: number }> = {
@@ -418,8 +419,17 @@ const QuickActions: React.FC<{ campaign: Campaign; onAction: (msg: string) => vo
   const navigate = useNavigate();
   const [loading, setLoading] = useState<string | null>(null);
   const [feedback, setFeedback] = useState('');
+  // Actions that can add spend run only after a second, explicit click (the server refuses them otherwise).
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const ADDS_SPEND = ['scale_budget', 'activate_campaign'];
 
   const execAction = async (action: string, label: string, value?: number) => {
+    if (ADDS_SPEND.includes(action) && confirming !== action) {
+      setConfirming(action);
+      setFeedback(`${label} can add spend. Click again to approve. Your ad account's daily ceiling still applies.`);
+      return;
+    }
+    setConfirming(null);
     setLoading(action); setFeedback('');
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -435,7 +445,8 @@ const QuickActions: React.FC<{ campaign: Campaign; onAction: (msg: string) => vo
         source: 'quick_action',
         campaign_id: campaign.id,
         brand_id: campaign.brand_id,
-        ...(value !== undefined ? { new_budget: value } : {}),
+        ...(value !== undefined ? { value } : {}),
+        ...(ADDS_SPEND.includes(action) ? { approved: true } : {}),
       };
       const result = await callEdge(fnName, body, session.access_token);
       setFeedback(`✓ ${result.message || label + ' successful'}`);
@@ -1086,6 +1097,7 @@ const CampaignDetailPanel: React.FC<Props> = ({ campaign, rawCampaign, onClose }
 
             {/* Quick Actions */}
             <QuickActions campaign={displayCampaign} onAction={msg => setActionMsg(msg)} />
+            <AdHalfLife campaignId={displayCampaign.id} />
 
             {/* Campaign Chat */}
             <CampaignChat campaign={displayCampaign} initialMsg={actionMsg} />

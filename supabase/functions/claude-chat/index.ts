@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import Anthropic from 'npm:@anthropic-ai/sdk';
-import { createClient } from 'npm:@supabase/supabase-js';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.126.0';
+import { createClient } from 'npm:@supabase/supabase-js@2.107.0';
 
 // ── Inline objective helpers (Deno-safe, no src/lib import) ─────
 const GOAL_BENCHMARK: Record<string, string> = {

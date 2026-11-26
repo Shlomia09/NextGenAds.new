@@ -12,7 +12,7 @@
  * from the original request (forwarded to meta-action for JWT validation).
  */
 
-import { createClient, SupabaseClient } from 'npm:@supabase/supabase-js';
+import { createClient, SupabaseClient } from 'npm:@supabase/supabase-js@2.107.0';
 
 export type ActionSource = 'recommendation' | 'quick_action' | 'ai_chat';
 

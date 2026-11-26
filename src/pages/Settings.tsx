@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { signOut } from '../lib/supabase';
 import { LogOut, User, Bell } from 'lucide-react';
+import { SpendingCeilings } from '../components/settings/SpendingCeilings';
 
 const Settings: React.FC = () => {
   const { user } = useAuth();
@@ -30,6 +31,8 @@ const Settings: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <SpendingCeilings />
 
         {/* Notifications */}
         <div className="card">

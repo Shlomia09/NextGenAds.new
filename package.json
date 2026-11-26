@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node scripts/run-ts.mjs --test tests/reference-dataset.test.ts"
+    "test": "node scripts/run-ts.mjs --test tests/*.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",

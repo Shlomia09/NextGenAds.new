@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { RoadmapTag } from './RoadmapTag';
 import { useNavigate } from 'react-router-dom';
 import { PLAN_META, type PlanId } from '../../hooks/usePlan';
 import { createCheckoutSession } from '../../hooks/useSubscription';
@@ -109,7 +110,7 @@ export function PricingSection({ headingLevel = 'h2', aside }: { headingLevel?: 
                 {cycle === 'yearly' && <div className="mk-plan-sub">{eur(Math.round(meta.yearly / 12))} / month</div>}
               </div>
               <p className="mk-plan-for">{p.for}</p>
-              <ul>{p.includes.map(f => <li key={f}>{f}</li>)}</ul>
+              <ul>{p.includes.map(f => <li key={f}>{f}{/^Half-life/.test(f) && <> <RoadmapTag capability="half_life" /></>}</li>)}</ul>
               <button
                 className="btn btn-lg btn-secondary"
                 disabled={loading === p.id}

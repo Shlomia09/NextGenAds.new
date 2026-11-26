@@ -3,16 +3,23 @@
 //   node scripts/run-ts.mjs --test tests/*.test.ts
 // (vitest/vite-node need rollup's native binary, which Application Control blocks on this machine.)
 import { build } from 'esbuild';
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, basename } from 'node:path';
+import { join, basename, dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const args = process.argv.slice(2);
 const testMode = args[0] === '--test';
-const entries = testMode ? args.slice(1) : [args[0]];
+
+// Windows shells don't expand globs, so a 'dir/*.test.ts' argument is expanded here.
+const expand = (p) => {
+  if (!p.includes('*')) return [p];
+  const pattern = new RegExp('^' + basename(p).split('*').map(s => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$');
+  return readdirSync(dirname(p)).filter(f => pattern.test(f)).sort().map(f => join(dirname(p), f));
+};
+const entries = (testMode ? args.slice(1) : [args[0]]).filter(Boolean).flatMap(expand);
 const rest = testMode ? [] : args.slice(1);
-if (!entries.length || !entries[0]) { console.error('usage: node scripts/run-ts.mjs [--test] <file.ts> …'); process.exit(2); }
+if (!entries.length) { console.error('usage: node scripts/run-ts.mjs [--test] <file.ts> …'); process.exit(2); }
 
 const out = mkdtempSync(join(tmpdir(), 'rouge-ts-'));
 const outFiles = [];

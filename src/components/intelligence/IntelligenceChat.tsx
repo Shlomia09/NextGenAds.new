@@ -5,6 +5,7 @@ import type { ChatMessage, Brand, Campaign } from '../../types';
 import { sendChatMessage, ChatLimitError, type CampaignContext, type ActionProposal } from '../../lib/claude-api';
 import { useActiveAccount } from '../../contexts/ActiveAccountContext';
 import { supabase } from '../../lib/supabase';
+import { AiLabel } from '../ui/AiLabel';
 
 interface IntelligenceChatProps {
   brand: Brand;
@@ -239,6 +240,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           brand_id:             brand.id,
           source:               'ai_chat',
           ...((proposal.params as Record<string, unknown> | undefined) ?? {}),
+          approved:             true,   // the user pressed Confirm on this proposal
         };
         const res = await supabase.functions.invoke('log-direct-action', { body });
         data  = res.data;
@@ -251,6 +253,7 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
           ad_id_external:       proposal.ad_id_external,
           params:               proposal.params,
           value:                (proposal.params as Record<string, unknown> | undefined)?.value,
+          approved:             true,   // the user pressed Confirm on this proposal
         };
         const res = await supabase.functions.invoke('meta-action', { body });
         data  = res.data;
@@ -652,19 +655,22 @@ const IntelligenceChat: React.FC<IntelligenceChatProps> = ({
                     : msg.content}
               </div>
 
-              {/* Timestamp */}
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 9,
-                  fontWeight: 400,
-                  color: T.textHint,
-                }}
-              >
-                {new Date(msg.timestamp).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+              {/* Timestamp — and the AI label on model answers */}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                {msg.role === 'assistant' && !msg.content.startsWith('__LIMIT__') && <AiLabel />}
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 9,
+                    fontWeight: 400,
+                    color: T.textHint,
+                  }}
+                >
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
               </span>
             </div>
           </div>

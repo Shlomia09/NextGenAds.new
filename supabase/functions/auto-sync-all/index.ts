@@ -15,7 +15,8 @@
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'npm:@supabase/supabase-js';
+import { createClient } from 'npm:@supabase/supabase-js@2.107.0';
+import { syncAdDaily } from '../_shared/adDailySync.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -89,6 +90,8 @@ interface SyncResult {
   account_id: string;
   synced: number;
   daily?: number;
+  ad_daily?: number;         // ad-level daily rows written (Half-Life)
+  ad_daily_error?: string;
   error?: string;
 }
 
@@ -233,6 +236,15 @@ async function syncAccount(
     }
     result.daily = dailyRows.length;
 
+    // ── Step 3b: Ad-level daily data for Half-Life (_shared/adDailySync.ts) ─
+    // Its own try: a failure here is reported, but does not mark the campaign sync above as failed.
+    try {
+      result.ad_daily = await syncAdDaily(supabase, { brand_id, adAccountId, externalAccountId, accessToken });
+    } catch (adErr) {
+      result.ad_daily_error = adErr instanceof Error ? adErr.message : String(adErr);
+      console.error(`[auto-sync-all] ad-level daily failed for ${externalAccountId}:`, result.ad_daily_error);
+    }
+
     // ── Step 4: Log a sync event the dashboard can see ─────────────────────
     // system_events has no user_id column, so the old insert failed silently and the
     // dashboard reported the last manual sync as the latest. Type 'sync' is what it counts;
@@ -250,7 +262,7 @@ async function syncAccount(
         brand_id,
         type:     'sync',
         label:    `${campaignRows.length} campaigns synced with Meta`,
-        metadata: { ad_account_id: adAccountId, daily_rows: dailyRows.length, trigger: 'pg_cron' },
+        metadata: { ad_account_id: adAccountId, daily_rows: dailyRows.length, ad_daily_rows: result.ad_daily ?? 0, trigger: 'pg_cron' },
       });
       if (evErr) console.error(`[auto-sync-all] event insert failed for ${externalAccountId}:`, evErr.message);
     }
