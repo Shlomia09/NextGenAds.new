@@ -148,6 +148,23 @@ export const classifyObjective = (objective: string): GoalType => {
   return 'unknown';
 };
 
+// Google Ads has campaign types, not objectives. Mapped onto the same GoalType so Meta and Google
+// share one taxonomy. Mirrored in SQL by public.rouge_goal(); a test keeps the two identical.
+export const GOOGLE_CAMPAIGN_TYPE_GOAL: Record<string, GoalType> = {
+  'PERFORMANCE MAX': 'sales',
+  'SHOPPING':        'sales',
+  'SMART':           'sales',
+  'SEARCH':          'traffic',
+  'DISPLAY':         'awareness',
+  'VIDEO':           'awareness',
+  'DEMAND GEN':      'engagement',
+};
+
+export const classifyCampaign = (platform: 'meta' | 'google', objectiveOrType: string): GoalType =>
+  platform === 'google'
+    ? GOOGLE_CAMPAIGN_TYPE_GOAL[(objectiveOrType || '').toUpperCase()] ?? 'unknown'
+    : classifyObjective(objectiveOrType);
+
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 /** Get GoalMeta for an objective string */

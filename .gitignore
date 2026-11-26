@@ -7,3 +7,6 @@ dist
 # brand asset staging (duplicates public/brand and src/components/brand)
 brand-assets/
 public/brand/
+
+# Reference benchmark dataset: raw exports with brand and account names. Never commit.
+data/reference/
