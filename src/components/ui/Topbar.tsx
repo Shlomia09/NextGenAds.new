@@ -81,15 +81,15 @@ const Topbar: React.FC<TopbarProps> = ({ kpis, conversionType: _ct, title: _t })
   return (
     <div style={{ flexShrink: 0, zIndex: 10 }}>
       {/* ── Main bar ── */}
-      <div style={topbarStyle}>
+      <div className="app-topbar" style={topbarStyle}>
         {/* Search */}
-        <div style={searchPillStyle}>
+        <div className="app-topbar-search" style={searchPillStyle}>
           <Search size={14} color="var(--text-3)" strokeWidth={2} />
           <input style={searchInputStyle} placeholder="Search campaigns, brands…" aria-label="Search" />
         </div>
 
         {/* Right cluster */}
-        <div style={topRightStyle}>
+        <div className="app-topbar-right" style={topRightStyle}>
 
           {/* Mail — messages panel (simple: links to settings) */}
           <div style={{ position: 'relative' }}>
@@ -181,7 +181,7 @@ const Topbar: React.FC<TopbarProps> = ({ kpis, conversionType: _ct, title: _t })
             aria-label="Open Ads Manager"
           >
             <ExternalLink size={13} strokeWidth={1.75} />
-            Ads Manager
+            <span className="app-topbar-ads-label">Ads Manager</span>
           </a>
 
           {/* Avatar */}
@@ -207,6 +207,15 @@ const Topbar: React.FC<TopbarProps> = ({ kpis, conversionType: _ct, title: _t })
       )}
 
       <style>{`
+        /* Mobile: the sidebar's fixed hamburger sits at the left of this bar, on the same row */
+        @media (max-width: 900px) {
+          .app-topbar { padding: 12px 16px 12px 64px !important; gap: 12px !important; }
+          .app-topbar-search { min-width: 0; }
+          .app-topbar-right { gap: 12px !important; }
+        }
+        @media (max-width: 520px) {
+          .app-topbar-ads-label { display: none; }
+        }
         @keyframes notif-slide-in {
           from { opacity: 0; transform: translateY(-8px); }
           to   { opacity: 1; transform: translateY(0); }

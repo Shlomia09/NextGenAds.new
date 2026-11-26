@@ -88,6 +88,7 @@ interface SyncResult {
   ad_account_id: string;
   account_id: string;
   synced: number;
+  daily?: number;
   error?: string;
 }
 
@@ -95,7 +96,7 @@ async function syncAccount(
   supabase: ReturnType<typeof createClient>,
   account: AdAccount,
 ): Promise<SyncResult> {
-  const { id: adAccountId, account_id: externalAccountId, access_token: accessToken, brand_id, user_id } = account;
+  const { id: adAccountId, account_id: externalAccountId, access_token: accessToken, brand_id } = account;
   const result: SyncResult = { ad_account_id: adAccountId, account_id: externalAccountId, synced: 0 };
 
   try {
@@ -111,11 +112,15 @@ async function syncAccount(
     );
     campaignsUrl.searchParams.set('limit', '100');
 
-    const campaignsRes  = await fetch(campaignsUrl.toString());
-    const campaignsData = await campaignsRes.json();
-    if (campaignsData.error) throw new Error(`Meta API: ${campaignsData.error.message}`);
-
-    const campaigns = campaignsData.data || [];
+    // Page through every campaign: a single request stops at 100.
+    const campaigns: Record<string, unknown>[] = [];
+    let nextUrl: string | null = campaignsUrl.toString();
+    while (nextUrl) {
+      const page = await (await fetch(nextUrl)).json();
+      if (page.error) throw new Error(`Meta API: ${page.error.message}`);
+      campaigns.push(...(page.data || []));
+      nextUrl = page.paging?.next ?? null;
+    }
     if (campaigns.length === 0) return result;
 
     // ── Step 2: Upsert campaigns ───────────────────────────────────────────
@@ -165,14 +170,90 @@ async function syncAccount(
 
     result.synced = campaignRows.length;
 
-    // ── Step 3: Log system event ───────────────────────────────────────────
-    await supabase.from('system_events').insert({
-      brand_id,
-      user_id,
-      type:     'auto_sync',
-      label:    `Auto-sync: ${campaignRows.length} campaigns synced`,
-      metadata: { ad_account_id: adAccountId, total: campaigns.length, trigger: 'pg_cron' },
-    }).select(); // .select() prevents "Results contains 0 rows" warning
+    // ── Step 3: Daily breakdown (last 30 days) ─────────────────────────────
+    // Every date-range view (KPIs, charts, the campaigns table) reads campaign_daily_stats.
+    // This job used to write totals only, so the daily table froze at the last manual sync.
+    // One account-level request broken down by campaign and day, paged, instead of one per campaign.
+    const { data: dbCampaigns } = await supabase
+      .from('campaigns')
+      .select('id, campaign_id_external')
+      .eq('brand_id', brand_id)
+      .eq('ad_account_id', adAccountId);
+    const uuidByExternal = new Map<string, string>(
+      (dbCampaigns || []).map((c: { id: string; campaign_id_external: string }) => [c.campaign_id_external, c.id]),
+    );
+    const convKeyByExternal = new Map<string, string>(
+      campaigns.map((c) => [c.id as string, resolveConversionKey(c.promoted_object as Record<string, string> | null, c.objective as string)]),
+    );
+
+    const dailyUrl = new URL(`${META_API_BASE}/act_${externalAccountId}/insights`);
+    dailyUrl.searchParams.set('access_token', accessToken);
+    dailyUrl.searchParams.set('level', 'campaign');
+    dailyUrl.searchParams.set('date_preset', 'last_30d');
+    dailyUrl.searchParams.set('time_increment', '1');
+    dailyUrl.searchParams.set('fields', 'campaign_id,date_start,spend,impressions,clicks,reach,actions,action_values');
+    dailyUrl.searchParams.set('limit', '500');
+
+    type Act = { action_type: string; value: string };
+    const dailyRows: Record<string, unknown>[] = [];
+    let nextDaily: string | null = dailyUrl.toString();
+    while (nextDaily) {
+      const page = await (await fetch(nextDaily)).json();
+      if (page.error) throw new Error(`Meta API (daily): ${page.error.message}`);
+      for (const row of (page.data || []) as Record<string, unknown>[]) {
+        const campaignUuid = uuidByExternal.get(row.campaign_id as string);
+        if (!campaignUuid) continue;
+        const actions = (row.actions as Act[]) || [];
+        const values  = (row.action_values as Act[]) || [];
+        const find = (list: Act[], ...types: string[]) => list.find((a) => types.includes(a.action_type))?.value || '0';
+        const convKey = convKeyByExternal.get(row.campaign_id as string) || 'LINK_CLICK';
+        dailyRows.push({
+          campaign_id:      campaignUuid,
+          brand_id,
+          date:             row.date_start,
+          spend:            parseFloat((row.spend as string) || '0'),
+          impressions:      parseInt((row.impressions as string) || '0'),
+          clicks:           parseInt((row.clicks as string) || '0'),
+          reach:            parseInt((row.reach as string) || '0'),
+          leads:            extractLeads(actions),
+          purchases:        parseInt(find(actions, 'offsite_conversion.fb_pixel_purchase', 'purchase')),
+          revenue:          parseFloat(find(values, 'offsite_conversion.fb_pixel_purchase', 'purchase')),
+          atc:              parseInt(find(actions, 'offsite_conversion.fb_pixel_add_to_cart', 'add_to_cart')),
+          page_views:       parseInt(find(actions, 'landing_page_view')),
+          conversion_value: parseInt(find(actions, META_CONVERSION_MAP[convKey]?.actionType ?? '')),
+        });
+      }
+      nextDaily = page.paging?.next ?? null;
+    }
+    if (dailyRows.length > 0) {
+      const { error: dailyErr } = await supabase
+        .from('campaign_daily_stats')
+        .upsert(dailyRows, { onConflict: 'campaign_id,date' });
+      if (dailyErr) throw new Error(`DB upsert (daily): ${dailyErr.message}`);
+    }
+    result.daily = dailyRows.length;
+
+    // ── Step 4: Log a sync event the dashboard can see ─────────────────────
+    // system_events has no user_id column, so the old insert failed silently and the
+    // dashboard reported the last manual sync as the latest. Type 'sync' is what it counts;
+    // at most one per brand every 6 hours so an hourly job doesn't flood Live activity.
+    const since = new Date(Date.now() - 6 * 3600_000).toISOString();
+    const { data: recent } = await supabase
+      .from('system_events')
+      .select('id')
+      .eq('brand_id', brand_id)
+      .eq('type', 'sync')
+      .gte('created_at', since)
+      .limit(1);
+    if (!recent || recent.length === 0) {
+      const { error: evErr } = await supabase.from('system_events').insert({
+        brand_id,
+        type:     'sync',
+        label:    `${campaignRows.length} campaigns synced with Meta`,
+        metadata: { ad_account_id: adAccountId, daily_rows: dailyRows.length, trigger: 'pg_cron' },
+      });
+      if (evErr) console.error(`[auto-sync-all] event insert failed for ${externalAccountId}:`, evErr.message);
+    }
 
   } catch (err) {
     result.error = err instanceof Error ? err.message : String(err);
@@ -182,7 +263,6 @@ async function syncAccount(
     try {
       await supabase.from('system_events').insert({
         brand_id,
-        user_id,
         type:     'auto_sync_error',
         label:    `Auto-sync FAILED for account ${externalAccountId}: ${result.error}`,
         metadata: { ad_account_id: adAccountId, account_id: externalAccountId, error: result.error, trigger: 'pg_cron' },
@@ -270,29 +350,15 @@ serve(async (req) => {
 
     console.log(`[auto-sync-all] Done: ${adAccounts.length} accounts, ${totalCampaigns} campaigns, ${errors.length} errors`);
 
-    // ── Log overall run outcome to system_events ─────────────────────────────
-    // Every cron run gets a row. This is the audit trail that lets the product
-    // surface sync health — pg_cron "succeeded" only means HTTP was accepted.
-    const runType  = errors.length === 0 ? 'auto_sync' : 'auto_sync_error';
-    const runLabel = errors.length === 0
-      ? `Auto-sync OK: ${adAccounts.length} account${adAccounts.length !== 1 ? 's' : ''}, ${totalCampaigns} campaigns synced`
-      : `Auto-sync PARTIAL: ${errors.length}/${adAccounts.length} accounts failed, ${totalCampaigns} campaigns synced`;
-    try {
-      await supabase.from('system_events').insert({
-        type:     runType,
-        label:    runLabel,
-        metadata: {
-          accounts_checked: adAccounts.length,
-          accounts_synced:  results.filter(r => !r.error).length,
-          total_campaigns:  totalCampaigns,
-          errors:           errors.map(r => ({ account: r.account_id, error: r.error })),
-          trigger:          'pg_cron',
-          timestamp:        new Date().toISOString(),
-        },
-      });
-    } catch (logErr) {
-      console.error('[auto-sync-all] Failed to write run summary to system_events:', logErr);
-    }
+    // The run summary stays in the function log: system_events.brand_id is NOT NULL, so a
+    // brand-less summary row was rejected every run. Per-brand events are written above.
+    console.log('[auto-sync-all] summary', JSON.stringify({
+      accounts_checked: adAccounts.length,
+      accounts_synced:  results.filter(r => !r.error).length,
+      total_campaigns:  totalCampaigns,
+      daily_rows:       results.reduce((n, r) => n + (r.daily ?? 0), 0),
+      errors:           errors.map(r => ({ account: r.account_id, error: r.error })),
+    }));
 
     return new Response(
       JSON.stringify({
@@ -300,6 +366,7 @@ serve(async (req) => {
         accounts_checked: adAccounts.length,
         accounts_synced:  results.filter(r => !r.error).length,
         total_campaigns:  totalCampaigns,
+        daily_rows:       results.reduce((n, r) => n + (r.daily ?? 0), 0),
         errors:           errors.map(r => ({ account: r.account_id, error: r.error })),
         timestamp:        new Date().toISOString(),
       }),

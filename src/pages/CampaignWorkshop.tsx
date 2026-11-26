@@ -737,7 +737,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
   }
 
   return (
-    <div style={{ height: 'calc(100vh - 44px)', overflowY: 'auto', background: 'var(--bg)', padding: '22px 28px 50px' }}>
+    <div className="ws-page" style={{ height: 'calc(100vh - 44px)', overflowY: 'auto', background: 'var(--bg)', padding: '22px 28px 50px' }}>
 
       {/* ══ Header ══════════════════════════════════════════════ */}
       <div style={{ marginBottom: 18 }}>
@@ -758,7 +758,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
       </div>
 
       {/* ══ Stepper ══════════════════════════════════════════════ */}
-      <div style={{ display: 'flex', alignItems: 'center', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px 20px', boxShadow: 'var(--shadow)', marginBottom: 22, gap: 0 }}>
+      <div className="ws-stepper" style={{ display: 'flex', alignItems: 'center', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px 20px', boxShadow: 'var(--shadow)', marginBottom: 22, gap: 0 }}>
         {STEPS.map((s, idx) => {
           const isDone   = s.n < step;
           const isActive = s.n === step;
@@ -766,6 +766,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
             <React.Fragment key={s.n}>
               <div
                 onClick={() => isDone && goTo(s.n)}
+                className={`ws-step${isActive ? ' active' : ''}`}
                 style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: isDone ? 'pointer' : 'default' }}
               >
                 {/* Number / checkmark */}
@@ -780,7 +781,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
                   {isDone ? <CheckCheck size={13} style={{ color: 'var(--green)' }} /> : s.n}
                 </div>
                 {/* Label */}
-                <div style={{
+                <div className="ws-step-label" style={{
                   fontSize: 12.5, fontFamily: 'var(--font-ui)', whiteSpace: 'nowrap',
                   color: isActive ? 'var(--text)' : isDone ? 'var(--text-2)' : 'var(--text-3)',
                   fontWeight: isActive ? 500 : 400,
@@ -790,7 +791,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
               </div>
               {/* Connector line */}
               {idx < STEPS.length - 1 && (
-                <div style={{ flex: 1, height: 1, background: 'var(--border)', margin: '0 14px', minWidth: 18 }} />
+                <div className="ws-step-line" style={{ flex: 1, height: 1, background: 'var(--border)', margin: '0 14px', minWidth: 18 }} />
               )}
             </React.Fragment>
           );
@@ -798,7 +799,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
       </div>
 
       {/* ══ 2-Column Layout ══════════════════════════════════════ */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 18, alignItems: 'start' }}>
+      <div className="ws-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px', gap: 18, alignItems: 'start' }}>
 
         {/* ── FORM CARD ───────────────────────────────────────── */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, boxShadow: 'var(--shadow)', padding: '26px 28px', minHeight: 480, display: 'flex', flexDirection: 'column' }}>
@@ -1553,9 +1554,9 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
           </div>
         </div>
 
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
+        <div className="ws-table" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow)' }}>
           {/* Table header */}
-          <div style={{
+          <div className="ws-table-row" style={{
             display: 'grid',
             gridTemplateColumns: '1fr 110px 100px 140px 120px',
             gap: 0,
@@ -1593,6 +1594,7 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
               return (
                 <div
                   key={draft.id}
+                  className="ws-table-row"
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 110px 100px 140px 120px',
@@ -1694,7 +1696,17 @@ Respond with ONLY this JSON (ISO 3166-1 alpha-2 country codes):
       <style>{`
         @keyframes wsfade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
         @keyframes wspin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @media (max-width: 1080px) { .ws-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 1080px) { .ws-grid { grid-template-columns: minmax(0, 1fr) !important; } .ws-grid > * { min-width: 0; } }
+        /* Up to tablet the five step labels do not fit: show numbers, with only the current step named */
+        @media (max-width: 900px) { .ws-step:not(.active) .ws-step-label { display: none; } }
+        /* Phones: tighter stepper and page gutters; the drafts table scrolls sideways */
+        @media (max-width: 640px) {
+          .ws-page { padding: 18px 16px 40px !important; }
+          .ws-stepper { padding: 12px 14px !important; }
+          .ws-step-line { margin: 0 8px !important; min-width: 10px !important; }
+          .ws-table { overflow-x: auto !important; }
+          .ws-table-row { min-width: 640px; }
+        }
       `}</style>
     </div>
   );

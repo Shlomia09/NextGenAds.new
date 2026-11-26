@@ -405,7 +405,7 @@ const Connect: React.FC = () => {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
+      <div className="conn-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(320px, 100%), 1fr))', gap: 14 }}>
 
         {/* ── Meta Ads ── */}
         <div className="conn-card" style={metaAccounts.length > 0 ? { background: 'var(--bg-card)', borderColor: 'rgba(16,185,129,0.35)', gridColumn: metaAccounts.length > 1 ? 'span 2' : undefined } : { background: 'var(--bg-card)', border: '0.5px solid var(--border)' }}>
@@ -653,7 +653,7 @@ const Connect: React.FC = () => {
           eCommerce Integration
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="conn-ecom-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 16 }}>
           {user && <ShopifyConnect userId={user.id} brands={brands} />}
           {user && <WooCommerceConnect userId={user.id} brands={brands} />}
         </div>
@@ -716,6 +716,11 @@ const Connect: React.FC = () => {
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        @media (max-width: 760px) {
+          .conn-grid { grid-template-columns: minmax(0, 1fr) !important; }
+          .conn-grid > .conn-card { grid-column: auto !important; min-width: 0; }
+          .conn-ecom-grid { grid-template-columns: minmax(0, 1fr) !important; }
+        }
         .conn-card {
           background: var(--app-surface);
           border: 0.5px solid var(--app-border);
